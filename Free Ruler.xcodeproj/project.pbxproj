@@ -1,0 +1,411 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		50DC1EDE1B26A31B00F71737 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DC1EDD1B26A31B00F71737 /* AppDelegate.swift */; };
+		50DC1EE01B26A31B00F71737 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 50DC1EDF1B26A31B00F71737 /* Images.xcassets */; };
+		50DC1EE31B26A31B00F71737 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50DC1EE11B26A31B00F71737 /* MainMenu.xib */; };
+		50DC1EEF1B26A31B00F71737 /* Free_RulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DC1EEE1B26A31B00F71737 /* Free_RulerTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		50DC1EE91B26A31B00F71737 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 50DC1ED01B26A31B00F71737 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 50DC1ED71B26A31B00F71737;
+			remoteInfo = "Free Ruler";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		50DC1ED81B26A31B00F71737 /* Free Ruler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Free Ruler.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		50DC1EDC1B26A31B00F71737 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		50DC1EDD1B26A31B00F71737 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		50DC1EDF1B26A31B00F71737 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		50DC1EE21B26A31B00F71737 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		50DC1EE81B26A31B00F71737 /* Free RulerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Free RulerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		50DC1EED1B26A31B00F71737 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		50DC1EEE1B26A31B00F71737 /* Free_RulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Free_RulerTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		50DC1ED51B26A31B00F71737 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		50DC1EE51B26A31B00F71737 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		50DC1ECF1B26A31B00F71737 = {
+			isa = PBXGroup;
+			children = (
+				50DC1EDA1B26A31B00F71737 /* Free Ruler */,
+				50DC1EEB1B26A31B00F71737 /* Free RulerTests */,
+				50DC1ED91B26A31B00F71737 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		50DC1ED91B26A31B00F71737 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				50DC1ED81B26A31B00F71737 /* Free Ruler.app */,
+				50DC1EE81B26A31B00F71737 /* Free RulerTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		50DC1EDA1B26A31B00F71737 /* Free Ruler */ = {
+			isa = PBXGroup;
+			children = (
+				50DC1EDD1B26A31B00F71737 /* AppDelegate.swift */,
+				50DC1EDF1B26A31B00F71737 /* Images.xcassets */,
+				50DC1EE11B26A31B00F71737 /* MainMenu.xib */,
+				50DC1EDB1B26A31B00F71737 /* Supporting Files */,
+			);
+			path = "Free Ruler";
+			sourceTree = "<group>";
+		};
+		50DC1EDB1B26A31B00F71737 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				50DC1EDC1B26A31B00F71737 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		50DC1EEB1B26A31B00F71737 /* Free RulerTests */ = {
+			isa = PBXGroup;
+			children = (
+				50DC1EEE1B26A31B00F71737 /* Free_RulerTests.swift */,
+				50DC1EEC1B26A31B00F71737 /* Supporting Files */,
+			);
+			path = "Free RulerTests";
+			sourceTree = "<group>";
+		};
+		50DC1EEC1B26A31B00F71737 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				50DC1EED1B26A31B00F71737 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		50DC1ED71B26A31B00F71737 /* Free Ruler */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 50DC1EF21B26A31B00F71737 /* Build configuration list for PBXNativeTarget "Free Ruler" */;
+			buildPhases = (
+				50DC1ED41B26A31B00F71737 /* Sources */,
+				50DC1ED51B26A31B00F71737 /* Frameworks */,
+				50DC1ED61B26A31B00F71737 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Free Ruler";
+			productName = "Free Ruler";
+			productReference = 50DC1ED81B26A31B00F71737 /* Free Ruler.app */;
+			productType = "com.apple.product-type.application";
+		};
+		50DC1EE71B26A31B00F71737 /* Free RulerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 50DC1EF51B26A31B00F71737 /* Build configuration list for PBXNativeTarget "Free RulerTests" */;
+			buildPhases = (
+				50DC1EE41B26A31B00F71737 /* Sources */,
+				50DC1EE51B26A31B00F71737 /* Frameworks */,
+				50DC1EE61B26A31B00F71737 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				50DC1EEA1B26A31B00F71737 /* PBXTargetDependency */,
+			);
+			name = "Free RulerTests";
+			productName = "Free RulerTests";
+			productReference = 50DC1EE81B26A31B00F71737 /* Free RulerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		50DC1ED01B26A31B00F71737 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0630;
+				ORGANIZATIONNAME = Pascal;
+				TargetAttributes = {
+					50DC1ED71B26A31B00F71737 = {
+						CreatedOnToolsVersion = 6.3.2;
+					};
+					50DC1EE71B26A31B00F71737 = {
+						CreatedOnToolsVersion = 6.3.2;
+						TestTargetID = 50DC1ED71B26A31B00F71737;
+					};
+				};
+			};
+			buildConfigurationList = 50DC1ED31B26A31B00F71737 /* Build configuration list for PBXProject "Free Ruler" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 50DC1ECF1B26A31B00F71737;
+			productRefGroup = 50DC1ED91B26A31B00F71737 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				50DC1ED71B26A31B00F71737 /* Free Ruler */,
+				50DC1EE71B26A31B00F71737 /* Free RulerTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		50DC1ED61B26A31B00F71737 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				50DC1EE01B26A31B00F71737 /* Images.xcassets in Resources */,
+				50DC1EE31B26A31B00F71737 /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		50DC1EE61B26A31B00F71737 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		50DC1ED41B26A31B00F71737 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				50DC1EDE1B26A31B00F71737 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		50DC1EE41B26A31B00F71737 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				50DC1EEF1B26A31B00F71737 /* Free_RulerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		50DC1EEA1B26A31B00F71737 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 50DC1ED71B26A31B00F71737 /* Free Ruler */;
+			targetProxy = 50DC1EE91B26A31B00F71737 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		50DC1EE11B26A31B00F71737 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				50DC1EE21B26A31B00F71737 /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		50DC1EF01B26A31B00F71737 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		50DC1EF11B26A31B00F71737 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		50DC1EF31B26A31B00F71737 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "Free Ruler/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		50DC1EF41B26A31B00F71737 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "Free Ruler/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		50DC1EF61B26A31B00F71737 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "Free RulerTests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Free Ruler.app/Contents/MacOS/Free Ruler";
+			};
+			name = Debug;
+		};
+		50DC1EF71B26A31B00F71737 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "Free RulerTests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Free Ruler.app/Contents/MacOS/Free Ruler";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		50DC1ED31B26A31B00F71737 /* Build configuration list for PBXProject "Free Ruler" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				50DC1EF01B26A31B00F71737 /* Debug */,
+				50DC1EF11B26A31B00F71737 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		50DC1EF21B26A31B00F71737 /* Build configuration list for PBXNativeTarget "Free Ruler" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				50DC1EF31B26A31B00F71737 /* Debug */,
+				50DC1EF41B26A31B00F71737 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		50DC1EF51B26A31B00F71737 /* Build configuration list for PBXNativeTarget "Free RulerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				50DC1EF61B26A31B00F71737 /* Debug */,
+				50DC1EF71B26A31B00F71737 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 50DC1ED01B26A31B00F71737 /* Project object */;
+}
