@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		509980361B27997B00AF73FF /* Ruler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509980351B27997B00AF73FF /* Ruler.swift */; };
 		50DC1EDE1B26A31B00F71737 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DC1EDD1B26A31B00F71737 /* AppDelegate.swift */; };
 		50DC1EE01B26A31B00F71737 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 50DC1EDF1B26A31B00F71737 /* Images.xcassets */; };
 		50DC1EE31B26A31B00F71737 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50DC1EE11B26A31B00F71737 /* MainMenu.xib */; };
@@ -24,6 +25,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		509980351B27997B00AF73FF /* Ruler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ruler.swift; sourceTree = "<group>"; };
 		50DC1ED81B26A31B00F71737 /* Free Ruler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Free Ruler.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		50DC1EDC1B26A31B00F71737 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50DC1EDD1B26A31B00F71737 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -76,6 +78,7 @@
 				50DC1EDD1B26A31B00F71737 /* AppDelegate.swift */,
 				50DC1EDF1B26A31B00F71737 /* Images.xcassets */,
 				50DC1EE11B26A31B00F71737 /* MainMenu.xib */,
+				509980351B27997B00AF73FF /* Ruler.swift */,
 				50DC1EDB1B26A31B00F71737 /* Supporting Files */,
 			);
 			path = "Free Ruler";
@@ -155,6 +158,7 @@
 				TargetAttributes = {
 					50DC1ED71B26A31B00F71737 = {
 						CreatedOnToolsVersion = 6.3.2;
+						DevelopmentTeam = 6WCM9T4Q4J;
 					};
 					50DC1EE71B26A31B00F71737 = {
 						CreatedOnToolsVersion = 6.3.2;
@@ -205,6 +209,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				509980361B27997B00AF73FF /* Ruler.swift in Sources */,
 				50DC1EDE1B26A31B00F71737 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -323,6 +328,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "Free Ruler/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
@@ -334,6 +340,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "Free Ruler/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
@@ -396,6 +403,7 @@
 				50DC1EF41B26A31B00F71737 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		50DC1EF51B26A31B00F71737 /* Build configuration list for PBXNativeTarget "Free RulerTests" */ = {
 			isa = XCConfigurationList;
@@ -404,6 +412,7 @@
 				50DC1EF71B26A31B00F71737 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
