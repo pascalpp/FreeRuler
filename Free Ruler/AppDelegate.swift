@@ -12,7 +12,7 @@ import Cocoa
 
 # TODO
 
-- moving windows
+√ moving windows
 - drawing rulers
 - close button
 - resize controls? - probably not needed
@@ -26,39 +26,39 @@ import Cocoa
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
-	@IBOutlet weak var hRulerPanel: NSPanel!
-	@IBOutlet weak var vRulerPanel: NSPanel!
+	@IBOutlet weak var hRulerWindow: RulerWindow!
+	@IBOutlet weak var vRulerWindow: RulerWindow!
 
 	var hRuler = Ruler()
 	var vRuler = Ruler()
 
 	func applicationDidFinishLaunching(aNotification: NSNotification) {
 		// Insert code here to initialize your application
-		hRulerPanel.alphaValue = 0.9
-		hRulerPanel.floatingPanel = true
-		hRulerPanel.minSize.height = 50
-		hRulerPanel.maxSize.height = 50
-		hRulerPanel.minSize.width = 200
-		hRulerPanel.maxSize.width = 5000
+		hRulerWindow.alphaValue = 0.9
+		hRulerWindow.floatingPanel = true
+		hRulerWindow.minSize.height = 50
+		hRulerWindow.maxSize.height = 50
+		hRulerWindow.minSize.width = 200
+		hRulerWindow.maxSize.width = 5000
 		
-		vRulerPanel.alphaValue = 0.9
-		vRulerPanel.floatingPanel = true
-		vRulerPanel.minSize.width = 50
-		vRulerPanel.maxSize.width = 50
-		vRulerPanel.minSize.height = 200
-		vRulerPanel.maxSize.height = 5000
+		vRulerWindow.alphaValue = 0.9
+		vRulerWindow.floatingPanel = true
+		vRulerWindow.minSize.width = 50
+		vRulerWindow.maxSize.width = 50
+		vRulerWindow.minSize.height = 200
+		vRulerWindow.maxSize.height = 5000
 	}
 	
 	func applicationDidBecomeActive(notification: NSNotification) {
 		println("active")
-		hRulerPanel.alphaValue = 0.9
-		vRulerPanel.alphaValue = 0.9
+		hRulerWindow.alphaValue = 0.9
+		vRulerWindow.alphaValue = 0.9
 	}
 	
 	func applicationDidResignActive(notification: NSNotification) {
 		println("inactive")
-		hRulerPanel.alphaValue = 0.5
-		vRulerPanel.alphaValue = 0.5
+		hRulerWindow.alphaValue = 0.5
+		vRulerWindow.alphaValue = 0.5
 	}
 
 	func applicationWillTerminate(aNotification: NSNotification) {

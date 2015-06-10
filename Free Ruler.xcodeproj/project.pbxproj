@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		509980361B27997B00AF73FF /* Ruler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509980351B27997B00AF73FF /* Ruler.swift */; };
+		5099838B1B28DE8E00AF73FF /* RulerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5099838A1B28DE8E00AF73FF /* RulerView.swift */; };
+		5099838D1B28E07000AF73FF /* RulerWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5099838C1B28E07000AF73FF /* RulerWindow.swift */; };
 		50DC1EDE1B26A31B00F71737 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DC1EDD1B26A31B00F71737 /* AppDelegate.swift */; };
 		50DC1EE01B26A31B00F71737 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 50DC1EDF1B26A31B00F71737 /* Images.xcassets */; };
 		50DC1EE31B26A31B00F71737 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50DC1EE11B26A31B00F71737 /* MainMenu.xib */; };
@@ -26,6 +28,8 @@
 
 /* Begin PBXFileReference section */
 		509980351B27997B00AF73FF /* Ruler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ruler.swift; sourceTree = "<group>"; };
+		5099838A1B28DE8E00AF73FF /* RulerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RulerView.swift; sourceTree = "<group>"; };
+		5099838C1B28E07000AF73FF /* RulerWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RulerWindow.swift; sourceTree = "<group>"; };
 		50DC1ED81B26A31B00F71737 /* Free Ruler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Free Ruler.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		50DC1EDC1B26A31B00F71737 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50DC1EDD1B26A31B00F71737 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -78,6 +82,8 @@
 				50DC1EDD1B26A31B00F71737 /* AppDelegate.swift */,
 				50DC1EDF1B26A31B00F71737 /* Images.xcassets */,
 				50DC1EE11B26A31B00F71737 /* MainMenu.xib */,
+				5099838A1B28DE8E00AF73FF /* RulerView.swift */,
+				5099838C1B28E07000AF73FF /* RulerWindow.swift */,
 				509980351B27997B00AF73FF /* Ruler.swift */,
 				50DC1EDB1B26A31B00F71737 /* Supporting Files */,
 			);
@@ -210,6 +216,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				509980361B27997B00AF73FF /* Ruler.swift in Sources */,
+				5099838B1B28DE8E00AF73FF /* RulerView.swift in Sources */,
+				5099838D1B28E07000AF73FF /* RulerWindow.swift in Sources */,
 				50DC1EDE1B26A31B00F71737 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

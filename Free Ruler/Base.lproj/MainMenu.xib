@@ -667,26 +667,26 @@
                 </menuItem>
             </items>
         </menu>
-        <window title="Horizontal Ruler" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hasShadow="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" animationBehavior="default" id="cNN-s7-5Kj" customClass="NSPanel">
+        <window title="Horizontal Ruler" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hasShadow="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" animationBehavior="default" id="cNN-s7-5Kj" customClass="RulerWindow" customModule="Free_Ruler" customModuleProvider="target">
             <windowStyleMask key="styleMask" closable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES"/>
             <rect key="contentRect" x="72" y="779" width="400" height="50"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
-            <view key="contentView" id="sUr-AB-Zv1">
+            <view key="contentView" id="sUr-AB-Zv1" customClass="RulerView" customModule="Free_Ruler" customModuleProvider="target">
                 <rect key="frame" x="0.0" y="0.0" width="400" height="50"/>
                 <autoresizingMask key="autoresizingMask"/>
             </view>
             <connections>
                 <outlet property="delegate" destination="Voe-Tx-rLC" id="Ofb-vY-bx0"/>
             </connections>
-            <point key="canvasLocation" x="276" y="130"/>
+            <point key="canvasLocation" x="282" y="85"/>
         </window>
-        <window title="Vertical Ruler" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hasShadow="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" animationBehavior="default" id="prS-BO-IfD" customClass="NSPanel">
+        <window title="Vertical Ruler" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hasShadow="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" animationBehavior="default" id="prS-BO-IfD" customClass="RulerWindow" customModule="Free_Ruler" customModuleProvider="target">
             <windowStyleMask key="styleMask" closable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES"/>
             <rect key="contentRect" x="167" y="496" width="50" height="400"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
-            <view key="contentView" id="BpO-dg-iiz">
+            <view key="contentView" id="BpO-dg-iiz" customClass="RulerView" customModule="Free_Ruler" customModuleProvider="target">
                 <rect key="frame" x="0.0" y="0.0" width="50" height="400"/>
                 <autoresizingMask key="autoresizingMask"/>
             </view>
