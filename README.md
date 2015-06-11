@@ -1,4 +1,4 @@
-# FreeRuler
+# Free Ruler
 A ruler application for Mac OS X
 
 ### A work in progress
