@@ -8,3 +8,7 @@ Finally learning Cocoa and rewriting Free Ruler as a proper Mac app. You can dow
 http://www.pascal.com/software/freeruler/
 
 But please don't.
+
+### Contributing
+
+As this is my first Cocoa application, any help is appreciated!

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		50486E771B2951E5001F17E1 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 50486E761B2951E5001F17E1 /* README.md */; };
 		509980361B27997B00AF73FF /* Ruler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509980351B27997B00AF73FF /* Ruler.swift */; };
 		5099838B1B28DE8E00AF73FF /* RulerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5099838A1B28DE8E00AF73FF /* RulerView.swift */; };
 		5099838D1B28E07000AF73FF /* RulerWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5099838C1B28E07000AF73FF /* RulerWindow.swift */; };
@@ -27,6 +28,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		50486E761B2951E5001F17E1 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		509980351B27997B00AF73FF /* Ruler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ruler.swift; sourceTree = "<group>"; };
 		5099838A1B28DE8E00AF73FF /* RulerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RulerView.swift; sourceTree = "<group>"; };
 		5099838C1B28E07000AF73FF /* RulerWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RulerWindow.swift; sourceTree = "<group>"; };
@@ -61,6 +63,7 @@
 		50DC1ECF1B26A31B00F71737 = {
 			isa = PBXGroup;
 			children = (
+				50486E761B2951E5001F17E1 /* README.md */,
 				50DC1EDA1B26A31B00F71737 /* FreeRuler */,
 				50DC1EEB1B26A31B00F71737 /* FreeRulerTests */,
 				50DC1ED91B26A31B00F71737 /* Products */,
@@ -216,6 +219,7 @@
 			files = (
 				509980361B27997B00AF73FF /* Ruler.swift in Sources */,
 				5099838B1B28DE8E00AF73FF /* RulerView.swift in Sources */,
+				50486E771B2951E5001F17E1 /* README.md in Sources */,
 				5099838D1B28E07000AF73FF /* RulerWindow.swift in Sources */,
 				50DC1EDE1B26A31B00F71737 /* AppDelegate.swift in Sources */,
 			);
