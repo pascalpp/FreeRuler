@@ -14,7 +14,9 @@
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="Free_Ruler" customModuleProvider="target">
             <connections>
                 <outlet property="hRulerPanel" destination="cNN-s7-5Kj" id="3rh-EO-iff"/>
+                <outlet property="hRulerWindow" destination="cNN-s7-5Kj" id="fTL-rS-O0h"/>
                 <outlet property="vRulerPanel" destination="prS-BO-IfD" id="6K3-hX-3l3"/>
+                <outlet property="vRulerWindow" destination="prS-BO-IfD" id="VBJ-Ve-QuX"/>
             </connections>
         </customObject>
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
@@ -668,32 +670,59 @@
             </items>
         </menu>
         <window title="Horizontal Ruler" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hasShadow="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" animationBehavior="default" id="cNN-s7-5Kj" customClass="RulerWindow" customModule="Free_Ruler" customModuleProvider="target">
-            <windowStyleMask key="styleMask" closable="YES" resizable="YES"/>
+            <windowStyleMask key="styleMask" closable="YES" resizable="YES" fullSizeContentView="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES"/>
             <rect key="contentRect" x="72" y="779" width="400" height="50"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <view key="contentView" id="sUr-AB-Zv1" customClass="RulerView" customModule="Free_Ruler" customModuleProvider="target">
                 <rect key="frame" x="0.0" y="0.0" width="400" height="50"/>
                 <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jWx-xn-a0W">
+                        <rect key="frame" x="0.0" y="30" width="20" height="20"/>
+                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSStopProgressTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="fhT-f2-QUO">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="closeHorizontalRuler:" target="Voe-Tx-rLC" id="4GR-xM-xiI"/>
+                        </connections>
+                    </button>
+                </subviews>
             </view>
             <connections>
                 <outlet property="delegate" destination="Voe-Tx-rLC" id="Ofb-vY-bx0"/>
             </connections>
-            <point key="canvasLocation" x="282" y="85"/>
+            <point key="canvasLocation" x="371" y="73"/>
         </window>
         <window title="Vertical Ruler" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hasShadow="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" animationBehavior="default" id="prS-BO-IfD" customClass="RulerWindow" customModule="Free_Ruler" customModuleProvider="target">
-            <windowStyleMask key="styleMask" closable="YES" resizable="YES"/>
+            <windowStyleMask key="styleMask" closable="YES" resizable="YES" fullSizeContentView="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES"/>
             <rect key="contentRect" x="167" y="496" width="50" height="400"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <view key="contentView" id="BpO-dg-iiz" customClass="RulerView" customModule="Free_Ruler" customModuleProvider="target">
                 <rect key="frame" x="0.0" y="0.0" width="50" height="400"/>
                 <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cEK-B6-9Dq">
+                        <rect key="frame" x="0.0" y="380" width="20" height="20"/>
+                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSStopProgressTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="cu3-HF-z5W">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="closeVerticalRuler:" target="Voe-Tx-rLC" id="vNE-vt-cZP"/>
+                        </connections>
+                    </button>
+                </subviews>
             </view>
             <connections>
                 <outlet property="delegate" destination="Voe-Tx-rLC" id="3Ge-cH-e7i"/>
             </connections>
-            <point key="canvasLocation" x="101" y="437"/>
+            <point key="canvasLocation" x="196" y="403"/>
         </window>
     </objects>
+    <resources>
+        <image name="NSStopProgressTemplate" width="11" height="11"/>
+    </resources>
 </document>

@@ -20,10 +20,11 @@ class RulerView: NSView {
         super.drawRect(dirtyRect)
 
         // Drawing code here.
+		
     }
 	
 	override func mouseDown(theEvent: NSEvent) {
-		println(theEvent.deltaX)
+		// println(theEvent.deltaX)
 	}
 
 }
