@@ -13,7 +13,7 @@
 		50DC1EDE1B26A31B00F71737 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DC1EDD1B26A31B00F71737 /* AppDelegate.swift */; };
 		50DC1EE01B26A31B00F71737 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 50DC1EDF1B26A31B00F71737 /* Images.xcassets */; };
 		50DC1EE31B26A31B00F71737 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50DC1EE11B26A31B00F71737 /* MainMenu.xib */; };
-		50DC1EEF1B26A31B00F71737 /* Free_RulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DC1EEE1B26A31B00F71737 /* Free_RulerTests.swift */; };
+		50DC1EEF1B26A31B00F71737 /* FreeRulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DC1EEE1B26A31B00F71737 /* FreeRulerTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,14 +30,14 @@
 		509980351B27997B00AF73FF /* Ruler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ruler.swift; sourceTree = "<group>"; };
 		5099838A1B28DE8E00AF73FF /* RulerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RulerView.swift; sourceTree = "<group>"; };
 		5099838C1B28E07000AF73FF /* RulerWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RulerWindow.swift; sourceTree = "<group>"; };
-		50DC1ED81B26A31B00F71737 /* Free Ruler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Free Ruler.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		50DC1ED81B26A31B00F71737 /* FreeRuler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FreeRuler.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		50DC1EDC1B26A31B00F71737 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50DC1EDD1B26A31B00F71737 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		50DC1EDF1B26A31B00F71737 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		50DC1EE21B26A31B00F71737 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		50DC1EE81B26A31B00F71737 /* Free RulerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Free RulerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		50DC1EE81B26A31B00F71737 /* FreeRulerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FreeRulerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		50DC1EED1B26A31B00F71737 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		50DC1EEE1B26A31B00F71737 /* Free_RulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Free_RulerTests.swift; sourceTree = "<group>"; };
+		50DC1EEE1B26A31B00F71737 /* FreeRulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeRulerTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,8 +61,8 @@
 		50DC1ECF1B26A31B00F71737 = {
 			isa = PBXGroup;
 			children = (
-				50DC1EDA1B26A31B00F71737 /* Free Ruler */,
-				50DC1EEB1B26A31B00F71737 /* Free RulerTests */,
+				50DC1EDA1B26A31B00F71737 /* FreeRuler */,
+				50DC1EEB1B26A31B00F71737 /* FreeRulerTests */,
 				50DC1ED91B26A31B00F71737 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -70,13 +70,13 @@
 		50DC1ED91B26A31B00F71737 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				50DC1ED81B26A31B00F71737 /* Free Ruler.app */,
-				50DC1EE81B26A31B00F71737 /* Free RulerTests.xctest */,
+				50DC1ED81B26A31B00F71737 /* FreeRuler.app */,
+				50DC1EE81B26A31B00F71737 /* FreeRulerTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		50DC1EDA1B26A31B00F71737 /* Free Ruler */ = {
+		50DC1EDA1B26A31B00F71737 /* FreeRuler */ = {
 			isa = PBXGroup;
 			children = (
 				50DC1EDD1B26A31B00F71737 /* AppDelegate.swift */,
@@ -87,7 +87,7 @@
 				509980351B27997B00AF73FF /* Ruler.swift */,
 				50DC1EDB1B26A31B00F71737 /* Supporting Files */,
 			);
-			path = "Free Ruler";
+			path = FreeRuler;
 			sourceTree = "<group>";
 		};
 		50DC1EDB1B26A31B00F71737 /* Supporting Files */ = {
@@ -98,13 +98,13 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		50DC1EEB1B26A31B00F71737 /* Free RulerTests */ = {
+		50DC1EEB1B26A31B00F71737 /* FreeRulerTests */ = {
 			isa = PBXGroup;
 			children = (
-				50DC1EEE1B26A31B00F71737 /* Free_RulerTests.swift */,
+				50DC1EEE1B26A31B00F71737 /* FreeRulerTests.swift */,
 				50DC1EEC1B26A31B00F71737 /* Supporting Files */,
 			);
-			path = "Free RulerTests";
+			path = FreeRulerTests;
 			sourceTree = "<group>";
 		};
 		50DC1EEC1B26A31B00F71737 /* Supporting Files */ = {
@@ -118,9 +118,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		50DC1ED71B26A31B00F71737 /* Free Ruler */ = {
+		50DC1ED71B26A31B00F71737 /* FreeRuler */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 50DC1EF21B26A31B00F71737 /* Build configuration list for PBXNativeTarget "Free Ruler" */;
+			buildConfigurationList = 50DC1EF21B26A31B00F71737 /* Build configuration list for PBXNativeTarget "FreeRuler" */;
 			buildPhases = (
 				50DC1ED41B26A31B00F71737 /* Sources */,
 				50DC1ED51B26A31B00F71737 /* Frameworks */,
@@ -130,14 +130,14 @@
 			);
 			dependencies = (
 			);
-			name = "Free Ruler";
+			name = FreeRuler;
 			productName = "Free Ruler";
-			productReference = 50DC1ED81B26A31B00F71737 /* Free Ruler.app */;
+			productReference = 50DC1ED81B26A31B00F71737 /* FreeRuler.app */;
 			productType = "com.apple.product-type.application";
 		};
-		50DC1EE71B26A31B00F71737 /* Free RulerTests */ = {
+		50DC1EE71B26A31B00F71737 /* FreeRulerTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 50DC1EF51B26A31B00F71737 /* Build configuration list for PBXNativeTarget "Free RulerTests" */;
+			buildConfigurationList = 50DC1EF51B26A31B00F71737 /* Build configuration list for PBXNativeTarget "FreeRulerTests" */;
 			buildPhases = (
 				50DC1EE41B26A31B00F71737 /* Sources */,
 				50DC1EE51B26A31B00F71737 /* Frameworks */,
@@ -148,9 +148,9 @@
 			dependencies = (
 				50DC1EEA1B26A31B00F71737 /* PBXTargetDependency */,
 			);
-			name = "Free RulerTests";
+			name = FreeRulerTests;
 			productName = "Free RulerTests";
-			productReference = 50DC1EE81B26A31B00F71737 /* Free RulerTests.xctest */;
+			productReference = 50DC1EE81B26A31B00F71737 /* FreeRulerTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -168,11 +168,10 @@
 					};
 					50DC1EE71B26A31B00F71737 = {
 						CreatedOnToolsVersion = 6.3.2;
-						TestTargetID = 50DC1ED71B26A31B00F71737;
 					};
 				};
 			};
-			buildConfigurationList = 50DC1ED31B26A31B00F71737 /* Build configuration list for PBXProject "Free Ruler" */;
+			buildConfigurationList = 50DC1ED31B26A31B00F71737 /* Build configuration list for PBXProject "FreeRuler" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -185,8 +184,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				50DC1ED71B26A31B00F71737 /* Free Ruler */,
-				50DC1EE71B26A31B00F71737 /* Free RulerTests */,
+				50DC1ED71B26A31B00F71737 /* FreeRuler */,
+				50DC1EE71B26A31B00F71737 /* FreeRulerTests */,
 			);
 		};
 /* End PBXProject section */
@@ -226,7 +225,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				50DC1EEF1B26A31B00F71737 /* Free_RulerTests.swift in Sources */,
+				50DC1EEF1B26A31B00F71737 /* FreeRulerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -235,7 +234,7 @@
 /* Begin PBXTargetDependency section */
 		50DC1EEA1B26A31B00F71737 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 50DC1ED71B26A31B00F71737 /* Free Ruler */;
+			target = 50DC1ED71B26A31B00F71737 /* FreeRuler */;
 			targetProxy = 50DC1EE91B26A31B00F71737 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -338,9 +337,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
-				INFOPLIST_FILE = "Free Ruler/Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/FreeRuler/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = FreeRuler;
 			};
 			name = Debug;
 		};
@@ -350,16 +349,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
-				INFOPLIST_FILE = "Free Ruler/Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/FreeRuler/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = FreeRuler;
 			};
 			name = Release;
 		};
 		50DC1EF61B26A31B00F71737 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
@@ -369,33 +367,30 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = "Free RulerTests/Info.plist";
+				INFOPLIST_FILE = FreeRulerTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Free Ruler.app/Contents/MacOS/Free Ruler";
+				PRODUCT_NAME = FreeRulerTests;
 			};
 			name = Debug;
 		};
 		50DC1EF71B26A31B00F71737 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = "Free RulerTests/Info.plist";
+				INFOPLIST_FILE = FreeRulerTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Free Ruler.app/Contents/MacOS/Free Ruler";
+				PRODUCT_NAME = FreeRulerTests;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		50DC1ED31B26A31B00F71737 /* Build configuration list for PBXProject "Free Ruler" */ = {
+		50DC1ED31B26A31B00F71737 /* Build configuration list for PBXProject "FreeRuler" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				50DC1EF01B26A31B00F71737 /* Debug */,
@@ -404,7 +399,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		50DC1EF21B26A31B00F71737 /* Build configuration list for PBXNativeTarget "Free Ruler" */ = {
+		50DC1EF21B26A31B00F71737 /* Build configuration list for PBXNativeTarget "FreeRuler" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				50DC1EF31B26A31B00F71737 /* Debug */,
@@ -413,7 +408,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		50DC1EF51B26A31B00F71737 /* Build configuration list for PBXNativeTarget "Free RulerTests" */ = {
+		50DC1EF51B26A31B00F71737 /* Build configuration list for PBXNativeTarget "FreeRulerTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				50DC1EF61B26A31B00F71737 /* Debug */,
