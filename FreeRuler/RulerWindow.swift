@@ -13,12 +13,12 @@ class RulerWindow: NSPanel {
 	var orientation: Orientation?
 	var ruler: Ruler?
 
-	override init(contentRect: NSRect, styleMask aStyle: Int, backing bufferingType: NSBackingStoreType, defer flag: Bool) {
-		super.init(contentRect: contentRect, styleMask: aStyle, backing: bufferingType, defer: flag)
-		
-		self.movableByWindowBackground = true
-		self.backgroundColor = NSColor(calibratedRed: 255/255, green: 255/255, blue: 179/255, alpha: 1.0)
-	}
+    override init(contentRect: NSRect, styleMask aStyle: Int, backing bufferingType: NSBackingStoreType, `defer` flag: Bool) {
+        super.init(contentRect: contentRect, styleMask: aStyle, backing: bufferingType, `defer`: flag)
+        
+        self.movableByWindowBackground = true
+        self.backgroundColor = NSColor(calibratedRed: 255/255, green: 255/255, blue: 179/255, alpha: 1.0)
+    }
 
 	required init?(coder: NSCoder) {
 	    super.init(coder: coder)
@@ -27,9 +27,9 @@ class RulerWindow: NSPanel {
 	func drawMouseTick(mouseLoc: NSPoint) {
 		switch orientation! {
 		case .Horizontal:
-			println("mouse x: \(mouseLoc.x)")
+			Swift.print("mouse x: \(mouseLoc.x)")
 		case .Vertical:
-			println("mouse y: \(mouseLoc.y)")
+			Swift.print("mouse y: \(mouseLoc.y)")
 		}
 	}
 	
