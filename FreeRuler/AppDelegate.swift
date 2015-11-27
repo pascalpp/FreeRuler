@@ -66,7 +66,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 	}
 	
 	func applicationDidBecomeActive(notification: NSNotification) {
-		println("active")
+		print("active")
 		hRulerWindow.alphaValue = 0.9
 		vRulerWindow.alphaValue = 0.9
 		
@@ -76,7 +76,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 	}
 	
 	func applicationDidResignActive(notification: NSNotification) {
-		println("inactive")
+		print("inactive")
 		hRulerWindow.alphaValue = 0.5
 		vRulerWindow.alphaValue = 0.5
 
@@ -100,12 +100,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 	}
 	
 	func onInterval(timer: NSTimer) {
-		println("onInterval")
+		print("onInterval")
 		self.queryMouseLocation()
 	}
 	
 	func queryMouseLocation() {
-		var mouseLoc = NSEvent.mouseLocation()
+		let mouseLoc = NSEvent.mouseLocation()
 		hRulerWindow.drawMouseTick(mouseLoc)
 		vRulerWindow.drawMouseTick(mouseLoc)
 	}
