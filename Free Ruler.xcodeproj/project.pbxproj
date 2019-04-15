@@ -294,13 +294,13 @@
 				CODE_SIGN_ENTITLEMENTS = "Free Ruler/Free_Ruler.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 38T4C62JZM;
+				DEVELOPMENT_TEAM = X88CY268NZ;
 				INFOPLIST_FILE = "Free Ruler/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.marmaladesoul.Free-Ruler";
+				PRODUCT_BUNDLE_IDENTIFIER = com.pascal.freeruler;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 			};
@@ -313,13 +313,13 @@
 				CODE_SIGN_ENTITLEMENTS = "Free Ruler/Free_Ruler.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 38T4C62JZM;
+				DEVELOPMENT_TEAM = X88CY268NZ;
 				INFOPLIST_FILE = "Free Ruler/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.marmaladesoul.Free-Ruler";
+				PRODUCT_BUNDLE_IDENTIFIER = com.pascal.freeruler;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 			};
