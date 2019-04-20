@@ -74,10 +74,15 @@ class VerticalRule: NSView {
         // Draw the MouseTick & number
         if showMouseTick && mouseTickY >= 1 && mouseTickY < windowHeight {
             let mouseTick = NSBezierPath()
-            let width: CGFloat = (mouseTickY > 21) ? 40 : 20
+            var startX: CGFloat = 0
+            var width: CGFloat = 40
+            
+            if (mouseTickY > windowHeight - 30) {
+                startX = 22
+            }
 
-            mouseTick.move(to: CGPoint(x: width, y: mouseTickY))
-            mouseTick.line(to: CGPoint(x: 0, y: mouseTickY))
+            mouseTick.move(to: CGPoint(x: startX, y: mouseTickY))
+            mouseTick.line(to: CGPoint(x: width, y: mouseTickY))
             #colorLiteral(red: 0.7254902124, green: 0.4784313738, blue: 0.09803921729, alpha: 1).setStroke()
             mouseTick.stroke()
 
@@ -91,16 +96,17 @@ class VerticalRule: NSView {
         
         let number = windowHeight - mouseTickY
 
-        var labelY = number - 5
-
-        if labelY < 30 {
-            // Switch to below the tick
-            labelY = number + 13
-        }
+        // draw below the tick
+        var labelY = number + 13
 
         if labelY < 30 {
             // don't collide with close button
             labelY = 30
+        }
+        
+        if labelY > windowHeight - 30 {
+            // switch to above the tick
+            labelY = number - 5
         }
 
         let attrs = [
@@ -109,7 +115,7 @@ class VerticalRule: NSView {
         ]
 
         let label = String(Int(number))
-        label.draw(with: CGRect(x: 3, y: windowHeight - labelY, width: 20, height: 10), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
+        label.draw(with: CGRect(x: 5, y: windowHeight - labelY, width: 20, height: 10), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
 
     }
 
