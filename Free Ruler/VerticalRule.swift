@@ -1,19 +1,19 @@
 //
-//  HorizontalRule.swift
+//  VerticalRule.swift
 //  Free Ruler
 //
-//  Created by Jeff Hanbury on 12/04/19.
-//  Copyright © 2019 Marmaladesoul. All rights reserved.
+//  Created by Pascal on 2019-04-19.
+//
 //
 
 import Cocoa
 
 @IBDesignable
-class HorizontalRule: NSView {
+class VerticalRule: NSView {
 
-    var mouseTickX: CGFloat = 0 {
+    var mouseTickY: CGFloat = 0 {
         didSet {
-            if mouseTickX != oldValue {
+            if mouseTickY != oldValue {
                 needsDisplay = true
             }
         }
@@ -27,8 +27,8 @@ class HorizontalRule: NSView {
         }
     }
 
-    var windowWidth: CGFloat {
-        return self.window?.frame.width ?? 0
+    var windowHeight: CGFloat {
+        return self.window?.frame.height ?? 0
     }
 
     override func draw(_ dirtyRect: NSRect) {
@@ -39,31 +39,32 @@ class HorizontalRule: NSView {
         dirtyRect.fill()
 
         let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.alignment = .center
+        paragraphStyle.alignment = .right
         let attrs = [
             NSAttributedString.Key.font: NSFont(name: "HelveticaNeue", size: 10)!, NSAttributedString.Key.paragraphStyle: paragraphStyle,
             NSAttributedString.Key.foregroundColor: #colorLiteral(red: 0.3098039329, green: 0.2039215714, blue: 0.03921568766, alpha: 1)
         ]
 
         let width = Int(dirtyRect.width)
+        let height = Int(dirtyRect.height)
         let myPath = NSBezierPath()
 
-        for i in 1...width {
+        for i in 1...height {
             if i.isMultiple(of: 50) {
-                myPath.move(to: CGPoint(x: i, y: 0))
-                myPath.line(to: CGPoint(x: i, y: 10))
+                myPath.move(to: CGPoint(x: width - 0, y: height - i))
+                myPath.line(to: CGPoint(x: width - 10, y: height - i))
 
                 let label = String(i)
-                label.draw(with: CGRect(x: i-10, y: 3, width: 20, height: 20), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
+                label.draw(with: CGRect(x: 3, y: height - i - 13, width: 24, height: 20), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
 
             }
             if i.isMultiple(of: 10) {
-                myPath.move(to: CGPoint(x: i, y: 0))
-                myPath.line(to: CGPoint(x: i, y: 8))
+                myPath.move(to: CGPoint(x: width - 0, y: height - i))
+                myPath.line(to: CGPoint(x: width - 8, y: height - i))
             }
             else if i.isMultiple(of: 2) {
-                myPath.move(to: CGPoint(x: i, y: 0))
-                myPath.line(to: CGPoint(x: i, y: 5))
+                myPath.move(to: CGPoint(x: width - 0, y: height - i))
+                myPath.line(to: CGPoint(x: width - 5, y: height - i))
             }
         }
 
@@ -71,31 +72,35 @@ class HorizontalRule: NSView {
         myPath.stroke()
 
         // Draw the MouseTick & number
-        if showMouseTick && mouseTickX >= 1 && mouseTickX < windowWidth {
+        if showMouseTick && mouseTickY >= 1 && mouseTickY < windowHeight {
             let mouseTick = NSBezierPath()
-            let height: CGFloat = (mouseTickX > 21) ? 40 : 20
+            let width: CGFloat = (mouseTickY > 21) ? 40 : 20
 
-            mouseTick.move(to: CGPoint(x: mouseTickX, y: 0))
-            mouseTick.line(to: CGPoint(x: mouseTickX, y: height))
+            mouseTick.move(to: CGPoint(x: width, y: mouseTickY))
+            mouseTick.line(to: CGPoint(x: 0, y: mouseTickY))
             #colorLiteral(red: 0.7254902124, green: 0.4784313738, blue: 0.09803921729, alpha: 1).setStroke()
             mouseTick.stroke()
 
-            drawMouseNumber(mouseTickX)
+            drawMouseNumber(mouseTickY)
         }
     }
 
-    func drawMouseNumber(_ number: CGFloat) {
+    func drawMouseNumber(_ mouseTickY: CGFloat) {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .left
+        
+        let number = windowHeight - mouseTickY
 
-        var labelX = (number > 21) ? number : 21
-        labelX = labelX + 3 // 3px padding from the line
+        var labelY = number - 5
 
-        if windowWidth - labelX < 20 {
-            // Switch to the left of the tick
-            labelX = number - 20
-            labelX = labelX - 3 // 3px padding from the line
-            paragraphStyle.alignment = .right
+        if labelY < 30 {
+            // Switch to below the tick
+            labelY = number + 13
+        }
+
+        if labelY < 30 {
+            // don't collide with close button
+            labelY = 30
         }
 
         let attrs = [
@@ -104,28 +109,28 @@ class HorizontalRule: NSView {
         ]
 
         let label = String(Int(number))
-        label.draw(with: CGRect(x: labelX, y: 27, width: 20, height: 10), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
+        label.draw(with: CGRect(x: 3, y: windowHeight - labelY, width: 20, height: 10), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
 
     }
 
 }
 
-extension HorizontalRule: TickableX {
+extension VerticalRule: TickableY {
     func drawMouseTick(at mouseLoc: NSPoint) {
-        let windowX = self.window?.frame.origin.x ?? 0
-        let mouseX = mouseLoc.x
-        self.mouseTickX = mouseX - windowX
+        let windowY = self.window?.frame.origin.y ?? 0
+        let mouseY = mouseLoc.y
+        self.mouseTickY = mouseY - windowY
     }
 }
 
-protocol TickableX {
+protocol TickableY {
     func drawMouseTick(at mouseLoc: NSPoint)
 }
 
 
 // MARK: - Mouse events
 
-extension HorizontalRule {
+extension VerticalRule {
     // Hide the ruler tick when the mouse is clicked on the ruler, for example
     // during window drag.
     override func mouseDown(with event: NSEvent) {

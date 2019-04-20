@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5012CAA9226AAC8D00BD9565 /* RulerVerticalWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5012CAA8226AAC8D00BD9565 /* RulerVerticalWindow.swift */; };
+		5012CAAB226AB05200BD9565 /* RulerVerticalWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5012CAAA226AB05200BD9565 /* RulerVerticalWindow.xib */; };
+		5012CAAD226AB09000BD9565 /* VerticalRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5012CAAC226AB09000BD9565 /* VerticalRule.swift */; };
 		6F4102892260712F00F06A10 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F4102882260712F00F06A10 /* AppDelegate.swift */; };
 		6F41028B2260713100F06A10 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6F41028A2260713100F06A10 /* Assets.xcassets */; };
 		6F41028E2260713100F06A10 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6F41028C2260713100F06A10 /* MainMenu.xib */; };
@@ -17,6 +20,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5012CAA8226AAC8D00BD9565 /* RulerVerticalWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RulerVerticalWindow.swift; sourceTree = "<group>"; };
+		5012CAAA226AB05200BD9565 /* RulerVerticalWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RulerVerticalWindow.xib; sourceTree = "<group>"; };
+		5012CAAC226AB09000BD9565 /* VerticalRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerticalRule.swift; sourceTree = "<group>"; };
 		6F4102852260712F00F06A10 /* Free Ruler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Free Ruler.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F4102882260712F00F06A10 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6F41028A2260713100F06A10 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -61,8 +67,11 @@
 			children = (
 				6F4102882260712F00F06A10 /* AppDelegate.swift */,
 				6F41029A226072B600F06A10 /* RulerHorizontalWindow.swift */,
+				5012CAA8226AAC8D00BD9565 /* RulerVerticalWindow.swift */,
 				6F41029B226072B600F06A10 /* RulerHorizontalWindow.xib */,
+				5012CAAA226AB05200BD9565 /* RulerVerticalWindow.xib */,
 				6F41029E22607DC900F06A10 /* HorizontalRule.swift */,
+				5012CAAC226AB09000BD9565 /* VerticalRule.swift */,
 				6F4102A42262B88300F06A10 /* Extensions */,
 				6F41028A2260713100F06A10 /* Assets.xcassets */,
 				6F41028C2260713100F06A10 /* MainMenu.xib */,
@@ -138,6 +147,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5012CAAB226AB05200BD9565 /* RulerVerticalWindow.xib in Resources */,
 				6F41028B2260713100F06A10 /* Assets.xcassets in Resources */,
 				6F41029D226072B600F06A10 /* RulerHorizontalWindow.xib in Resources */,
 				6F41028E2260713100F06A10 /* MainMenu.xib in Resources */,
@@ -152,6 +162,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				6F41029F22607DC900F06A10 /* HorizontalRule.swift in Sources */,
+				5012CAAD226AB09000BD9565 /* VerticalRule.swift in Sources */,
+				5012CAA9226AAC8D00BD9565 /* RulerVerticalWindow.swift in Sources */,
 				6F41029C226072B600F06A10 /* RulerHorizontalWindow.swift in Sources */,
 				6F4102892260712F00F06A10 /* AppDelegate.swift in Sources */,
 				6F4102A62262B8A100F06A10 /* NSWindow+Move.swift in Sources */,
