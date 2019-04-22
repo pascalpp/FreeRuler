@@ -117,7 +117,7 @@
 			attributes = {
 				LastSwiftUpdateCheck = 1020;
 				LastUpgradeCheck = 1020;
-				ORGANIZATIONNAME = Marmaladesoul;
+				ORGANIZATIONNAME = "Free Ruler";
 				TargetAttributes = {
 					6F4102842260712F00F06A10 = {
 						CreatedOnToolsVersion = 10.2;
