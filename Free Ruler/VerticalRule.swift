@@ -74,8 +74,8 @@ class VerticalRule: NSView {
         // Draw the MouseTick & number
         if showMouseTick && mouseTickY >= 1 && mouseTickY < windowHeight {
             let mouseTick = NSBezierPath()
+            let width: CGFloat = 40
             var startX: CGFloat = 0
-            var width: CGFloat = 40
             
             if (mouseTickY > windowHeight - 30) {
                 startX = 22
