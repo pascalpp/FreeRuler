@@ -3,7 +3,6 @@
 //  Free Ruler
 //
 //  Created by Jeff Hanbury on 12/04/19.
-//  Copyright © 2019 Marmaladesoul. All rights reserved.
 //
 
 import Cocoa
@@ -18,6 +17,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var currentTimerInterval: TimeInterval?
     var foregroundTimerInterval: TimeInterval = 40 / 1000 // 25 fps
     var backgroundTimerInterval: TimeInterval = 66 / 1000 // 15 fps
+    var grouped: Bool = true
     
 
     // MARK: - Lifecycle
@@ -48,6 +48,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ aNotification: Notification) {
         // Insert code here to tear down your application
+    }
+    
+    func windowWillMove(_ notification: Notification, sender: NSWindowController) {
+        let which = (sender === rulerHorizontalWindow) ? "horizonal" : "vertical"
+        print("windowWillMove: sender is \(which)")
+        let window = notification.object as? NSWindow
+        print(window?.frame.origin as? Any)
+        
+    }
+    
+    func windowDidMove(_ notification: Notification, sender: NSWindowController) {
+        let which = (sender === rulerHorizontalWindow) ? "horizonal" : "vertical"
+        print("windowDidMove: sender is \(which)")
+        let window = notification.object as? NSWindow
+        print(window?.frame.origin as? Any)
     }
 
 }

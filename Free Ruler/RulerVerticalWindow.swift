@@ -12,9 +12,12 @@ import Carbon.HIToolbox // For key constants
 class RulerVerticalWindow: NSWindowController {
 
     @IBOutlet weak var verticalRule: VerticalRule!
+    weak var appDelegate: AppDelegate?
 
     override func windowDidLoad() {
         super.windowDidLoad()
+
+        appDelegate = NSApplication.shared.delegate as? AppDelegate
 
         setupKeyboardListening()
     }
@@ -33,6 +36,12 @@ extension RulerVerticalWindow: NSWindowDelegate {
         verticalRule.showMouseTick = true
     }
 
+    func windowWillMove(_ notification: Notification) {
+        appDelegate?.windowWillMove(notification, sender: self)
+    }
+    func windowDidMove(_ notification: Notification) {
+        appDelegate?.windowDidMove(notification, sender: self)
+    }
 }
 
 

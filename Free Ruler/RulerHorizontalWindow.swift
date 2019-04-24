@@ -3,7 +3,6 @@
 //  Free Ruler
 //
 //  Created by Jeff Hanbury on 12/04/19.
-//  Copyright © 2019 Marmaladesoul. All rights reserved.
 //
 
 import Cocoa
@@ -13,9 +12,12 @@ import Carbon.HIToolbox // For key constants
 class RulerHorizontalWindow: NSWindowController {
 
     @IBOutlet weak var horizontalRule: HorizontalRule!
+    weak var appDelegate: AppDelegate?
     
     override func windowDidLoad() {
         super.windowDidLoad()
+        
+        appDelegate = NSApplication.shared.delegate as? AppDelegate
         
         setupKeyboardListening()
     }
@@ -32,6 +34,13 @@ extension RulerHorizontalWindow: NSWindowDelegate {
     
     func windowDidEndLiveResize(_ notification: Notification) {
         horizontalRule.showMouseTick = true
+    }
+    
+    func windowWillMove(_ notification: Notification) {
+        appDelegate?.windowWillMove(notification, sender: self)
+    }
+    func windowDidMove(_ notification: Notification) {
+        appDelegate?.windowDidMove(notification, sender: self)
     }
 
 }
