@@ -23,6 +23,8 @@ class RulerHorizontalWindow: NSWindowController {
         
         appDelegate = NSApplication.shared.delegate as? AppDelegate
         
+        print(#file, window as Any)
+        
         setupKeyboardListening()
     }
         
