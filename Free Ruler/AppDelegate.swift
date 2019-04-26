@@ -18,6 +18,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let foregroundTimerInterval: TimeInterval = 40 / 1000 // 25 fps
     let backgroundTimerInterval: TimeInterval = 66 / 1000 // 15 fps
 
+    @IBOutlet weak var groupedMenuItem: NSMenuItem!
     var grouped: Bool = true
     
 
@@ -90,6 +91,11 @@ extension AppDelegate {
         mouseLoc.y = mouseLoc.y.rounded()
         horizontal.rule?.drawMouseTick(at: mouseLoc)
         vertical.rule?.drawMouseTick(at: mouseLoc)
+    }
+    
+    @IBAction func groupRulers(_ sender: Any) {
+        grouped = !grouped
+        groupedMenuItem?.state = (grouped ? .on : .off)
     }
 
 }
