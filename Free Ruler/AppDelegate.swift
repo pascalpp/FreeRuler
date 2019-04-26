@@ -54,7 +54,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         print("windowWillMove: sender is \(which)")
         let window = notification.object as? NSWindow
         print(window?.frame.origin as Any)
-        
     }
     
     func windowDidMove(_ notification: Notification, sender: NSWindowController) {
