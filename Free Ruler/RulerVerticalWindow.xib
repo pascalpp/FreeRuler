@@ -7,7 +7,7 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="RulerVerticalWindow" customModule="Free_Ruler" customModuleProvider="target">
             <connections>
-                <outlet property="verticalRule" destination="gyz-gi-vH3" id="rBc-az-mOM"/>
+                <outlet property="rule" destination="gyz-gi-vH3" id="wUL-Fj-FHI"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
@@ -19,11 +19,11 @@
             <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
             <value key="minSize" type="size" width="40" height="200"/>
             <value key="maxSize" type="size" width="40" height="4000"/>
-            <view key="contentView" id="BUP-mD-NKX">
+            <view key="contentView" wantsLayer="YES" id="BUP-mD-NKX">
                 <rect key="frame" x="0.0" y="0.0" width="40" height="583"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="gyz-gi-vH3" customClass="VerticalRule" customModule="Free_Ruler" customModuleProvider="target">
+                    <customView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gyz-gi-vH3" customClass="VerticalRule" customModule="Free_Ruler" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="40" height="583"/>
                     </customView>
                 </subviews>

@@ -11,9 +11,13 @@ import Carbon.HIToolbox // For key constants
 
 class RulerVerticalWindow: NSWindowController {
 
-    @IBOutlet weak var verticalRule: VerticalRule!
+    @IBOutlet weak var rule: VerticalRule!
     weak var appDelegate: AppDelegate?
 
+    convenience init() {
+        self.init(windowNibName: "RulerVerticalWindow")
+    }
+    
     override func windowDidLoad() {
         super.windowDidLoad()
 
@@ -29,11 +33,11 @@ class RulerVerticalWindow: NSWindowController {
 extension RulerVerticalWindow: NSWindowDelegate {
 
     func windowWillStartLiveResize(_ notification: Notification) {
-        verticalRule.showMouseTick = false
+        rule.showMouseTick = false
     }
 
     func windowDidEndLiveResize(_ notification: Notification) {
-        verticalRule.showMouseTick = true
+        rule.showMouseTick = true
     }
 
     func windowWillMove(_ notification: Notification) {

@@ -10,8 +10,8 @@ import Cocoa
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     
-    var rulerHorizontalWindow: RulerHorizontalWindow?
-    var rulerVerticalWindow: RulerVerticalWindow?
+    let horizontal = RulerHorizontalWindow()
+    let vertical = RulerVerticalWindow()
 
     var timer: Timer?
     var currentTimerInterval: TimeInterval?
@@ -23,24 +23,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Lifecycle
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        rulerHorizontalWindow = RulerHorizontalWindow(windowNibName: "RulerHorizontalWindow")
-        rulerHorizontalWindow?.showWindow(self)
-
-        rulerVerticalWindow = RulerVerticalWindow(windowNibName: "RulerVerticalWindow")
-        rulerVerticalWindow?.showWindow(self)
+        horizontal.showWindow(nil)
+        vertical.showWindow(nil)
     }
     
     func applicationDidBecomeActive(_ notification: Notification) {
-        rulerHorizontalWindow?.window?.alphaValue = 0.9
-        rulerVerticalWindow?.window?.alphaValue = 0.9
+        horizontal.window?.alphaValue = 0.9
+        vertical.window?.alphaValue = 0.9
 
         currentTimerInterval = foregroundTimerInterval
         startTimer()
     }
     
     func applicationDidResignActive(_ notification: Notification) {
-        rulerHorizontalWindow?.window?.alphaValue = 0.5
-        rulerVerticalWindow?.window?.alphaValue = 0.5
+        horizontal.window?.alphaValue = 0.5
+        vertical.window?.alphaValue = 0.5
 
         currentTimerInterval = backgroundTimerInterval
         startTimer()
@@ -51,18 +48,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func windowWillMove(_ notification: Notification, sender: NSWindowController) {
-        let which = (sender === rulerHorizontalWindow) ? "horizonal" : "vertical"
+        let which = (sender === horizontal) ? "horizonal" : "vertical"
         print("windowWillMove: sender is \(which)")
         let window = notification.object as? NSWindow
-        print(window?.frame.origin as? Any)
+        print(window?.frame.origin as Any)
         
     }
     
     func windowDidMove(_ notification: Notification, sender: NSWindowController) {
-        let which = (sender === rulerHorizontalWindow) ? "horizonal" : "vertical"
+        let which = (sender === horizontal) ? "horizonal" : "vertical"
         print("windowDidMove: sender is \(which)")
         let window = notification.object as? NSWindow
-        print(window?.frame.origin as? Any)
+        print(window?.frame.origin as Any)
     }
 
 }
@@ -90,8 +87,8 @@ extension AppDelegate {
         var mouseLoc = NSEvent.mouseLocation
         mouseLoc.x = mouseLoc.x.rounded()
         mouseLoc.y = mouseLoc.y.rounded()
-        rulerHorizontalWindow?.horizontalRule.drawMouseTick(at: mouseLoc)
-        rulerVerticalWindow?.verticalRule.drawMouseTick(at: mouseLoc)
+        horizontal.rule?.drawMouseTick(at: mouseLoc)
+        vertical.rule?.drawMouseTick(at: mouseLoc)
     }
 
 }

@@ -11,7 +11,7 @@ import Carbon.HIToolbox // For key constants
 
 class RulerHorizontalWindow: NSWindowController {
 
-    @IBOutlet weak var horizontalRule: HorizontalRule!
+    @IBOutlet weak var rule: HorizontalRule!
     weak var appDelegate: AppDelegate?
     
     override func windowDidLoad() {
@@ -29,11 +29,11 @@ class RulerHorizontalWindow: NSWindowController {
 extension RulerHorizontalWindow: NSWindowDelegate {
     
     func windowWillStartLiveResize(_ notification: Notification) {
-        horizontalRule.showMouseTick = false
+        rule.showMouseTick = false
     }
     
     func windowDidEndLiveResize(_ notification: Notification) {
-        horizontalRule.showMouseTick = true
+        rule.showMouseTick = true
     }
     
     func windowWillMove(_ notification: Notification) {
@@ -59,7 +59,7 @@ extension RulerHorizontalWindow {
     // Return nil if the event was handled here.
     func myKeyDown(with event: NSEvent) -> NSEvent? {
         // handle keyDown only if current window has focus, i.e. is keyWindow
-//        guard NSApplication.shared.keyWindow === self else { return event }
+        // guard NSApplication.shared.keyWindow === self else { return event }
         
         let shiftPressed = event.modifierFlags.contains(.shift)
         
