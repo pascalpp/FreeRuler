@@ -9,12 +9,10 @@ import Cocoa
 import Carbon.HIToolbox // For key constants
 
 
-class VerticalController: NSWindowController {
+class VerticalController: NSWindowController, Synchronisable {
 
     @IBOutlet weak var rule: VerticalRule!
     weak var appDelegate: AppDelegate?
-    var lastOrigin: CGPoint?
-    var movedByOther = false
 
     convenience init() {
         self.init(windowNibName: "VerticalController")
@@ -24,12 +22,10 @@ class VerticalController: NSWindowController {
         super.windowDidLoad()
 
         appDelegate = NSApplication.shared.delegate as? AppDelegate
-
-        lastOrigin = window?.frame.origin
         
         setupKeyboardListening()
     }
-
+    
 }
 
 // Note: window.delegate is set in IB, as it's not loaded in time to do so in
@@ -44,18 +40,10 @@ extension VerticalController: NSWindowDelegate {
         rule.showMouseTick = true
     }
 
-    func windowWillMove(_ notification: Notification) {
-        appDelegate?.windowWillMove(notification, sender: self)
-    }
     func windowDidMove(_ notification: Notification) {
-        print("vertical windowDidMove")
-        let origin = window!.frame.origin
-        if !movedByOther {
-            let offset = NSMakePoint(origin.x - lastOrigin!.x, origin.y - lastOrigin!.y)
-            appDelegate?.windowDidMove(notification, offset: offset, sender: self)
-        }
-        lastOrigin = origin
+        appDelegate?.synchroniseWindows()
     }
+
 }
 
 
@@ -92,14 +80,6 @@ extension VerticalController {
         default:
             return event
         }
-    }
-
-    func moveByOffset(offset: CGPoint) {
-        print("vertical", #function, offset)
-        movedByOther = true
-        window?.moveHorizontally(by: offset.x)
-        window?.moveVertically(by: offset.y)
-        movedByOther = false
     }
 
 }

@@ -49,23 +49,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Insert code here to tear down your application
     }
     
-    func windowWillMove(_ notification: Notification, sender: NSWindowController) {
-        let which = (sender === horizontal) ? "horizonal" : "vertical"
-        print("windowWillMove: sender is \(which)")
-        let window = notification.object as? NSWindow
-        print(window?.frame.origin as Any)
-    }
-    
-    func windowDidMove(_ notification: Notification, offset: CGPoint, sender: NSWindowController) {
-        if grouped {
-            if sender === horizontal {
-                vertical.moveByOffset(offset: offset)
-            } else {
-                horizontal.moveByOffset(offset: offset)
-            }
+    func synchroniseWindows() {
+        guard grouped,
+            let hWindow = horizontal.window,
+            let vWindow = vertical.window
+            else { return }
+        
+        if hWindow.isKeyWindow {
+            vertical.moveWith(horizontal.window)
+        } else if vWindow.isKeyWindow {
+            horizontal.moveWith(vertical.window)
         }
     }
-
 }
 
 
