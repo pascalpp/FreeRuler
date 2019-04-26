@@ -1,5 +1,5 @@
 //
-//  RulerVerticalWindow.swift
+//  VerticalController.swift
 //  Free Ruler
 //
 //  Created by Pascal on 2019-04-19.
@@ -13,6 +13,8 @@ class VerticalController: NSWindowController {
 
     @IBOutlet weak var rule: VerticalRule!
     weak var appDelegate: AppDelegate?
+    var lastOrigin: CGPoint?
+    var movedByOther = false
 
     convenience init() {
         self.init(windowNibName: "VerticalController")
@@ -23,7 +25,7 @@ class VerticalController: NSWindowController {
 
         appDelegate = NSApplication.shared.delegate as? AppDelegate
 
-        print(#file, window as Any)
+        lastOrigin = window?.frame.origin
         
         setupKeyboardListening()
     }
@@ -46,7 +48,13 @@ extension VerticalController: NSWindowDelegate {
         appDelegate?.windowWillMove(notification, sender: self)
     }
     func windowDidMove(_ notification: Notification) {
-        appDelegate?.windowDidMove(notification, sender: self)
+        print("vertical windowDidMove")
+        let origin = window!.frame.origin
+        if !movedByOther {
+            let offset = NSMakePoint(origin.x - lastOrigin!.x, origin.y - lastOrigin!.y)
+            appDelegate?.windowDidMove(notification, offset: offset, sender: self)
+        }
+        lastOrigin = origin
     }
 }
 
@@ -84,6 +92,14 @@ extension VerticalController {
         default:
             return event
         }
+    }
+
+    func moveByOffset(offset: CGPoint) {
+        print("vertical", #function, offset)
+        movedByOther = true
+        window?.moveHorizontally(by: offset.x)
+        window?.moveVertically(by: offset.y)
+        movedByOther = false
     }
 
 }

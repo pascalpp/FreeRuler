@@ -56,11 +56,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         print(window?.frame.origin as Any)
     }
     
-    func windowDidMove(_ notification: Notification, sender: NSWindowController) {
-        let which = (sender === horizontal) ? "horizonal" : "vertical"
-        print("windowDidMove: sender is \(which)")
-        let window = notification.object as? NSWindow
-        print(window?.frame.origin as Any)
+    func windowDidMove(_ notification: Notification, offset: CGPoint, sender: NSWindowController) {
+        if grouped {
+            if sender === horizontal {
+                vertical.moveByOffset(offset: offset)
+            } else {
+                horizontal.moveByOffset(offset: offset)
+            }
+        }
     }
 
 }

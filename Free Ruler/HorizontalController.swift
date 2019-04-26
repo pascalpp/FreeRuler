@@ -1,5 +1,5 @@
 //
-//  RulerHorizontalWindow.swift
+//  HorizontalController.swift
 //  Free Ruler
 //
 //  Created by Jeff Hanbury on 12/04/19.
@@ -13,7 +13,9 @@ class HorizontalController: NSWindowController {
 
     @IBOutlet weak var rule: HorizontalRule!
     weak var appDelegate: AppDelegate?
-    
+    var lastOrigin: CGPoint?
+    var movedByOther = false
+
     convenience init() {
         self.init(windowNibName: "HorizontalController")
     }
@@ -23,7 +25,7 @@ class HorizontalController: NSWindowController {
         
         appDelegate = NSApplication.shared.delegate as? AppDelegate
         
-        print(#file, window as Any)
+        lastOrigin = window?.frame.origin
         
         setupKeyboardListening()
     }
@@ -46,7 +48,13 @@ extension HorizontalController: NSWindowDelegate {
         appDelegate?.windowWillMove(notification, sender: self)
     }
     func windowDidMove(_ notification: Notification) {
-        appDelegate?.windowDidMove(notification, sender: self)
+        print("horizontal windowDidMove")
+        let origin = window!.frame.origin
+        if !movedByOther {
+            let offset = NSMakePoint(origin.x - lastOrigin!.x, origin.y - lastOrigin!.y)
+            appDelegate?.windowDidMove(notification, offset: offset, sender: self)
+        }
+        lastOrigin = origin
     }
 
 }
@@ -85,6 +93,14 @@ extension HorizontalController {
         default:
             return event
         }
+    }
+
+    func moveByOffset(offset: CGPoint) {
+        print("horizontal", #function, offset)
+        movedByOther = true
+        window?.moveHorizontally(by: offset.x)
+        window?.moveVertically(by: offset.y)
+        movedByOther = false
     }
 
 }
