@@ -9,13 +9,13 @@ import Cocoa
 import Carbon.HIToolbox // For key constants
 
 
-class RulerHorizontalWindow: NSWindowController {
+class HorizontalController: NSWindowController {
 
     @IBOutlet weak var rule: HorizontalRule!
     weak var appDelegate: AppDelegate?
     
     convenience init() {
-        self.init(windowNibName: "RulerHorizontalWindow")
+        self.init(windowNibName: "HorizontalController")
     }
     
     override func windowDidLoad() {
@@ -32,7 +32,7 @@ class RulerHorizontalWindow: NSWindowController {
 
 // Note: window.delegate is set in IB, as it's not loaded in time to do so in
 // NSWindowController's init or such.
-extension RulerHorizontalWindow: NSWindowDelegate {
+extension HorizontalController: NSWindowDelegate {
     
     func windowWillStartLiveResize(_ notification: Notification) {
         rule.showMouseTick = false
@@ -54,7 +54,7 @@ extension RulerHorizontalWindow: NSWindowDelegate {
 
 // MARK: - Keyboard
 
-extension RulerHorizontalWindow {
+extension HorizontalController {
     func setupKeyboardListening() {
         NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] in
             guard let self = self else {return $0}

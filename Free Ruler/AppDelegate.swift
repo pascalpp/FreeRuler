@@ -10,13 +10,14 @@ import Cocoa
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     
-    let horizontal = RulerHorizontalWindow()
-    let vertical = RulerVerticalWindow()
+    let horizontal = HorizontalController()
+    let vertical = VerticalController()
 
     var timer: Timer?
     var currentTimerInterval: TimeInterval?
-    var foregroundTimerInterval: TimeInterval = 40 / 1000 // 25 fps
-    var backgroundTimerInterval: TimeInterval = 66 / 1000 // 15 fps
+    let foregroundTimerInterval: TimeInterval = 40 / 1000 // 25 fps
+    let backgroundTimerInterval: TimeInterval = 66 / 1000 // 15 fps
+
     var grouped: Bool = true
     
 

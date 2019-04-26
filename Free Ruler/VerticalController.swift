@@ -9,13 +9,13 @@ import Cocoa
 import Carbon.HIToolbox // For key constants
 
 
-class RulerVerticalWindow: NSWindowController {
+class VerticalController: NSWindowController {
 
     @IBOutlet weak var rule: VerticalRule!
     weak var appDelegate: AppDelegate?
 
     convenience init() {
-        self.init(windowNibName: "RulerVerticalWindow")
+        self.init(windowNibName: "VerticalController")
     }
     
     override func windowDidLoad() {
@@ -32,7 +32,7 @@ class RulerVerticalWindow: NSWindowController {
 
 // Note: window.delegate is set in IB, as it's not loaded in time to do so in
 // NSWindowController's init or such.
-extension RulerVerticalWindow: NSWindowDelegate {
+extension VerticalController: NSWindowDelegate {
 
     func windowWillStartLiveResize(_ notification: Notification) {
         rule.showMouseTick = false
@@ -53,7 +53,7 @@ extension RulerVerticalWindow: NSWindowDelegate {
 
 // MARK: - Keyboard
 
-extension RulerVerticalWindow {
+extension VerticalController {
     func setupKeyboardListening() {
         NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] in
             guard let self = self else {return $0}

@@ -5,27 +5,27 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner" customClass="RulerVerticalWindow" customModule="Free_Ruler" customModuleProvider="target">
+        <customObject id="-2" userLabel="File's Owner" customClass="HorizontalController" customModule="Free_Ruler" customModuleProvider="target">
             <connections>
-                <outlet property="rule" destination="gyz-gi-vH3" id="wUL-Fj-FHI"/>
-                <outlet property="window" destination="VBH-PX-ypm" id="S0n-9X-i6S"/>
+                <outlet property="rule" destination="gyz-gi-vH3" id="rBc-az-mOM"/>
+                <outlet property="window" destination="VBH-PX-ypm" id="tXZ-GF-0fE"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window title="Vertical" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hasShadow="NO" releasedWhenClosed="NO" frameAutosaveName="RulerVertical" animationBehavior="default" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="VBH-PX-ypm" customClass="NSPanel">
+        <window title="Horizontal" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hasShadow="NO" releasedWhenClosed="NO" frameAutosaveName="RulerHorizontal" animationBehavior="default" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="VBH-PX-ypm" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" resizable="YES" utility="YES" HUD="YES" fullSizeContentView="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="139" y="81" width="40" height="480"/>
+            <rect key="contentRect" x="139" y="81" width="480" height="40"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
-            <value key="minSize" type="size" width="40" height="200"/>
-            <value key="maxSize" type="size" width="40" height="4000"/>
+            <value key="minSize" type="size" width="200" height="40"/>
+            <value key="maxSize" type="size" width="4000" height="40"/>
             <view key="contentView" wantsLayer="YES" id="BUP-mD-NKX">
-                <rect key="frame" x="0.0" y="0.0" width="40" height="480"/>
+                <rect key="frame" x="0.0" y="0.0" width="480" height="40"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <customView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gyz-gi-vH3" customClass="VerticalRule" customModule="Free_Ruler" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="40" height="480"/>
+                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="gyz-gi-vH3" customClass="HorizontalRule" customModule="Free_Ruler" customModuleProvider="target">
+                        <rect key="frame" x="0.0" y="0.0" width="480" height="40"/>
                     </customView>
                 </subviews>
                 <constraints>
@@ -38,7 +38,7 @@
             <connections>
                 <outlet property="delegate" destination="-2" id="BPq-Fw-7lS"/>
             </connections>
-            <point key="canvasLocation" x="-200" y="-332"/>
+            <point key="canvasLocation" x="172.5" y="-19"/>
         </window>
     </objects>
 </document>
