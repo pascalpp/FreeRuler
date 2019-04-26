@@ -8,14 +8,11 @@
 import Cocoa
 import Carbon.HIToolbox // For key constants
 
-
-class HorizontalController: NSWindowController {
+class HorizontalController: NSWindowController, Synchronisable {
 
     @IBOutlet weak var rule: HorizontalRule!
     weak var appDelegate: AppDelegate?
-    var lastOrigin: CGPoint?
-    var movedByOther = false
-
+    
     convenience init() {
         self.init(windowNibName: "HorizontalController")
     }
@@ -24,12 +21,10 @@ class HorizontalController: NSWindowController {
         super.windowDidLoad()
         
         appDelegate = NSApplication.shared.delegate as? AppDelegate
-        
-        lastOrigin = window?.frame.origin
-        
+                
         setupKeyboardListening()
     }
-        
+    
 }
 
 // Note: window.delegate is set in IB, as it's not loaded in time to do so in
@@ -43,18 +38,9 @@ extension HorizontalController: NSWindowDelegate {
     func windowDidEndLiveResize(_ notification: Notification) {
         rule.showMouseTick = true
     }
-    
-    func windowWillMove(_ notification: Notification) {
-        appDelegate?.windowWillMove(notification, sender: self)
-    }
+
     func windowDidMove(_ notification: Notification) {
-        print("horizontal windowDidMove")
-        let origin = window!.frame.origin
-        if !movedByOther {
-            let offset = NSMakePoint(origin.x - lastOrigin!.x, origin.y - lastOrigin!.y)
-            appDelegate?.windowDidMove(notification, offset: offset, sender: self)
-        }
-        lastOrigin = origin
+        appDelegate?.synchroniseWindows()
     }
 
 }
@@ -95,12 +81,5 @@ extension HorizontalController {
         }
     }
 
-    func moveByOffset(offset: CGPoint) {
-        print("horizontal", #function, offset)
-        movedByOther = true
-        window?.moveHorizontally(by: offset.x)
-        window?.moveVertically(by: offset.y)
-        movedByOther = false
-    }
 
 }
