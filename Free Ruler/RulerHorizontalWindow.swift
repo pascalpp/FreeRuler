@@ -14,6 +14,10 @@ class RulerHorizontalWindow: NSWindowController {
     @IBOutlet weak var rule: HorizontalRule!
     weak var appDelegate: AppDelegate?
     
+    convenience init() {
+        self.init(windowNibName: "RulerHorizontalWindow")
+    }
+    
     override func windowDidLoad() {
         super.windowDidLoad()
         
