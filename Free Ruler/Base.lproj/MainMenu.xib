@@ -614,7 +614,7 @@
                             <menuItem title="Group Rulers" state="on" keyEquivalent="g" id="7Ga-Fb-LLc">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="groupRulers:" target="Voe-Tx-rLC" id="32O-qa-dwL"/>
+                                    <action selector="toggleGroupedRulers:" target="Voe-Tx-rLC" id="Biv-Pi-sJF"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Show Toolbar" keyEquivalent="t" id="snW-S8-Cw5">

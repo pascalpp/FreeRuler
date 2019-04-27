@@ -10,6 +10,8 @@ import Cocoa
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     
+    let defaults = UserDefaults.standard
+
     let horizontal = HorizontalController()
     let vertical = VerticalController()
 
@@ -19,13 +21,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let backgroundTimerInterval: TimeInterval = 66 / 1000 // 15 fps
 
     @IBOutlet weak var groupedMenuItem: NSMenuItem!
-    var grouped: Bool = false
-    
+    var groupedRulers: Bool = false
 
     // MARK: - Lifecycle
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        groupedMenuItem?.state = (grouped ? .on : .off)
+        updateGroupedRulers()
+
         horizontal.showWindow(nil)
         vertical.showWindow(nil)
     }
@@ -51,11 +53,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func synchroniseWindows() {
-        guard grouped,
+        guard groupedRulers,
             let hWindow = horizontal.window,
             let vWindow = vertical.window
             else { return }
-        
+
         if hWindow.isKeyWindow {
             vertical.moveWith(horizontal.window)
         } else if vWindow.isKeyWindow {
@@ -91,10 +93,16 @@ extension AppDelegate {
         vertical.rule?.drawMouseTick(at: mouseLoc)
     }
     
-    @IBAction func groupRulers(_ sender: Any) {
-        grouped = !grouped
-        groupedMenuItem?.state = (grouped ? .on : .off)
+    @IBAction func toggleGroupedRulers(_ sender: Any) {
+        defaults.set(!groupedRulers, forKey: "groupedRulers")
+        updateGroupedRulers()
     }
+
+    func updateGroupedRulers() {
+        groupedRulers = defaults.bool(forKey: "groupedRulers")
+        groupedMenuItem?.state = (groupedRulers ? .on : .off)
+    }
+    
 
 }
 
