@@ -79,7 +79,7 @@ extension VerticalController {
     // Return nil if the event was handled here.
     func myKeyDown(with event: NSEvent) -> NSEvent? {
         // handle keyDown only if current window has focus, i.e. is keyWindow
-//        guard NSApplication.shared.keyWindow === self else { return event }
+        // guard NSApplication.shared.keyWindow === self else { return event }
 
         let shiftPressed = event.modifierFlags.contains(.shift)
 
