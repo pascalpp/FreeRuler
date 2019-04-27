@@ -55,6 +55,11 @@ extension VerticalController: NSWindowDelegate {
     }
 
     func windowDidMove(_ notification: Notification) {
+        guard
+            let window = window,
+            window.isKeyWindow
+            else { return }
+
         appDelegate?.synchroniseWindows()
     }
 
@@ -94,6 +99,18 @@ extension VerticalController {
         default:
             return event
         }
+    }
+
+    func moveWith(_ otherWindow: NSWindow?) {
+        guard let hWindow = otherWindow,
+            let vWindow = window
+            else { return }
+        
+        let point = CGPoint(
+            x: hWindow.frame.minX - vWindow.frame.width,
+            y: hWindow.frame.minY
+        )
+        vWindow.setFrameTopLeftPoint(point)
     }
 
 }

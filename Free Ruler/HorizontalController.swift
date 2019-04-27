@@ -56,6 +56,11 @@ extension HorizontalController: NSWindowDelegate {
     }
 
     func windowDidMove(_ notification: Notification) {
+        guard
+            let window = window,
+            window.isKeyWindow
+            else { return }
+
         appDelegate?.synchroniseWindows()
     }
 
@@ -95,6 +100,18 @@ extension HorizontalController {
         default:
             return event
         }
+    }
+
+    func moveWith(_ otherWindow: NSWindow?) {
+        guard let vWindow = otherWindow,
+            let hWindow = window
+            else { return }
+        
+        let point = CGPoint(
+            x: vWindow.frame.maxX,
+            y: vWindow.frame.maxY + hWindow.frame.height
+        )
+        hWindow.setFrameTopLeftPoint(point)
     }
 
 
