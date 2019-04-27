@@ -95,11 +95,11 @@ class HorizontalRule: NSView {
         let number = mouseTickX
         let labelWidth: CGFloat = 40
 
-        var labelX = number + 3 // 3px padding from the line
+        var labelX = number + 5 // 3px padding from the line
 
         if labelX + labelWidth > windowWidth {
             // Switch to the left of the tick
-            labelX = number - labelWidth - 3
+            labelX = number - labelWidth - 5
             paragraphStyle.alignment = .right
         }
 
