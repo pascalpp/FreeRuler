@@ -42,7 +42,7 @@ class HorizontalRule: NSView {
         paragraphStyle.alignment = .center
         let attrs = [
             NSAttributedString.Key.font: NSFont(name: "HelveticaNeue", size: 10)!, NSAttributedString.Key.paragraphStyle: paragraphStyle,
-            NSAttributedString.Key.foregroundColor: #colorLiteral(red: 0.3098039329, green: 0.2039215714, blue: 0.03921568766, alpha: 1)
+            NSAttributedString.Key.foregroundColor: #colorLiteral(red: 0.7254902124, green: 0.4784313738, blue: 0.09803921729, alpha: 1)
         ]
 
         let width = Int(dirtyRect.width)
@@ -77,7 +77,7 @@ class HorizontalRule: NSView {
 
             mouseTick.move(to: CGPoint(x: mouseTickX, y: 0))
             mouseTick.line(to: CGPoint(x: mouseTickX, y: height))
-            #colorLiteral(red: 0.7254902124, green: 0.4784313738, blue: 0.09803921729, alpha: 1).setStroke()
+            #colorLiteral(red: 0.3098039329, green: 0.2039215714, blue: 0.03921568766, alpha: 0.75).setStroke()
             mouseTick.stroke()
 
             drawMouseNumber(mouseTickX)
@@ -100,7 +100,8 @@ class HorizontalRule: NSView {
 
         let attrs = [
             NSAttributedString.Key.font: NSFont(name: "HelveticaNeue", size: 10)!, NSAttributedString.Key.paragraphStyle: paragraphStyle,
-            NSAttributedString.Key.foregroundColor: #colorLiteral(red: 0.7254902124, green: 0.4784313738, blue: 0.09803921729, alpha: 1)
+            NSAttributedString.Key.foregroundColor: #colorLiteral(red: 0.3098039329, green: 0.2039215714, blue: 0.03921568766, alpha: 1),
+            NSAttributedString.Key.backgroundColor: #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1),
         ]
 
         let label = String(Int(number))
