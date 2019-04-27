@@ -74,21 +74,20 @@ class VerticalRule: NSView {
 
         // Draw the MouseTick & number
         if showMouseTick && mouseTickY >= 1 && mouseTickY < windowHeight {
-            let mouseTick = NSBezierPath()
-            let width: CGFloat = 40
-            var startX: CGFloat = 0
-            
-            if (mouseTickY > windowHeight - 30) {
-                startX = 22
-            }
-
-            mouseTick.move(to: CGPoint(x: startX, y: mouseTickY))
-            mouseTick.line(to: CGPoint(x: width, y: mouseTickY))
-            #colorLiteral(red: 0.3098039329, green: 0.2039215714, blue: 0.03921568766, alpha: 0.75).setStroke()
-            mouseTick.stroke()
-
+            drawMouseTick(mouseTickY)
             drawMouseNumber(mouseTickY)
         }
+    }
+    
+    func drawMouseTick(_ mouseTickY: CGFloat) {
+        let mouseTick = NSBezierPath()
+        let width: CGFloat = 40
+        let startX: CGFloat = 0
+        
+        mouseTick.move(to: CGPoint(x: startX, y: mouseTickY))
+        mouseTick.line(to: CGPoint(x: width, y: mouseTickY))
+        #colorLiteral(red: 0.3098039329, green: 0.2039215714, blue: 0.03921568766, alpha: 0.75).setStroke()
+        mouseTick.stroke()
     }
 
     func drawMouseNumber(_ mouseTickY: CGFloat) {
@@ -100,21 +99,16 @@ class VerticalRule: NSView {
         // draw below the tick
         var labelY = number + 13
 
-        if labelY < 30 {
-            // don't collide with close button
-            labelY = 30
-        }
-        
-        if labelY > windowHeight - 30 {
+        if labelY > windowHeight - 15 {
             // switch to above the tick
             labelY = number - 5
         }
 
         let attrs = [
-            NSAttributedString.Key.font: NSFont(name: "HelveticaNeue", size: 10)!, NSAttributedString.Key.paragraphStyle: paragraphStyle,
+            NSAttributedString.Key.font: NSFont(name: "HelveticaNeue", size: 10)!,
+            NSAttributedString.Key.paragraphStyle: paragraphStyle,
             NSAttributedString.Key.foregroundColor: #colorLiteral(red: 0.3098039329, green: 0.2039215714, blue: 0.03921568766, alpha: 1),
             NSAttributedString.Key.backgroundColor: #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1),
-
         ]
 
         let label = String(Int(number))
