@@ -8,7 +8,6 @@
 import Cocoa
 import Carbon.HIToolbox // For key constants
 
-
 class VerticalController: NSWindowController, Synchronisable {
 
     weak var appDelegate: AppDelegate?
@@ -25,8 +24,13 @@ class VerticalController: NSWindowController, Synchronisable {
 
         appDelegate = NSApplication.shared.delegate as? AppDelegate
         
-        window?.titleVisibility = .hidden
-        window?.styleMask.remove(.titled)
+        let closeButton = window?.standardWindowButton(.closeButton)
+        let miniaturizeButton = window?.standardWindowButton(.miniaturizeButton)
+        let zoomButton = window?.standardWindowButton(.zoomButton)
+        closeButton?.isHidden = true
+        miniaturizeButton?.isHidden = true
+        zoomButton?.isHidden = true
+
         window?.backgroundColor = .clear
         window?.isMovableByWindowBackground = true
         
