@@ -10,8 +10,10 @@ import Carbon.HIToolbox // For key constants
 
 class HorizontalController: NSWindowController, Synchronisable {
 
-    @IBOutlet weak var rule: HorizontalRule!
     weak var appDelegate: AppDelegate?
+
+    @IBOutlet weak var rule: HorizontalRule!
+    @IBOutlet weak var contentView: NSVisualEffectView!
     
     convenience init() {
         self.init(windowNibName: "HorizontalController")
@@ -21,7 +23,15 @@ class HorizontalController: NSWindowController, Synchronisable {
         super.windowDidLoad()
         
         appDelegate = NSApplication.shared.delegate as? AppDelegate
-                
+        
+        window?.titleVisibility = .hidden
+        window?.styleMask.remove(.titled)
+        window?.backgroundColor = .clear
+        window?.isMovableByWindowBackground = true
+        
+        contentView.wantsLayer = true
+        contentView.layer?.cornerRadius = 0.0
+
         setupKeyboardListening()
     }
     

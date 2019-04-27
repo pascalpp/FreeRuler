@@ -11,9 +11,11 @@ import Carbon.HIToolbox // For key constants
 
 class VerticalController: NSWindowController, Synchronisable {
 
-    @IBOutlet weak var rule: VerticalRule!
     weak var appDelegate: AppDelegate?
 
+    @IBOutlet weak var rule: VerticalRule!
+    @IBOutlet weak var contentView: NSView!
+    
     convenience init() {
         self.init(windowNibName: "VerticalController")
     }
@@ -23,6 +25,14 @@ class VerticalController: NSWindowController, Synchronisable {
 
         appDelegate = NSApplication.shared.delegate as? AppDelegate
         
+        window?.titleVisibility = .hidden
+        window?.styleMask.remove(.titled)
+        window?.backgroundColor = .clear
+        window?.isMovableByWindowBackground = true
+        
+        contentView.wantsLayer = true
+        contentView.layer?.cornerRadius = 0.0
+
         setupKeyboardListening()
     }
     
