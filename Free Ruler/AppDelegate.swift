@@ -59,9 +59,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             else { return }
 
         if hWindow.isKeyWindow {
-            vertical.moveWith(horizontal.window)
+            vertical.moveWith(hWindow)
         } else if vWindow.isKeyWindow {
-            horizontal.moveWith(vertical.window)
+            horizontal.moveWith(vWindow)
         }
     }
 }
