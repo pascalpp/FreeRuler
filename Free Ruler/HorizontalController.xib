@@ -7,7 +7,6 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="HorizontalController" customModule="Free_Ruler" customModuleProvider="target">
             <connections>
-                <outlet property="contentView" destination="BUP-mD-NKX" id="7TC-Fy-Zqj"/>
                 <outlet property="rule" destination="gyz-gi-vH3" id="rBc-az-mOM"/>
                 <outlet property="window" destination="VBH-PX-ypm" id="tXZ-GF-0fE"/>
             </connections>

@@ -13,7 +13,6 @@ class VerticalController: NSWindowController, Synchronisable {
     weak var appDelegate: AppDelegate?
 
     @IBOutlet weak var rule: VerticalRule!
-    @IBOutlet weak var contentView: NSView!
     
     convenience init() {
         self.init(windowNibName: "VerticalController")
@@ -26,9 +25,8 @@ class VerticalController: NSWindowController, Synchronisable {
         
         window?.backgroundColor = .clear
         window?.isMovableByWindowBackground = true
-        
-        contentView.wantsLayer = true
-        contentView.layer?.cornerRadius = 0.0
+        print("vertical", "isFloatingPanel", window?.isFloatingPanel as Any)
+        print("vertical", "hidesOnDeactivate", window?.hidesOnDeactivate as Any)
 
         setupKeyboardListening()
     }

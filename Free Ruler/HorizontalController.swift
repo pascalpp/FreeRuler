@@ -13,7 +13,6 @@ class HorizontalController: NSWindowController, Synchronisable {
     weak var appDelegate: AppDelegate?
 
     @IBOutlet weak var rule: HorizontalRule!
-    @IBOutlet weak var contentView: NSVisualEffectView!
     
     convenience init() {
         self.init(windowNibName: "HorizontalController")
@@ -26,10 +25,9 @@ class HorizontalController: NSWindowController, Synchronisable {
         
         window?.backgroundColor = .clear
         window?.isMovableByWindowBackground = true
+        print("horizontal", "isFloatingPanel", window?.isFloatingPanel as Any)
+        print("horizontal", "hidesOnDeactivate", window?.hidesOnDeactivate as Any)
         
-        contentView.wantsLayer = true
-        contentView.layer?.cornerRadius = 0.0
-
         setupKeyboardListening()
     }
     
