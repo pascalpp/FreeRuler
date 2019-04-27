@@ -19,12 +19,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let backgroundTimerInterval: TimeInterval = 66 / 1000 // 15 fps
 
     @IBOutlet weak var groupedMenuItem: NSMenuItem!
-    var grouped: Bool = true
+    var grouped: Bool = false
     
 
     // MARK: - Lifecycle
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
+        groupedMenuItem?.state = (grouped ? .on : .off)
         horizontal.showWindow(nil)
         vertical.showWindow(nil)
     }
