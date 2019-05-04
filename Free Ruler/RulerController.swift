@@ -35,6 +35,7 @@ class RulerController: NSCoder, NSWindowDelegate {
     
     func windowDidMove(_ notification: Notification) {
 //        print(self.type, "windowDidMove")
+        window.invalidateShadow()
     }
     
     func windowDidBecomeKey(_ notification: Notification) {

@@ -11,6 +11,7 @@ class RulerWindow: NSPanel {
         let styleMask: NSWindow.StyleMask = [
             .borderless,
             .resizable,
+            .fullSizeContentView,
         ]
 
         super.init(
@@ -27,6 +28,8 @@ class RulerWindow: NSPanel {
         self.hidesOnDeactivate = false
         self.isMovableByWindowBackground = true
         // self.hasShadow = false
+        
+        self.contentView = NSView(frame: contentRect)
 
     }
     
