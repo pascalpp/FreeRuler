@@ -18,22 +18,8 @@ class VerticalRule: RulerView {
         }
     }
 
-    var showMouseTick: Bool = true {
-        didSet {
-            if showMouseTick != oldValue {
-                needsDisplay = true
-            }
-        }
-    }
-
     var windowHeight: CGFloat {
         return self.window?.frame.height ?? 0
-    }
-
-    override func drawMouseTick(at mouseLoc: NSPoint) {
-        let windowY = self.window?.frame.origin.y ?? 0
-        let mouseY = mouseLoc.y
-        self.mouseTickY = mouseY - windowY
     }
 
     override func draw(_ dirtyRect: NSRect) {
@@ -84,6 +70,12 @@ class VerticalRule: RulerView {
         }
     }
     
+    override func drawMouseTick(at mouseLoc: NSPoint) {
+        let windowY = self.window?.frame.origin.y ?? 0
+        let mouseY = mouseLoc.y
+        self.mouseTickY = mouseY - windowY
+    }
+    
     func drawMouseTick(_ mouseTickY: CGFloat) {
         let mouseTick = NSBezierPath()
         let width: CGFloat = 40
@@ -121,18 +113,4 @@ class VerticalRule: RulerView {
 
     }
 
-}
-
-// MARK: - Mouse events
-
-extension VerticalRule {
-    // Hide the ruler tick when the mouse is clicked on the ruler, for example
-    // during window drag.
-    override func mouseDown(with event: NSEvent) {
-        showMouseTick = false
-    }
-
-    override func mouseUp(with event: NSEvent) {
-        showMouseTick = true
-    }
 }
