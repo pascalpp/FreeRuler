@@ -612,7 +612,7 @@
                     <menu key="submenu" title="View" id="HyV-fh-RgO">
                         <items>
                             <menuItem title="Group Rulers" state="on" keyEquivalent="g" id="7Ga-Fb-LLc">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                 <connections>
                                     <action selector="toggleGroupedRulers:" target="Voe-Tx-rLC" id="Biv-Pi-sJF"/>
                                 </connections>
