@@ -8,8 +8,7 @@
 
 import Cocoa
 
-@IBDesignable
-class HorizontalRule: NSView {
+class HorizontalRule: RulerView {
 
     var mouseTickX: CGFloat = 0 {
         didSet {
@@ -29,6 +28,12 @@ class HorizontalRule: NSView {
 
     var windowWidth: CGFloat {
         return self.window?.frame.width ?? 0
+    }
+
+    override func drawMouseTick(at mouseLoc: NSPoint) {
+        let windowX = self.window?.frame.origin.x ?? 0
+        let mouseX = mouseLoc.x
+        self.mouseTickX = mouseX - windowX
     }
 
     override func draw(_ dirtyRect: NSRect) {
@@ -115,18 +120,6 @@ class HorizontalRule: NSView {
 
     }
 
-}
-
-extension HorizontalRule: TickableX {
-    func drawMouseTick(at mouseLoc: NSPoint) {
-        let windowX = self.window?.frame.origin.x ?? 0
-        let mouseX = mouseLoc.x
-        self.mouseTickX = mouseX - windowX
-    }
-}
-
-protocol TickableX {
-    func drawMouseTick(at mouseLoc: NSPoint)
 }
 
 

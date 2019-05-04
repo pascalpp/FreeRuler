@@ -3,11 +3,14 @@ import Cocoa
 class RulerWindow: NSPanel {
     
     var type: RulerType
+    var rule: RulerView
     
     init(type: RulerType) {
         self.type = type
 
         let contentRect = getContentRect(type: type)
+        self.rule = getRulerView(type: type, contentRect: contentRect)
+
         let styleMask: NSWindow.StyleMask = [
             .borderless,
             .resizable,
@@ -29,7 +32,7 @@ class RulerWindow: NSPanel {
         self.isMovableByWindowBackground = true
         // self.hasShadow = false
         
-        self.contentView = getRulerView(type: type, contentRect: contentRect)
+        self.contentView = self.rule
     }
     
     override var canBecomeKey: Bool {
@@ -85,7 +88,7 @@ func getMaxSize(type: RulerType) -> NSSize {
     }
 }
 
-func getRulerView(type: RulerType, contentRect: NSRect) -> NSView {
+func getRulerView(type: RulerType, contentRect: NSRect) -> RulerView {
     switch type {
     case .Horizontal:
         return HorizontalRule(frame: contentRect)

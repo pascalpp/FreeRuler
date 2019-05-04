@@ -8,10 +8,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let horizontal = RulerController(type: .Horizontal)
     let vertical = RulerController(type: .Vertical)
 
-//    var timer: Timer?
-//    var currentTimerInterval: TimeInterval?
-//    let foregroundTimerInterval: TimeInterval = 40 / 1000 // 25 fps
-//    let backgroundTimerInterval: TimeInterval = 66 / 1000 // 15 fps
+    var timer: Timer?
+    let foregroundTimerInterval: TimeInterval = 1000 / 60 / 1000 // 60 fps
+    let backgroundTimerInterval: TimeInterval = 1000 / 15 / 1000 // 15 fps
 
     @IBOutlet weak var groupedMenuItem: NSMenuItem!
 
@@ -31,16 +30,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         horizontal.window.alphaValue = 0.9
         vertical.window.alphaValue = 0.9
 
-//        currentTimerInterval = foregroundTimerInterval
-//        startTimer()
+        startTimer(timeInterval: foregroundTimerInterval)
     }
     
     func applicationDidResignActive(_ notification: Notification) {
         horizontal.window.alphaValue = 0.5
         vertical.window.alphaValue = 0.5
 
-//        currentTimerInterval = backgroundTimerInterval
-//        startTimer()
+        startTimer(timeInterval: backgroundTimerInterval)
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -71,30 +68,29 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 // MARK: - Timer
 extension AppDelegate {
 
-//    private func startTimer() {
-//        timer?.invalidate()
-//
-//        timer = Timer.scheduledTimer(
-//            timeInterval: currentTimerInterval!,
-//            target: self,
-//            selector: #selector(self.onInterval),
-//            userInfo: nil,
-//            repeats: true
-//        )
-//    }
-//
-//    @objc func onInterval() {
-//        self.updateMouseLocation()
-//    }
-//
-//    private func updateMouseLocation() {
-//        var mouseLoc = NSEvent.mouseLocation
-//        mouseLoc.x = mouseLoc.x.rounded()
-//        mouseLoc.y = mouseLoc.y.rounded()
-//        horizontal.rule?.drawMouseTick(at: mouseLoc)
-//        vertical.rule?.drawMouseTick(at: mouseLoc)
-//    }
-//
+    private func startTimer(timeInterval: TimeInterval) {
+        timer?.invalidate()
+
+        timer = Timer.scheduledTimer(
+            timeInterval: timeInterval,
+            target: self,
+            selector: #selector(self.onInterval),
+            userInfo: nil,
+            repeats: true
+        )
+    }
+
+    @objc func onInterval() {
+        self.updateMouseLocation()
+    }
+
+    private func updateMouseLocation() {
+        var mouseLoc = NSEvent.mouseLocation
+        mouseLoc.x = mouseLoc.x.rounded()
+        mouseLoc.y = mouseLoc.y.rounded()
+        horizontal.window.rule.drawMouseTick(at: mouseLoc)
+        vertical.window.rule.drawMouseTick(at: mouseLoc)
+    }
 
 }
 

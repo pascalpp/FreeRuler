@@ -8,8 +8,7 @@
 
 import Cocoa
 
-@IBDesignable
-class VerticalRule: NSView {
+class VerticalRule: RulerView {
 
     var mouseTickY: CGFloat = 0 {
         didSet {
@@ -29,6 +28,12 @@ class VerticalRule: NSView {
 
     var windowHeight: CGFloat {
         return self.window?.frame.height ?? 0
+    }
+
+    override func drawMouseTick(at mouseLoc: NSPoint) {
+        let windowY = self.window?.frame.origin.y ?? 0
+        let mouseY = mouseLoc.y
+        self.mouseTickY = mouseY - windowY
     }
 
     override func draw(_ dirtyRect: NSRect) {
@@ -117,19 +122,6 @@ class VerticalRule: NSView {
     }
 
 }
-
-extension VerticalRule: TickableY {
-    func drawMouseTick(at mouseLoc: NSPoint) {
-        let windowY = self.window?.frame.origin.y ?? 0
-        let mouseY = mouseLoc.y
-        self.mouseTickY = mouseY - windowY
-    }
-}
-
-protocol TickableY {
-    func drawMouseTick(at mouseLoc: NSPoint)
-}
-
 
 // MARK: - Mouse events
 
