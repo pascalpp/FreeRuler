@@ -29,8 +29,7 @@ class RulerWindow: NSPanel {
         self.isMovableByWindowBackground = true
         // self.hasShadow = false
         
-        self.contentView = NSView(frame: contentRect)
-
+        self.contentView = getRulerView(type: type, contentRect: contentRect)
     }
     
     override var canBecomeKey: Bool {
@@ -83,5 +82,14 @@ func getMaxSize(type: RulerType) -> NSSize {
         return NSSize(width: 20000, height: 40)
     case .Vertical:
         return NSSize(width: 40, height: 20000)
+    }
+}
+
+func getRulerView(type: RulerType, contentRect: NSRect) -> NSView {
+    switch type {
+    case .Horizontal:
+        return HorizontalRule(frame: contentRect)
+    case .Vertical:
+        return VerticalRule(frame: contentRect)
     }
 }
