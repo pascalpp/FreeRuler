@@ -17,8 +17,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Lifecycle
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        horizontal.other = vertical.window
-        vertical.other = horizontal.window
+        horizontal.otherWindow = vertical.rulerWindow
+        vertical.otherWindow = horizontal.rulerWindow
         
         updateGroupedRulers()
         
@@ -27,15 +27,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func applicationDidBecomeActive(_ notification: Notification) {
-        horizontal.window.alphaValue = 0.9
-        vertical.window.alphaValue = 0.9
+        horizontal.rulerWindow.alphaValue = 0.9
+        vertical.rulerWindow.alphaValue = 0.9
 
         startTimer(timeInterval: foregroundTimerInterval)
     }
     
     func applicationDidResignActive(_ notification: Notification) {
-        horizontal.window.alphaValue = 0.5
-        vertical.window.alphaValue = 0.5
+        horizontal.rulerWindow.alphaValue = 0.5
+        vertical.rulerWindow.alphaValue = 0.5
 
         startTimer(timeInterval: backgroundTimerInterval)
     }
@@ -88,8 +88,8 @@ extension AppDelegate {
         var mouseLoc = NSEvent.mouseLocation
         mouseLoc.x = mouseLoc.x.rounded()
         mouseLoc.y = mouseLoc.y.rounded()
-        horizontal.window.rule.drawMouseTick(at: mouseLoc)
-        vertical.window.rule.drawMouseTick(at: mouseLoc)
+        horizontal.rulerWindow.rule.drawMouseTick(at: mouseLoc)
+        vertical.rulerWindow.rule.drawMouseTick(at: mouseLoc)
     }
 
 }
