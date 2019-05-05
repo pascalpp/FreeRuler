@@ -25,8 +25,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         updateGroupedRulers()
         
-        horizontal.showWindow()
         vertical.showWindow()
+        horizontal.showWindow()
     }
     
     func applicationDidBecomeActive(_ notification: Notification) {
