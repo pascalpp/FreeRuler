@@ -31,6 +31,7 @@ class RulerWindow: NSPanel {
         // self.hasShadow = false
         
         self.contentView = self.rule
+        self.setFrameAutosaveName(ruler.orientation.rawValue)
     }
     
     override var canBecomeKey: Bool {
