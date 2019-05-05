@@ -1,4 +1,5 @@
 import Cocoa
+import SwiftyUserDefaults
 
 class RulerController: NSCoder, NSWindowDelegate {
     
@@ -51,7 +52,7 @@ class RulerController: NSCoder, NSWindowDelegate {
     func updateChildWindow() {
         guard let other = otherWindow else { return }
         
-        let grouped = defaults.bool(forKey: "groupedRulers")
+        let grouped = Defaults[.groupedRulers]
         if grouped && rulerWindow.isKeyWindow {
             self.rulerWindow.addChildWindow(other, ordered: .below)
         } else {

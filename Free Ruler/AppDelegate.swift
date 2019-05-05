@@ -1,4 +1,10 @@
 import Cocoa
+import SwiftyUserDefaults
+
+extension DefaultsKeys {
+    static let groupedRulers = DefaultsKey<Bool>("groupedRulers", defaultValue: false)
+}
+
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -45,7 +51,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func updateGroupedRulers() {
-        let grouped = defaults.bool(forKey: "groupedRulers")
+        let grouped = Defaults[.groupedRulers]
 
         horizontal.updateChildWindow()
         vertical.updateChildWindow()
@@ -56,8 +62,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @IBAction func toggleGroupedRulers(_ sender: Any) {
-        let grouped = defaults.bool(forKey: "groupedRulers")
-        defaults.set(!grouped, forKey: "groupedRulers")
+        Defaults[.groupedRulers] = !Defaults[.groupedRulers]
         updateGroupedRulers()
     }
 

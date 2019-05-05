@@ -1,0 +1,11 @@
+framework module SwiftyUserDefaults {
+  umbrella header "SwiftyUserDefaults.h"
+
+  export *
+  module * { export * }
+}
+
+module SwiftyUserDefaults.Swift {
+    header "SwiftyUserDefaults-Swift.h"
+    requires objc
+}
