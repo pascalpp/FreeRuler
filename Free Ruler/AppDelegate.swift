@@ -5,7 +5,6 @@ extension DefaultsKeys {
     static let groupedRulers = DefaultsKey<Bool>("groupedRulers", defaultValue: false)
 }
 
-
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     
