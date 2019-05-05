@@ -2,14 +2,12 @@ import Cocoa
 
 class RulerWindow: NSPanel {
     
-    var type: RulerType
-    var rule: RulerView
+    var ruler: Ruler
+    var rule: RuleView
     
-    init(type: RulerType) {
-        self.type = type
-
-        let contentRect = getContentRect(type: type)
-        self.rule = getRulerView(type: type, contentRect: contentRect)
+    init(ruler: Ruler) {
+        self.ruler = ruler
+        self.rule = getRulerView(ruler: ruler)
 
         let styleMask: NSWindow.StyleMask = [
             .borderless,
@@ -18,14 +16,14 @@ class RulerWindow: NSPanel {
         ]
 
         super.init(
-            contentRect: contentRect,
+            contentRect: ruler.frame,
             styleMask: styleMask,
             backing: .buffered,
             defer: false
         )
         
-        self.minSize = getMinSize(type: type)
-        self.maxSize = getMaxSize(type: type)
+        self.minSize = getMinSize(ruler: ruler)
+        self.maxSize = getMaxSize(ruler: ruler)
         
         self.isFloatingPanel = true
         self.hidesOnDeactivate = false
@@ -41,37 +39,9 @@ class RulerWindow: NSPanel {
 
 }
 
-func getContentRect(type: RulerType) -> NSRect {
-    var screenHeight: CGFloat = 1000
-    if let screen = NSScreen.main?.frame {
-        screenHeight = screen.height
-    }
-    
-    let initialOffset: CGFloat = 50
-    let rulerLength: CGFloat = 600
-    let rulerThickness: CGFloat = 40
-    
-    switch type {
-    case .Horizontal:
-        return NSRect(
-            x: initialOffset + rulerThickness,
-            y: screenHeight - initialOffset - rulerThickness,
-            width: rulerLength,
-            height: rulerThickness
-        )
-    case .Vertical:
-        return NSRect(
-            x: initialOffset,
-            y: screenHeight - initialOffset - rulerThickness - rulerLength,
-            width: rulerThickness,
-            height: rulerLength
-        )
-    }
-    
-}
 
-func getMinSize(type: RulerType) -> NSSize {
-    switch type {
+func getMinSize(ruler: Ruler) -> NSSize {
+    switch ruler.orientation {
     case .Horizontal:
         return NSSize(width: 200, height: 40)
     case .Vertical:
@@ -79,8 +49,8 @@ func getMinSize(type: RulerType) -> NSSize {
     }
 }
 
-func getMaxSize(type: RulerType) -> NSSize {
-    switch type {
+func getMaxSize(ruler: Ruler) -> NSSize {
+    switch ruler.orientation {
     case .Horizontal:
         return NSSize(width: 20000, height: 40)
     case .Vertical:
@@ -88,11 +58,11 @@ func getMaxSize(type: RulerType) -> NSSize {
     }
 }
 
-func getRulerView(type: RulerType, contentRect: NSRect) -> RulerView {
-    switch type {
+func getRulerView(ruler: Ruler) -> RuleView {
+    switch ruler.orientation {
     case .Horizontal:
-        return HorizontalRule(frame: contentRect)
+        return HorizontalRule(frame: ruler.frame)
     case .Vertical:
-        return VerticalRule(frame: contentRect)
+        return VerticalRule(frame: ruler.frame)
     }
 }

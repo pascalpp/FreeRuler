@@ -5,13 +5,11 @@ class RulerController: NSCoder, NSWindowDelegate {
     
     let defaults = UserDefaults.standard
 
-    var type: RulerType
     var rulerWindow: RulerWindow
     var otherWindow: RulerWindow?
     
-    init(type: RulerType) {
-        self.type = type
-        self.rulerWindow = RulerWindow(type: type)
+    init(ruler: Ruler) {
+        self.rulerWindow = RulerWindow(ruler: ruler)
 
         super.init()
 

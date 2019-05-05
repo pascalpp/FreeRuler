@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class VerticalRule: RulerView {
+class VerticalRule: RuleView {
 
     var mouseTickY: CGFloat = 0 {
         didSet {
