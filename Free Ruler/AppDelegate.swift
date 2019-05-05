@@ -5,7 +5,6 @@ extension DefaultsKeys {
     static let groupedRulers = DefaultsKey<Bool>("groupedRulers", defaultValue: false)
 }
 
-
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     
@@ -26,8 +25,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         updateGroupedRulers()
         
-        horizontal.showWindow()
         vertical.showWindow()
+        horizontal.showWindow()
     }
     
     func applicationDidBecomeActive(_ notification: Notification) {

@@ -66,3 +66,48 @@ func getRulerView(ruler: Ruler) -> RuleView {
         return VerticalRule(frame: ruler.frame)
     }
 }
+
+extension RulerWindow {
+    private enum Distance: CGFloat {
+        case aLittle = 1
+        case aLot = 10
+    }
+
+    func moveHorizontally(by pixels: CGFloat) {
+        var position = frame.origin
+        position.x = position.x + pixels
+        setFrameOrigin(position)
+    }
+
+    func moveVertically(by pixels: CGFloat) {
+        var position = frame.origin
+        position.y = position.y + pixels
+        setFrameOrigin(position)
+    }
+
+    private func distance(withShift: Bool) -> CGFloat {
+        let distance = withShift ? Distance.aLot : Distance.aLittle
+        return distance.rawValue
+    }
+
+    func nudgeLeft(withShift shiftPressed: Bool) {
+        let distance = self.distance(withShift: shiftPressed)
+        moveHorizontally(by: distance * -1)
+    }
+
+    func nudgeRight(withShift shiftPressed: Bool) {
+        let distance = self.distance(withShift: shiftPressed)
+        moveHorizontally(by: distance)
+    }
+
+    func nudgeDown(withShift shiftPressed: Bool) {
+        let distance = self.distance(withShift: shiftPressed)
+        moveVertically(by: distance * -1)
+    }
+
+    func nudgeUp(withShift shiftPressed: Bool) {
+        let distance = self.distance(withShift: shiftPressed)
+        moveVertically(by: distance)
+    }
+
+}
