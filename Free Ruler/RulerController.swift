@@ -1,24 +1,25 @@
 import Cocoa
+import SwiftyUserDefaults
 
 class RulerController: NSCoder, NSWindowDelegate {
     
     let defaults = UserDefaults.standard
 
     var type: RulerType
-    var window: RulerWindow
-    var other: RulerWindow?
+    var rulerWindow: RulerWindow
+    var otherWindow: RulerWindow?
     
     init(type: RulerType) {
         self.type = type
-        self.window = RulerWindow(type: type)
+        self.rulerWindow = RulerWindow(type: type)
 
         super.init()
 
-        window.delegate = self
+        rulerWindow.delegate = self
     }
     
     func showWindow() {
-        window.orderFront(nil)
+        rulerWindow.orderFront(nil)
     }
 
     func windowWillStartLiveResize(_ notification: Notification) {
@@ -35,27 +36,27 @@ class RulerController: NSCoder, NSWindowDelegate {
     
     func windowDidMove(_ notification: Notification) {
 //        print(self.type, "windowDidMove")
-        window.invalidateShadow()
+        rulerWindow.invalidateShadow()
     }
     
     func windowDidBecomeKey(_ notification: Notification) {
-        print(self.type, "windowDidBecomeKey")
+//        print(self.type, "windowDidBecomeKey")
         updateChildWindow()
     }
     
     func windowDidResignKey(_ notification: Notification) {
-        print(self.type, "windowDidResignKey")
+//        print(self.type, "windowDidResignKey")
         updateChildWindow()
     }
     
     func updateChildWindow() {
-        guard let other = other else { return }
+        guard let other = otherWindow else { return }
         
-        let grouped = defaults.bool(forKey: "groupedRulers")
-        if grouped && window.isKeyWindow {
-            self.window.addChildWindow(other, ordered: .below)
+        let grouped = Defaults[.groupedRulers]
+        if grouped && rulerWindow.isKeyWindow {
+            self.rulerWindow.addChildWindow(other, ordered: .below)
         } else {
-            self.window.removeChildWindow(other)
+            self.rulerWindow.removeChildWindow(other)
         }
     }
 

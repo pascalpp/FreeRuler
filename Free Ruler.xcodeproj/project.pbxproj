@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		5012CAAD226AB09000BD9565 /* VerticalRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5012CAAC226AB09000BD9565 /* VerticalRule.swift */; };
+		5077EFD6227E6E5400A13D57 /* SwiftyUserDefaults.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5077EFD3227E6DBD00A13D57 /* SwiftyUserDefaults.framework.dSYM */; };
+		5077EFD8227E6E6400A13D57 /* SwiftyUserDefaults.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5077EFCE227E6D2300A13D57 /* SwiftyUserDefaults.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		50D7BEE7227D42FD0008B95E /* RulerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEE6227D42FD0008B95E /* RulerController.swift */; };
 		50D7BEE9227D43270008B95E /* RulerType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEE8227D43270008B95E /* RulerType.swift */; };
 		50D7BEEB227D432E0008B95E /* RulerWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEEA227D432E0008B95E /* RulerWindow.swift */; };
@@ -19,8 +21,34 @@
 		6F4102A62262B8A100F06A10 /* NSWindow+Move.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F4102A52262B8A100F06A10 /* NSWindow+Move.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		5077EFD2227E6D9D00A13D57 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 16;
+			files = (
+				5077EFD6227E6E5400A13D57 /* SwiftyUserDefaults.framework.dSYM in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5077EFD9227E6E6400A13D57 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				5077EFD8227E6E6400A13D57 /* SwiftyUserDefaults.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		5012CAAC226AB09000BD9565 /* VerticalRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerticalRule.swift; sourceTree = "<group>"; };
+		5077EFCE227E6D2300A13D57 /* SwiftyUserDefaults.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SwiftyUserDefaults.framework; sourceTree = "<group>"; };
+		5077EFD3227E6DBD00A13D57 /* SwiftyUserDefaults.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = SwiftyUserDefaults.framework.dSYM; sourceTree = "<group>"; };
 		50D7BEE6227D42FD0008B95E /* RulerController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RulerController.swift; sourceTree = "<group>"; };
 		50D7BEE8227D43270008B95E /* RulerType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RulerType.swift; sourceTree = "<group>"; };
 		50D7BEEA227D432E0008B95E /* RulerWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RulerWindow.swift; sourceTree = "<group>"; };
@@ -46,11 +74,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5077EFD5227E6E0400A13D57 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				5077EFCE227E6D2300A13D57 /* SwiftyUserDefaults.framework */,
+				5077EFD3227E6DBD00A13D57 /* SwiftyUserDefaults.framework.dSYM */,
+			);
+			path = Frameworks;
+			sourceTree = "<group>";
+		};
 		6F41027C2260712F00F06A10 = {
 			isa = PBXGroup;
 			children = (
 				6F4102872260712F00F06A10 /* Free Ruler */,
 				6F4102862260712F00F06A10 /* Products */,
+				5077EFD5227E6E0400A13D57 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -99,6 +137,8 @@
 				6F4102812260712F00F06A10 /* Sources */,
 				6F4102822260712F00F06A10 /* Frameworks */,
 				6F4102832260712F00F06A10 /* Resources */,
+				5077EFD2227E6D9D00A13D57 /* CopyFiles */,
+				5077EFD9227E6E6400A13D57 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -307,6 +347,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = X88CY268NZ;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+					"$(PROJECT_DIR)/Frameworks",
+				);
 				INFOPLIST_FILE = "Free Ruler/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -326,6 +371,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = X88CY268NZ;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+					"$(PROJECT_DIR)/Frameworks",
+				);
 				INFOPLIST_FILE = "Free Ruler/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

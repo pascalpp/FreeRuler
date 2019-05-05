@@ -1,0 +1,15 @@
+{
+  "commitish" : "4.0.0",
+  "Mac" : [
+    {
+      "name" : "SwiftyUserDefaults",
+      "hash" : "f37d3b926ac61cfbd3cb15436060c441ffec4d96ae0516b518d1581bc41beb24",
+      "swiftToolchainVersion" : "5.0.1 (swiftlang-1001.0.82.4 clang-1001.0.46.5)"
+    },
+    {
+      "name" : "SwiftyUserDefaults",
+      "hash" : "f37d3b926ac61cfbd3cb15436060c441ffec4d96ae0516b518d1581bc41beb24",
+      "swiftToolchainVersion" : "5.0.1 (swiftlang-1001.0.82.4 clang-1001.0.46.5)"
+    }
+  ]
+}

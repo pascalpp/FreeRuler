@@ -1,4 +1,10 @@
 import Cocoa
+import SwiftyUserDefaults
+
+extension DefaultsKeys {
+    static let groupedRulers = DefaultsKey<Bool>("groupedRulers", defaultValue: false)
+}
+
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -17,8 +23,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Lifecycle
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        horizontal.other = vertical.window
-        vertical.other = horizontal.window
+        horizontal.otherWindow = vertical.rulerWindow
+        vertical.otherWindow = horizontal.rulerWindow
         
         updateGroupedRulers()
         
@@ -27,15 +33,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func applicationDidBecomeActive(_ notification: Notification) {
-        horizontal.window.alphaValue = 0.9
-        vertical.window.alphaValue = 0.9
+        horizontal.rulerWindow.alphaValue = 0.9
+        vertical.rulerWindow.alphaValue = 0.9
 
         startTimer(timeInterval: foregroundTimerInterval)
     }
     
     func applicationDidResignActive(_ notification: Notification) {
-        horizontal.window.alphaValue = 0.5
-        vertical.window.alphaValue = 0.5
+        horizontal.rulerWindow.alphaValue = 0.5
+        vertical.rulerWindow.alphaValue = 0.5
 
         startTimer(timeInterval: backgroundTimerInterval)
     }
@@ -45,7 +51,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func updateGroupedRulers() {
-        let grouped = defaults.bool(forKey: "groupedRulers")
+        let grouped = Defaults[.groupedRulers]
 
         horizontal.updateChildWindow()
         vertical.updateChildWindow()
@@ -56,8 +62,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @IBAction func toggleGroupedRulers(_ sender: Any) {
-        let grouped = defaults.bool(forKey: "groupedRulers")
-        defaults.set(!grouped, forKey: "groupedRulers")
+        Defaults[.groupedRulers] = !Defaults[.groupedRulers]
         updateGroupedRulers()
     }
 
@@ -88,8 +93,8 @@ extension AppDelegate {
         var mouseLoc = NSEvent.mouseLocation
         mouseLoc.x = mouseLoc.x.rounded()
         mouseLoc.y = mouseLoc.y.rounded()
-        horizontal.window.rule.drawMouseTick(at: mouseLoc)
-        vertical.window.rule.drawMouseTick(at: mouseLoc)
+        horizontal.rulerWindow.rule.drawMouseTick(at: mouseLoc)
+        vertical.rulerWindow.rule.drawMouseTick(at: mouseLoc)
     }
 
 }
