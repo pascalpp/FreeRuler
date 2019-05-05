@@ -85,28 +85,29 @@ extension RulerWindow {
         setFrameOrigin(position)
     }
 
-    private func distance(withShift: Bool) -> Distance {
-        return withShift ? .aLot : .aLittle
+    private func distance(withShift: Bool) -> CGFloat {
+        let distance = withShift ? Distance.aLot : Distance.aLittle
+        return distance.rawValue
     }
 
     func nudgeLeft(withShift shiftPressed: Bool) {
         let distance = self.distance(withShift: shiftPressed)
-        moveHorizontally(by: distance.rawValue * -1)
+        moveHorizontally(by: distance * -1)
     }
 
     func nudgeRight(withShift shiftPressed: Bool) {
         let distance = self.distance(withShift: shiftPressed)
-        moveHorizontally(by: distance.rawValue)
+        moveHorizontally(by: distance)
     }
 
     func nudgeDown(withShift shiftPressed: Bool) {
         let distance = self.distance(withShift: shiftPressed)
-        moveVertically(by: distance.rawValue * -1)
+        moveVertically(by: distance * -1)
     }
 
     func nudgeUp(withShift shiftPressed: Bool) {
         let distance = self.distance(withShift: shiftPressed)
-        moveVertically(by: distance.rawValue)
+        moveVertically(by: distance)
     }
 
 }
