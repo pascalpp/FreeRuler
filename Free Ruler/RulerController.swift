@@ -8,7 +8,8 @@ class RulerController: NSCoder, NSWindowDelegate {
     let ruler: Ruler
     let rulerWindow: RulerWindow
     var otherWindow: RulerWindow?
-
+    var keyListener: Any?
+    
     init(ruler: Ruler) {
         self.ruler = ruler
         self.rulerWindow = RulerWindow(ruler: ruler)
@@ -20,7 +21,6 @@ class RulerController: NSCoder, NSWindowDelegate {
 
     func showWindow() {
         rulerWindow.orderFront(nil)
-        setupKeyboardListening()
     }
 
     func windowWillStartLiveResize(_ notification: Notification) {
@@ -43,11 +43,13 @@ class RulerController: NSCoder, NSWindowDelegate {
     func windowDidBecomeKey(_ notification: Notification) {
 //        print(self.type, "windowDidBecomeKey")
         updateChildWindow()
+        startKeyListener()
     }
 
     func windowDidResignKey(_ notification: Notification) {
 //        print(self.type, "windowDidResignKey")
         updateChildWindow()
+        stopKeyListener()
     }
 
     func updateChildWindow() {
@@ -63,37 +65,42 @@ class RulerController: NSCoder, NSWindowDelegate {
 
 }
 
+// MARK: KeyListener
 
 extension RulerController {
-
-    func setupKeyboardListening() {
-        NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] in
+    
+    func startKeyListener() {
+        self.keyListener = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] in
             guard let self = self else { return $0 }
             return self.onKeyDown(with: $0)
+        }
+    }
+    
+    func stopKeyListener() {
+        if let keyListener = self.keyListener {
+            NSEvent.removeMonitor(keyListener)
+            self.keyListener = nil
         }
     }
 
     // Return nil if the event was handled here.
     func onKeyDown(with event: NSEvent) -> NSEvent? {
-
-        guard let window = event.window as! RulerWindow?,
-            window.isKeyWindow
-        else { return event }
+        print(ruler.orientation, "onKeyDown")
 
         let shift = event.modifierFlags.contains(.shift)
 
-        switch Int( event.keyCode) {
+        switch Int(event.keyCode) {
         case kVK_LeftArrow:
-            window.nudgeLeft(withShift: shift)
+            rulerWindow.nudgeLeft(withShift: shift)
             return nil
         case kVK_RightArrow:
-            window.nudgeRight(withShift: shift)
+            rulerWindow.nudgeRight(withShift: shift)
             return nil
         case kVK_UpArrow:
-            window.nudgeUp(withShift: shift)
+            rulerWindow.nudgeUp(withShift: shift)
             return nil
         case kVK_DownArrow:
-            window.nudgeDown(withShift: shift)
+            rulerWindow.nudgeDown(withShift: shift)
             return nil
         default:
             return event
