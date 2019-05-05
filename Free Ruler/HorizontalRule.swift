@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class HorizontalRule: RulerView {
+class HorizontalRule: RuleView {
 
     var mouseTickX: CGFloat = 0 {
         didSet {

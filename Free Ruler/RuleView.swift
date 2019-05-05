@@ -1,6 +1,6 @@
 import Cocoa
 
-class RulerView: NSView {
+class RuleView: NSView {
 
     func drawMouseTick(at mouseLoc: NSPoint) {
         // required override

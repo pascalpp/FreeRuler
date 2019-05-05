@@ -9,8 +9,8 @@ extension DefaultsKeys {
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     
-    let horizontal = RulerController(type: .Horizontal)
-    let vertical = RulerController(type: .Vertical)
+    let horizontal = RulerController(ruler: Ruler(orientation: .Horizontal))
+    let vertical = RulerController(ruler: Ruler(orientation: .Vertical))
 
     var timer: Timer?
     let foregroundTimerInterval: TimeInterval = 1 / 60 // 60 fps
