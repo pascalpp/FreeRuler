@@ -9,14 +9,12 @@ extension DefaultsKeys {
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     
-    let defaults = UserDefaults.standard
-
     let horizontal = RulerController(type: .Horizontal)
     let vertical = RulerController(type: .Vertical)
 
     var timer: Timer?
-    let foregroundTimerInterval: TimeInterval = 1000 / 60 / 1000 // 60 fps
-    let backgroundTimerInterval: TimeInterval = 1000 / 15 / 1000 // 15 fps
+    let foregroundTimerInterval: TimeInterval = 1 / 60 // 60 fps
+    let backgroundTimerInterval: TimeInterval = 1 / 15 // 15 fps
 
     @IBOutlet weak var groupedMenuItem: NSMenuItem!
 
