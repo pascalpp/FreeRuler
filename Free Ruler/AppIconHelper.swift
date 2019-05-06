@@ -1,8 +1,16 @@
 import Cocoa
 
 /*
+ 
+ This file draws a special set of windows to be used as the app icon, with some additional image manipulation.
+ 
  Steps taken to generate the icon:
+ - choose the 'App Icon Helper' scheme and run.
  - take screenshot
+    - press cmd-shift-4
+    - press and release the space bar to switch to object mode
+    - click on the window
+    - the rulers are set as child windows, so they'll be included in the screenshot
  - create 1024x1024 image in Photoshop, Pixelmator, etc
  - rotate 351°
  - scale screenshot proportionately to match size of Apple Notes icon
@@ -25,8 +33,8 @@ class AppIconHelper: NSObject {
     func show() {
         self.showAppIconBackdrop()
         self.showAppIconRulers()
-        self.showAppIconRulersEffShape()
-        self.showAppIconRulersEffShapeAsViews()
+//        self.showAppIconRulersEffShape()
+//        self.showAppIconRulersEffShapeAsViews()
     }
     
     func showAppIconBackdrop() {
