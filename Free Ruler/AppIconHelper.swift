@@ -1,4 +1,5 @@
 import Cocoa
+import QuartzCore
 
 /*
  
@@ -177,3 +178,35 @@ func addBorder(view: NSView) {
     view.addSubview(border)
 }
 
+extension NSWindow {
+
+    open override func mouseDown(with event: NSEvent) {
+        self.shakeWindow()
+    }
+    
+    func shakeWindow(){
+        let numberOfShakes = 3
+        let durationOfShake = 0.5
+        let vigourOfShake: CGFloat = 0.1
+        
+        let frame = self.frame
+        let shakeAnimation = CAKeyframeAnimation()
+        
+        let shakePath = CGMutablePath()
+        shakePath.move(to: CGPoint(x: frame.minX, y: frame.minY))
+        
+        for _ in 0..<numberOfShakes {
+            shakePath.addLine(to: CGPoint(x: frame.minX - frame.size.width * vigourOfShake, y: frame.minY))
+            shakePath.addLine(to: CGPoint(x: frame.minX + frame.size.width * vigourOfShake, y: frame.minY))
+        }
+        
+        shakePath.closeSubpath()
+        
+        shakeAnimation.path = shakePath;
+        shakeAnimation.duration = durationOfShake;
+        
+        self.animations = ["frameOrigin": shakeAnimation]
+        self.animator().setFrameOrigin(self.frame.origin)
+    }
+    
+}
