@@ -2,26 +2,30 @@ import Cocoa
 import SwiftyUserDefaults
 
 enum Orientation: String {
-    case Horizontal
-    case Vertical
+    case horizontal
+    case vertical
 }
 
 
 struct Ruler {
+    static let thickness: CGFloat = 40
+
     let orientation: Orientation
-    var frame: NSRect
+    let frame: NSRect
+    let name: String? // used for frameAutosaveName
     
-    init(orientation: Orientation, frame: NSRect?) {
+    init(_ orientation: Orientation, frame: NSRect?, name: String?) {
         self.orientation = orientation
-        if let frame = frame {
-            self.frame = frame
-        } else {
-            self.frame = getDefaultContentRect(orientation: orientation)
-        }
+        self.name = name
+        self.frame = frame ?? getDefaultContentRect(orientation: orientation)
+    }
+
+    init(_ orientation: Orientation, name: String) {
+        self.init(orientation, frame: nil, name: name)
     }
     
-    init(orientation: Orientation) {
-        self.init(orientation: orientation, frame: nil)
+    init(_ orientation: Orientation, frame: NSRect) {
+        self.init(orientation, frame: frame, name: nil)
     }
 }
 
@@ -42,14 +46,14 @@ func getDefaultContentRect(orientation: Orientation) -> NSRect {
     let verticalLength = horizontalLength / aspectRatio
     
     switch orientation {
-    case .Horizontal:
+    case .horizontal:
         return NSRect(
             x: xOffset + rulerThickness,
             y: screenHeight - yOffset - rulerThickness,
             width: horizontalLength,
             height: rulerThickness
         )
-    case .Vertical:
+    case .vertical:
         return NSRect(
             x: xOffset,
             y: screenHeight - yOffset - rulerThickness - verticalLength,

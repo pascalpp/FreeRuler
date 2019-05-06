@@ -38,29 +38,29 @@ class HorizontalRule: RuleView {
         ]
 
         let width = Int(dirtyRect.width)
-        let myPath = NSBezierPath()
+        let path = NSBezierPath()
 
         for i in 1...width {
             if i.isMultiple(of: 50) {
-                myPath.move(to: CGPoint(x: i, y: 0))
-                myPath.line(to: CGPoint(x: i, y: 10))
+                path.move(to: CGPoint(x: i, y: 0))
+                path.line(to: CGPoint(x: i, y: 10))
 
                 let label = String(i)
                 label.draw(with: CGRect(x: i-20, y: 3, width: 40, height: 20), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
 
             }
             if i.isMultiple(of: 10) {
-                myPath.move(to: CGPoint(x: i, y: 0))
-                myPath.line(to: CGPoint(x: i, y: 8))
+                path.move(to: CGPoint(x: i, y: 0))
+                path.line(to: CGPoint(x: i, y: 8))
             }
             else if i.isMultiple(of: 2) {
-                myPath.move(to: CGPoint(x: i, y: 0))
-                myPath.line(to: CGPoint(x: i, y: 5))
+                path.move(to: CGPoint(x: i, y: 0))
+                path.line(to: CGPoint(x: i, y: 5))
             }
         }
 
         #colorLiteral(red: 0.7254902124, green: 0.4784313738, blue: 0.09803921729, alpha: 1).setStroke()
-        myPath.stroke()
+        path.stroke()
 
         // Draw the MouseTick & number
         if showMouseTick && mouseTickX > 0 && mouseTickX < windowWidth {
