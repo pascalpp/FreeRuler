@@ -19,6 +19,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let backgroundTimerInterval: TimeInterval = 1 / 15 // 15 fps
 
     @IBOutlet weak var groupedMenuItem: NSMenuItem!
+    
+    var preferencesController: PreferencesController? = nil
 
     // MARK: - Lifecycle
     
@@ -68,6 +70,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         groupedMenuItem?.state = (grouped ? .on : .off)
 
+    }
+
+    @IBAction func openPreferences(_ sender: Any) {
+        if preferencesController == nil {
+            preferencesController = PreferencesController(windowNibName: "PreferencesController")
+        }
+        
+        if preferencesController != nil {
+            preferencesController?.showWindow(nil)
+        }
     }
 
     @IBAction func toggleGroupedRulers(_ sender: Any) {
