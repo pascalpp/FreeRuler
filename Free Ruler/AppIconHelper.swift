@@ -1,5 +1,23 @@
 import Cocoa
 
+/*
+ Steps taken to generate the icon:
+ - take screenshot
+ - create 1024x1024 image in Photoshop, Pixelmator, etc
+ - rotate 351°
+ - scale screenshot proportionately to match size of Apple Notes icon
+   (okay to size up a bit if needed to fill 1024px cuz it'll almost never be seen that large.)
+ - add drop shadow:
+    - black, 75% opacity
+    - 270° (straight down)
+    - 10px offset
+    - 32px blur
+ - export 1024, 512, 256, 128, 64, 32, and 16px sizes
+ 
+ There's probably a better way to generate the sizes, some research needed. I'm not overly concerned with hand-tuning the smaller sizes at this point.
+ 
+ */
+
 let titlebarHeight: CGFloat = 22
 
 class AppIconHelper: NSObject {
