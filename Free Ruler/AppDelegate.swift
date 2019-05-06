@@ -5,8 +5,14 @@ let env = ProcessInfo.processInfo.environment
 let APP_ICON_HELPER = env["APP_ICON_HELPER"] != nil
 
 extension DefaultsKeys {
-    static let groupedRulers = DefaultsKey<Bool>("groupedRulers", defaultValue: false)
+    static var groupedRulers = DefaultsKey<Bool>("groupedRulers", defaultValue: false)
+    static var foregroundOpacity = DefaultsKey<Float>("foregroundOpacity", defaultValue: 0.9)
+    static var backgroundOpacity = DefaultsKey<Float>("backgroundOpacity", defaultValue: 0.5)
+    static var rulerColor = DefaultsKey<NSColor>("rulerColor", defaultValue: #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1))
 }
+
+extension Float: DefaultsSerializable {}
+extension NSColor: DefaultsSerializable {}
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -34,6 +40,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             showRulers()
         }
         
+        openPreferences(self)
     }
     
     func showRulers() {
@@ -45,15 +52,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func applicationDidBecomeActive(_ notification: Notification) {
-        horizontal.rulerWindow.alphaValue = 0.9
-        vertical.rulerWindow.alphaValue = 0.9
+        horizontal.rulerWindow.alphaValue = CGFloat(Defaults[.foregroundOpacity])
+        vertical.rulerWindow.alphaValue = CGFloat(Defaults[.foregroundOpacity])
 
         startTimer(timeInterval: foregroundTimerInterval)
     }
     
     func applicationDidResignActive(_ notification: Notification) {
-        horizontal.rulerWindow.alphaValue = 0.5
-        vertical.rulerWindow.alphaValue = 0.5
+        horizontal.rulerWindow.alphaValue = CGFloat(Defaults[.backgroundOpacity])
+        vertical.rulerWindow.alphaValue = CGFloat(Defaults[.backgroundOpacity])
 
         startTimer(timeInterval: backgroundTimerInterval)
     }

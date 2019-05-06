@@ -1,12 +1,5 @@
-//
-//  VerticalRule.swift
-//  Free Ruler
-//
-//  Created by Pascal on 2019-04-19.
-//
-//
-
 import Cocoa
+import SwiftyUserDefaults
 
 class VerticalRule: RuleView {
 
@@ -26,7 +19,8 @@ class VerticalRule: RuleView {
         super.draw(dirtyRect)
 
         // Drawing code here.
-        #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1).setFill()
+        let color = Defaults[.rulerColor]
+        color.setFill()
         dirtyRect.fill()
 
         let paragraphStyle = NSMutableParagraphStyle()
@@ -105,7 +99,7 @@ class VerticalRule: RuleView {
             NSAttributedString.Key.font: NSFont(name: "HelveticaNeue", size: 10)!,
             NSAttributedString.Key.paragraphStyle: paragraphStyle,
             NSAttributedString.Key.foregroundColor: #colorLiteral(red: 0.3098039329, green: 0.2039215714, blue: 0.03921568766, alpha: 1),
-            NSAttributedString.Key.backgroundColor: #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1),
+            NSAttributedString.Key.backgroundColor: Defaults[.rulerColor],
         ]
 
         let label = String(Int(number))

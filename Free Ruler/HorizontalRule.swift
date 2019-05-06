@@ -1,12 +1,5 @@
-//
-//  HorizontalRule.swift
-//  Free Ruler
-//
-//  Created by Jeff Hanbury on 12/04/19.
-//  Copyright © 2019 Marmaladesoul. All rights reserved.
-//
-
 import Cocoa
+import SwiftyUserDefaults
 
 class HorizontalRule: RuleView {
 
@@ -26,7 +19,8 @@ class HorizontalRule: RuleView {
         super.draw(dirtyRect)
 
         // Drawing code here.
-        #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1).setFill()
+        let color = Defaults[.rulerColor]
+        color.setFill()
         dirtyRect.fill()
 
         let paragraphStyle = NSMutableParagraphStyle()
@@ -104,7 +98,7 @@ class HorizontalRule: RuleView {
             NSAttributedString.Key.font: NSFont(name: "HelveticaNeue", size: 10)!,
             NSAttributedString.Key.paragraphStyle: paragraphStyle,
             NSAttributedString.Key.foregroundColor: #colorLiteral(red: 0.3098039329, green: 0.2039215714, blue: 0.03921568766, alpha: 1),
-            NSAttributedString.Key.backgroundColor: #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1),
+            NSAttributedString.Key.backgroundColor: Defaults[.rulerColor],
         ]
 
         let label = String(Int(number))
