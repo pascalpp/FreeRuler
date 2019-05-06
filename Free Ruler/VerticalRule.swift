@@ -39,29 +39,29 @@ class VerticalRule: RuleView {
 
         let width = Int(dirtyRect.width)
         let height = Int(dirtyRect.height)
-        let myPath = NSBezierPath()
+        let path = NSBezierPath()
 
         for i in 1...height {
             if i.isMultiple(of: 50) {
-                myPath.move(to: CGPoint(x: width - 0, y: height - i))
-                myPath.line(to: CGPoint(x: width - 10, y: height - i))
+                path.move(to: CGPoint(x: width - 0, y: height - i))
+                path.line(to: CGPoint(x: width - 10, y: height - i))
 
                 let label = String(i)
                 label.draw(with: CGRect(x: 3, y: height - i - 13, width: 24, height: 20), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
 
             }
             if i.isMultiple(of: 10) {
-                myPath.move(to: CGPoint(x: width - 0, y: height - i))
-                myPath.line(to: CGPoint(x: width - 8, y: height - i))
+                path.move(to: CGPoint(x: width - 0, y: height - i))
+                path.line(to: CGPoint(x: width - 8, y: height - i))
             }
             else if i.isMultiple(of: 2) {
-                myPath.move(to: CGPoint(x: width - 0, y: height - i))
-                myPath.line(to: CGPoint(x: width - 5, y: height - i))
+                path.move(to: CGPoint(x: width - 0, y: height - i))
+                path.line(to: CGPoint(x: width - 5, y: height - i))
             }
         }
 
         #colorLiteral(red: 0.7254902124, green: 0.4784313738, blue: 0.09803921729, alpha: 1).setStroke()
-        myPath.stroke()
+        path.stroke()
 
         // Draw the MouseTick & number
         if showMouseTick && mouseTickY >= 1 && mouseTickY < windowHeight {
