@@ -31,7 +31,9 @@ class RulerWindow: NSPanel {
         // self.hasShadow = false
         
         self.contentView = self.rule
-        self.setFrameAutosaveName(ruler.orientation.rawValue)
+        if let frameAutosaveName = ruler.name {
+            self.setFrameAutosaveName(frameAutosaveName)
+        }
     }
     
     override var canBecomeKey: Bool {
@@ -43,27 +45,27 @@ class RulerWindow: NSPanel {
 
 func getMinSize(ruler: Ruler) -> NSSize {
     switch ruler.orientation {
-    case .Horizontal:
+    case .horizontal:
         return NSSize(width: 200, height: 40)
-    case .Vertical:
+    case .vertical:
         return NSSize(width: 40, height: 200)
     }
 }
 
 func getMaxSize(ruler: Ruler) -> NSSize {
     switch ruler.orientation {
-    case .Horizontal:
+    case .horizontal:
         return NSSize(width: 20000, height: 40)
-    case .Vertical:
+    case .vertical:
         return NSSize(width: 40, height: 20000)
     }
 }
 
 func getRulerView(ruler: Ruler) -> RuleView {
     switch ruler.orientation {
-    case .Horizontal:
+    case .horizontal:
         return HorizontalRule(frame: ruler.frame)
-    case .Vertical:
+    case .vertical:
         return VerticalRule(frame: ruler.frame)
     }
 }

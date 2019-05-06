@@ -1,6 +1,9 @@
 import Cocoa
 import SwiftyUserDefaults
 
+let env = ProcessInfo.processInfo.environment
+let APP_ICON_HELPER = env["APP_ICON_HELPER"] != nil
+
 extension DefaultsKeys {
     static let groupedRulers = DefaultsKey<Bool>("groupedRulers", defaultValue: false)
 }
@@ -8,8 +11,8 @@ extension DefaultsKeys {
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     
-    let horizontal = RulerController(ruler: Ruler(orientation: .Horizontal))
-    let vertical = RulerController(ruler: Ruler(orientation: .Vertical))
+    let horizontal = RulerController(ruler: Ruler(.horizontal, name: "horizontal-ruler"))
+    let vertical = RulerController(ruler: Ruler(.vertical, name: "vertical-ruler"))
 
     var timer: Timer?
     let foregroundTimerInterval: TimeInterval = 1 / 60 // 60 fps
@@ -20,10 +23,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Lifecycle
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
+        updateGroupedRulers()
+        
+        if APP_ICON_HELPER {
+            let helper = AppIconHelper()
+            helper.show()
+        } else {
+            showRulers()
+        }
+        
+    }
+    
+    func showRulers() {
         horizontal.otherWindow = vertical.rulerWindow
         vertical.otherWindow = horizontal.rulerWindow
-        
-        updateGroupedRulers()
         
         vertical.showWindow()
         horizontal.showWindow()
@@ -55,11 +68,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         groupedMenuItem?.state = (grouped ? .on : .off)
 
-        print("grouped", grouped)
     }
 
     @IBAction func toggleGroupedRulers(_ sender: Any) {
         Defaults[.groupedRulers] = !Defaults[.groupedRulers]
+        print("grouped", Defaults[.groupedRulers])
         updateGroupedRulers()
     }
 
