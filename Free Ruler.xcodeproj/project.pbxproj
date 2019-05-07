@@ -70,19 +70,11 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		5077EFD5227E6E0400A13D57 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Frameworks;
-			sourceTree = "<group>";
-		};
 		6F41027C2260712F00F06A10 = {
 			isa = PBXGroup;
 			children = (
 				6F4102872260712F00F06A10 /* Free Ruler */,
 				6F4102862260712F00F06A10 /* Products */,
-				5077EFD5227E6E0400A13D57 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -338,7 +330,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
-					"$(PROJECT_DIR)/Frameworks",
 				);
 				INFOPLIST_FILE = "Free Ruler/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
