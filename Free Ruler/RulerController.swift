@@ -1,5 +1,4 @@
 import Cocoa
-import SwiftyUserDefaults
 import Carbon.HIToolbox // For key constants
 
 
@@ -10,9 +9,16 @@ class RulerController: NSCoder, NSWindowDelegate {
     var otherWindow: RulerWindow?
     var keyListener: Any?
     
+    var opacity: Float {
+        didSet {
+            rulerWindow.alphaValue = CGFloat(opacity)
+        }
+    }
+    
     init(ruler: Ruler) {
         self.ruler = ruler
         self.rulerWindow = RulerWindow(ruler: ruler)
+        self.opacity = Prefs.float(.foregroundOpacity)!
 
         super.init()
 
@@ -52,16 +58,30 @@ class RulerController: NSCoder, NSWindowDelegate {
         stopKeyListener()
     }
 
+    func onChangeGrouped() {
+        updateChildWindow()
+    }
+        
     func updateChildWindow() {
-        guard let other = otherWindow else { return }
-
-        let grouped = Defaults[.groupedRulers]
+        guard
+            let grouped = Prefs.bool(.groupRulers),
+            let other = otherWindow
+            else { return }
+        
         if grouped && rulerWindow.isKeyWindow {
             self.rulerWindow.addChildWindow(other, ordered: .below)
         } else {
             self.rulerWindow.removeChildWindow(other)
         }
     }
+    
+    func foreground() {
+        opacity = Prefs.float(.foregroundOpacity)!
+    }
+    func background() {
+        opacity = Prefs.float(.backgroundOpacity)!
+    }
+    
 
 }
 

@@ -1,29 +1,36 @@
 import Cocoa
-import SwiftyUserDefaults
 
 let env = ProcessInfo.processInfo.environment
 let APP_ICON_HELPER = env["APP_ICON_HELPER"] != nil
 
-extension DefaultsKeys {
-    static let groupedRulers = DefaultsKey<Bool>("groupedRulers", defaultValue: false)
-}
-
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     
-    let horizontal = RulerController(ruler: Ruler(.horizontal, name: "horizontal-ruler"))
-    let vertical = RulerController(ruler: Ruler(.vertical, name: "vertical-ruler"))
+    var rulers: [RulerController] = []
 
     var timer: Timer?
     let foregroundTimerInterval: TimeInterval = 1 / 60 // 60 fps
     let backgroundTimerInterval: TimeInterval = 1 / 15 // 15 fps
+    
+    var grouped: Bool? {
+        didSet {
+            onChangeGrouped()
+        }
+    }
 
     @IBOutlet weak var groupedMenuItem: NSMenuItem!
 
     // MARK: - Lifecycle
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        updateGroupedRulers()
+
+        // initialize preferences
+        Prefs.readKeys()
+        Prefs.bool(.groupRulers, defaultValue: true)
+        Prefs.float(.foregroundOpacity, defaultValue: 0.9)
+        Prefs.float(.backgroundOpacity, defaultValue: 0.5)
+        
+        grouped = Prefs.bool(.groupRulers)!
         
         if APP_ICON_HELPER {
             let helper = AppIconHelper()
@@ -31,27 +38,36 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         } else {
             showRulers()
         }
-        
     }
     
     func showRulers() {
-        horizontal.otherWindow = vertical.rulerWindow
-        vertical.otherWindow = horizontal.rulerWindow
+        rulers = [
+            RulerController(ruler: Ruler(.horizontal, name: "horizontal-ruler")),
+            RulerController(ruler: Ruler(.vertical, name: "vertical-ruler")),
+        ]
         
-        vertical.showWindow()
-        horizontal.showWindow()
+        // let rulers know about each other
+        // TODO: provide each ruler with otherRulers: [RulerWindow]
+        rulers[0].otherWindow = rulers[1].rulerWindow
+        rulers[1].otherWindow = rulers[0].rulerWindow
+
+        for ruler in rulers {
+            ruler.showWindow()
+        }
     }
     
     func applicationDidBecomeActive(_ notification: Notification) {
-        horizontal.rulerWindow.alphaValue = 0.9
-        vertical.rulerWindow.alphaValue = 0.9
+        for ruler in rulers {
+            ruler.foreground()
+        }
 
         startTimer(timeInterval: foregroundTimerInterval)
     }
     
     func applicationDidResignActive(_ notification: Notification) {
-        horizontal.rulerWindow.alphaValue = 0.5
-        vertical.rulerWindow.alphaValue = 0.5
+        for ruler in rulers {
+            ruler.background()
+        }
 
         startTimer(timeInterval: backgroundTimerInterval)
     }
@@ -60,20 +76,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Insert code here to tear down your application
     }
 
-    func updateGroupedRulers() {
-        let grouped = Defaults[.groupedRulers]
+    func onChangeGrouped() {
+        if let grouped = grouped {
+            for ruler in rulers {
+                ruler.onChangeGrouped()
+            }
 
-        horizontal.updateChildWindow()
-        vertical.updateChildWindow()
-
-        groupedMenuItem?.state = (grouped ? .on : .off)
-
+            groupedMenuItem?.state = (grouped ? .on : .off)
+        }
     }
 
     @IBAction func toggleGroupedRulers(_ sender: Any) {
-        Defaults[.groupedRulers] = !Defaults[.groupedRulers]
-        print("grouped", Defaults[.groupedRulers])
-        updateGroupedRulers()
+        grouped = !grouped!
+        Prefs.set(.groupRulers, grouped!)
+        print("grouped", grouped!)
     }
 
 }
@@ -103,8 +119,9 @@ extension AppDelegate {
         var mouseLoc = NSEvent.mouseLocation
         mouseLoc.x = mouseLoc.x.rounded()
         mouseLoc.y = mouseLoc.y.rounded()
-        horizontal.rulerWindow.rule.drawMouseTick(at: mouseLoc)
-        vertical.rulerWindow.rule.drawMouseTick(at: mouseLoc)
+        for ruler in rulers {
+            ruler.rulerWindow.rule.drawMouseTick(at: mouseLoc)
+        }
     }
 
 }
