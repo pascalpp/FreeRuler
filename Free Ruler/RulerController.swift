@@ -30,11 +30,7 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
     }
 
     required init?(coder: NSCoder) {
-        // for some reason this init is required but it never gets called
-        print("init?(coder: NSCoder)")
-        self.ruler = Ruler(.horizontal)
-        self.rulerWindow = RulerWindow(self.ruler)
-        super.init(coder: coder)
+        fatalError("init(coder:) has not been implemented. Use init(ruler: Ruler)")
     }
 
     func windowWillStartLiveResize(_ notification: Notification) {
