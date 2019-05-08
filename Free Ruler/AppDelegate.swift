@@ -11,6 +11,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
     var timer: Timer?
     let foregroundTimerInterval: TimeInterval = 1 / 60 // 60 fps
     let backgroundTimerInterval: TimeInterval = 1 / 30 // 30 fps
+    
+    let crosshair = NSCursor.crosshair
 
     @IBOutlet weak var groupedMenuItem: NSMenuItem!
 
@@ -130,6 +132,8 @@ extension AppDelegate {
     }
 
     @objc func onInterval() {
+        crosshair.push()
+        
         self.updateMouseLocation()
     }
 
