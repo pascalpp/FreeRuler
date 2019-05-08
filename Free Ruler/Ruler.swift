@@ -12,10 +12,14 @@ struct Ruler {
     let frame: NSRect
     let name: String? // used for frameAutosaveName
     
-    init(_ orientation: Orientation, frame: NSRect?, name: String?) {
+    init(orientation: Orientation, frame: NSRect?, name: String?) {
         self.orientation = orientation
         self.name = name
         self.frame = frame ?? getDefaultContentRect(orientation: orientation)
+    }
+
+    init(_ orientation: Orientation, frame: NSRect?, name: String?) {
+        self.init(orientation: orientation, frame: frame, name: name)
     }
 
     init(_ orientation: Orientation, name: String) {
@@ -25,6 +29,11 @@ struct Ruler {
     init(_ orientation: Orientation, frame: NSRect) {
         self.init(orientation, frame: frame, name: nil)
     }
+
+    init(_ orientation: Orientation) {
+        self.init(orientation, frame: nil, name: nil)
+    }
+
 }
 
 func getDefaultContentRect(orientation: Orientation) -> NSRect {

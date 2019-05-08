@@ -60,13 +60,13 @@ class AppIconHelper: NSObject {
         
         let topRect = NSRect(x: frame.minX, y: frame.maxY + titlebarHeight, width: frame.width, height: Ruler.thickness)
         let topRuler = Ruler(.horizontal, frame: topRect)
-        let top = RulerController(ruler: topRuler)
-        top.showWindow()
+        let top = RulerController(topRuler)
+        top.showWindow(nil)
         
         let leftRect = NSRect(x: frame.minX - Ruler.thickness, y: frame.minY, width: Ruler.thickness, height: frame.height + titlebarHeight)
         let leftRuler = Ruler(.vertical, frame: leftRect)
-        let left = RulerController(ruler: leftRuler)
-        left.showWindow()
+        let left = RulerController(leftRuler)
+        left.showWindow(nil)
         
         window.addChildWindow(top.rulerWindow, ordered: .below)
         window.addChildWindow(left.rulerWindow, ordered: .below)
@@ -91,18 +91,18 @@ class AppIconHelper: NSObject {
         
         let topRect = NSRect(x: frame.minX, y: frame.maxY - Ruler.thickness, width: frame.width, height: Ruler.thickness)
         let topRuler = Ruler(.horizontal, frame: topRect)
-        let top = RulerController(ruler: topRuler)
-        top.showWindow()
+        let top = RulerController(topRuler)
+        top.showWindow(nil)
         
         let leftRect = NSRect(x: frame.minX, y: frame.minY, width: Ruler.thickness, height: frame.height)
         let leftRuler = Ruler(.vertical, frame: leftRect)
-        let left = RulerController(ruler: leftRuler)
-        left.showWindow()
+        let left = RulerController(leftRuler)
+        left.showWindow(nil)
         
         let middleRect = NSRect(x: frame.minX, y: frame.minY + frame.height / 2 - Ruler.thickness / 2, width: frame.width - Ruler.thickness, height: Ruler.thickness)
         let middleRuler = Ruler(.horizontal, frame: middleRect)
-        let middle = RulerController(ruler: middleRuler)
-        middle.showWindow()
+        let middle = RulerController(middleRuler)
+        middle.showWindow(nil)
         
         window.orderFront(nil)
         window.makeKey()
