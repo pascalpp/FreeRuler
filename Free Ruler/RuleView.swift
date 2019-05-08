@@ -2,6 +2,18 @@ import Cocoa
 
 class RuleView: NSView {
 
+    // TODO research layer-backed view rendering
+//    override var wantsLayer: Bool {
+//        get { return true }
+//        set {}
+//    }
+    
+//    override func viewDidMoveToWindow() {
+//        print("viewDidMoveToWindow")
+//        super.viewDidMoveToWindow()
+//        self.addCursorRect(self.frame, cursor: .crosshair)
+//    }
+    
     func drawMouseTick(at mouseLoc: NSPoint) {
         // required override
         // TODO is there a better way to do this, maybe via a protocol?
