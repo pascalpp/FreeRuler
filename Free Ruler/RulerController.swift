@@ -85,12 +85,18 @@ class RulerController: NSCoder, NSWindowDelegate, PreferenceSubscriber {
 
     func subscribeToPrefs() {
         Prefs.groupRulers.subscribe(self)
+        Prefs.foregroundOpacity.subscribe(self)
+        Prefs.backgroundOpacity.subscribe(self)
     }
 
     func onChangePreference(_ name: String) {
         switch(name) {
         case Prefs.groupRulers.name:
             updateChildWindow()
+        case Prefs.foregroundOpacity.name:
+            opacity = Prefs.foregroundOpacity.value
+        case Prefs.backgroundOpacity.name:
+            opacity = Prefs.backgroundOpacity.value
         default:
             print("Unknown preference changed: \(name)")
         }
