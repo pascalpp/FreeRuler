@@ -1,5 +1,4 @@
 import Cocoa
-import SwiftyUserDefaults
 
 class VerticalRule: RuleView {
 
@@ -19,7 +18,7 @@ class VerticalRule: RuleView {
         super.draw(dirtyRect)
 
         // Drawing code here.
-        let color = Defaults[.rulerColor]
+        let color = #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1)
         color.setFill()
         dirtyRect.fill()
 
@@ -99,7 +98,7 @@ class VerticalRule: RuleView {
             NSAttributedString.Key.font: NSFont(name: "HelveticaNeue", size: 10)!,
             NSAttributedString.Key.paragraphStyle: paragraphStyle,
             NSAttributedString.Key.foregroundColor: #colorLiteral(red: 0.3098039329, green: 0.2039215714, blue: 0.03921568766, alpha: 1),
-            NSAttributedString.Key.backgroundColor: Defaults[.rulerColor],
+            NSAttributedString.Key.backgroundColor: #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1),
         ]
 
         let label = String(Int(number))

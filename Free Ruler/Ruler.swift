@@ -1,11 +1,9 @@
 import Cocoa
-import SwiftyUserDefaults
 
 enum Orientation: String {
     case horizontal
     case vertical
 }
-
 
 struct Ruler {
     static let thickness: CGFloat = 40

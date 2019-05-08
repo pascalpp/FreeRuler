@@ -1,5 +1,4 @@
 import Cocoa
-import SwiftyUserDefaults
 
 let defaults = UserDefaults.standard
 
@@ -44,15 +43,7 @@ class PreferencesController: NSWindowController {
 
         print("floatValue", value)
 
-        Defaults[.foregroundOpacity] = Float(value)
-
-        print("Defaults", Defaults[.foregroundOpacity])
-        
-        // TODO why isn't the default updating?
-
-        defaults.set(value, forKey: "foregroundOpacity")
-        
-        print(defaults.float(forKey: "unknown"))
+        Prefs.foregroundOpacity.value = CGFloat(value)
         
         updateDisplay()
     }
