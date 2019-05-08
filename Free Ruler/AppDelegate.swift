@@ -4,7 +4,7 @@ let env = ProcessInfo.processInfo.environment
 let APP_ICON_HELPER = env["APP_ICON_HELPER"] != nil
 
 @NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
     
     var rulers: [RulerController] = []
 
@@ -12,25 +12,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let foregroundTimerInterval: TimeInterval = 1 / 60 // 60 fps
     let backgroundTimerInterval: TimeInterval = 1 / 15 // 15 fps
     
-    var grouped: Bool? {
-        didSet {
-            onChangeGrouped()
-        }
-    }
-
     @IBOutlet weak var groupedMenuItem: NSMenuItem!
 
     // MARK: - Lifecycle
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-
-        // initialize preferences
-        Prefs.readKeys()
-        Prefs.bool(.groupRulers, defaultValue: true)
-        Prefs.float(.foregroundOpacity, defaultValue: 0.9)
-        Prefs.float(.backgroundOpacity, defaultValue: 0.5)
-        
-        grouped = Prefs.bool(.groupRulers)!
+        updateGroupRulersMenuItem()
+        Prefs.groupRulers.subscribe(self)
         
         if APP_ICON_HELPER {
             let helper = AppIconHelper()
@@ -76,20 +64,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Insert code here to tear down your application
     }
 
-    func onChangeGrouped() {
-        if let grouped = grouped {
-            for ruler in rulers {
-                ruler.onChangeGrouped()
-            }
-
-            groupedMenuItem?.state = (grouped ? .on : .off)
-        }
+    @IBAction func toggleGroupedRulers(_ sender: Any) {
+        Prefs.groupRulers.value = !Prefs.groupRulers.value
     }
 
-    @IBAction func toggleGroupedRulers(_ sender: Any) {
-        grouped = !grouped!
-        Prefs.set(.groupRulers, grouped!)
-        print("grouped", grouped!)
+    func onChangePreference(_ name: String) {
+        switch(name) {
+        case Prefs.groupRulers.name:
+            updateGroupRulersMenuItem()
+        default:
+            print("Unknown preference changed: \(name)")
+        }
+    }
+    
+    func updateGroupRulersMenuItem() {
+        groupedMenuItem?.state = Prefs.groupRulers.value ? .on : .off
     }
 
 }
@@ -125,4 +114,3 @@ extension AppDelegate {
     }
 
 }
-

@@ -2,27 +2,31 @@ import Cocoa
 import Carbon.HIToolbox // For key constants
 
 
-class RulerController: NSCoder, NSWindowDelegate {
-
+class RulerController: NSCoder, NSWindowDelegate, PreferenceSubscriber {
     let ruler: Ruler
     let rulerWindow: RulerWindow
     var otherWindow: RulerWindow?
     var keyListener: Any?
     
-    var opacity: Float {
+    var opacity: CGFloat {
         didSet {
-            rulerWindow.alphaValue = CGFloat(opacity)
+            rulerWindow.alphaValue = opacity
         }
     }
     
     init(ruler: Ruler) {
         self.ruler = ruler
         self.rulerWindow = RulerWindow(ruler: ruler)
-        self.opacity = Prefs.float(.foregroundOpacity)!
+        self.opacity = Prefs.foregroundOpacity.value
 
         super.init()
 
+        subscribeToPrefs()
         rulerWindow.delegate = self
+    }
+
+    convenience init(_ ruler: Ruler) {
+        self.init(ruler: ruler)
     }
 
     func showWindow() {
@@ -63,12 +67,9 @@ class RulerController: NSCoder, NSWindowDelegate {
     }
         
     func updateChildWindow() {
-        guard
-            let grouped = Prefs.bool(.groupRulers),
-            let other = otherWindow
-            else { return }
+        guard let other = otherWindow else { return }
         
-        if grouped && rulerWindow.isKeyWindow {
+        if Prefs.groupRulers.value && rulerWindow.isKeyWindow {
             self.rulerWindow.addChildWindow(other, ordered: .below)
         } else {
             self.rulerWindow.removeChildWindow(other)
@@ -76,12 +77,24 @@ class RulerController: NSCoder, NSWindowDelegate {
     }
     
     func foreground() {
-        opacity = Prefs.float(.foregroundOpacity)!
+        opacity = Prefs.foregroundOpacity.value
     }
     func background() {
-        opacity = Prefs.float(.backgroundOpacity)!
+        opacity = Prefs.backgroundOpacity.value
+    }
+
+    func subscribeToPrefs() {
+        Prefs.groupRulers.subscribe(self)
     }
     
+    func onChangePreference(_ name: String) {
+        switch(name) {
+        case Prefs.groupRulers.name:
+            updateChildWindow()
+        default:
+            print("Unknown preference changed: \(name)")
+        }
+    }
 
 }
 
