@@ -29,7 +29,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
         } else {
             showRulers()
         }
-        
+
     }
     
     func subscribeToPrefs() {

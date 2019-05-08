@@ -6,7 +6,6 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
 
     let ruler: Ruler
     let rulerWindow: RulerWindow
-
     var otherWindow: RulerWindow?
     var keyListener: Any?
 
@@ -15,17 +14,21 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
             rulerWindow.alphaValue = windowAlphaValue(opacity)
         }
     }
-    
-    init(_ ruler: Ruler) {
+
+    init(ruler: Ruler) {
         self.ruler = ruler
         self.rulerWindow = RulerWindow(ruler)
 
         super.init(window: self.rulerWindow)
         
-        rulerWindow.delegate = self
         subscribeToPrefs()
+        rulerWindow.delegate = self
     }
-    
+
+    convenience init(_ ruler: Ruler) {
+        self.init(ruler: ruler)
+    }
+
     required init?(coder: NSCoder) {
         // for some reason this init is required but it never gets called
         print("init?(coder: NSCoder)")
@@ -33,7 +36,7 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
         self.rulerWindow = RulerWindow(self.ruler)
         super.init(coder: coder)
     }
-    
+
     func windowWillStartLiveResize(_ notification: Notification) {
         // print("windowWillStartLiveResize")
     }
@@ -68,9 +71,7 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
     }
 
     func updateChildWindow() {
-        guard
-            let otherWindow = otherWindow
-            else { return }
+        guard let otherWindow = otherWindow else { return }
 
         if Prefs.groupRulers.value && rulerWindow.isKeyWindow {
             rulerWindow.addChildWindow(otherWindow, ordered: .below)
@@ -108,7 +109,7 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
             print("Unknown preference changed: \(name)")
         }
     }
-    
+
 }
 
 // MARK: KeyListener
