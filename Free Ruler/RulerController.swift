@@ -1,22 +1,32 @@
 import Cocoa
-import SwiftyUserDefaults
 import Carbon.HIToolbox // For key constants
 
 
-class RulerController: NSCoder, NSWindowDelegate {
-
+class RulerController: NSCoder, NSWindowDelegate, PreferenceSubscriber {
     let ruler: Ruler
     let rulerWindow: RulerWindow
     var otherWindow: RulerWindow?
     var keyListener: Any?
     
+    var opacity: CGFloat {
+        didSet {
+            rulerWindow.alphaValue = opacity
+        }
+    }
+    
     init(ruler: Ruler) {
         self.ruler = ruler
         self.rulerWindow = RulerWindow(ruler: ruler)
+        self.opacity = Prefs.foregroundOpacity.value
 
         super.init()
 
+        subscribeToPrefs()
         rulerWindow.delegate = self
+    }
+
+    convenience init(_ ruler: Ruler) {
+        self.init(ruler: ruler)
     }
 
     func showWindow() {
@@ -52,14 +62,37 @@ class RulerController: NSCoder, NSWindowDelegate {
         stopKeyListener()
     }
 
+    func onChangeGrouped() {
+        updateChildWindow()
+    }
+        
     func updateChildWindow() {
         guard let other = otherWindow else { return }
-
-        let grouped = Defaults[.groupedRulers]
-        if grouped && rulerWindow.isKeyWindow {
+        
+        if Prefs.groupRulers.value && rulerWindow.isKeyWindow {
             self.rulerWindow.addChildWindow(other, ordered: .below)
         } else {
             self.rulerWindow.removeChildWindow(other)
+        }
+    }
+    
+    func foreground() {
+        opacity = Prefs.foregroundOpacity.value
+    }
+    func background() {
+        opacity = Prefs.backgroundOpacity.value
+    }
+
+    func subscribeToPrefs() {
+        Prefs.groupRulers.subscribe(self)
+    }
+    
+    func onChangePreference(_ name: String) {
+        switch(name) {
+        case Prefs.groupRulers.name:
+            updateChildWindow()
+        default:
+            print("Unknown preference changed: \(name)")
         }
     }
 

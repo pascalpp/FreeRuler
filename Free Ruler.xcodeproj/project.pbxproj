@@ -8,8 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		5012CAAD226AB09000BD9565 /* VerticalRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5012CAAC226AB09000BD9565 /* VerticalRule.swift */; };
-		5077EFD6227E6E5400A13D57 /* SwiftyUserDefaults.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5077EFD3227E6DBD00A13D57 /* SwiftyUserDefaults.framework.dSYM */; };
-		5077EFD8227E6E6400A13D57 /* SwiftyUserDefaults.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5077EFCE227E6D2300A13D57 /* SwiftyUserDefaults.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		503869FD2282582400C3B076 /* Preference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 503869FC2282582400C3B076 /* Preference.swift */; };
+		507FED602280E13200BD77DC /* Prefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507FED5F2280E13200BD77DC /* Prefs.swift */; };
 		50CCB206227FCD26004645C5 /* AppIconHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CCB205227FCD26004645C5 /* AppIconHelper.swift */; };
 		50D7BEE7227D42FD0008B95E /* RulerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEE6227D42FD0008B95E /* RulerController.swift */; };
 		50D7BEE9227D43270008B95E /* Ruler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEE8227D43270008B95E /* Ruler.swift */; };
@@ -28,7 +28,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
-				5077EFD6227E6E5400A13D57 /* SwiftyUserDefaults.framework.dSYM in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -36,9 +35,8 @@
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
-			dstSubfolderSpec = 10;
+			dstSubfolderSpec = 16;
 			files = (
-				5077EFD8227E6E6400A13D57 /* SwiftyUserDefaults.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -47,8 +45,8 @@
 
 /* Begin PBXFileReference section */
 		5012CAAC226AB09000BD9565 /* VerticalRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerticalRule.swift; sourceTree = "<group>"; };
-		5077EFCE227E6D2300A13D57 /* SwiftyUserDefaults.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SwiftyUserDefaults.framework; sourceTree = "<group>"; };
-		5077EFD3227E6DBD00A13D57 /* SwiftyUserDefaults.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = SwiftyUserDefaults.framework.dSYM; sourceTree = "<group>"; };
+		503869FC2282582400C3B076 /* Preference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preference.swift; sourceTree = "<group>"; };
+		507FED5F2280E13200BD77DC /* Prefs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prefs.swift; sourceTree = "<group>"; };
 		50CCB205227FCD26004645C5 /* AppIconHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconHelper.swift; sourceTree = "<group>"; };
 		50D7BEE6227D42FD0008B95E /* RulerController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RulerController.swift; sourceTree = "<group>"; };
 		50D7BEE8227D43270008B95E /* Ruler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ruler.swift; sourceTree = "<group>"; };
@@ -74,21 +72,11 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		5077EFD5227E6E0400A13D57 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				5077EFCE227E6D2300A13D57 /* SwiftyUserDefaults.framework */,
-				5077EFD3227E6DBD00A13D57 /* SwiftyUserDefaults.framework.dSYM */,
-			);
-			path = Frameworks;
-			sourceTree = "<group>";
-		};
 		6F41027C2260712F00F06A10 = {
 			isa = PBXGroup;
 			children = (
 				6F4102872260712F00F06A10 /* Free Ruler */,
 				6F4102862260712F00F06A10 /* Products */,
-				5077EFD5227E6E0400A13D57 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -103,6 +91,7 @@
 		6F4102872260712F00F06A10 /* Free Ruler */ = {
 			isa = PBXGroup;
 			children = (
+				507FED5F2280E13200BD77DC /* Prefs.swift */,
 				6F4102882260712F00F06A10 /* AppDelegate.swift */,
 				50CCB205227FCD26004645C5 /* AppIconHelper.swift */,
 				50D7BEE8227D43270008B95E /* Ruler.swift */,
@@ -111,6 +100,7 @@
 				50D7BEEC227D5C810008B95E /* RuleView.swift */,
 				6F41029E22607DC900F06A10 /* HorizontalRule.swift */,
 				5012CAAC226AB09000BD9565 /* VerticalRule.swift */,
+				503869FC2282582400C3B076 /* Preference.swift */,
 				6F41028C2260713100F06A10 /* MainMenu.xib */,
 				6F41028A2260713100F06A10 /* Assets.xcassets */,
 				6F41028F2260713100F06A10 /* Info.plist */,
@@ -191,6 +181,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				503869FD2282582400C3B076 /* Preference.swift in Sources */,
+				507FED602280E13200BD77DC /* Prefs.swift in Sources */,
 				50CCB206227FCD26004645C5 /* AppIconHelper.swift in Sources */,
 				6F41029F22607DC900F06A10 /* HorizontalRule.swift in Sources */,
 				50D7BEEB227D432E0008B95E /* RulerWindow.swift in Sources */,
@@ -342,7 +334,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
-					"$(PROJECT_DIR)/Frameworks",
 				);
 				INFOPLIST_FILE = "Free Ruler/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
