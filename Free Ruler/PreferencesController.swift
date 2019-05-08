@@ -12,6 +12,10 @@ class PreferencesController: NSWindowController, NSWindowDelegate, PreferenceSub
     
     @IBOutlet weak var floatRulersCheckbox: NSButton!
     
+    override var windowNibName: String {
+        return "PreferencesController"
+    }
+    
     override func windowDidLoad() {
         super.windowDidLoad()
 

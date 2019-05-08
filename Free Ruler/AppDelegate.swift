@@ -96,7 +96,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
 
     @IBAction func openPreferences(_ sender: Any) {
         if preferencesController == nil {
-            preferencesController = PreferencesController(windowNibName: "PreferencesController")
+            preferencesController = PreferencesController()
         }
 
         if preferencesController != nil {
