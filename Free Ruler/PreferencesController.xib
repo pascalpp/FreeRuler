@@ -19,14 +19,14 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <window title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" frameAutosaveName="preferences" animationBehavior="default" id="F0z-JX-Cv5">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" fullSizeContentView="YES"/>
-            <rect key="contentRect" x="602" y="585" width="350" height="300"/>
+            <rect key="contentRect" x="602" y="585" width="350" height="286"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
             <view key="contentView" id="se5-gp-TjO">
-                <rect key="frame" x="0.0" y="0.0" width="350" height="296"/>
+                <rect key="frame" x="0.0" y="0.0" width="350" height="286"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eQR-PQ-skH">
-                        <rect key="frame" x="18" y="244" width="72" height="17"/>
+                        <rect key="frame" x="18" y="234" width="72" height="17"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="Ruler Color" id="SgF-4q-JP6">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -41,7 +41,7 @@
                         </connections>
                     </slider>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fKJ-pW-Idj">
-                        <rect key="frame" x="18" y="159" width="125" height="17"/>
+                        <rect key="frame" x="18" y="149" width="125" height="17"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="Foreground Opacity" id="BgV-9N-IVn">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -49,7 +49,7 @@
                         </textFieldCell>
                     </textField>
                     <colorWell translatesAutoresizingMaskIntoConstraints="NO" id="RCb-x3-BTE">
-                        <rect key="frame" x="20" y="196" width="100" height="40"/>
+                        <rect key="frame" x="20" y="186" width="100" height="40"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="100" id="HiX-02-W6N"/>
                             <constraint firstAttribute="height" constant="40" id="vbq-cu-Eln"/>
@@ -58,7 +58,10 @@
                     </colorWell>
                     <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vDG-0i-7UH">
                         <rect key="frame" x="18" y="63" width="314" height="24"/>
-                        <sliderCell key="cell" state="on" alignment="left" minValue="5" maxValue="100" doubleValue="50" tickMarkPosition="below" numberOfTickMarks="20" sliderType="linear" id="isR-aS-fmz"/>
+                        <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="5" maxValue="100" doubleValue="50" tickMarkPosition="below" numberOfTickMarks="20" allowsTickMarkValuesOnly="YES" sliderType="linear" id="isR-aS-fmz"/>
+                        <connections>
+                            <action selector="setBackgroundOpacity:" target="-2" id="KAY-mT-HC0"/>
+                        </connections>
                     </slider>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8tT-pC-4Sb">
                         <rect key="frame" x="18" y="93" width="127" height="17"/>
@@ -69,7 +72,7 @@
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Fs7-sZ-5IE">
-                        <rect key="frame" x="295" y="159" width="37" height="17"/>
+                        <rect key="frame" x="295" y="149" width="37" height="17"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Label" id="Vqd-CI-vmd">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -99,26 +102,26 @@
                     <constraint firstAttribute="trailing" secondItem="L9c-EP-R2u" secondAttribute="trailing" constant="20" id="B2w-DA-UWe"/>
                     <constraint firstItem="RCb-x3-BTE" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="Bsb-Ep-td6"/>
                     <constraint firstItem="fKJ-pW-Idj" firstAttribute="top" secondItem="RCb-x3-BTE" secondAttribute="bottom" constant="20" id="C9G-fu-Pfu"/>
-                    <constraint firstItem="ZzT-WS-Ex9" firstAttribute="top" secondItem="fKJ-pW-Idj" secondAttribute="bottom" constant="8" id="IBK-pz-IXE"/>
                     <constraint firstItem="MHD-HA-XYA" firstAttribute="top" secondItem="vDG-0i-7UH" secondAttribute="bottom" constant="20" id="Kxo-CJ-PCZ"/>
                     <constraint firstItem="vDG-0i-7UH" firstAttribute="top" secondItem="8tT-pC-4Sb" secondAttribute="bottom" constant="8" id="M26-Cl-Uwc"/>
                     <constraint firstItem="eQR-PQ-skH" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="OHD-Zv-bu9"/>
-                    <constraint firstAttribute="trailing" secondItem="ZzT-WS-Ex9" secondAttribute="trailing" constant="20" id="OaQ-Gg-0Aq"/>
                     <constraint firstItem="eQR-PQ-skH" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" constant="35" id="SH0-bP-US8"/>
                     <constraint firstItem="MHD-HA-XYA" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="Smm-3W-cCd"/>
                     <constraint firstItem="8tT-pC-4Sb" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="TfB-Y8-mn5"/>
                     <constraint firstItem="Fs7-sZ-5IE" firstAttribute="top" secondItem="fKJ-pW-Idj" secondAttribute="top" id="ToD-Pe-p3x"/>
+                    <constraint firstItem="ZzT-WS-Ex9" firstAttribute="trailing" secondItem="Fs7-sZ-5IE" secondAttribute="trailing" id="bpc-DW-97Y"/>
                     <constraint firstAttribute="trailing" secondItem="vDG-0i-7UH" secondAttribute="trailing" constant="20" id="cD9-0a-aPS"/>
-                    <constraint firstItem="8tT-pC-4Sb" firstAttribute="top" secondItem="ZzT-WS-Ex9" secondAttribute="bottom" constant="20" id="dS7-Bp-feB"/>
+                    <constraint firstItem="8tT-pC-4Sb" firstAttribute="top" secondItem="ZzT-WS-Ex9" secondAttribute="bottom" constant="20" id="eOe-a4-0mj"/>
                     <constraint firstAttribute="bottom" secondItem="MHD-HA-XYA" secondAttribute="bottom" constant="30" id="jPE-cI-TXO"/>
                     <constraint firstItem="RCb-x3-BTE" firstAttribute="top" secondItem="eQR-PQ-skH" secondAttribute="bottom" constant="8" id="mu3-WJ-xQW"/>
-                    <constraint firstItem="ZzT-WS-Ex9" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="pU8-5b-4wL"/>
+                    <constraint firstItem="ZzT-WS-Ex9" firstAttribute="leading" secondItem="fKJ-pW-Idj" secondAttribute="leading" id="neY-8t-5ZR"/>
                     <constraint firstItem="L9c-EP-R2u" firstAttribute="top" secondItem="8tT-pC-4Sb" secondAttribute="top" id="rlY-Gb-iZr"/>
                 </constraints>
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
             </connections>
+            <point key="canvasLocation" x="139" y="151"/>
         </window>
     </objects>
 </document>

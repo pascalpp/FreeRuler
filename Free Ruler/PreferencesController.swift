@@ -1,6 +1,6 @@
 import Cocoa
 
-class PreferencesController: NSWindowController {
+class PreferencesController: NSWindowController, PreferenceSubscriber {
 
     @IBOutlet weak var rulerColorWell: NSColorWell!
     
@@ -15,24 +15,46 @@ class PreferencesController: NSWindowController {
 
         // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
         
-        updateDisplay()
-    }
-    
-    func updateDisplay() {
-        let foregroundOpacity = Prefs.foregroundOpacity.value
-        let backgroundOpacity = Prefs.backgroundOpacity.value
+        Prefs.foregroundOpacity.subscribe(self)
+        Prefs.backgroundOpacity.subscribe(self)
         
-        foregroundOpacitySlider.integerValue = foregroundOpacity
-        backgroundOpacitySlider.integerValue = backgroundOpacity
-        
-        foregroundOpacityLabel.stringValue = "\(foregroundOpacity)%"
-        backgroundOpacityLabel.stringValue = "\(backgroundOpacity)%"
-
+        updateView()
     }
 
     @IBAction func setForegroundOpacity(_ sender: Any) {
         Prefs.foregroundOpacity.value = foregroundOpacitySlider.integerValue
-        updateDisplay()
+    }
+    @IBAction func setBackgroundOpacity(_ sender: Any) {
+        Prefs.backgroundOpacity.value = backgroundOpacitySlider.integerValue
     }
     
+    func updateView() {
+        updateForegroundSlider()
+        updateBackgroundSlider()
+    }
+    
+    func updateForegroundSlider() {
+        let foregroundOpacity = Prefs.foregroundOpacity.value
+        foregroundOpacitySlider.integerValue = foregroundOpacity
+        foregroundOpacityLabel.stringValue = "\(foregroundOpacity)%"
+    }
+    
+    func updateBackgroundSlider() {
+        let backgroundOpacity = Prefs.backgroundOpacity.value
+        backgroundOpacitySlider.integerValue = backgroundOpacity
+        backgroundOpacityLabel.stringValue = "\(backgroundOpacity)%"
+    }
+
+    func onChangePreference(_ name: String) {
+        print("onChangePreference", name)
+        switch name {
+        case Prefs.foregroundOpacity.name:
+            updateForegroundSlider()
+        case Prefs.backgroundOpacity.name:
+            updateBackgroundSlider()
+        default:
+            break
+        }
+    }
+
 }
