@@ -4,8 +4,9 @@ import Carbon.HIToolbox // For key constants
 
 class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscriber {
 
-    var ruler: Ruler
-    var rulerWindow: RulerWindow
+    let ruler: Ruler
+    let rulerWindow: RulerWindow
+
     var otherWindow: RulerWindow?
     var keyListener: Any?
 
@@ -34,30 +35,30 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
     }
     
     func windowWillStartLiveResize(_ notification: Notification) {
-        // print(self.type, "windowWillStartLiveResize")
+        // print("windowWillStartLiveResize")
     }
 
     func windowDidEndLiveResize(_ notification: Notification) {
-        // print(self.type, "windowDidEndLiveResize")
+        // print("windowDidEndLiveResize")
     }
 
     func windowWillMove(_ notification: Notification) {
-        // print(self.type, "windowWillMove")
+        // print("windowWillMove")
     }
 
     func windowDidMove(_ notification: Notification) {
-        // print(self.type, "windowDidMove")
+        // print("windowDidMove")
         rulerWindow.invalidateShadow()
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
-        //print("windowDidBecomeKey")
+        // print("windowDidBecomeKey")
         updateChildWindow()
-        //startKeyListener()
+        startKeyListener()
     }
 
     func windowDidResignKey(_ notification: Notification) {
-        //print("windowDidResignKey")
+        // print("windowDidResignKey")
         updateChildWindow()
         stopKeyListener()
     }
@@ -93,7 +94,7 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
     }
 
     func onChangePreference(_ name: String) {
-        print("onChangePreference", name)
+        // print("onChangePreference", name)
         switch(name) {
         case Prefs.groupRulers.name:
             updateChildWindow()
