@@ -21,8 +21,7 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
 
         super.init(window: self.rulerWindow)
         
-        print("self.rulerWindow.canBecomeKey", self.rulerWindow.canBecomeKey)
-
+        rulerWindow.delegate = self
         subscribeToPrefs()
     }
     
@@ -34,13 +33,6 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
         super.init(coder: coder)
     }
     
-    override func showWindow(_ sender: Any?) {
-        updateChildWindow()
-        super.showWindow(sender)
-        rulerWindow.orderFront(sender)
-        rulerWindow.makeKey()
-    }
-
     func windowWillStartLiveResize(_ notification: Notification) {
         // print(self.type, "windowWillStartLiveResize")
     }
@@ -55,17 +47,17 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
 
     func windowDidMove(_ notification: Notification) {
         // print(self.type, "windowDidMove")
-        window?.invalidateShadow()
+        rulerWindow.invalidateShadow()
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
-        print("windowDidBecomeKey")
+        //print("windowDidBecomeKey")
         updateChildWindow()
         //startKeyListener()
     }
 
     func windowDidResignKey(_ notification: Notification) {
-        print("windowDidResignKey")
+        //print("windowDidResignKey")
         updateChildWindow()
         stopKeyListener()
     }
@@ -79,18 +71,14 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
             let otherWindow = otherWindow
             else { return }
 
-        print(ruler.orientation, "rulerWindow.isKeyWindow", rulerWindow.isKeyWindow)
         if Prefs.groupRulers.value && rulerWindow.isKeyWindow {
-            print("- addChildWindow")
             rulerWindow.addChildWindow(otherWindow, ordered: .below)
         } else {
-            print("- removeChildWindow")
             rulerWindow.removeChildWindow(otherWindow)
         }
     }
 
     func foreground() {
-        print("foreground")
         opacity = Prefs.foregroundOpacity.value
     }
     func background() {
