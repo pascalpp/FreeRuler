@@ -26,7 +26,7 @@ class RulerWindow: NSPanel {
         self.minSize = getMinSize(ruler: ruler)
         self.maxSize = getMaxSize(ruler: ruler)
         
-        self.isFloatingPanel = true
+        self.isFloatingPanel = Prefs.floatRulers.value
         self.hidesOnDeactivate = false
         self.isMovableByWindowBackground = true
         // self.hasShadow = false

@@ -70,9 +70,9 @@ class RulerController: NSCoder, NSWindowDelegate, PreferenceSubscriber {
         guard let other = otherWindow else { return }
 
         if Prefs.groupRulers.value && rulerWindow.isKeyWindow {
-            self.rulerWindow.addChildWindow(other, ordered: .below)
+            rulerWindow.addChildWindow(other, ordered: .below)
         } else {
-            self.rulerWindow.removeChildWindow(other)
+            rulerWindow.removeChildWindow(other)
         }
     }
 
@@ -87,6 +87,7 @@ class RulerController: NSCoder, NSWindowDelegate, PreferenceSubscriber {
         Prefs.groupRulers.subscribe(self)
         Prefs.foregroundOpacity.subscribe(self)
         Prefs.backgroundOpacity.subscribe(self)
+        Prefs.floatRulers.subscribe(self)
     }
 
     func onChangePreference(_ name: String) {
@@ -97,6 +98,8 @@ class RulerController: NSCoder, NSWindowDelegate, PreferenceSubscriber {
             opacity = Prefs.foregroundOpacity.value
         case Prefs.backgroundOpacity.name:
             opacity = Prefs.backgroundOpacity.value
+        case Prefs.floatRulers.name:
+            rulerWindow.isFloatingPanel = Prefs.floatRulers.value
         default:
             print("Unknown preference changed: \(name)")
         }

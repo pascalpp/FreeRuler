@@ -16,8 +16,8 @@ class Preference<T>: NSObject {
             return privateValue ?? defaultValue
         }
         set {
-            // print("Pref.\(name) changed: \(newValue)")
             privateValue = newValue
+//            print(self)
             notifySubscribers()
             writeValue()
         }

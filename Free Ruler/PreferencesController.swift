@@ -1,6 +1,6 @@
 import Cocoa
 
-class PreferencesController: NSWindowController, PreferenceSubscriber {
+class PreferencesController: NSWindowController, NSWindowDelegate, PreferenceSubscriber {
 
     @IBOutlet weak var rulerColorWell: NSColorWell!
     
@@ -10,15 +10,42 @@ class PreferencesController: NSWindowController, PreferenceSubscriber {
     @IBOutlet weak var foregroundOpacityLabel: NSTextField!
     @IBOutlet weak var backgroundOpacityLabel: NSTextField!
     
+    @IBOutlet weak var floatRulersCheckbox: NSButton!
+    
     override func windowDidLoad() {
         super.windowDidLoad()
 
         // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
         
+        subscribePrefs()
+        updateView()
+    }
+    
+    func windowWillClose(_ notification: Notification) {
+        // HACK:
+        // if the user modifies backgroundOpacity right before closing the prefs window, the ruler opacity needs to be reset to foregroundOpacity. Since rulers are subscribed to foregroundOpacity, we can twiddle that value to coerce rulers back to the correct opacity
+        // TODO find a better way to do this
+        Prefs.foregroundOpacity.value += 1
+        Prefs.foregroundOpacity.value -= 1
+    }
+
+    func subscribePrefs() {
         Prefs.foregroundOpacity.subscribe(self)
         Prefs.backgroundOpacity.subscribe(self)
-        
-        updateView()
+        Prefs.floatRulers.subscribe(self)
+    }
+    
+    func onChangePreference(_ name: String) {
+        switch name {
+        case Prefs.foregroundOpacity.name:
+            updateForegroundSlider()
+        case Prefs.backgroundOpacity.name:
+            updateBackgroundSlider()
+        case Prefs.floatRulers.name:
+            updateFloatRulersCheckbox()
+        default:
+            break
+        }
     }
 
     @IBAction func setForegroundOpacity(_ sender: Any) {
@@ -27,10 +54,14 @@ class PreferencesController: NSWindowController, PreferenceSubscriber {
     @IBAction func setBackgroundOpacity(_ sender: Any) {
         Prefs.backgroundOpacity.value = backgroundOpacitySlider.integerValue
     }
+    @IBAction func setFloatRulers(_ sender: Any) {
+        Prefs.floatRulers.value = floatRulersCheckbox.state == .on
+    }
     
     func updateView() {
         updateForegroundSlider()
         updateBackgroundSlider()
+        updateFloatRulersCheckbox()
     }
     
     func updateForegroundSlider() {
@@ -44,17 +75,9 @@ class PreferencesController: NSWindowController, PreferenceSubscriber {
         backgroundOpacitySlider.integerValue = backgroundOpacity
         backgroundOpacityLabel.stringValue = "\(backgroundOpacity)%"
     }
-
-    func onChangePreference(_ name: String) {
-        print("onChangePreference", name)
-        switch name {
-        case Prefs.foregroundOpacity.name:
-            updateForegroundSlider()
-        case Prefs.backgroundOpacity.name:
-            updateBackgroundSlider()
-        default:
-            break
-        }
+    
+    func updateFloatRulersCheckbox() {
+        floatRulersCheckbox.state = Prefs.floatRulers.value ? .on : .off
     }
 
 }

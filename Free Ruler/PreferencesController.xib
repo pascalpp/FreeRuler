@@ -9,6 +9,7 @@
             <connections>
                 <outlet property="backgroundOpacityLabel" destination="L9c-EP-R2u" id="nAz-JV-OSp"/>
                 <outlet property="backgroundOpacitySlider" destination="vDG-0i-7UH" id="bh7-oU-DQI"/>
+                <outlet property="floatRulersCheckbox" destination="MHD-HA-XYA" id="FQ1-9T-pqJ"/>
                 <outlet property="foregroundOpacityLabel" destination="Fs7-sZ-5IE" id="qfm-M7-boB"/>
                 <outlet property="foregroundOpacitySlider" destination="ZzT-WS-Ex9" id="rug-vL-keS"/>
                 <outlet property="rulerColorWell" destination="RCb-x3-BTE" id="Pfz-zR-1hp"/>
@@ -93,6 +94,9 @@
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
+                        <connections>
+                            <action selector="setFloatRulers:" target="-2" id="Mp1-PV-8KT"/>
+                        </connections>
                     </button>
                 </subviews>
                 <constraints>
