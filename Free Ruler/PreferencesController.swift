@@ -1,7 +1,5 @@
 import Cocoa
 
-let defaults = UserDefaults.standard
-
 class PreferencesController: NSWindowController {
 
     @IBOutlet weak var rulerColorWell: NSColorWell!
@@ -17,15 +15,12 @@ class PreferencesController: NSWindowController {
 
         // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
         
-        print(defaults.dictionaryRepresentation().keys)
-        print(defaults.dictionaryRepresentation().values)
-        
         updateDisplay()
     }
     
     func updateDisplay() {
-        let foregroundOpacity = Int(defaults.float(forKey: "foregroundOpacity") * 100)
-        let backgroundOpacity = Int(defaults.float(forKey: "backgroundOpacity") * 100)
+        let foregroundOpacity = Prefs.foregroundOpacity.value
+        let backgroundOpacity = Prefs.backgroundOpacity.value
         
         foregroundOpacitySlider.integerValue = foregroundOpacity
         backgroundOpacitySlider.integerValue = backgroundOpacity
@@ -36,15 +31,7 @@ class PreferencesController: NSWindowController {
     }
 
     @IBAction func setForegroundOpacity(_ sender: Any) {
-        print("---------------------")
-        print("integerValue", foregroundOpacitySlider.integerValue)
-        
-        let value = foregroundOpacitySlider.floatValue / 100
-
-        print("floatValue", value)
-
-        Prefs.foregroundOpacity.value = CGFloat(value)
-        
+        Prefs.foregroundOpacity.value = foregroundOpacitySlider.integerValue
         updateDisplay()
     }
     

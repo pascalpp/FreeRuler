@@ -22,7 +22,7 @@ class RulerWindow: NSPanel {
             defer: false
         )
         
-        self.alphaValue = Prefs.foregroundOpacity.value
+        self.alphaValue = windowAlphaValue(Prefs.foregroundOpacity.value)
         self.minSize = getMinSize(ruler: ruler)
         self.maxSize = getMaxSize(ruler: ruler)
         

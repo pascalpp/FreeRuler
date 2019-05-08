@@ -7,13 +7,13 @@ class RulerController: NSCoder, NSWindowDelegate, PreferenceSubscriber {
     let rulerWindow: RulerWindow
     var otherWindow: RulerWindow?
     var keyListener: Any?
-    
-    var opacity: CGFloat {
+
+    var opacity: Int {
         didSet {
-            rulerWindow.alphaValue = opacity
+            rulerWindow.alphaValue = windowAlphaValue(opacity)
         }
     }
-    
+
     init(ruler: Ruler) {
         self.ruler = ruler
         self.rulerWindow = RulerWindow(ruler: ruler)
@@ -34,30 +34,30 @@ class RulerController: NSCoder, NSWindowDelegate, PreferenceSubscriber {
     }
 
     func windowWillStartLiveResize(_ notification: Notification) {
-//        print(self.type, "windowWillStartLiveResize")
+        // print(self.type, "windowWillStartLiveResize")
     }
 
     func windowDidEndLiveResize(_ notification: Notification) {
-//        print(self.type, "windowDidEndLiveResize")
+        // print(self.type, "windowDidEndLiveResize")
     }
 
     func windowWillMove(_ notification: Notification) {
-//        print(self.type, "windowWillMove")
+        // print(self.type, "windowWillMove")
     }
 
     func windowDidMove(_ notification: Notification) {
-//        print(self.type, "windowDidMove")
+        // print(self.type, "windowDidMove")
         rulerWindow.invalidateShadow()
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
-//        print(self.type, "windowDidBecomeKey")
+        // print(self.type, "windowDidBecomeKey")
         updateChildWindow()
         startKeyListener()
     }
 
     func windowDidResignKey(_ notification: Notification) {
-//        print(self.type, "windowDidResignKey")
+        // print(self.type, "windowDidResignKey")
         updateChildWindow()
         stopKeyListener()
     }
@@ -65,17 +65,17 @@ class RulerController: NSCoder, NSWindowDelegate, PreferenceSubscriber {
     func onChangeGrouped() {
         updateChildWindow()
     }
-        
+
     func updateChildWindow() {
         guard let other = otherWindow else { return }
-        
+
         if Prefs.groupRulers.value && rulerWindow.isKeyWindow {
             self.rulerWindow.addChildWindow(other, ordered: .below)
         } else {
             self.rulerWindow.removeChildWindow(other)
         }
     }
-    
+
     func foreground() {
         opacity = Prefs.foregroundOpacity.value
     }
@@ -86,7 +86,7 @@ class RulerController: NSCoder, NSWindowDelegate, PreferenceSubscriber {
     func subscribeToPrefs() {
         Prefs.groupRulers.subscribe(self)
     }
-    
+
     func onChangePreference(_ name: String) {
         switch(name) {
         case Prefs.groupRulers.name:
@@ -101,14 +101,14 @@ class RulerController: NSCoder, NSWindowDelegate, PreferenceSubscriber {
 // MARK: KeyListener
 
 extension RulerController {
-    
+
     func startKeyListener() {
         self.keyListener = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] in
             guard let self = self else { return $0 }
             return self.onKeyDown(with: $0)
         }
     }
-    
+
     func stopKeyListener() {
         if let keyListener = self.keyListener {
             NSEvent.removeMonitor(keyListener)
@@ -118,7 +118,7 @@ extension RulerController {
 
     // Return nil if the event was handled here.
     func onKeyDown(with event: NSEvent) -> NSEvent? {
-        print(ruler.orientation, "onKeyDown")
+        // print(ruler.orientation, "onKeyDown")
 
         let shift = event.modifierFlags.contains(.shift)
 
