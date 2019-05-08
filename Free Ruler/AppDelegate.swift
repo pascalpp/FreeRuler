@@ -29,6 +29,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
         } else {
             showRulers()
         }
+        
     }
     
     func subscribeToPrefs() {
@@ -66,12 +67,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
 
         for ruler in rulers {
             ruler.showWindow(self)
-//            ruler.rulerWindow?.nextResponder = self
         }
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
-        print("applicationDidBecomeActive")
         for ruler in rulers {
             ruler.foreground()
         }
@@ -112,10 +111,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
             window.setFrame(frame, display: true)
         }
     }
-    
-//    override func keyDown(with event: NSEvent) {
-//        print(#function, event.keyCode)
-//    }
     
 }
 
