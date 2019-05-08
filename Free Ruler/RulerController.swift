@@ -2,35 +2,43 @@ import Cocoa
 import Carbon.HIToolbox // For key constants
 
 
-class RulerController: NSCoder, NSWindowDelegate, PreferenceSubscriber {
-    let ruler: Ruler
-    let rulerWindow: RulerWindow
+class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscriber {
+
+    var ruler: Ruler
+    var rulerWindow: RulerWindow
     var otherWindow: RulerWindow?
     var keyListener: Any?
 
-    var opacity: Int {
+    var opacity = Prefs.foregroundOpacity.value {
         didSet {
             rulerWindow.alphaValue = windowAlphaValue(opacity)
         }
     }
-
-    init(ruler: Ruler) {
+    
+    init(_ ruler: Ruler) {
         self.ruler = ruler
-        self.rulerWindow = RulerWindow(ruler: ruler)
-        self.opacity = Prefs.foregroundOpacity.value
+        self.rulerWindow = RulerWindow(ruler)
 
-        super.init()
+        super.init(window: self.rulerWindow)
+        
+        print("self.rulerWindow.canBecomeKey", self.rulerWindow.canBecomeKey)
 
         subscribeToPrefs()
-        rulerWindow.delegate = self
     }
-
-    convenience init(_ ruler: Ruler) {
-        self.init(ruler: ruler)
+    
+    required init?(coder: NSCoder) {
+        // for some reason this init is required but it never gets called
+        print("init?(coder: NSCoder)")
+        self.ruler = Ruler(.horizontal)
+        self.rulerWindow = RulerWindow(self.ruler)
+        super.init(coder: coder)
     }
-
-    func showWindow() {
-        rulerWindow.orderFront(nil)
+    
+    override func showWindow(_ sender: Any?) {
+        updateChildWindow()
+        super.showWindow(sender)
+        rulerWindow.orderFront(sender)
+        rulerWindow.makeKey()
     }
 
     func windowWillStartLiveResize(_ notification: Notification) {
@@ -47,17 +55,17 @@ class RulerController: NSCoder, NSWindowDelegate, PreferenceSubscriber {
 
     func windowDidMove(_ notification: Notification) {
         // print(self.type, "windowDidMove")
-        rulerWindow.invalidateShadow()
+        window?.invalidateShadow()
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
-        // print(self.type, "windowDidBecomeKey")
+        print("windowDidBecomeKey")
         updateChildWindow()
-        startKeyListener()
+        //startKeyListener()
     }
 
     func windowDidResignKey(_ notification: Notification) {
-        // print(self.type, "windowDidResignKey")
+        print("windowDidResignKey")
         updateChildWindow()
         stopKeyListener()
     }
@@ -67,16 +75,22 @@ class RulerController: NSCoder, NSWindowDelegate, PreferenceSubscriber {
     }
 
     func updateChildWindow() {
-        guard let other = otherWindow else { return }
+        guard
+            let otherWindow = otherWindow
+            else { return }
 
+        print(ruler.orientation, "rulerWindow.isKeyWindow", rulerWindow.isKeyWindow)
         if Prefs.groupRulers.value && rulerWindow.isKeyWindow {
-            rulerWindow.addChildWindow(other, ordered: .below)
+            print("- addChildWindow")
+            rulerWindow.addChildWindow(otherWindow, ordered: .below)
         } else {
-            rulerWindow.removeChildWindow(other)
+            print("- removeChildWindow")
+            rulerWindow.removeChildWindow(otherWindow)
         }
     }
 
     func foreground() {
+        print("foreground")
         opacity = Prefs.foregroundOpacity.value
     }
     func background() {
@@ -91,6 +105,7 @@ class RulerController: NSCoder, NSWindowDelegate, PreferenceSubscriber {
     }
 
     func onChangePreference(_ name: String) {
+        print("onChangePreference", name)
         switch(name) {
         case Prefs.groupRulers.name:
             updateChildWindow()
@@ -104,7 +119,7 @@ class RulerController: NSCoder, NSWindowDelegate, PreferenceSubscriber {
             print("Unknown preference changed: \(name)")
         }
     }
-
+    
 }
 
 // MARK: KeyListener

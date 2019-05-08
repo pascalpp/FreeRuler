@@ -29,7 +29,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
         } else {
             showRulers()
         }
-
     }
     
     func subscribeToPrefs() {
@@ -56,8 +55,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
 
     func showRulers() {
         rulers = [
-            RulerController(ruler: Ruler(.horizontal, name: "horizontal-ruler")),
-            RulerController(ruler: Ruler(.vertical, name: "vertical-ruler")),
+            RulerController(Ruler(.horizontal, name: "horizontal-ruler")),
+            RulerController(Ruler(.vertical, name: "vertical-ruler")),
         ]
 
         // let rulers know about each other
@@ -66,11 +65,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
         rulers[1].otherWindow = rulers[0].rulerWindow
 
         for ruler in rulers {
-            ruler.showWindow()
+            ruler.showWindow(self)
+//            ruler.rulerWindow?.nextResponder = self
         }
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
+        print("applicationDidBecomeActive")
         for ruler in rulers {
             ruler.foreground()
         }
@@ -105,11 +106,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
     }
 
     @IBAction func resetRulerPositions(_ sender: Any) {
-        for ruler in rulers {
-            let frame = getDefaultContentRect(orientation: ruler.ruler.orientation)
-            ruler.rulerWindow.setFrame(frame, display: true)   
+        for rulerController in rulers {
+            let window = rulerController.rulerWindow
+            let frame = getDefaultContentRect(orientation: window.ruler.orientation)
+            window.setFrame(frame, display: true)
         }
     }
+    
+//    override func keyDown(with event: NSEvent) {
+//        print(#function, event.keyCode)
+//    }
     
 }
 

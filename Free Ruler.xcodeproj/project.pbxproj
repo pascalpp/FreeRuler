@@ -8,9 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		5012CAAD226AB09000BD9565 /* VerticalRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5012CAAC226AB09000BD9565 /* VerticalRule.swift */; };
+		503869FD2282582400C3B076 /* Preference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 503869FC2282582400C3B076 /* Preference.swift */; };
 		507FED43227FFF5300BD77DC /* PreferencesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507FED41227FFF5300BD77DC /* PreferencesController.swift */; };
 		507FED44227FFF5300BD77DC /* PreferencesController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 507FED42227FFF5300BD77DC /* PreferencesController.xib */; };
-		503869FD2282582400C3B076 /* Preference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 503869FC2282582400C3B076 /* Preference.swift */; };
 		507FED602280E13200BD77DC /* Prefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507FED5F2280E13200BD77DC /* Prefs.swift */; };
 		50CCB206227FCD26004645C5 /* AppIconHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CCB205227FCD26004645C5 /* AppIconHelper.swift */; };
 		50D7BEE7227D42FD0008B95E /* RulerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEE6227D42FD0008B95E /* RulerController.swift */; };
@@ -47,9 +47,9 @@
 
 /* Begin PBXFileReference section */
 		5012CAAC226AB09000BD9565 /* VerticalRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerticalRule.swift; sourceTree = "<group>"; };
+		503869FC2282582400C3B076 /* Preference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preference.swift; sourceTree = "<group>"; };
 		507FED41227FFF5300BD77DC /* PreferencesController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesController.swift; sourceTree = "<group>"; };
 		507FED42227FFF5300BD77DC /* PreferencesController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PreferencesController.xib; sourceTree = "<group>"; };
-		503869FC2282582400C3B076 /* Preference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preference.swift; sourceTree = "<group>"; };
 		507FED5F2280E13200BD77DC /* Prefs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prefs.swift; sourceTree = "<group>"; };
 		50CCB205227FCD26004645C5 /* AppIconHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconHelper.swift; sourceTree = "<group>"; };
 		50D7BEE6227D42FD0008B95E /* RulerController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RulerController.swift; sourceTree = "<group>"; };
