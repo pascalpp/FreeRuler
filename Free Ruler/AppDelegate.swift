@@ -19,8 +19,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
     // MARK: - Lifecycle
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        updateGroupRulersMenuItem()
-        Prefs.groupRulers.subscribe(self)
+
+        subscribeToPrefs()
+        updateDisplay()
 
         if APP_ICON_HELPER {
             let helper = AppIconHelper()
@@ -29,8 +30,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
             showRulers()
         }
 
-        openPreferences(self)
     }
+    
+    func subscribeToPrefs() {
+        Prefs.groupRulers.subscribe(self)
+    }
+    
+    func updateDisplay() {
+        updateGroupRulersMenuItem()
+    }
+
+    func updateGroupRulersMenuItem() {
+        groupedMenuItem?.state = Prefs.groupRulers.value ? .on : .off
+    }
+    
 
     func showRulers() {
         rulers = [
@@ -89,10 +102,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
         default:
             print("Unknown preference changed: \(name)")
         }
-    }
-
-    func updateGroupRulersMenuItem() {
-        groupedMenuItem?.state = Prefs.groupRulers.value ? .on : .off
     }
 
 }

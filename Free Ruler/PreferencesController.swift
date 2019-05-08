@@ -17,7 +17,7 @@ class PreferencesController: NSWindowController, NSWindowDelegate, PreferenceSub
 
         // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
         
-        subscribePrefs()
+        subscribeToPrefs()
         updateView()
     }
     
@@ -29,7 +29,7 @@ class PreferencesController: NSWindowController, NSWindowDelegate, PreferenceSub
         Prefs.foregroundOpacity.value -= 1
     }
 
-    func subscribePrefs() {
+    func subscribeToPrefs() {
         Prefs.foregroundOpacity.subscribe(self)
         Prefs.backgroundOpacity.subscribe(self)
         Prefs.floatRulers.subscribe(self)
