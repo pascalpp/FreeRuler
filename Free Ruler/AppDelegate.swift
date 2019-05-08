@@ -10,7 +10,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
 
     var timer: Timer?
     let foregroundTimerInterval: TimeInterval = 1 / 60 // 60 fps
-    let backgroundTimerInterval: TimeInterval = 1 / 15 // 15 fps
+    let backgroundTimerInterval: TimeInterval = 1 / 30 // 30 fps
 
     @IBOutlet weak var groupedMenuItem: NSMenuItem!
 
@@ -35,7 +35,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
     func subscribeToPrefs() {
         Prefs.groupRulers.subscribe(self)
     }
-    
+
+    func onChangePreference(_ name: String) {
+        switch(name) {
+        case Prefs.groupRulers.name:
+            updateGroupRulersMenuItem()
+        default:
+            print("Unknown preference changed: \(name)")
+        }
+    }
+
     func updateDisplay() {
         updateGroupRulersMenuItem()
     }
@@ -95,15 +104,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
         }
     }
 
-    func onChangePreference(_ name: String) {
-        switch(name) {
-        case Prefs.groupRulers.name:
-            updateGroupRulersMenuItem()
-        default:
-            print("Unknown preference changed: \(name)")
+    @IBAction func resetRulerPositions(_ sender: Any) {
+        for ruler in rulers {
+            let frame = getDefaultContentRect(orientation: ruler.ruler.orientation)
+            ruler.rulerWindow.setFrame(frame, display: true)   
         }
     }
-
+    
 }
 
 

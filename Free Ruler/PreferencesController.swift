@@ -17,8 +17,15 @@ class PreferencesController: NSWindowController, NSWindowDelegate, PreferenceSub
 
         // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
         
+        window?.isMovableByWindowBackground = true
+        
         subscribeToPrefs()
         updateView()
+    }
+    
+    override func showWindow(_ sender: Any?) {
+        window?.makeKeyAndOrderFront(sender)
+        window?.center()
     }
     
     func windowWillClose(_ notification: Notification) {
