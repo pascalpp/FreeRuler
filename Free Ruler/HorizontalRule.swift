@@ -1,11 +1,3 @@
-//
-//  HorizontalRule.swift
-//  Free Ruler
-//
-//  Created by Jeff Hanbury on 12/04/19.
-//  Copyright © 2019 Marmaladesoul. All rights reserved.
-//
-
 import Cocoa
 
 class HorizontalRule: RuleView {
@@ -26,7 +18,8 @@ class HorizontalRule: RuleView {
         super.draw(dirtyRect)
 
         // Drawing code here.
-        #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1).setFill()
+        let color = #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1)
+        color.setFill()
         dirtyRect.fill()
 
         let paragraphStyle = NSMutableParagraphStyle()

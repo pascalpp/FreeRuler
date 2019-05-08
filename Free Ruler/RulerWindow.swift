@@ -22,11 +22,11 @@ class RulerWindow: NSPanel {
             defer: false
         )
         
-        self.alphaValue = Prefs.foregroundOpacity.value
+        self.alphaValue = windowAlphaValue(Prefs.foregroundOpacity.value)
         self.minSize = getMinSize(ruler: ruler)
         self.maxSize = getMaxSize(ruler: ruler)
         
-        self.isFloatingPanel = true
+        self.isFloatingPanel = Prefs.floatRulers.value
         self.hidesOnDeactivate = false
         self.isMovableByWindowBackground = true
         // self.hasShadow = false
@@ -90,28 +90,28 @@ extension RulerWindow {
     }
 
     private func distance(withShift: Bool) -> CGFloat {
-        let distance = withShift ? Distance.aLot : Distance.aLittle
-        return distance.rawValue
+        let dist = withShift ? Distance.aLot : Distance.aLittle
+        return dist.rawValue
     }
 
     func nudgeLeft(withShift shiftPressed: Bool) {
-        let distance = self.distance(withShift: shiftPressed)
-        moveHorizontally(by: distance * -1)
+        let dist = distance(withShift: shiftPressed)
+        moveHorizontally(by: dist * -1)
     }
 
     func nudgeRight(withShift shiftPressed: Bool) {
-        let distance = self.distance(withShift: shiftPressed)
-        moveHorizontally(by: distance)
+        let dist = distance(withShift: shiftPressed)
+        moveHorizontally(by: dist)
     }
 
     func nudgeDown(withShift shiftPressed: Bool) {
-        let distance = self.distance(withShift: shiftPressed)
-        moveVertically(by: distance * -1)
+        let dist = distance(withShift: shiftPressed)
+        moveVertically(by: dist * -1)
     }
 
     func nudgeUp(withShift shiftPressed: Bool) {
-        let distance = self.distance(withShift: shiftPressed)
-        moveVertically(by: distance)
+        let dist = distance(withShift: shiftPressed)
+        moveVertically(by: dist)
     }
 
 }

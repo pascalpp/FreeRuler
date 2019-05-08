@@ -5,35 +5,52 @@ let APP_ICON_HELPER = env["APP_ICON_HELPER"] != nil
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
-    
+
     var rulers: [RulerController] = []
 
     var timer: Timer?
     let foregroundTimerInterval: TimeInterval = 1 / 60 // 60 fps
     let backgroundTimerInterval: TimeInterval = 1 / 15 // 15 fps
-    
+
     @IBOutlet weak var groupedMenuItem: NSMenuItem!
 
+    var preferencesController: PreferencesController? = nil
+
     // MARK: - Lifecycle
-    
+
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        updateGroupRulersMenuItem()
-        Prefs.groupRulers.subscribe(self)
-        
+
+        subscribeToPrefs()
+        updateDisplay()
+
         if APP_ICON_HELPER {
             let helper = AppIconHelper()
             helper.show()
         } else {
             showRulers()
         }
+
     }
     
+    func subscribeToPrefs() {
+        Prefs.groupRulers.subscribe(self)
+    }
+    
+    func updateDisplay() {
+        updateGroupRulersMenuItem()
+    }
+
+    func updateGroupRulersMenuItem() {
+        groupedMenuItem?.state = Prefs.groupRulers.value ? .on : .off
+    }
+    
+
     func showRulers() {
         rulers = [
             RulerController(ruler: Ruler(.horizontal, name: "horizontal-ruler")),
             RulerController(ruler: Ruler(.vertical, name: "vertical-ruler")),
         ]
-        
+
         // let rulers know about each other
         // TODO: provide each ruler with otherRulers: [RulerWindow]
         rulers[0].otherWindow = rulers[1].rulerWindow
@@ -43,7 +60,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
             ruler.showWindow()
         }
     }
-    
+
     func applicationDidBecomeActive(_ notification: Notification) {
         for ruler in rulers {
             ruler.foreground()
@@ -51,7 +68,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
 
         startTimer(timeInterval: foregroundTimerInterval)
     }
-    
+
     func applicationDidResignActive(_ notification: Notification) {
         for ruler in rulers {
             ruler.background()
@@ -68,6 +85,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
         Prefs.groupRulers.value = !Prefs.groupRulers.value
     }
 
+    @IBAction func openPreferences(_ sender: Any) {
+        if preferencesController == nil {
+            preferencesController = PreferencesController(windowNibName: "PreferencesController")
+        }
+
+        if preferencesController != nil {
+            preferencesController?.showWindow(nil)
+        }
+    }
+
     func onChangePreference(_ name: String) {
         switch(name) {
         case Prefs.groupRulers.name:
@@ -75,10 +102,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
         default:
             print("Unknown preference changed: \(name)")
         }
-    }
-    
-    func updateGroupRulersMenuItem() {
-        groupedMenuItem?.state = Prefs.groupRulers.value ? .on : .off
     }
 
 }

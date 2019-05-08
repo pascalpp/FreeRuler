@@ -10,14 +10,14 @@ class Preference<T>: NSObject {
 
     private let defaultValue: T
     private var privateValue: T?
-
+    
     var value: T {
         get {
             return privateValue ?? defaultValue
         }
         set {
-            // print("Pref.\(name) changed: \(newValue)")
             privateValue = newValue
+//            print(self)
             notifySubscribers()
             writeValue()
         }

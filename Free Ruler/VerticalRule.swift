@@ -1,11 +1,3 @@
-//
-//  VerticalRule.swift
-//  Free Ruler
-//
-//  Created by Pascal on 2019-04-19.
-//
-//
-
 import Cocoa
 
 class VerticalRule: RuleView {
@@ -26,7 +18,8 @@ class VerticalRule: RuleView {
         super.draw(dirtyRect)
 
         // Drawing code here.
-        #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1).setFill()
+        let color = #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1)
+        color.setFill()
         dirtyRect.fill()
 
         let paragraphStyle = NSMutableParagraphStyle()
