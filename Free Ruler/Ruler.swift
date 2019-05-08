@@ -5,7 +5,7 @@ enum Orientation: String {
     case vertical
 }
 
-struct Ruler {
+class Ruler {
     static let thickness: CGFloat = 40
 
     let orientation: Orientation
@@ -18,19 +18,19 @@ struct Ruler {
         self.frame = frame ?? getDefaultContentRect(orientation: orientation)
     }
 
-    init(_ orientation: Orientation, frame: NSRect?, name: String?) {
+    convenience init(_ orientation: Orientation, frame: NSRect?, name: String?) {
         self.init(orientation: orientation, frame: frame, name: name)
     }
 
-    init(_ orientation: Orientation, name: String) {
+    convenience init(_ orientation: Orientation, name: String) {
         self.init(orientation, frame: nil, name: name)
     }
     
-    init(_ orientation: Orientation, frame: NSRect) {
+    convenience init(_ orientation: Orientation, frame: NSRect) {
         self.init(orientation, frame: frame, name: nil)
     }
 
-    init(_ orientation: Orientation) {
+    convenience init(_ orientation: Orientation) {
         self.init(orientation, frame: nil, name: nil)
     }
 
