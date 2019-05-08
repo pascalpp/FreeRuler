@@ -105,6 +105,11 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
             print("Unknown preference changed: \(name)")
         }
     }
+    
+    func resetPosition() {
+        let frame = getDefaultContentRect(orientation: ruler.orientation)
+        rulerWindow.setFrame(frame, display: true)
+    }
 
 }
 

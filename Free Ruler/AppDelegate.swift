@@ -105,10 +105,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
     }
 
     @IBAction func resetRulerPositions(_ sender: Any) {
-        for rulerController in rulers {
-            let window = rulerController.rulerWindow
-            let frame = getDefaultContentRect(orientation: window.ruler.orientation)
-            window.setFrame(frame, display: true)
+        for ruler in rulers {
+            ruler.resetPosition()
         }
     }
     
