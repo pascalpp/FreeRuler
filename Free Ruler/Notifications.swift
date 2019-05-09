@@ -16,7 +16,7 @@ extension Notification.Name {
 extension NotificationCenter {
     
     // convenience method for addObserver with closure
-    // rather than call a selector, pass a closure that changes some local state variable when the event occurs
+    // rather than call an @objc selector, pass a closure that changes some local state variable when the event occurs
     //
     // Notes.addObserver(.preferencesWindowOpened) { _ in self.preferencesWindowOpen = true }
     //
