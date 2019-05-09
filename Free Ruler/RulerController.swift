@@ -33,7 +33,12 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
 
         createObservers()
         subscribeToPrefs()
+
         rulerWindow.delegate = self
+
+        if let windowFrameAutosaveName = ruler.name {
+            self.windowFrameAutosaveName = windowFrameAutosaveName
+        }
     }
 
     convenience init(_ ruler: Ruler) {
