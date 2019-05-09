@@ -36,9 +36,6 @@ class RulerWindow: NSPanel {
         // self.hasShadow = false
         
         self.contentView = rule
-        if let frameAutosaveName = ruler.name {
-            self.setFrameAutosaveName(frameAutosaveName)
-        }
     }
     
     override var canBecomeKey: Bool {
