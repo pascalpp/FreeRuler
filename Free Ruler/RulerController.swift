@@ -2,8 +2,7 @@ import Cocoa
 import Carbon.HIToolbox // For key constants
 
 
-class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscriber {
-
+class RulerController: NSCoder, NSWindowDelegate, PreferenceSubscriber {
     let ruler: Ruler
     let rulerWindow: RulerWindow
     var otherWindow: RulerWindow?
@@ -19,7 +18,7 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
         self.ruler = ruler
         self.rulerWindow = RulerWindow(ruler)
 
-        super.init(window: self.rulerWindow)
+        super.init()
         
         subscribeToPrefs()
         rulerWindow.delegate = self
@@ -29,8 +28,8 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
         self.init(ruler: ruler)
     }
 
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented. Use init(ruler: Ruler)")
+    func showWindow(_ sender: Any?) {
+        rulerWindow.orderFront(sender)
     }
 
     func windowWillStartLiveResize(_ notification: Notification) {
