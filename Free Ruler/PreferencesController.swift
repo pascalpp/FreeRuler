@@ -1,10 +1,5 @@
 import Cocoa
 
-struct PreferencesWindowNotifications {
-    static var opened = Notification.Name(rawValue: "com.pascal.freeruler.preferencesWindowOpened")
-    static var closed = Notification.Name(rawValue: "com.pascal.freeruler.preferencesWindowClosed")
-}
-
 class PreferencesController: NSWindowController, NSWindowDelegate, PreferenceSubscriber {
     
     @IBOutlet weak var rulerColorWell: NSColorWell!
@@ -34,7 +29,7 @@ class PreferencesController: NSWindowController, NSWindowDelegate, PreferenceSub
     
     override func showWindow(_ sender: Any?) {
         // send opened notification
-        NotificationCenter.default.post(name: PreferencesWindowNotifications.opened, object: nil)
+        Notes.post(.preferencesWindowOpened)
 
         window?.makeKeyAndOrderFront(sender)
         window?.center()
@@ -42,7 +37,7 @@ class PreferencesController: NSWindowController, NSWindowDelegate, PreferenceSub
     
     func windowWillClose(_ notification: Notification) {
         // send closed notification
-        NotificationCenter.default.post(name: PreferencesWindowNotifications.closed, object: nil)
+        Notes.post(.preferencesWindowClosed)
     }
 
     func subscribeToPrefs() {
