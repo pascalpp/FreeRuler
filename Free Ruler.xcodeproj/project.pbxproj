@@ -98,6 +98,7 @@
 			isa = PBXGroup;
 			children = (
 				6F4102882260712F00F06A10 /* AppDelegate.swift */,
+				6F41028C2260713100F06A10 /* MainMenu.xib */,
 				50D7BEE8227D43270008B95E /* Ruler.swift */,
 				50D7BEE6227D42FD0008B95E /* RulerController.swift */,
 				50D7BEEA227D432E0008B95E /* RulerWindow.swift */,
@@ -107,7 +108,6 @@
 				50008B6022846FCD001E3EE4 /* Notifications.swift */,
 				507FED5F2280E13200BD77DC /* Prefs.swift */,
 				503869FC2282582400C3B076 /* Preference.swift */,
-				6F41028C2260713100F06A10 /* MainMenu.xib */,
 				507FED41227FFF5300BD77DC /* PreferencesController.swift */,
 				507FED42227FFF5300BD77DC /* PreferencesController.xib */,
 				50CCB205227FCD26004645C5 /* AppIconHelper.swift */,
