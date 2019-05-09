@@ -1,5 +1,7 @@
 import Foundation
 
+// sugar syntax for NotificationCenter
+
 // short name for NotificationCenter.default
 let Notes = NotificationCenter.default
 
@@ -12,6 +14,16 @@ extension Notification.Name {
 }
 
 extension NotificationCenter {
+    
+    // convenience method for addObserver with closure
+    // rather than call a selector, pass a closure that changes some local state variable when the event occurs
+    //
+    // Notes.addObserver(.preferencesWindowOpened) { _ in self.preferencesWindowOpen = true }
+    //
+    // use in conjunction with didSet to react to changes
+    func addObserver(_ forName: Notification.Name, using: @escaping (Notification) -> Void) {
+        self.addObserver(forName: forName, object: nil, queue: nil, using: using)
+    }
     
     // convenience method for posting an event with no object or userInfo
     // Notes.post(.eventName)

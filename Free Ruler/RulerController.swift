@@ -54,28 +54,10 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
     }
     
     func createObservers() {
-        Notes.addObserver(
-            self,
-            selector: #selector(RulerController.onPreferenceWindowOpened(notification:)),
-            name: .preferencesWindowOpened,
-            object: nil
-        )
-
-        Notes.addObserver(
-            self,
-            selector: #selector(RulerController.onPreferenceWindowClosed(notification:)),
-            name: .preferencesWindowClosed,
-            object: nil
-        )
+        Notes.addObserver(.preferencesWindowOpened) { _ in self.preferencesWindowOpen = true }
+        Notes.addObserver(.preferencesWindowClosed) { _ in self.preferencesWindowOpen = false }
     }
     
-    @objc func onPreferenceWindowOpened(notification: NSNotification) {
-        preferencesWindowOpen = true
-    }
-    @objc func onPreferenceWindowClosed(notification: NSNotification) {
-        preferencesWindowOpen = false
-    }
-
     func windowWillStartLiveResize(_ notification: Notification) {
         // print("windowWillStartLiveResize")
     }
