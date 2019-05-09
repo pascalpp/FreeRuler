@@ -2,8 +2,6 @@ import Cocoa
 
 class PreferencesController: NSWindowController, NSWindowDelegate, PreferenceSubscriber {
     
-    @IBOutlet weak var rulerColorWell: NSColorWell!
-    
     @IBOutlet weak var foregroundOpacitySlider: NSSlider!
     @IBOutlet weak var backgroundOpacitySlider: NSSlider!
 
