@@ -8,6 +8,16 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
     let rulerWindow: RulerWindow
     var otherWindow: RulerWindow?
     var keyListener: Any?
+    
+    var preferencesWindowOpen = false {
+        didSet {
+            updateIsFloatingPanel()
+            // reset opacity to foreground in case they modified background opacity last
+            if !preferencesWindowOpen {
+                opacity = Prefs.foregroundOpacity.value
+            }
+        }
+    }
 
     var opacity = Prefs.foregroundOpacity.value {
         didSet {
@@ -20,7 +30,8 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
         self.rulerWindow = RulerWindow(ruler)
 
         super.init(window: self.rulerWindow)
-        
+
+        createObservers()
         subscribeToPrefs()
         rulerWindow.delegate = self
     }
@@ -31,6 +42,35 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented. Use init(ruler: Ruler)")
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    func createObservers() {
+        let opened = Notification.Name(rawValue: preferencesWindowOpenedNotificationKey)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(RulerController.onPreferenceWindowOpened(notification:)),
+            name: opened,
+            object: nil
+        )
+
+        let closed = Notification.Name(rawValue: preferencesWindowClosedNotificationKey)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(RulerController.onPreferenceWindowClosed(notification:)),
+            name: closed,
+            object: nil
+        )
+    }
+    
+    @objc func onPreferenceWindowOpened(notification: NSNotification) {
+        preferencesWindowOpen = true
+    }
+    @objc func onPreferenceWindowClosed(notification: NSNotification) {
+        preferencesWindowOpen = false
     }
 
     func windowWillStartLiveResize(_ notification: Notification) {
@@ -75,6 +115,15 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
             rulerWindow.removeChildWindow(otherWindow)
         }
     }
+    
+    func updateIsFloatingPanel() {
+        // never float while preferences window is open
+        if preferencesWindowOpen {
+            rulerWindow.isFloatingPanel = false
+        } else {
+            rulerWindow.isFloatingPanel = Prefs.floatRulers.value
+        }
+    }
 
     func foreground() {
         opacity = Prefs.foregroundOpacity.value
@@ -100,7 +149,7 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
         case Prefs.backgroundOpacity.name:
             opacity = Prefs.backgroundOpacity.value
         case Prefs.floatRulers.name:
-            rulerWindow.isFloatingPanel = Prefs.floatRulers.value
+            updateIsFloatingPanel()
         default:
             print("Unknown preference changed: \(name)")
         }

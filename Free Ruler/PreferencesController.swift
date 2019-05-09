@@ -1,5 +1,8 @@
 import Cocoa
 
+let preferencesWindowOpenedNotificationKey = "com.pascal.freeruler.preferencesWindowOpenedNotificationKey"
+let preferencesWindowClosedNotificationKey = "com.pascal.freeruler.preferencesWindowClosedNotificationKey"
+
 class PreferencesController: NSWindowController, NSWindowDelegate, PreferenceSubscriber {
 
     @IBOutlet weak var rulerColorWell: NSColorWell!
@@ -28,16 +31,18 @@ class PreferencesController: NSWindowController, NSWindowDelegate, PreferenceSub
     }
     
     override func showWindow(_ sender: Any?) {
+        // send opened notification
+        let name = Notification.Name(rawValue: preferencesWindowOpenedNotificationKey)
+        NotificationCenter.default.post(name: name, object: nil)
+
         window?.makeKeyAndOrderFront(sender)
         window?.center()
     }
     
     func windowWillClose(_ notification: Notification) {
-        // HACK:
-        // if the user modifies backgroundOpacity right before closing the prefs window, the ruler opacity needs to be reset to foregroundOpacity. Since rulers are subscribed to foregroundOpacity, we can twiddle that value to coerce rulers back to the correct opacity
-        // TODO find a better way to do this
-        Prefs.foregroundOpacity.value += 1
-        Prefs.foregroundOpacity.value -= 1
+        // send closed notification
+        let name = Notification.Name(rawValue: preferencesWindowClosedNotificationKey)
+        NotificationCenter.default.post(name: name, object: nil)
     }
 
     func subscribeToPrefs() {
