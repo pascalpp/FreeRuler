@@ -49,19 +49,17 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
     }
     
     func createObservers() {
-        let opened = Notification.Name(rawValue: preferencesWindowOpenedNotificationKey)
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(RulerController.onPreferenceWindowOpened(notification:)),
-            name: opened,
+            name: PreferencesWindowNotifications.opened,
             object: nil
         )
 
-        let closed = Notification.Name(rawValue: preferencesWindowClosedNotificationKey)
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(RulerController.onPreferenceWindowClosed(notification:)),
-            name: closed,
+            name: PreferencesWindowNotifications.closed,
             object: nil
         )
     }
