@@ -1,8 +1,6 @@
 import Cocoa
 
-class PreferencesController: NSWindowController, NSWindowDelegate, PreferenceSubscriber {
-
-    @IBOutlet weak var rulerColorWell: NSColorWell!
+class PreferencesController: NSWindowController, NSWindowDelegate, PreferenceSubscriber, NotificationPoster {
     
     @IBOutlet weak var foregroundOpacitySlider: NSSlider!
     @IBOutlet weak var backgroundOpacitySlider: NSSlider!
@@ -28,16 +26,16 @@ class PreferencesController: NSWindowController, NSWindowDelegate, PreferenceSub
     }
     
     override func showWindow(_ sender: Any?) {
+        // send opened notification
+        post(.preferencesWindowOpened)
+
         window?.makeKeyAndOrderFront(sender)
         window?.center()
     }
     
     func windowWillClose(_ notification: Notification) {
-        // HACK:
-        // if the user modifies backgroundOpacity right before closing the prefs window, the ruler opacity needs to be reset to foregroundOpacity. Since rulers are subscribed to foregroundOpacity, we can twiddle that value to coerce rulers back to the correct opacity
-        // TODO find a better way to do this
-        Prefs.foregroundOpacity.value += 1
-        Prefs.foregroundOpacity.value -= 1
+        // send closed notification
+        post(.preferencesWindowClosed)
     }
 
     func subscribeToPrefs() {

@@ -2,12 +2,22 @@ import Cocoa
 import Carbon.HIToolbox // For key constants
 
 
-class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscriber {
+class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscriber, NotificationObserver {
 
     let ruler: Ruler
     let rulerWindow: RulerWindow
     var otherWindow: RulerWindow?
     var keyListener: Any?
+    
+    var preferencesWindowOpen = false {
+        didSet {
+            updateIsFloatingPanel()
+            // reset opacity to foreground in case they modified background opacity last
+            if !preferencesWindowOpen {
+                opacity = Prefs.foregroundOpacity.value
+            }
+        }
+    }
 
     var opacity = Prefs.foregroundOpacity.value {
         didSet {
@@ -20,7 +30,8 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
         self.rulerWindow = RulerWindow(ruler)
 
         super.init(window: self.rulerWindow)
-        
+
+        createObservers()
         subscribeToPrefs()
 
         rulerWindow.delegate = self
@@ -37,7 +48,16 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented. Use init(ruler: Ruler)")
     }
-
+    
+    deinit {
+        removeObserver()
+    }
+    
+    func createObservers() {
+        observe(.preferencesWindowOpened) { _ in self.preferencesWindowOpen = true }
+        observe(.preferencesWindowClosed) { _ in self.preferencesWindowOpen = false }
+    }
+    
     func windowWillStartLiveResize(_ notification: Notification) {
         // print("windowWillStartLiveResize")
     }
@@ -80,6 +100,15 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
             rulerWindow.removeChildWindow(otherWindow)
         }
     }
+    
+    func updateIsFloatingPanel() {
+        // never float while preferences window is open
+        if preferencesWindowOpen {
+            rulerWindow.isFloatingPanel = false
+        } else {
+            rulerWindow.isFloatingPanel = Prefs.floatRulers.value
+        }
+    }
 
     func foreground() {
         opacity = Prefs.foregroundOpacity.value
@@ -105,7 +134,7 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
         case Prefs.backgroundOpacity.name:
             opacity = Prefs.backgroundOpacity.value
         case Prefs.floatRulers.name:
-            rulerWindow.isFloatingPanel = Prefs.floatRulers.value
+            updateIsFloatingPanel()
         default:
             print("Unknown preference changed: \(name)")
         }
