@@ -132,6 +132,7 @@ extension AppDelegate {
     }
 
     @objc func onInterval() {
+        // this can't be right
         crosshair.push()
         
         self.updateMouseLocation()
