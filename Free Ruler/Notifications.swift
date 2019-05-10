@@ -19,8 +19,8 @@ extension NotificationPoster {
 
 protocol NotificationObserver {}
 extension NotificationObserver {
-
-    func observe(_ forName: Notification.Name, using: @escaping (Notification) -> Void) {
+    
+    func addObserver(_ forName: Notification.Name, using: @escaping (Notification) -> Void) {
         NotificationCenter.default.addObserver(forName: forName, object: nil, queue: nil, using: using)
     }
     
