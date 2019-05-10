@@ -1,6 +1,6 @@
 import Cocoa
 
-class PreferencesController: NSWindowController, NSWindowDelegate, PreferenceSubscriber {
+class PreferencesController: NSWindowController, NSWindowDelegate, PreferenceSubscriber, NotificationPoster {
     
     @IBOutlet weak var foregroundOpacitySlider: NSSlider!
     @IBOutlet weak var backgroundOpacitySlider: NSSlider!
@@ -27,7 +27,7 @@ class PreferencesController: NSWindowController, NSWindowDelegate, PreferenceSub
     
     override func showWindow(_ sender: Any?) {
         // send opened notification
-        Notes.post(.preferencesWindowOpened)
+        post(.preferencesWindowOpened)
 
         window?.makeKeyAndOrderFront(sender)
         window?.center()
@@ -35,7 +35,7 @@ class PreferencesController: NSWindowController, NSWindowDelegate, PreferenceSub
     
     func windowWillClose(_ notification: Notification) {
         // send closed notification
-        Notes.post(.preferencesWindowClosed)
+        post(.preferencesWindowClosed)
     }
 
     func subscribeToPrefs() {

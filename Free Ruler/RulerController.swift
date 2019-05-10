@@ -2,7 +2,7 @@ import Cocoa
 import Carbon.HIToolbox // For key constants
 
 
-class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscriber {
+class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscriber, NotificationObserver {
 
     let ruler: Ruler
     let rulerWindow: RulerWindow
@@ -50,12 +50,12 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
     }
     
     deinit {
-        Notes.removeObserver(self)
+        removeObserver()
     }
     
     func createObservers() {
-        Notes.addObserver(.preferencesWindowOpened) { _ in self.preferencesWindowOpen = true }
-        Notes.addObserver(.preferencesWindowClosed) { _ in self.preferencesWindowOpen = false }
+        observe(.preferencesWindowOpened) { _ in self.preferencesWindowOpen = true }
+        observe(.preferencesWindowClosed) { _ in self.preferencesWindowOpen = false }
     }
     
     func windowWillStartLiveResize(_ notification: Notification) {
