@@ -36,7 +36,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func subscribeToPrefs() {
         observers = [
-            prefs.observe(\Prefs.groupRulers, options: .new) { ruler, changed in
+            prefs.observe(\Prefs.groupRulers, options: .new) { prefs, changed in
                 self.updateGroupRulersMenuItem()
             },
         ]

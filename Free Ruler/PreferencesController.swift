@@ -41,13 +41,13 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
 
     func subscribeToPrefs() {
         observers = [
-            prefs.observe(\Prefs.foregroundOpacity, options: .new) { ruler, changed in
+            prefs.observe(\Prefs.foregroundOpacity, options: .new) { prefs, changed in
                 self.updateForegroundSlider()
             },
-            prefs.observe(\Prefs.backgroundOpacity, options: .new) { ruler, changed in
+            prefs.observe(\Prefs.backgroundOpacity, options: .new) { prefs, changed in
                 self.updateBackgroundSlider()
             },
-            prefs.observe(\Prefs.floatRulers, options: .new) { ruler, changed in
+            prefs.observe(\Prefs.floatRulers, options: .new) { prefs, changed in
                 self.updateFloatRulersCheckbox()
             },
         ]

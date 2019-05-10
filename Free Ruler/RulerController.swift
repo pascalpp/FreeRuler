@@ -119,16 +119,16 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
 
     func subscribeToPrefs() {
         observers = [
-            prefs.observe(\Prefs.foregroundOpacity, options: .new) { ruler, changed in
+            prefs.observe(\Prefs.foregroundOpacity, options: .new) { prefs, changed in
                 self.opacity = prefs.foregroundOpacity
             },
-            prefs.observe(\Prefs.backgroundOpacity, options: .new) { ruler, changed in
+            prefs.observe(\Prefs.backgroundOpacity, options: .new) { prefs, changed in
                 self.opacity = prefs.backgroundOpacity
             },
-            prefs.observe(\Prefs.groupRulers, options: .new) { ruler, changed in
+            prefs.observe(\Prefs.groupRulers, options: .new) { prefs, changed in
                 self.updateChildWindow()
             },
-            prefs.observe(\Prefs.floatRulers, options: .new) { ruler, changed in
+            prefs.observe(\Prefs.floatRulers, options: .new) { prefs, changed in
                 self.updateIsFloatingPanel()
             },
         ]
