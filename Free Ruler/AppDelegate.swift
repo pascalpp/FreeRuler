@@ -78,6 +78,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
         }
 
         startTimer(timeInterval: foregroundTimerInterval)
+
+        crosshair.push()
     }
 
     func applicationDidResignActive(_ notification: Notification) {
@@ -86,6 +88,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
         }
 
         startTimer(timeInterval: backgroundTimerInterval)
+        
+        crosshair.pop()
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -132,9 +136,6 @@ extension AppDelegate {
     }
 
     @objc func onInterval() {
-        // this can't be right
-        crosshair.push()
-        
         self.updateMouseLocation()
     }
 
