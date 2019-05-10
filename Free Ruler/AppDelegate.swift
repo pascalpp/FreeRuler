@@ -73,6 +73,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
+        print("applicationDidBecomeActive")
         for ruler in rulers {
             ruler.foreground()
         }
@@ -83,6 +84,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
     }
 
     func applicationDidResignActive(_ notification: Notification) {
+        print("applicationDidResignActive")
         for ruler in rulers {
             ruler.background()
         }
