@@ -35,10 +35,7 @@ class RulerWindow: NSPanel {
         self.isMovableByWindowBackground = true
         // self.hasShadow = false
         
-        self.contentView = self.rule
-        if let frameAutosaveName = ruler.name {
-            self.setFrameAutosaveName(frameAutosaveName)
-        }
+        self.contentView = rule
     }
     
     override var canBecomeKey: Bool {
