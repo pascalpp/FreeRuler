@@ -52,8 +52,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func showRulers() {
         rulers = [
-            RulerController(ruler: Ruler(.horizontal, name: "horizontal-ruler")),
-            RulerController(ruler: Ruler(.vertical, name: "vertical-ruler")),
+            RulerController(Ruler(.horizontal, name: "horizontal-ruler")),
+            RulerController(Ruler(.vertical, name: "vertical-ruler")),
         ]
 
         // let rulers know about each other
@@ -62,7 +62,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         rulers[1].otherWindow = rulers[0].rulerWindow
 
         for ruler in rulers {
-            
             ruler.showWindow(self)
         }
     }

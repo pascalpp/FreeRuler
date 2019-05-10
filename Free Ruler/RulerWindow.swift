@@ -5,6 +5,10 @@ class RulerWindow: NSPanel {
     var ruler: Ruler
     var rule: RuleView
     
+    convenience init(_ ruler: Ruler) {
+        self.init(ruler: ruler)
+    }
+    
     init(ruler: Ruler) {
         self.ruler = ruler
         self.rule = getRulerView(ruler: ruler)

@@ -52,7 +52,7 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
             },
         ]
     }
-    
+
     @IBAction func setForegroundOpacity(_ sender: Any) {
         prefs.foregroundOpacity = foregroundOpacitySlider.integerValue
     }

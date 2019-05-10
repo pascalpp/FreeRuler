@@ -21,16 +21,19 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
         }
     }
 
-    var opacity: Int {
+    var opacity = prefs.foregroundOpacity {
         didSet {
             rulerWindow.alphaValue = windowAlphaValue(opacity)
         }
     }
 
+    convenience init(_ ruler: Ruler) {
+        self.init(ruler: ruler)
+    }
+    
     init(ruler: Ruler) {
         self.ruler = ruler
-        self.rulerWindow = RulerWindow(ruler: ruler)
-        self.opacity = prefs.foregroundOpacity
+        self.rulerWindow = RulerWindow(ruler)
 
         super.init(window: self.rulerWindow)
 
@@ -133,7 +136,7 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
             },
         ]
     }
-
+    
     func resetPosition() {
         let frame = getDefaultContentRect(orientation: ruler.orientation)
         rulerWindow.setFrame(frame, display: true)
