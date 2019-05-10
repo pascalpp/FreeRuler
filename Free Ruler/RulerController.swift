@@ -39,6 +39,7 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
         if let windowFrameAutosaveName = ruler.name {
             self.windowFrameAutosaveName = windowFrameAutosaveName
         }
+        
     }
 
     convenience init(_ ruler: Ruler) {
@@ -54,8 +55,8 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
     }
     
     func createObservers() {
-        observe(.preferencesWindowOpened) { _ in self.preferencesWindowOpen = true }
-        observe(.preferencesWindowClosed) { _ in self.preferencesWindowOpen = false }
+        addObserver(.preferencesWindowOpened) { _ in self.preferencesWindowOpen = true }
+        addObserver(.preferencesWindowClosed) { _ in self.preferencesWindowOpen = false }
     }
     
     func windowWillStartLiveResize(_ notification: Notification) {
