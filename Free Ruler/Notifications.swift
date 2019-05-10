@@ -21,12 +21,17 @@ extension NotificationCenter {
     // Notes.addObserver(.preferencesWindowOpened) { _ in self.preferencesWindowOpen = true }
     //
     // use in conjunction with didSet to react to changes
+    //
+    // or
+    // Notes.addObserver(.preferencesWindowOpened) { note in self.onNotification(note) }
+
     func addObserver(_ forName: Notification.Name, using: @escaping (Notification) -> Void) {
         self.addObserver(forName: forName, object: nil, queue: nil, using: using)
     }
     
     // convenience method for posting an event with no object or userInfo
     // Notes.post(.eventName)
+
     func post(_ name: Notification.Name) {
         self.post(name: name, object: nil)
     }
