@@ -2,7 +2,10 @@ import Cocoa
 import Carbon.HIToolbox // For key constants
 
 
-class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscriber, NotificationObserver {
+class RulerController: NSWindowController, NSWindowDelegate, NotificationObserver {
+
+    @objc var prefs: Prefs
+    var observers: [NSKeyValueObservation] = []
 
     let ruler: Ruler
     let rulerWindow: RulerWindow
@@ -14,20 +17,22 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
             updateIsFloatingPanel()
             // reset opacity to foreground in case they modified background opacity last
             if !preferencesWindowOpen {
-                opacity = Prefs.foregroundOpacity.value
+                opacity = prefs.foregroundOpacity
             }
         }
     }
 
-    var opacity = Prefs.foregroundOpacity.value {
+    var opacity: Int {
         didSet {
             rulerWindow.alphaValue = windowAlphaValue(opacity)
         }
     }
 
-    init(ruler: Ruler) {
+    init(ruler: Ruler, prefs: Prefs) {
         self.ruler = ruler
-        self.rulerWindow = RulerWindow(ruler)
+        self.rulerWindow = RulerWindow(ruler: ruler, prefs: prefs)
+        self.prefs = prefs
+        self.opacity = prefs.foregroundOpacity
 
         super.init(window: self.rulerWindow)
 
@@ -40,10 +45,6 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
             self.windowFrameAutosaveName = windowFrameAutosaveName
         }
         
-    }
-
-    convenience init(_ ruler: Ruler) {
-        self.init(ruler: ruler)
     }
 
     required init?(coder: NSCoder) {
@@ -95,7 +96,7 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
     func updateChildWindow() {
         guard let otherWindow = otherWindow else { return }
 
-        if Prefs.groupRulers.value && rulerWindow.isKeyWindow {
+        if prefs.groupRulers && rulerWindow.isKeyWindow {
             rulerWindow.addChildWindow(otherWindow, ordered: .below)
         } else {
             rulerWindow.removeChildWindow(otherWindow)
@@ -107,40 +108,34 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
         if preferencesWindowOpen {
             rulerWindow.isFloatingPanel = false
         } else {
-            rulerWindow.isFloatingPanel = Prefs.floatRulers.value
+            rulerWindow.isFloatingPanel = prefs.floatRulers
         }
     }
 
     func foreground() {
-        opacity = Prefs.foregroundOpacity.value
+        opacity = prefs.foregroundOpacity
     }
     func background() {
-        opacity = Prefs.backgroundOpacity.value
+        opacity = prefs.backgroundOpacity
     }
 
     func subscribeToPrefs() {
-        Prefs.groupRulers.subscribe(self)
-        Prefs.foregroundOpacity.subscribe(self)
-        Prefs.backgroundOpacity.subscribe(self)
-        Prefs.floatRulers.subscribe(self)
+        observers = [
+            prefs.observe(\Prefs.foregroundOpacity, options: .new) { ruler, changed in
+                self.opacity = self.prefs.foregroundOpacity
+            },
+            prefs.observe(\Prefs.backgroundOpacity, options: .new) { ruler, changed in
+                self.opacity = self.prefs.backgroundOpacity
+            },
+            prefs.observe(\Prefs.groupRulers, options: .new) { ruler, changed in
+                self.updateChildWindow()
+            },
+            prefs.observe(\Prefs.floatRulers, options: .new) { ruler, changed in
+                self.updateIsFloatingPanel()
+            },
+        ]
     }
 
-    func onChangePreference(_ name: String) {
-        // print("onChangePreference", name)
-        switch(name) {
-        case Prefs.groupRulers.name:
-            updateChildWindow()
-        case Prefs.foregroundOpacity.name:
-            opacity = Prefs.foregroundOpacity.value
-        case Prefs.backgroundOpacity.name:
-            opacity = Prefs.backgroundOpacity.value
-        case Prefs.floatRulers.name:
-            updateIsFloatingPanel()
-        default:
-            print("Unknown preference changed: \(name)")
-        }
-    }
-    
     func resetPosition() {
         let frame = getDefaultContentRect(orientation: ruler.orientation)
         rulerWindow.setFrame(frame, display: true)
@@ -190,4 +185,9 @@ extension RulerController {
         }
     }
 
+}
+
+// helper to convert opacity Int to window.alphaValue
+func windowAlphaValue(_ value: Int) -> CGFloat {
+    return CGFloat(value) / 100.0
 }

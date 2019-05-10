@@ -2,16 +2,26 @@ import Foundation
 
 // define default preferences
 
-struct Prefs {
+//let prefs = UserDefaults.standard
 
-    static var groupRulers          = Preference("groupRulers",         defaultValue: true)
-    static var foregroundOpacity    = Preference("foregroundOpacity",   defaultValue: 90)
-    static var backgroundOpacity    = Preference("backgroundOpacity",   defaultValue: 50)
-    static var floatRulers          = Preference("floatRulers",         defaultValue: true)
+//let defaults: [String: Any] = [
+//    "groupRulers": true,
+//    "floatRulers": true,
+//    "foregroundOpacity": 90,
+//    "backgroundOpacity": 50,
+//]
+//
 
+class Prefs: NSObject {
+    
+    @objc dynamic var groupRulers          = true
+    @objc dynamic var foregroundOpacity    = 90
+    @objc dynamic var backgroundOpacity    = 50
+    @objc dynamic var floatRulers          = true
+    
 }
 
-// helper to convert opacity Int to window.alphaValue
-func windowAlphaValue(_ value: Int) -> CGFloat {
-    return CGFloat(value) / 100.0
-}
+
+
+// TODO: figure registering defaults
+// TODO: figure out saving preferences on quit

@@ -30,6 +30,13 @@ let titlebarHeight: CGFloat = 22
 
 class AppIconHelper: NSObject {
     
+    var prefs: Prefs
+    
+    init(prefs: Prefs) {
+        self.prefs = prefs
+        super.init()
+    }
+    
     func show() {
         self.showAppIconBackdrop()
         self.showAppIconRulers()
@@ -60,12 +67,12 @@ class AppIconHelper: NSObject {
         
         let topRect = NSRect(x: frame.minX, y: frame.maxY + titlebarHeight, width: frame.width, height: Ruler.thickness)
         let topRuler = Ruler(.horizontal, frame: topRect)
-        let top = RulerController(topRuler)
+        let top = RulerController(ruler: topRuler, prefs: prefs)
         top.showWindow(nil)
         
         let leftRect = NSRect(x: frame.minX - Ruler.thickness, y: frame.minY, width: Ruler.thickness, height: frame.height + titlebarHeight)
         let leftRuler = Ruler(.vertical, frame: leftRect)
-        let left = RulerController(leftRuler)
+        let left = RulerController(ruler: leftRuler, prefs: prefs)
         left.showWindow(nil)
         
         window.addChildWindow(top.rulerWindow, ordered: .below)
@@ -91,17 +98,17 @@ class AppIconHelper: NSObject {
         
         let topRect = NSRect(x: frame.minX, y: frame.maxY - Ruler.thickness, width: frame.width, height: Ruler.thickness)
         let topRuler = Ruler(.horizontal, frame: topRect)
-        let top = RulerController(topRuler)
+        let top = RulerController(ruler: topRuler, prefs: prefs)
         top.showWindow(nil)
         
         let leftRect = NSRect(x: frame.minX, y: frame.minY, width: Ruler.thickness, height: frame.height)
         let leftRuler = Ruler(.vertical, frame: leftRect)
-        let left = RulerController(leftRuler)
+        let left = RulerController(ruler: leftRuler, prefs: prefs)
         left.showWindow(nil)
         
         let middleRect = NSRect(x: frame.minX, y: frame.minY + frame.height / 2 - Ruler.thickness / 2, width: frame.width - Ruler.thickness, height: Ruler.thickness)
         let middleRuler = Ruler(.horizontal, frame: middleRect)
-        let middle = RulerController(middleRuler)
+        let middle = RulerController(ruler: middleRuler, prefs: prefs)
         middle.showWindow(nil)
         
         window.orderFront(nil)

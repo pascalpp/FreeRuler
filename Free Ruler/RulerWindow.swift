@@ -2,14 +2,12 @@ import Cocoa
 
 class RulerWindow: NSPanel {
     
+    var prefs: Prefs
     var ruler: Ruler
     var rule: RuleView
     
-    convenience init(_ ruler: Ruler) {
-        self.init(ruler: ruler)
-    }
-    
-    init(ruler: Ruler) {
+    init(ruler: Ruler, prefs: Prefs) {
+        self.prefs = prefs
         self.ruler = ruler
         self.rule = getRulerView(ruler: ruler)
 
@@ -26,11 +24,11 @@ class RulerWindow: NSPanel {
             defer: false
         )
         
-        self.alphaValue = windowAlphaValue(Prefs.foregroundOpacity.value)
+        self.alphaValue = windowAlphaValue(prefs.foregroundOpacity)
         self.minSize = getMinSize(ruler: ruler)
         self.maxSize = getMaxSize(ruler: ruler)
         
-        self.isFloatingPanel = Prefs.floatRulers.value
+        self.isFloatingPanel = prefs.floatRulers
         self.hidesOnDeactivate = false
         self.isMovableByWindowBackground = true
         // self.hasShadow = false

@@ -4,8 +4,11 @@ let env = ProcessInfo.processInfo.environment
 let APP_ICON_HELPER = env["APP_ICON_HELPER"] != nil
 
 @NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
+class AppDelegate: NSObject, NSApplicationDelegate {
 
+    let prefs = Prefs()
+    var observers: [NSKeyValueObservation] = []
+    
     var rulers: [RulerController] = []
 
     var timer: Timer?
@@ -24,7 +27,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
         updateDisplay()
 
         if APP_ICON_HELPER {
-            let helper = AppIconHelper()
+            let helper = AppIconHelper(prefs: prefs)
             helper.show()
         } else {
             showRulers()
@@ -33,16 +36,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
     }
     
     func subscribeToPrefs() {
-        Prefs.groupRulers.subscribe(self)
-    }
-
-    func onChangePreference(_ name: String) {
-        switch(name) {
-        case Prefs.groupRulers.name:
-            updateGroupRulersMenuItem()
-        default:
-            print("Unknown preference changed: \(name)")
-        }
+        observers = [
+            prefs.observe(\Prefs.groupRulers, options: .new) { ruler, changed in
+                self.updateGroupRulersMenuItem()
+            },
+        ]
     }
 
     func updateDisplay() {
@@ -50,14 +48,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
     }
 
     func updateGroupRulersMenuItem() {
-        groupedMenuItem?.state = Prefs.groupRulers.value ? .on : .off
+        groupedMenuItem?.state = prefs.groupRulers ? .on : .off
     }
     
-
     func showRulers() {
         rulers = [
-            RulerController(Ruler(.horizontal, name: "horizontal-ruler")),
-            RulerController(Ruler(.vertical, name: "vertical-ruler")),
+            RulerController(ruler: Ruler(.horizontal, name: "horizontal-ruler"), prefs: prefs),
+            RulerController(ruler: Ruler(.vertical, name: "vertical-ruler"), prefs: prefs),
         ]
 
         // let rulers know about each other
@@ -66,6 +63,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
         rulers[1].otherWindow = rulers[0].rulerWindow
 
         for ruler in rulers {
+            
             ruler.showWindow(self)
         }
     }
@@ -91,7 +89,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
     }
 
     @IBAction func toggleGroupedRulers(_ sender: Any) {
-        Prefs.groupRulers.value = !Prefs.groupRulers.value
+        prefs.groupRulers = prefs.groupRulers
     }
 
     @IBAction func openPreferences(_ sender: Any) {
@@ -100,7 +98,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
         }
 
         if preferencesController != nil {
-            preferencesController?.showWindow(nil)
+            preferencesController?.showWindow(self, prefs: prefs)
         }
     }
 
