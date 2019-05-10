@@ -4,7 +4,6 @@ import Carbon.HIToolbox // For key constants
 
 class RulerController: NSWindowController, NSWindowDelegate, NotificationObserver {
 
-    @objc var prefs: Prefs
     var observers: [NSKeyValueObservation] = []
 
     let ruler: Ruler
@@ -28,10 +27,9 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
         }
     }
 
-    init(ruler: Ruler, prefs: Prefs) {
+    init(ruler: Ruler) {
         self.ruler = ruler
-        self.rulerWindow = RulerWindow(ruler: ruler, prefs: prefs)
-        self.prefs = prefs
+        self.rulerWindow = RulerWindow(ruler: ruler)
         self.opacity = prefs.foregroundOpacity
 
         super.init(window: self.rulerWindow)
@@ -122,10 +120,10 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     func subscribeToPrefs() {
         observers = [
             prefs.observe(\Prefs.foregroundOpacity, options: .new) { ruler, changed in
-                self.opacity = self.prefs.foregroundOpacity
+                self.opacity = prefs.foregroundOpacity
             },
             prefs.observe(\Prefs.backgroundOpacity, options: .new) { ruler, changed in
-                self.opacity = self.prefs.backgroundOpacity
+                self.opacity = prefs.backgroundOpacity
             },
             prefs.observe(\Prefs.groupRulers, options: .new) { ruler, changed in
                 self.updateChildWindow()

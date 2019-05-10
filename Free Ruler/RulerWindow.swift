@@ -2,12 +2,10 @@ import Cocoa
 
 class RulerWindow: NSPanel {
     
-    var prefs: Prefs
     var ruler: Ruler
     var rule: RuleView
     
-    init(ruler: Ruler, prefs: Prefs) {
-        self.prefs = prefs
+    init(ruler: Ruler) {
         self.ruler = ruler
         self.rule = getRulerView(ruler: ruler)
 

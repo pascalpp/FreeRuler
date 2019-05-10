@@ -21,6 +21,7 @@ class Prefs: NSObject {
     
 }
 
+let prefs = Prefs()
 
 
 // TODO: figure registering defaults

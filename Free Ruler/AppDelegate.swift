@@ -6,7 +6,6 @@ let APP_ICON_HELPER = env["APP_ICON_HELPER"] != nil
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
-    let prefs = Prefs()
     var observers: [NSKeyValueObservation] = []
     
     var rulers: [RulerController] = []
@@ -27,7 +26,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         updateDisplay()
 
         if APP_ICON_HELPER {
-            let helper = AppIconHelper(prefs: prefs)
+            let helper = AppIconHelper()
             helper.show()
         } else {
             showRulers()
@@ -53,8 +52,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func showRulers() {
         rulers = [
-            RulerController(ruler: Ruler(.horizontal, name: "horizontal-ruler"), prefs: prefs),
-            RulerController(ruler: Ruler(.vertical, name: "vertical-ruler"), prefs: prefs),
+            RulerController(ruler: Ruler(.horizontal, name: "horizontal-ruler")),
+            RulerController(ruler: Ruler(.vertical, name: "vertical-ruler")),
         ]
 
         // let rulers know about each other
@@ -89,7 +88,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @IBAction func toggleGroupedRulers(_ sender: Any) {
-        prefs.groupRulers = prefs.groupRulers
+        prefs.groupRulers = !prefs.groupRulers
     }
 
     @IBAction func openPreferences(_ sender: Any) {
@@ -98,7 +97,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         if preferencesController != nil {
-            preferencesController?.showWindow(self, prefs: prefs)
+            preferencesController?.showWindow(self)
         }
     }
 
