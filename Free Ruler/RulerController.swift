@@ -63,13 +63,11 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     }
     
     func windowWillStartLiveResize(_ notification: Notification) {
-        // print("windowWillStartLiveResize")
-        enableMouseTicks()
+        disableMouseTicks()
     }
 
     func windowDidEndLiveResize(_ notification: Notification) {
-        // print("windowDidEndLiveResize")
-        disableMouseTicks()
+        enableMouseTicks()
     }
 
     func windowWillMove(_ notification: Notification) {
