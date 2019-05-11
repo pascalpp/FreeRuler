@@ -35,6 +35,7 @@ class RulerWindow: NSPanel {
         self.isMovableByWindowBackground = true
         // self.hasShadow = false
         
+        rule.nextResponder = self
         self.contentView = rule
     }
     

@@ -41,6 +41,7 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
         subscribeToPrefs()
 
         rulerWindow.delegate = self
+        rulerWindow.nextResponder = self
 
         if let windowFrameAutosaveName = ruler.name {
             self.windowFrameAutosaveName = windowFrameAutosaveName
@@ -63,31 +64,44 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     
     func windowWillStartLiveResize(_ notification: Notification) {
         // print("windowWillStartLiveResize")
+        enableMouseTicks()
     }
 
     func windowDidEndLiveResize(_ notification: Notification) {
         // print("windowDidEndLiveResize")
+        disableMouseTicks()
     }
 
     func windowWillMove(_ notification: Notification) {
-        // print("windowWillMove")
+         disableMouseTicks()
     }
 
     func windowDidMove(_ notification: Notification) {
-        // print("windowDidMove")
         rulerWindow.invalidateShadow()
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
-        // print("windowDidBecomeKey")
         updateChildWindow()
         startKeyListener()
     }
 
     func windowDidResignKey(_ notification: Notification) {
-        // print("windowDidResignKey")
         updateChildWindow()
         stopKeyListener()
+    }
+    
+    override func mouseMoved(with event: NSEvent) {
+        enableMouseTicks()
+    }
+
+    func disableMouseTicks() {
+        rulerWindow.rule.showMouseTick = false
+        otherWindow?.rule.showMouseTick = false
+    }
+
+    func enableMouseTicks() {
+        rulerWindow.rule.showMouseTick = true
+        otherWindow?.rule.showMouseTick = true
     }
 
     func onChangeGrouped() {
