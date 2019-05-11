@@ -71,7 +71,7 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     }
 
     func windowWillMove(_ notification: Notification) {
-         disableMouseTicks()
+        disableMouseTicks()
     }
 
     func windowDidMove(_ notification: Notification) {
