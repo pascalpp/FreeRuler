@@ -18,8 +18,7 @@ class VerticalRule: RuleView {
         super.draw(dirtyRect)
 
         // Drawing code here.
-        let color = #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1)
-        color.setFill()
+        color.fill.setFill()
         dirtyRect.fill()
 
         let paragraphStyle = NSMutableParagraphStyle()
@@ -27,7 +26,7 @@ class VerticalRule: RuleView {
         let attrs = [
             NSAttributedString.Key.font: NSFont(name: "HelveticaNeue", size: 10)!,
             NSAttributedString.Key.paragraphStyle: paragraphStyle,
-            NSAttributedString.Key.foregroundColor: #colorLiteral(red: 0.7254902124, green: 0.4784313738, blue: 0.09803921729, alpha: 1)
+            NSAttributedString.Key.foregroundColor: color.numbers
        ]
 
         let width = Int(dirtyRect.width)
@@ -53,7 +52,7 @@ class VerticalRule: RuleView {
             }
         }
 
-        #colorLiteral(red: 0.7254902124, green: 0.4784313738, blue: 0.09803921729, alpha: 1).setStroke()
+        color.ticks.setStroke()
         path.stroke()
 
         // Draw the MouseTick & number
@@ -62,28 +61,28 @@ class VerticalRule: RuleView {
             drawMouseNumber(mouseTickY)
         }
     }
-    
+
     override func drawMouseTick(at mouseLoc: NSPoint) {
         let windowY = self.window?.frame.origin.y ?? 0
         let mouseY = mouseLoc.y
         self.mouseTickY = mouseY - windowY
     }
-    
+
     func drawMouseTick(_ mouseTickY: CGFloat) {
         let mouseTick = NSBezierPath()
         let width: CGFloat = 40
         let startX: CGFloat = 0
-        
+
         mouseTick.move(to: CGPoint(x: startX, y: mouseTickY))
         mouseTick.line(to: CGPoint(x: width, y: mouseTickY))
-        #colorLiteral(red: 0.3098039329, green: 0.2039215714, blue: 0.03921568766, alpha: 0.75).setStroke()
+        color.mouseTick.setStroke()
         mouseTick.stroke()
     }
 
     func drawMouseNumber(_ mouseTickY: CGFloat) {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .left
-        
+
         let number = windowHeight - mouseTickY
 
         // draw below the tick
@@ -97,8 +96,8 @@ class VerticalRule: RuleView {
         let attrs = [
             NSAttributedString.Key.font: NSFont(name: "HelveticaNeue", size: 10)!,
             NSAttributedString.Key.paragraphStyle: paragraphStyle,
-            NSAttributedString.Key.foregroundColor: #colorLiteral(red: 0.3098039329, green: 0.2039215714, blue: 0.03921568766, alpha: 1),
-            NSAttributedString.Key.backgroundColor: #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1),
+            NSAttributedString.Key.foregroundColor: color.mouseNumber,
+            NSAttributedString.Key.backgroundColor: color.fill,
         ]
 
         let label = String(Int(number))
