@@ -82,10 +82,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         startTimer(timeInterval: backgroundTimerInterval)
     }
 
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
-    }
-
     @IBAction func toggleGroupedRulers(_ sender: Any) {
         prefs.groupRulers = !prefs.groupRulers
     }
@@ -105,7 +101,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             ruler.resetPosition()
         }
     }
+
+    // MARK: - Application Quit
     
+    func applicationWillTerminate(_ aNotification: Notification) {
+        prefs.save()
+    }
+
 }
 
 
