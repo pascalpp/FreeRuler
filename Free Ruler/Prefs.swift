@@ -10,38 +10,52 @@ import Foundation
 // TODO: there's a lot of boilerplate in here, not sure if we can reduce it
 // TODO: figure out how avoid saving values that haven't changed from the default
 
+// MARK: - global shortcut to shared prefs instance
+let prefs = Prefs.shared
+
 class Prefs: NSObject {
+    
+    // MARK: - shared singleton instance
+    static let shared = Prefs()
 
-    let defaults = UserDefaults.standard
+    // MARK: - public properties
+    @objc dynamic var floatRulers       : Bool
+    @objc dynamic var groupRulers       : Bool
+    @objc dynamic var foregroundOpacity : Int
+    @objc dynamic var backgroundOpacity : Int
 
-    var defaultValues: [String: Any] = [
+    // MARK: - public save method
+    func save() {
+        defaults.synchronize()
+    }
+
+    // MARK: - private implementation
+
+    private let defaults = UserDefaults.standard
+
+    private var defaultValues: [String: Any] = [
         "groupRulers":       true,
         "floatRulers":       true,
         "foregroundOpacity": 90,
         "backgroundOpacity": 50,
     ]
 
-    @objc dynamic var floatRulers       : Bool
-    @objc dynamic var groupRulers       : Bool
-    @objc dynamic var foregroundOpacity : Int
-    @objc dynamic var backgroundOpacity : Int
-
-    var observers: [NSKeyValueObservation] = []
-
-    override init() {
+    private override init() {
         defaults.register(defaults: defaultValues)
 
         floatRulers       = defaults.bool(forKey: "floatRulers")
         groupRulers       = defaults.bool(forKey: "groupRulers")
         foregroundOpacity = defaults.integer(forKey: "foregroundOpacity")
         backgroundOpacity = defaults.integer(forKey: "backgroundOpacity")
-
+        
         super.init()
 
         addObservers()
     }
 
-    func addObservers() {
+    private var observers: [NSKeyValueObservation] = []
+    
+    private func addObservers() {
         observers = [
             observe(\Prefs.floatRulers, options: .new) { prefs, changed in
                 self.defaults.set(changed.newValue, forKey: "floatRulers")
@@ -58,9 +72,4 @@ class Prefs: NSObject {
         ]
     }
 
-    func save() {
-        defaults.synchronize()
-    }
 }
-
-let prefs = Prefs()
