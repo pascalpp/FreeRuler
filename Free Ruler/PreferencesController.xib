@@ -25,31 +25,9 @@
                 <rect key="frame" x="0.0" y="0.0" width="350" height="237"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZzT-WS-Ex9">
-                        <rect key="frame" x="18" y="165" width="314" height="24"/>
-                        <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="5" maxValue="100" doubleValue="50" tickMarkPosition="below" numberOfTickMarks="20" allowsTickMarkValuesOnly="YES" sliderType="linear" id="cBe-kv-k4O"/>
-                        <connections>
-                            <action selector="setForegroundOpacity:" target="-2" id="1eU-1v-QVs"/>
-                        </connections>
-                    </slider>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fKJ-pW-Idj">
                         <rect key="frame" x="18" y="195" width="125" height="17"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="Foreground Opacity" id="BgV-9N-IVn">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vDG-0i-7UH">
-                        <rect key="frame" x="18" y="99" width="314" height="24"/>
-                        <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="5" maxValue="100" doubleValue="50" tickMarkPosition="below" numberOfTickMarks="20" allowsTickMarkValuesOnly="YES" sliderType="linear" id="isR-aS-fmz"/>
-                        <connections>
-                            <action selector="setBackgroundOpacity:" target="-2" id="KAY-mT-HC0"/>
-                        </connections>
-                    </slider>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8tT-pC-4Sb">
-                        <rect key="frame" x="18" y="129" width="127" height="17"/>
-                        <textFieldCell key="cell" lineBreakMode="clipping" title="Background Opacity" id="cRb-8z-VZj">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -63,6 +41,21 @@
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
+                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZzT-WS-Ex9">
+                        <rect key="frame" x="18" y="165" width="314" height="24"/>
+                        <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="5" maxValue="100" doubleValue="50" tickMarkPosition="below" numberOfTickMarks="20" allowsTickMarkValuesOnly="YES" sliderType="linear" id="cBe-kv-k4O"/>
+                        <connections>
+                            <action selector="setForegroundOpacity:" target="-2" id="1eU-1v-QVs"/>
+                        </connections>
+                    </slider>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8tT-pC-4Sb">
+                        <rect key="frame" x="18" y="129" width="127" height="17"/>
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="Background Opacity" id="cRb-8z-VZj">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="L9c-EP-R2u">
                         <rect key="frame" x="295" y="129" width="37" height="17"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Label" id="VXi-Ch-Jf5">
@@ -71,6 +64,13 @@
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
+                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vDG-0i-7UH">
+                        <rect key="frame" x="18" y="99" width="314" height="24"/>
+                        <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="5" maxValue="100" doubleValue="50" tickMarkPosition="below" numberOfTickMarks="20" allowsTickMarkValuesOnly="YES" sliderType="linear" id="isR-aS-fmz"/>
+                        <connections>
+                            <action selector="setBackgroundOpacity:" target="-2" id="KAY-mT-HC0"/>
+                        </connections>
+                    </slider>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MHD-HA-XYA">
                         <rect key="frame" x="18" y="64" width="222" height="18"/>
                         <buttonCell key="cell" type="check" title="Float rulers above other windows" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="yPM-Cw-Qsi">
@@ -93,25 +93,25 @@
                     </button>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="Dlw-cH-IYI" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="4Ee-b5-sA0"/>
-                    <constraint firstItem="fKJ-pW-Idj" firstAttribute="leading" secondItem="ZzT-WS-Ex9" secondAttribute="leading" id="7Q6-zB-8jI"/>
-                    <constraint firstItem="Fs7-sZ-5IE" firstAttribute="trailing" secondItem="ZzT-WS-Ex9" secondAttribute="trailing" id="CXs-cV-Td1"/>
-                    <constraint firstItem="8tT-pC-4Sb" firstAttribute="top" secondItem="ZzT-WS-Ex9" secondAttribute="bottom" constant="20" id="KKS-iw-sLn"/>
-                    <constraint firstItem="ZzT-WS-Ex9" firstAttribute="leading" secondItem="8tT-pC-4Sb" secondAttribute="leading" id="QbY-Lk-GIz"/>
-                    <constraint firstAttribute="bottom" secondItem="Dlw-cH-IYI" secondAttribute="bottom" constant="25" id="TVt-6K-7i1"/>
-                    <constraint firstItem="fKJ-pW-Idj" firstAttribute="baseline" secondItem="Fs7-sZ-5IE" secondAttribute="baseline" id="TYi-ey-DjZ"/>
-                    <constraint firstItem="Dlw-cH-IYI" firstAttribute="top" secondItem="MHD-HA-XYA" secondAttribute="bottom" constant="20" id="YRQ-8m-WcN"/>
-                    <constraint firstItem="vDG-0i-7UH" firstAttribute="leading" secondItem="MHD-HA-XYA" secondAttribute="leading" id="ca2-Jx-92t"/>
-                    <constraint firstItem="MHD-HA-XYA" firstAttribute="top" secondItem="vDG-0i-7UH" secondAttribute="bottom" constant="20" id="ccT-YM-ige"/>
-                    <constraint firstItem="vDG-0i-7UH" firstAttribute="top" secondItem="8tT-pC-4Sb" secondAttribute="bottom" constant="8" symbolic="YES" id="cuL-Tx-7dU"/>
-                    <constraint firstItem="ZzT-WS-Ex9" firstAttribute="top" secondItem="fKJ-pW-Idj" secondAttribute="bottom" constant="8" symbolic="YES" id="fRH-71-5gJ"/>
-                    <constraint firstItem="L9c-EP-R2u" firstAttribute="trailing" secondItem="vDG-0i-7UH" secondAttribute="trailing" id="fpB-oC-tnW"/>
-                    <constraint firstItem="8tT-pC-4Sb" firstAttribute="leading" secondItem="vDG-0i-7UH" secondAttribute="leading" id="iu4-cV-tNk"/>
-                    <constraint firstItem="8tT-pC-4Sb" firstAttribute="baseline" secondItem="L9c-EP-R2u" secondAttribute="baseline" id="s6l-WI-l65"/>
-                    <constraint firstItem="Fs7-sZ-5IE" firstAttribute="leading" secondItem="L9c-EP-R2u" secondAttribute="leading" id="u8J-XH-yF5"/>
-                    <constraint firstItem="fKJ-pW-Idj" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" constant="25" id="uBz-nS-hBB"/>
-                    <constraint firstItem="fKJ-pW-Idj" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" symbolic="YES" id="xKR-NW-I71"/>
-                    <constraint firstAttribute="trailing" secondItem="Fs7-sZ-5IE" secondAttribute="trailing" constant="20" symbolic="YES" id="z4t-bf-0ou"/>
+                    <constraint firstItem="fKJ-pW-Idj" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="1Kz-4t-Izh"/>
+                    <constraint firstItem="fKJ-pW-Idj" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" constant="25" id="6j2-A9-RfT"/>
+                    <constraint firstItem="MHD-HA-XYA" firstAttribute="top" secondItem="vDG-0i-7UH" secondAttribute="bottom" constant="20" id="8aK-CY-f0B"/>
+                    <constraint firstItem="ZzT-WS-Ex9" firstAttribute="top" secondItem="fKJ-pW-Idj" secondAttribute="bottom" constant="8" id="95Z-Nm-R3G"/>
+                    <constraint firstAttribute="bottom" secondItem="Dlw-cH-IYI" secondAttribute="bottom" constant="25" id="Amf-On-TbF"/>
+                    <constraint firstItem="vDG-0i-7UH" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="JiU-zb-OYE"/>
+                    <constraint firstItem="8tT-pC-4Sb" firstAttribute="top" secondItem="ZzT-WS-Ex9" secondAttribute="bottom" constant="20" id="Os8-lr-m1I"/>
+                    <constraint firstItem="vDG-0i-7UH" firstAttribute="top" secondItem="8tT-pC-4Sb" secondAttribute="bottom" constant="8" id="QpH-M6-Hbl"/>
+                    <constraint firstAttribute="trailing" secondItem="ZzT-WS-Ex9" secondAttribute="trailing" constant="20" id="Z1g-J3-3RE"/>
+                    <constraint firstItem="Dlw-cH-IYI" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="a3p-rK-Pro"/>
+                    <constraint firstAttribute="trailing" secondItem="vDG-0i-7UH" secondAttribute="trailing" constant="20" id="bhX-QR-vP3"/>
+                    <constraint firstItem="ZzT-WS-Ex9" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="cS0-cB-7df"/>
+                    <constraint firstItem="L9c-EP-R2u" firstAttribute="firstBaseline" secondItem="8tT-pC-4Sb" secondAttribute="firstBaseline" id="drC-8c-dJ8"/>
+                    <constraint firstItem="Fs7-sZ-5IE" firstAttribute="firstBaseline" secondItem="fKJ-pW-Idj" secondAttribute="firstBaseline" id="iVj-L9-5lc"/>
+                    <constraint firstItem="Dlw-cH-IYI" firstAttribute="top" secondItem="MHD-HA-XYA" secondAttribute="bottom" constant="20" id="lch-5z-An7"/>
+                    <constraint firstAttribute="trailing" secondItem="L9c-EP-R2u" secondAttribute="trailing" constant="20" id="myW-gj-dmX"/>
+                    <constraint firstItem="MHD-HA-XYA" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="nEe-NO-kRx"/>
+                    <constraint firstAttribute="trailing" secondItem="Fs7-sZ-5IE" secondAttribute="trailing" constant="20" id="o3I-uM-LMk"/>
+                    <constraint firstItem="8tT-pC-4Sb" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="vFk-iR-SJY"/>
                 </constraints>
             </view>
             <connections>

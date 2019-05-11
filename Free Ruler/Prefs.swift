@@ -1,17 +1,75 @@
 import Foundation
 
-// define default preferences
+// Prefs
+// a KVO bridge for UserDefaults
+// - registers default values
+// - exposes defaults on the prefs instance for key-value observation
+// - listens for changes and persists new values to UserDefaults
+// - provides save method to synchronize UserDefaults on applicationWillTerminate
 
-struct Prefs {
+// TODO: there's a lot of boilerplate in here, not sure if we can reduce it
+// TODO: figure out how avoid saving values that haven't changed from the default
 
-    static var groupRulers          = Preference("groupRulers",         defaultValue: true)
-    static var foregroundOpacity    = Preference("foregroundOpacity",   defaultValue: 90)
-    static var backgroundOpacity    = Preference("backgroundOpacity",   defaultValue: 50)
-    static var floatRulers          = Preference("floatRulers",         defaultValue: true)
+// MARK: - global shortcut to shared prefs instance
+let prefs = Prefs.shared
 
-}
+class Prefs: NSObject {
+    
+    // MARK: - shared singleton instance
+    static let shared = Prefs()
 
-// helper to convert opacity Int to window.alphaValue
-func windowAlphaValue(_ value: Int) -> CGFloat {
-    return CGFloat(value) / 100.0
+    // MARK: - public properties
+    @objc dynamic var floatRulers       : Bool
+    @objc dynamic var groupRulers       : Bool
+    @objc dynamic var foregroundOpacity : Int
+    @objc dynamic var backgroundOpacity : Int
+
+    // MARK: - public save method
+    func save() {
+        defaults.synchronize()
+    }
+
+    // MARK: - private implementation
+
+    private let defaults = UserDefaults.standard
+
+    private var defaultValues: [String: Any] = [
+        "groupRulers":       true,
+        "floatRulers":       true,
+        "foregroundOpacity": 90,
+        "backgroundOpacity": 50,
+    ]
+
+    private override init() {
+        defaults.register(defaults: defaultValues)
+
+        floatRulers       = defaults.bool(forKey: "floatRulers")
+        groupRulers       = defaults.bool(forKey: "groupRulers")
+        foregroundOpacity = defaults.integer(forKey: "foregroundOpacity")
+        backgroundOpacity = defaults.integer(forKey: "backgroundOpacity")
+        
+        super.init()
+
+        addObservers()
+    }
+
+    private var observers: [NSKeyValueObservation] = []
+    
+    private func addObservers() {
+        observers = [
+            observe(\Prefs.floatRulers, options: .new) { prefs, changed in
+                self.defaults.set(changed.newValue, forKey: "floatRulers")
+            },
+            observe(\Prefs.groupRulers, options: .new) { prefs, changed in
+                self.defaults.set(changed.newValue, forKey: "groupRulers")
+            },
+            observe(\Prefs.foregroundOpacity, options: .new) { prefs, changed in
+                self.defaults.set(changed.newValue, forKey: "foregroundOpacity")
+            },
+            observe(\Prefs.backgroundOpacity, options: .new) { prefs, changed in
+                self.defaults.set(changed.newValue, forKey: "backgroundOpacity")
+            },
+        ]
+    }
+
 }

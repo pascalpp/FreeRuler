@@ -4,8 +4,10 @@ let env = ProcessInfo.processInfo.environment
 let APP_ICON_HELPER = env["APP_ICON_HELPER"] != nil
 
 @NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
+class AppDelegate: NSObject, NSApplicationDelegate {
 
+    var observers: [NSKeyValueObservation] = []
+    
     var rulers: [RulerController] = []
 
     var timer: Timer?
@@ -33,16 +35,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
     }
     
     func subscribeToPrefs() {
-        Prefs.groupRulers.subscribe(self)
-    }
-
-    func onChangePreference(_ name: String) {
-        switch(name) {
-        case Prefs.groupRulers.name:
-            updateGroupRulersMenuItem()
-        default:
-            print("Unknown preference changed: \(name)")
-        }
+        observers = [
+            prefs.observe(\Prefs.groupRulers, options: .new) { prefs, changed in
+                self.updateGroupRulersMenuItem()
+            },
+        ]
     }
 
     func updateDisplay() {
@@ -50,10 +47,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
     }
 
     func updateGroupRulersMenuItem() {
-        groupedMenuItem?.state = Prefs.groupRulers.value ? .on : .off
+        groupedMenuItem?.state = prefs.groupRulers ? .on : .off
     }
     
-
     func showRulers() {
         rulers = [
             RulerController(Ruler(.horizontal, name: "horizontal-ruler")),
@@ -86,12 +82,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
         startTimer(timeInterval: backgroundTimerInterval)
     }
 
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
-    }
-
     @IBAction func toggleGroupedRulers(_ sender: Any) {
-        Prefs.groupRulers.value = !Prefs.groupRulers.value
+        prefs.groupRulers = !prefs.groupRulers
     }
 
     @IBAction func openPreferences(_ sender: Any) {
@@ -100,7 +92,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
         }
 
         if preferencesController != nil {
-            preferencesController?.showWindow(nil)
+            preferencesController?.showWindow(self)
         }
     }
 
@@ -109,7 +101,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
             ruler.resetPosition()
         }
     }
+
+    // MARK: - Application Quit
     
+    func applicationWillTerminate(_ aNotification: Notification) {
+        prefs.save()
+    }
+
 }
 
 
