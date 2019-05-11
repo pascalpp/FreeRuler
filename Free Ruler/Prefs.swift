@@ -1,12 +1,20 @@
 import Foundation
 
+// Prefs
+// a KVO bridge for UserDefaults
+// - registers default values
+// - exposes defaults on the prefs instance for key-value observation
+// - listens for changes and persists new values to UserDefaults
+// - provides save method to synchronize UserDefaults on applicationWillTerminate
+
 // TODO: there's a lot of boilerplate in here, not sure if we can reduce it
+// TODO: figure out how avoid saving values that haven't changed from the default
 
 class Prefs: NSObject {
 
     let defaults = UserDefaults.standard
 
-    var values: [String: Any] = [
+    var defaultValues: [String: Any] = [
         "groupRulers":       true,
         "floatRulers":       true,
         "foregroundOpacity": 90,
@@ -21,7 +29,7 @@ class Prefs: NSObject {
     var observers: [NSKeyValueObservation] = []
 
     override init() {
-        defaults.register(defaults: values)
+        defaults.register(defaults: defaultValues)
 
         floatRulers       = defaults.bool(forKey: "floatRulers")
         groupRulers       = defaults.bool(forKey: "groupRulers")
@@ -30,44 +38,29 @@ class Prefs: NSObject {
 
         super.init()
 
-        self.updateValues()
-
         addObservers()
     }
 
     func addObservers() {
         observers = [
             observe(\Prefs.floatRulers, options: .new) { prefs, changed in
-                self.updateValues()
+                self.defaults.set(changed.newValue, forKey: "floatRulers")
             },
             observe(\Prefs.groupRulers, options: .new) { prefs, changed in
-                self.updateValues()
+                self.defaults.set(changed.newValue, forKey: "groupRulers")
             },
             observe(\Prefs.foregroundOpacity, options: .new) { prefs, changed in
-                self.updateValues()
+                self.defaults.set(changed.newValue, forKey: "foregroundOpacity")
             },
             observe(\Prefs.backgroundOpacity, options: .new) { prefs, changed in
-                self.updateValues()
+                self.defaults.set(changed.newValue, forKey: "backgroundOpacity")
             },
         ]
     }
 
-    func updateValues() {
-        values["floatRulers"] = floatRulers
-        values["groupRulers"] = groupRulers
-        values["foregroundOpacity"] = foregroundOpacity
-        values["backgroundOpacity"] = backgroundOpacity
-    }
-
     func save() {
-        defaults.setValuesForKeys(values)
+        defaults.synchronize()
     }
 }
 
 let prefs = Prefs()
-
-// TODO: figure registering defaults
-// TODO: figure out saving preferences on quit
-
-// above is sorta working but not quite
-// TODO: figure out how avoid saving values that haven't changed from the default
