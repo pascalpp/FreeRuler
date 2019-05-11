@@ -24,10 +24,6 @@ class RuleView: NSView {
         addTrackingArea(trackingArea)
     }
     
-    override func updateTrackingAreas() {
-        print("updateTrackingAreas")
-    }
-
     func drawMouseTick(at mouseLoc: NSPoint) {
         // required override
         // TODO: is there a better way to do this, maybe via a protocol?
