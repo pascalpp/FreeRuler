@@ -11,17 +11,25 @@ struct RulerColors {
 class RuleView: NSView {
 
     let color = RulerColors()
-    
-    override func viewDidMoveToWindow() {
-        super.viewDidMoveToWindow()
-        
-        let trackingArea = NSTrackingArea(
-            rect: self.frame,
-            options: [.mouseMoved, .activeInKeyWindow, .inVisibleRect],
+    var trackingArea: NSTrackingArea?
+    let trackingAreaOptions: NSTrackingArea.Options = [
+        .mouseMoved,
+        .activeInKeyWindow,
+        .inVisibleRect,
+    ]
+
+    override func updateTrackingAreas() {
+        if trackingArea != nil {
+            removeTrackingArea(trackingArea!)
+        }
+
+        trackingArea = NSTrackingArea(
+            rect: self.bounds,
+            options: trackingAreaOptions,
             owner: self,
             userInfo: nil
         )
-        addTrackingArea(trackingArea)
+        addTrackingArea(trackingArea!)
     }
     
     func drawMouseTick(at mouseLoc: NSPoint) {
