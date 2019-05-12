@@ -2,6 +2,8 @@ import Cocoa
 
 class HorizontalRule: RuleView {
 
+    let transformer = AffineTransform(translationByX: -0.5, byY: 0)
+
     var mouseTickX: CGFloat = 0 {
         didSet {
             if mouseTickX != oldValue {
@@ -23,10 +25,10 @@ class HorizontalRule: RuleView {
 
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .center
-        let attrs = [
-            NSAttributedString.Key.font: NSFont(name: "HelveticaNeue", size: 10)!,
-            NSAttributedString.Key.paragraphStyle: paragraphStyle,
-            NSAttributedString.Key.foregroundColor: color.numbers
+        let attrs: [NSAttributedString.Key: Any] = [
+            .font: NSFont(name: "HelveticaNeue", size: 10)!,
+            .paragraphStyle: paragraphStyle,
+            .foregroundColor: color.numbers
         ]
 
         let width = Int(dirtyRect.width)
@@ -38,10 +40,15 @@ class HorizontalRule: RuleView {
                 path.line(to: CGPoint(x: i, y: 10))
 
                 let label = String(i)
-                label.draw(with: CGRect(x: i-20, y: 3, width: 40, height: 20), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
+                label.draw(
+                    with: CGRect(x: i-20, y: 3, width: 40, height: 20),
+                    options: .usesLineFragmentOrigin,
+                    attributes: attrs,
+                    context: nil
+                )
 
             }
-            if i.isMultiple(of: 10) {
+            else if i.isMultiple(of: 10) {
                 path.move(to: CGPoint(x: i, y: 0))
                 path.line(to: CGPoint(x: i, y: 8))
             }
@@ -50,6 +57,8 @@ class HorizontalRule: RuleView {
                 path.line(to: CGPoint(x: i, y: 5))
             }
         }
+        
+        path.transform(using: transformer)
 
         color.ticks.setStroke()
         path.stroke()
@@ -73,6 +82,9 @@ class HorizontalRule: RuleView {
         
         mouseTick.move(to: CGPoint(x: mouseTickX, y: 0))
         mouseTick.line(to: CGPoint(x: mouseTickX, y: height))
+
+        mouseTick.transform(using: transformer)
+
         color.mouseTick.setStroke()
         mouseTick.stroke()
     }
