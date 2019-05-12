@@ -28,6 +28,7 @@ class RuleView: NSView {
         // required override
         // TODO: is there a better way to do this, maybe via a protocol?
         // AppDelegate needs to be able to infer that any RulerView has this method
+        fatalError("RuleView subclass must override drawMouseTick method.")
     }
 
     var showMouseTick: Bool = true {
