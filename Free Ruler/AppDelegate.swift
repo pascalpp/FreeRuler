@@ -14,7 +14,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let foregroundTimerInterval: TimeInterval = 1 / 60 // 60 fps
     let backgroundTimerInterval: TimeInterval = 1 / 30 // 30 fps
 
-    @IBOutlet weak var groupedMenuItem: NSMenuItem!
+    @IBOutlet weak var floatRulersMenuItem: NSMenuItem!
+    @IBOutlet weak var groupRulersMenuItem: NSMenuItem!
 
     var preferencesController: PreferencesController? = nil
 
@@ -36,6 +37,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func subscribeToPrefs() {
         observers = [
+            prefs.observe(\Prefs.floatRulers, options: .new) { prefs, changed in
+                self.updateFloatRulersMenuItem()
+            },
             prefs.observe(\Prefs.groupRulers, options: .new) { prefs, changed in
                 self.updateGroupRulersMenuItem()
             },
@@ -43,11 +47,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func updateDisplay() {
+        updateFloatRulersMenuItem()
         updateGroupRulersMenuItem()
     }
 
+    func updateFloatRulersMenuItem() {
+        floatRulersMenuItem?.state = prefs.floatRulers ? .on : .off
+    }
+    
     func updateGroupRulersMenuItem() {
-        groupedMenuItem?.state = prefs.groupRulers ? .on : .off
+        groupRulersMenuItem?.state = prefs.groupRulers ? .on : .off
     }
     
     func showRulers() {
@@ -82,7 +91,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         startTimer(timeInterval: backgroundTimerInterval)
     }
 
-    @IBAction func toggleGroupedRulers(_ sender: Any) {
+    @IBAction func toggleFloatRulers(_ sender: Any) {
+        prefs.floatRulers = !prefs.floatRulers
+    }
+
+    @IBAction func toggleGroupRulers(_ sender: Any) {
         prefs.groupRulers = !prefs.groupRulers
     }
 

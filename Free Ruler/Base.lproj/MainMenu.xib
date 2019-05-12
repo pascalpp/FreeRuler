@@ -13,7 +13,8 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="Free_Ruler" customModuleProvider="target">
             <connections>
-                <outlet property="groupedMenuItem" destination="7Ga-Fb-LLc" id="WrL-X9-6QE"/>
+                <outlet property="floatRulersMenuItem" destination="GDK-AC-uC8" id="552-nT-5F2"/>
+                <outlet property="groupRulersMenuItem" destination="7Ga-Fb-LLc" id="WrL-X9-6QE"/>
             </connections>
         </customObject>
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
@@ -611,26 +612,20 @@
                         </items>
                     </menu>
                 </menuItem>
-                <menuItem title="View" id="H8h-7b-M4v">
+                <menuItem title="Options" id="H8h-7b-M4v">
                     <modifierMask key="keyEquivalentModifierMask"/>
-                    <menu key="submenu" title="View" id="HyV-fh-RgO">
+                    <menu key="submenu" title="Options" id="HyV-fh-RgO">
                         <items>
-                            <menuItem title="Group Rulers" state="on" keyEquivalent="g" id="7Ga-Fb-LLc">
-                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
-                                <connections>
-                                    <action selector="toggleGroupedRulers:" target="Voe-Tx-rLC" id="Biv-Pi-sJF"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Show Toolbar" keyEquivalent="t" id="snW-S8-Cw5">
-                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
-                                <connections>
-                                    <action selector="toggleToolbarShown:" target="-1" id="BXY-wc-z0C"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Customize Toolbar…" id="1UK-8n-QPP">
+                            <menuItem title="Float Rulers" keyEquivalent="f" id="GDK-AC-uC8">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="runToolbarCustomizationPalette:" target="-1" id="pQI-g3-MTW"/>
+                                    <action selector="toggleFloatRulers:" target="Voe-Tx-rLC" id="MFv-BV-ZRR"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Group Rulers" state="on" keyEquivalent="g" id="7Ga-Fb-LLc">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="toggleGroupRulers:" target="Voe-Tx-rLC" id="0Dt-8h-7ed"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="hB3-LF-h0Y"/>

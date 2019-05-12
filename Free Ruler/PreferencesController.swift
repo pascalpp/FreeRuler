@@ -11,6 +11,7 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
     @IBOutlet weak var backgroundOpacityLabel: NSTextField!
     
     @IBOutlet weak var floatRulersCheckbox: NSButton!
+    @IBOutlet weak var groupRulersCheckbox: NSButton!
     
     override var windowNibName: String {
         return "PreferencesController"
@@ -50,6 +51,9 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
             prefs.observe(\Prefs.floatRulers, options: .new) { prefs, changed in
                 self.updateFloatRulersCheckbox()
             },
+            prefs.observe(\Prefs.groupRulers, options: .new) { prefs, changed in
+                self.updateGroupRulersCheckbox()
+            },
         ]
     }
 
@@ -62,11 +66,15 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
     @IBAction func setFloatRulers(_ sender: Any) {
         prefs.floatRulers = floatRulersCheckbox.state == .on
     }
+    @IBAction func setGroupRulers(_ sender: Any) {
+        prefs.groupRulers = groupRulersCheckbox.state == .on
+    }
     
     func updateView() {
         updateForegroundSlider()
         updateBackgroundSlider()
         updateFloatRulersCheckbox()
+        updateGroupRulersCheckbox()
     }
     
     func updateForegroundSlider() {
@@ -81,6 +89,10 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
     
     func updateFloatRulersCheckbox() {
         floatRulersCheckbox.state = prefs.floatRulers ? .on : .off
+    }
+
+    func updateGroupRulersCheckbox() {
+        groupRulersCheckbox.state = prefs.groupRulers ? .on : .off
     }
 
 }
