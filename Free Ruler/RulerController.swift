@@ -149,6 +149,48 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
         ]
     }
     
+    func alignRuler(at point: NSPoint) {
+        // only key window controller should respond to this command
+        guard rulerWindow.isKeyWindow else { return }
+
+        if prefs.groupRulers {
+            // if grouped, ungroup rulers, move both, regroup
+            prefs.groupRulers = false
+            alignRulerWindow(window: rulerWindow, at: point)
+            alignRulerWindow(window: otherWindow, at: point)
+            prefs.groupRulers = true
+        } else {
+            // if not groups, just move key window
+            alignRulerWindow(window: rulerWindow, at: point)
+        }
+    }
+    
+    func alignRulerWindow(window: RulerWindow?, at point: NSPoint) {
+        guard let window = window else { return }
+
+        let frame = window.frame
+        var x: CGFloat
+        var y: CGFloat
+        
+        switch window.ruler.orientation {
+        case .horizontal:
+            x = point.x
+            y = point.y
+        case .vertical:
+            x = point.x - frame.width
+            y = point.y - frame.height
+        }
+        
+        let rect = NSRect(
+            x: x,
+            y: y,
+            width: frame.width,
+            height: frame.height
+        )
+        
+        window.setFrame(rect, display: false)
+    }
+    
     func resetPosition() {
         let frame = getDefaultContentRect(orientation: ruler.orientation)
         rulerWindow.setFrame(frame, display: true)
