@@ -16,6 +16,7 @@
                 <outlet property="alignRulersMenuItem" destination="iKV-uW-hwy" id="KQ1-Wu-ShT"/>
                 <outlet property="floatRulersMenuItem" destination="GDK-AC-uC8" id="552-nT-5F2"/>
                 <outlet property="groupRulersMenuItem" destination="7Ga-Fb-LLc" id="WrL-X9-6QE"/>
+                <outlet property="rulerShadowMenuItem" destination="a8D-hN-A59" id="FZM-pS-71y"/>
             </connections>
         </customObject>
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
@@ -325,6 +326,12 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="toggleGroupRulers:" target="Voe-Tx-rLC" id="0Dt-8h-7ed"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Show Ruler Shadow" keyEquivalent="s" id="a8D-hN-A59">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="toggleRulerShadow:" target="Voe-Tx-rLC" id="GXO-Cn-108"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="hB3-LF-h0Y"/>

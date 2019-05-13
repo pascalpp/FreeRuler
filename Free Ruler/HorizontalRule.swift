@@ -2,7 +2,7 @@ import Cocoa
 
 class HorizontalRule: RuleView {
 
-    let transformer = AffineTransform(translationByX: -0.5, byY: 0)
+    let transformer = AffineTransform(translationByX: 0.5, byY: 0)
 
     var mouseTickX: CGFloat = 0 {
         didSet {

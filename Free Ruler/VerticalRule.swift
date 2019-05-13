@@ -2,7 +2,7 @@ import Cocoa
 
 class VerticalRule: RuleView {
 
-    let transformer = AffineTransform(translationByX: 0, byY: 0.5)
+    let transformer = AffineTransform(translationByX: 0, byY: -0.5)
 
     var mouseTickY: CGFloat = 0 {
         didSet {

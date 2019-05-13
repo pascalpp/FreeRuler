@@ -16,6 +16,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @IBOutlet weak var floatRulersMenuItem: NSMenuItem!
     @IBOutlet weak var groupRulersMenuItem: NSMenuItem!
+    @IBOutlet weak var rulerShadowMenuItem: NSMenuItem!
     @IBOutlet weak var alignRulersMenuItem: NSMenuItem!
     
     var preferencesController: PreferencesController? = nil
@@ -50,6 +51,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func updateDisplay() {
         updateFloatRulersMenuItem()
         updateGroupRulersMenuItem()
+        updateRulerShadowMenuItem()
     }
 
     func updateFloatRulersMenuItem() {
@@ -58,6 +60,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func updateGroupRulersMenuItem() {
         groupRulersMenuItem?.state = prefs.groupRulers ? .on : .off
+    }
+
+    func updateRulerShadowMenuItem() {
+        rulerShadowMenuItem?.state = prefs.rulerShadow ? .on : .off
     }
     
     func showRulers() {
@@ -98,6 +104,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @IBAction func toggleGroupRulers(_ sender: Any) {
         prefs.groupRulers = !prefs.groupRulers
+    }
+    @IBAction func toggleRulerShadow(_ sender: Any) {
+        prefs.rulerShadow = !prefs.rulerShadow
     }
 
     @IBAction func openPreferences(_ sender: Any) {

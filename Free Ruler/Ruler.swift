@@ -36,6 +36,8 @@ class Ruler {
 
 }
 
+// MARK: - Ruler size helpers
+
 func getDefaultContentRect(orientation: Orientation) -> NSRect {
     var screenWidth: CGFloat = 1000
     var screenHeight: CGFloat = 800
@@ -55,18 +57,39 @@ func getDefaultContentRect(orientation: Orientation) -> NSRect {
     switch orientation {
     case .horizontal:
         return NSRect(
-            x: xOffset + rulerThickness,
+            // offset horizontal by 1px leftward to compensate for ruler border
+            x: xOffset + rulerThickness - 1.0,
             y: screenHeight - yOffset - rulerThickness,
             width: horizontalLength,
             height: rulerThickness
         )
     case .vertical:
         return NSRect(
+            // offset vertical by 1px upward to compensate for ruler border
             x: xOffset,
-            y: screenHeight - yOffset - rulerThickness - verticalLength,
+            y: screenHeight - yOffset - rulerThickness - verticalLength + 1.0,
             width: rulerThickness,
             height: verticalLength
         )
     }
     
 }
+
+func getMinSize(ruler: Ruler) -> NSSize {
+    switch ruler.orientation {
+    case .horizontal:
+        return NSSize(width: 200, height: 40)
+    case .vertical:
+        return NSSize(width: 40, height: 200)
+    }
+}
+
+func getMaxSize(ruler: Ruler) -> NSSize {
+    switch ruler.orientation {
+    case .horizontal:
+        return NSSize(width: 4000, height: 40)
+    case .vertical:
+        return NSSize(width: 40, height: 4000)
+    }
+}
+
