@@ -16,7 +16,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @IBOutlet weak var floatRulersMenuItem: NSMenuItem!
     @IBOutlet weak var groupRulersMenuItem: NSMenuItem!
-
+    @IBOutlet weak var alignRulersMenuItem: NSMenuItem!
+    
     var preferencesController: PreferencesController? = nil
 
     // MARK: - Lifecycle
@@ -109,6 +110,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    @IBAction func alignRulersAtMouseLocation(_ sender: Any) {
+        var mouseLoc = NSEvent.mouseLocation
+        mouseLoc.x = mouseLoc.x.rounded()
+        mouseLoc.y = mouseLoc.y.rounded()
+        for ruler in rulers {
+            ruler.alignRuler(at: mouseLoc)
+        }
+    }
+    
     @IBAction func resetRulerPositions(_ sender: Any) {
         for ruler in rulers {
             ruler.resetPosition()
