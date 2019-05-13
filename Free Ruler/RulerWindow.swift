@@ -33,7 +33,11 @@ class RulerWindow: NSPanel {
         self.isFloatingPanel = prefs.floatRulers
         self.hidesOnDeactivate = false
         self.isMovableByWindowBackground = true
-        // self.hasShadow = false
+        self.hasShadow = false
+        
+        rule.wantsLayer = true
+        rule.layer?.borderColor = CGColor(gray: 0, alpha: 0.5)
+        rule.layer?.borderWidth = 1.0
         
         rule.nextResponder = self
         self.contentView = rule
@@ -58,9 +62,9 @@ func getMinSize(ruler: Ruler) -> NSSize {
 func getMaxSize(ruler: Ruler) -> NSSize {
     switch ruler.orientation {
     case .horizontal:
-        return NSSize(width: 20000, height: 40)
+        return NSSize(width: 4000, height: 40)
     case .vertical:
-        return NSSize(width: 40, height: 20000)
+        return NSSize(width: 40, height: 4000)
     }
 }
 
