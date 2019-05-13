@@ -33,8 +33,8 @@ class RulerWindow: NSPanel {
         self.isFloatingPanel = prefs.floatRulers
         self.hidesOnDeactivate = false
         self.isMovableByWindowBackground = true
-        self.hasShadow = false
-        
+        self.hasShadow = prefs.rulerShadow
+
         rule.wantsLayer = true
         rule.layer?.borderColor = CGColor(gray: 0, alpha: 0.5)
         rule.layer?.borderWidth = 1.0
@@ -47,34 +47,6 @@ class RulerWindow: NSPanel {
         return true
     }
 
-}
-
-
-func getMinSize(ruler: Ruler) -> NSSize {
-    switch ruler.orientation {
-    case .horizontal:
-        return NSSize(width: 200, height: 40)
-    case .vertical:
-        return NSSize(width: 40, height: 200)
-    }
-}
-
-func getMaxSize(ruler: Ruler) -> NSSize {
-    switch ruler.orientation {
-    case .horizontal:
-        return NSSize(width: 4000, height: 40)
-    case .vertical:
-        return NSSize(width: 40, height: 4000)
-    }
-}
-
-func getRulerView(ruler: Ruler) -> RuleView {
-    switch ruler.orientation {
-    case .horizontal:
-        return HorizontalRule(frame: ruler.frame)
-    case .vertical:
-        return VerticalRule(frame: ruler.frame)
-    }
 }
 
 extension RulerWindow {
@@ -120,4 +92,13 @@ extension RulerWindow {
         moveVertically(by: dist)
     }
 
+}
+
+func getRulerView(ruler: Ruler) -> RuleView {
+    switch ruler.orientation {
+    case .horizontal:
+        return HorizontalRule(frame: ruler.frame)
+    case .vertical:
+        return VerticalRule(frame: ruler.frame)
+    }
 }

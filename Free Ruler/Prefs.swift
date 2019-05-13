@@ -21,6 +21,7 @@ class Prefs: NSObject {
     // MARK: - public properties
     @objc dynamic var floatRulers       : Bool
     @objc dynamic var groupRulers       : Bool
+    @objc dynamic var rulerShadow       : Bool
     @objc dynamic var foregroundOpacity : Int
     @objc dynamic var backgroundOpacity : Int
 
@@ -36,6 +37,7 @@ class Prefs: NSObject {
     private var defaultValues: [String: Any] = [
         "groupRulers":       true,
         "floatRulers":       true,
+        "rulerShadow":       false,
         "foregroundOpacity": 90,
         "backgroundOpacity": 50,
     ]
@@ -45,6 +47,7 @@ class Prefs: NSObject {
 
         floatRulers       = defaults.bool(forKey: "floatRulers")
         groupRulers       = defaults.bool(forKey: "groupRulers")
+        rulerShadow       = defaults.bool(forKey: "rulerShadow")
         foregroundOpacity = defaults.integer(forKey: "foregroundOpacity")
         backgroundOpacity = defaults.integer(forKey: "backgroundOpacity")
         
@@ -62,6 +65,9 @@ class Prefs: NSObject {
             },
             observe(\Prefs.groupRulers, options: .new) { prefs, changed in
                 self.defaults.set(changed.newValue, forKey: "groupRulers")
+            },
+            observe(\Prefs.rulerShadow, options: .new) { prefs, changed in
+                self.defaults.set(changed.newValue, forKey: "rulerShadow")
             },
             observe(\Prefs.foregroundOpacity, options: .new) { prefs, changed in
                 self.defaults.set(changed.newValue, forKey: "foregroundOpacity")

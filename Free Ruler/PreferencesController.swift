@@ -12,7 +12,8 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
     
     @IBOutlet weak var floatRulersCheckbox: NSButton!
     @IBOutlet weak var groupRulersCheckbox: NSButton!
-    
+    @IBOutlet weak var rulerShadowCheckbox: NSButton!
+
     override var windowNibName: String {
         return "PreferencesController"
     }
@@ -54,6 +55,9 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
             prefs.observe(\Prefs.groupRulers, options: .new) { prefs, changed in
                 self.updateGroupRulersCheckbox()
             },
+            prefs.observe(\Prefs.rulerShadow, options: .new) { prefs, changed in
+                self.updateRulerShadowCheckbox()
+            },
         ]
     }
 
@@ -69,12 +73,16 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
     @IBAction func setGroupRulers(_ sender: Any) {
         prefs.groupRulers = groupRulersCheckbox.state == .on
     }
-    
+    @IBAction func setRulerShadow(_ sender: Any) {
+        prefs.rulerShadow = rulerShadowCheckbox.state == .on
+    }
+
     func updateView() {
         updateForegroundSlider()
         updateBackgroundSlider()
         updateFloatRulersCheckbox()
         updateGroupRulersCheckbox()
+        updateRulerShadowCheckbox()
     }
     
     func updateForegroundSlider() {
@@ -93,6 +101,10 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
 
     func updateGroupRulersCheckbox() {
         groupRulersCheckbox.state = prefs.groupRulers ? .on : .off
+    }
+
+    func updateRulerShadowCheckbox() {
+        rulerShadowCheckbox.state = prefs.rulerShadow ? .on : .off
     }
 
 }

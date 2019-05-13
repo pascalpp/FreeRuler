@@ -140,11 +140,14 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
             prefs.observe(\Prefs.backgroundOpacity, options: .new) { prefs, changed in
                 self.opacity = prefs.backgroundOpacity
             },
+            prefs.observe(\Prefs.floatRulers, options: .new) { prefs, changed in
+                self.updateIsFloatingPanel()
+            },
             prefs.observe(\Prefs.groupRulers, options: .new) { prefs, changed in
                 self.updateChildWindow()
             },
-            prefs.observe(\Prefs.floatRulers, options: .new) { prefs, changed in
-                self.updateIsFloatingPanel()
+            prefs.observe(\Prefs.rulerShadow, options: .new) { prefs, changed in
+                self.rulerWindow.hasShadow = prefs.rulerShadow
             },
         ]
     }
@@ -174,11 +177,13 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
         
         switch window.ruler.orientation {
         case .horizontal:
-            x = point.x
+            // offset horizontal by 1px leftward to compensate for ruler border
+            x = point.x - 1.0
             y = point.y
         case .vertical:
+            // offset vertical by 1px upward to compensate for ruler border
             x = point.x - frame.width
-            y = point.y - frame.height
+            y = point.y - frame.height + 1.0
         }
         
         let rect = NSRect(
