@@ -4,8 +4,10 @@ let env = ProcessInfo.processInfo.environment
 let APP_ICON_HELPER = env["APP_ICON_HELPER"] != nil
 
 @NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
+class AppDelegate: NSObject, NSApplicationDelegate {
 
+    var observers: [NSKeyValueObservation] = []
+    
     var rulers: [RulerController] = []
 
     var timer: Timer?
@@ -14,8 +16,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
     
     let crosshair = NSCursor.crosshair
 
-    @IBOutlet weak var groupedMenuItem: NSMenuItem!
-
+    @IBOutlet weak var floatRulersMenuItem: NSMenuItem!
+    @IBOutlet weak var groupRulersMenuItem: NSMenuItem!
+    @IBOutlet weak var rulerShadowMenuItem: NSMenuItem!
+    @IBOutlet weak var alignRulersMenuItem: NSMenuItem!
+    
     var preferencesController: PreferencesController? = nil
 
     // MARK: - Lifecycle
@@ -35,27 +40,34 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
     }
     
     func subscribeToPrefs() {
-        Prefs.groupRulers.subscribe(self)
-    }
-
-    func onChangePreference(_ name: String) {
-        switch(name) {
-        case Prefs.groupRulers.name:
-            updateGroupRulersMenuItem()
-        default:
-            print("Unknown preference changed: \(name)")
-        }
+        observers = [
+            prefs.observe(\Prefs.floatRulers, options: .new) { prefs, changed in
+                self.updateFloatRulersMenuItem()
+            },
+            prefs.observe(\Prefs.groupRulers, options: .new) { prefs, changed in
+                self.updateGroupRulersMenuItem()
+            },
+        ]
     }
 
     func updateDisplay() {
+        updateFloatRulersMenuItem()
         updateGroupRulersMenuItem()
+        updateRulerShadowMenuItem()
     }
 
-    func updateGroupRulersMenuItem() {
-        groupedMenuItem?.state = Prefs.groupRulers.value ? .on : .off
+    func updateFloatRulersMenuItem() {
+        floatRulersMenuItem?.state = prefs.floatRulers ? .on : .off
     }
     
+    func updateGroupRulersMenuItem() {
+        groupRulersMenuItem?.state = prefs.groupRulers ? .on : .off
+    }
 
+    func updateRulerShadowMenuItem() {
+        rulerShadowMenuItem?.state = prefs.rulerShadow ? .on : .off
+    }
+    
     func showRulers() {
         rulers = [
             RulerController(Ruler(.horizontal, name: "horizontal-ruler")),
@@ -94,12 +106,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
         crosshair.pop()
     }
 
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
+    @IBAction func toggleFloatRulers(_ sender: Any) {
+        prefs.floatRulers = !prefs.floatRulers
     }
 
-    @IBAction func toggleGroupedRulers(_ sender: Any) {
-        Prefs.groupRulers.value = !Prefs.groupRulers.value
+    @IBAction func toggleGroupRulers(_ sender: Any) {
+        prefs.groupRulers = !prefs.groupRulers
+    }
+    @IBAction func toggleRulerShadow(_ sender: Any) {
+        prefs.rulerShadow = !prefs.rulerShadow
     }
 
     @IBAction func openPreferences(_ sender: Any) {
@@ -108,16 +123,36 @@ class AppDelegate: NSObject, NSApplicationDelegate, PreferenceSubscriber {
         }
 
         if preferencesController != nil {
-            preferencesController?.showWindow(nil)
+            preferencesController?.showWindow(self)
         }
     }
 
-    @IBAction func resetRulerPositions(_ sender: Any) {
+    @IBAction func alignRulersAtMouseLocation(_ sender: Any) {
+        var mouseLoc = NSEvent.mouseLocation
+        mouseLoc.x = mouseLoc.x.rounded()
+        mouseLoc.y = mouseLoc.y.rounded()
         for ruler in rulers {
-            ruler.resetPosition()
+            ruler.alignRuler(at: mouseLoc)
         }
     }
     
+    @IBAction func resetRulerPositions(_ sender: Any) {
+        // ungroup rulers during reset operation
+        let groupRulers = prefs.groupRulers
+        prefs.groupRulers = false
+        for ruler in rulers {
+            ruler.resetPosition()
+        }
+        // reset groupRulers to previous value
+        prefs.groupRulers = groupRulers
+    }
+
+    // MARK: - Application Quit
+    
+    func applicationWillTerminate(_ aNotification: Notification) {
+        prefs.save()
+    }
+
 }
 
 

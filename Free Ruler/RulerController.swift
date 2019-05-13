@@ -2,7 +2,9 @@ import Cocoa
 import Carbon.HIToolbox // For key constants
 
 
-class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscriber, NotificationObserver {
+class RulerController: NSWindowController, NSWindowDelegate, NotificationObserver {
+
+    var observers: [NSKeyValueObservation] = []
 
     let ruler: Ruler
     let rulerWindow: RulerWindow
@@ -14,17 +16,21 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
             updateIsFloatingPanel()
             // reset opacity to foreground in case they modified background opacity last
             if !preferencesWindowOpen {
-                opacity = Prefs.foregroundOpacity.value
+                opacity = prefs.foregroundOpacity
             }
         }
     }
 
-    var opacity = Prefs.foregroundOpacity.value {
+    var opacity = prefs.foregroundOpacity {
         didSet {
             rulerWindow.alphaValue = windowAlphaValue(opacity)
         }
     }
 
+    convenience init(_ ruler: Ruler) {
+        self.init(ruler: ruler)
+    }
+    
     init(ruler: Ruler) {
         self.ruler = ruler
         self.rulerWindow = RulerWindow(ruler)
@@ -35,15 +41,12 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
         subscribeToPrefs()
 
         rulerWindow.delegate = self
+        rulerWindow.nextResponder = self
 
         if let windowFrameAutosaveName = ruler.name {
             self.windowFrameAutosaveName = windowFrameAutosaveName
         }
         
-    }
-
-    convenience init(_ ruler: Ruler) {
-        self.init(ruler: ruler)
     }
 
     required init?(coder: NSCoder) {
@@ -60,32 +63,43 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
     }
     
     func windowWillStartLiveResize(_ notification: Notification) {
-        // print("windowWillStartLiveResize")
+        disableMouseTicks()
     }
 
     func windowDidEndLiveResize(_ notification: Notification) {
-        // print("windowDidEndLiveResize")
+        enableMouseTicks()
     }
 
     func windowWillMove(_ notification: Notification) {
-        // print("windowWillMove")
+        disableMouseTicks()
     }
 
     func windowDidMove(_ notification: Notification) {
-        // print("windowDidMove")
         rulerWindow.invalidateShadow()
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
-        // print("windowDidBecomeKey")
         updateChildWindow()
         startKeyListener()
     }
 
     func windowDidResignKey(_ notification: Notification) {
-        // print("windowDidResignKey")
         updateChildWindow()
         stopKeyListener()
+    }
+    
+    override func mouseMoved(with event: NSEvent) {
+        enableMouseTicks()
+    }
+
+    func disableMouseTicks() {
+        rulerWindow.rule.showMouseTick = false
+        otherWindow?.rule.showMouseTick = false
+    }
+
+    func enableMouseTicks() {
+        rulerWindow.rule.showMouseTick = true
+        otherWindow?.rule.showMouseTick = true
     }
 
     func onChangeGrouped() {
@@ -95,7 +109,7 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
     func updateChildWindow() {
         guard let otherWindow = otherWindow else { return }
 
-        if Prefs.groupRulers.value && rulerWindow.isKeyWindow {
+        if prefs.groupRulers && rulerWindow.isKeyWindow {
             rulerWindow.addChildWindow(otherWindow, ordered: .below)
         } else {
             rulerWindow.removeChildWindow(otherWindow)
@@ -107,38 +121,79 @@ class RulerController: NSWindowController, NSWindowDelegate, PreferenceSubscribe
         if preferencesWindowOpen {
             rulerWindow.isFloatingPanel = false
         } else {
-            rulerWindow.isFloatingPanel = Prefs.floatRulers.value
+            rulerWindow.isFloatingPanel = prefs.floatRulers
         }
     }
 
     func foreground() {
-        opacity = Prefs.foregroundOpacity.value
+        opacity = prefs.foregroundOpacity
     }
     func background() {
-        opacity = Prefs.backgroundOpacity.value
+        opacity = prefs.backgroundOpacity
     }
 
     func subscribeToPrefs() {
-        Prefs.groupRulers.subscribe(self)
-        Prefs.foregroundOpacity.subscribe(self)
-        Prefs.backgroundOpacity.subscribe(self)
-        Prefs.floatRulers.subscribe(self)
+        observers = [
+            prefs.observe(\Prefs.foregroundOpacity, options: .new) { prefs, changed in
+                self.opacity = prefs.foregroundOpacity
+            },
+            prefs.observe(\Prefs.backgroundOpacity, options: .new) { prefs, changed in
+                self.opacity = prefs.backgroundOpacity
+            },
+            prefs.observe(\Prefs.floatRulers, options: .new) { prefs, changed in
+                self.updateIsFloatingPanel()
+            },
+            prefs.observe(\Prefs.groupRulers, options: .new) { prefs, changed in
+                self.updateChildWindow()
+            },
+            prefs.observe(\Prefs.rulerShadow, options: .new) { prefs, changed in
+                self.rulerWindow.hasShadow = prefs.rulerShadow
+            },
+        ]
     }
+    
+    func alignRuler(at point: NSPoint) {
+        // only key window controller should respond to this command
+        guard rulerWindow.isKeyWindow else { return }
 
-    func onChangePreference(_ name: String) {
-        // print("onChangePreference", name)
-        switch(name) {
-        case Prefs.groupRulers.name:
-            updateChildWindow()
-        case Prefs.foregroundOpacity.name:
-            opacity = Prefs.foregroundOpacity.value
-        case Prefs.backgroundOpacity.name:
-            opacity = Prefs.backgroundOpacity.value
-        case Prefs.floatRulers.name:
-            updateIsFloatingPanel()
-        default:
-            print("Unknown preference changed: \(name)")
+        if prefs.groupRulers {
+            // if grouped, ungroup rulers, move both, regroup
+            prefs.groupRulers = false
+            alignRulerWindow(window: rulerWindow, at: point)
+            alignRulerWindow(window: otherWindow, at: point)
+            prefs.groupRulers = true
+        } else {
+            // if not groups, just move key window
+            alignRulerWindow(window: rulerWindow, at: point)
         }
+    }
+    
+    func alignRulerWindow(window: RulerWindow?, at point: NSPoint) {
+        guard let window = window else { return }
+
+        let frame = window.frame
+        var x: CGFloat
+        var y: CGFloat
+        
+        switch window.ruler.orientation {
+        case .horizontal:
+            // offset horizontal by 1px leftward to compensate for ruler border
+            x = point.x - 1.0
+            y = point.y
+        case .vertical:
+            // offset vertical by 1px upward to compensate for ruler border
+            x = point.x - frame.width
+            y = point.y - frame.height + 1.0
+        }
+        
+        let rect = NSRect(
+            x: x,
+            y: y,
+            width: frame.width,
+            height: frame.height
+        )
+        
+        window.setFrame(rect, display: false)
     }
     
     func resetPosition() {
@@ -190,4 +245,9 @@ extension RulerController {
         }
     }
 
+}
+
+// helper to convert opacity Int to window.alphaValue
+func windowAlphaValue(_ value: Int) -> CGFloat {
+    return CGFloat(value) / 100.0
 }

@@ -1,7 +1,9 @@
 import Cocoa
 
-class PreferencesController: NSWindowController, NSWindowDelegate, PreferenceSubscriber, NotificationPoster {
+class PreferencesController: NSWindowController, NSWindowDelegate, NotificationPoster {
     
+    var observers: [NSKeyValueObservation] = []
+
     @IBOutlet weak var foregroundOpacitySlider: NSSlider!
     @IBOutlet weak var backgroundOpacitySlider: NSSlider!
 
@@ -9,7 +11,9 @@ class PreferencesController: NSWindowController, NSWindowDelegate, PreferenceSub
     @IBOutlet weak var backgroundOpacityLabel: NSTextField!
     
     @IBOutlet weak var floatRulersCheckbox: NSButton!
-    
+    @IBOutlet weak var groupRulersCheckbox: NSButton!
+    @IBOutlet weak var rulerShadowCheckbox: NSButton!
+
     override var windowNibName: String {
         return "PreferencesController"
     }
@@ -24,6 +28,7 @@ class PreferencesController: NSWindowController, NSWindowDelegate, PreferenceSub
     }
     
     override func showWindow(_ sender: Any?) {
+
         // send opened notification
         post(.preferencesWindowOpened)
 
@@ -37,54 +42,69 @@ class PreferencesController: NSWindowController, NSWindowDelegate, PreferenceSub
     }
 
     func subscribeToPrefs() {
-        Prefs.foregroundOpacity.subscribe(self)
-        Prefs.backgroundOpacity.subscribe(self)
-        Prefs.floatRulers.subscribe(self)
-    }
-    
-    func onChangePreference(_ name: String) {
-        switch name {
-        case Prefs.foregroundOpacity.name:
-            updateForegroundSlider()
-        case Prefs.backgroundOpacity.name:
-            updateBackgroundSlider()
-        case Prefs.floatRulers.name:
-            updateFloatRulersCheckbox()
-        default:
-            break
-        }
+        observers = [
+            prefs.observe(\Prefs.foregroundOpacity, options: .new) { prefs, changed in
+                self.updateForegroundSlider()
+            },
+            prefs.observe(\Prefs.backgroundOpacity, options: .new) { prefs, changed in
+                self.updateBackgroundSlider()
+            },
+            prefs.observe(\Prefs.floatRulers, options: .new) { prefs, changed in
+                self.updateFloatRulersCheckbox()
+            },
+            prefs.observe(\Prefs.groupRulers, options: .new) { prefs, changed in
+                self.updateGroupRulersCheckbox()
+            },
+            prefs.observe(\Prefs.rulerShadow, options: .new) { prefs, changed in
+                self.updateRulerShadowCheckbox()
+            },
+        ]
     }
 
     @IBAction func setForegroundOpacity(_ sender: Any) {
-        Prefs.foregroundOpacity.value = foregroundOpacitySlider.integerValue
+        prefs.foregroundOpacity = foregroundOpacitySlider.integerValue
     }
     @IBAction func setBackgroundOpacity(_ sender: Any) {
-        Prefs.backgroundOpacity.value = backgroundOpacitySlider.integerValue
+        prefs.backgroundOpacity = backgroundOpacitySlider.integerValue
     }
     @IBAction func setFloatRulers(_ sender: Any) {
-        Prefs.floatRulers.value = floatRulersCheckbox.state == .on
+        prefs.floatRulers = floatRulersCheckbox.state == .on
     }
-    
+    @IBAction func setGroupRulers(_ sender: Any) {
+        prefs.groupRulers = groupRulersCheckbox.state == .on
+    }
+    @IBAction func setRulerShadow(_ sender: Any) {
+        prefs.rulerShadow = rulerShadowCheckbox.state == .on
+    }
+
     func updateView() {
         updateForegroundSlider()
         updateBackgroundSlider()
         updateFloatRulersCheckbox()
+        updateGroupRulersCheckbox()
+        updateRulerShadowCheckbox()
     }
     
     func updateForegroundSlider() {
-        let foregroundOpacity = Prefs.foregroundOpacity.value
-        foregroundOpacitySlider.integerValue = foregroundOpacity
-        foregroundOpacityLabel.stringValue = "\(foregroundOpacity)%"
+        foregroundOpacitySlider.integerValue = prefs.foregroundOpacity
+        foregroundOpacityLabel.stringValue = "\(prefs.foregroundOpacity)%"
     }
     
     func updateBackgroundSlider() {
-        let backgroundOpacity = Prefs.backgroundOpacity.value
-        backgroundOpacitySlider.integerValue = backgroundOpacity
-        backgroundOpacityLabel.stringValue = "\(backgroundOpacity)%"
+        backgroundOpacitySlider.integerValue = prefs.backgroundOpacity
+        backgroundOpacityLabel.stringValue = "\(prefs.backgroundOpacity)%"
     }
     
     func updateFloatRulersCheckbox() {
-        floatRulersCheckbox.state = Prefs.floatRulers.value ? .on : .off
+        floatRulersCheckbox.state = prefs.floatRulers ? .on : .off
+    }
+
+    func updateGroupRulersCheckbox() {
+        groupRulersCheckbox.state = prefs.groupRulers ? .on : .off
+    }
+
+    func updateRulerShadowCheckbox() {
+        rulerShadowCheckbox.state = prefs.rulerShadow ? .on : .off
     }
 
 }
