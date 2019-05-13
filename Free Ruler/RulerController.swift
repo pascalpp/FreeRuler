@@ -7,10 +7,15 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     var observers: [NSKeyValueObservation] = []
 
     let ruler: Ruler
+
     let rulerWindow: RulerWindow
     var otherWindow: RulerWindow?
+
     var keyListener: Any?
-    
+
+    let openHand = NSCursor.openHand
+    let closedHand = NSCursor.closedHand
+
     var preferencesWindowOpen = false {
         didSet {
             updateIsFloatingPanel()
@@ -87,8 +92,27 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
         updateChildWindow()
         stopKeyListener()
     }
-    
+
+    override func mouseEntered(with event: NSEvent) {
+        openHand.push()
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        openHand.pop()
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        closedHand.push()
+    }
+
+    override func mouseUp(with event: NSEvent) {
+        closedHand.pop()
+    }
+
     override func mouseMoved(with event: NSEvent) {
+//        if NSCursor.current != openHand {
+//            openHand.push()
+//        }
         enableMouseTicks()
     }
 

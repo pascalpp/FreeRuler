@@ -20,7 +20,8 @@ class RuleView: NSView {
     var trackingArea: NSTrackingArea?
     let trackingAreaOptions: NSTrackingArea.Options = [
         .mouseMoved,
-        .activeInKeyWindow,
+        .mouseEnteredAndExited,
+        .activeAlways,
         .inVisibleRect,
     ]
 
