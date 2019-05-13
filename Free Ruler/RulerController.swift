@@ -150,14 +150,17 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     }
     
     func alignRuler(at point: NSPoint) {
+        // only key window controller should respond to this command
         guard rulerWindow.isKeyWindow else { return }
 
         if prefs.groupRulers {
+            // if grouped, ungroup rulers, move both, regroup
             prefs.groupRulers = false
             alignRulerWindow(window: rulerWindow, at: point)
             alignRulerWindow(window: otherWindow, at: point)
             prefs.groupRulers = true
         } else {
+            // if not groups, just move key window
             alignRulerWindow(window: rulerWindow, at: point)
         }
     }
