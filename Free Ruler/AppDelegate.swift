@@ -120,9 +120,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     @IBAction func resetRulerPositions(_ sender: Any) {
+        // ungroup rulers during reset operation
+        let groupRulers = prefs.groupRulers
+        prefs.groupRulers = false
         for ruler in rulers {
             ruler.resetPosition()
         }
+        // reset groupRulers to previous value
+        prefs.groupRulers = groupRulers
     }
 
     // MARK: - Application Quit
