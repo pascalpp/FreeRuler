@@ -85,7 +85,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
-        print("applicationDidBecomeActive")
         for ruler in rulers {
             ruler.foreground()
         }
@@ -96,7 +95,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidResignActive(_ notification: Notification) {
-        print("applicationDidResignActive")
         for ruler in rulers {
             ruler.background()
         }
