@@ -31,7 +31,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         updateDisplay()
 
         if APP_ICON_HELPER {
-            let helper = AppIconHelper()
+            let helper = AppIconLayout()
             helper.show()
         } else {
             showRulers()

@@ -35,14 +35,16 @@ class VerticalRule: RuleView {
         let height = Int(dirtyRect.height)
         let path = NSBezierPath()
 
-        for i in 1...height {
+        // substract two so ticks don't overlap with border
+        // substract from this range so we can use the height var for position calculations
+        for i in 1...height - 2 {
             if i.isMultiple(of: 50) {
                 path.move(to: CGPoint(x: width - 0, y: height - i))
                 path.line(to: CGPoint(x: width - 10, y: height - i))
 
                 let label = String(i)
                 label.draw(
-                    with: CGRect(x: 3, y: height - i - 13, width: 24, height: 20),
+                    with: CGRect(x: 3, y: CGFloat(height - i) - 13.5, width: 24, height: 20),
                     options: .usesLineFragmentOrigin,
                     attributes: attrs,
                     context: nil

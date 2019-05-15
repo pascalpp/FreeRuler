@@ -12,13 +12,13 @@
 		507FED43227FFF5300BD77DC /* PreferencesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507FED41227FFF5300BD77DC /* PreferencesController.swift */; };
 		507FED44227FFF5300BD77DC /* PreferencesController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 507FED42227FFF5300BD77DC /* PreferencesController.xib */; };
 		507FED602280E13200BD77DC /* Prefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507FED5F2280E13200BD77DC /* Prefs.swift */; };
-		50CCB206227FCD26004645C5 /* AppIconHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CCB205227FCD26004645C5 /* AppIconHelper.swift */; };
+		50C6D891228BDBAD0091F19E /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 50C6D890228BDBAD0091F19E /* Images.xcassets */; };
+		50CCB206227FCD26004645C5 /* AppIconLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CCB205227FCD26004645C5 /* AppIconLayout.swift */; };
 		50D7BEE7227D42FD0008B95E /* RulerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEE6227D42FD0008B95E /* RulerController.swift */; };
 		50D7BEE9227D43270008B95E /* Ruler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEE8227D43270008B95E /* Ruler.swift */; };
 		50D7BEEB227D432E0008B95E /* RulerWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEEA227D432E0008B95E /* RulerWindow.swift */; };
 		50D7BEED227D5C810008B95E /* RuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEEC227D5C810008B95E /* RuleView.swift */; };
 		6F4102892260712F00F06A10 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F4102882260712F00F06A10 /* AppDelegate.swift */; };
-		6F41028B2260713100F06A10 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6F41028A2260713100F06A10 /* Assets.xcassets */; };
 		6F41028E2260713100F06A10 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6F41028C2260713100F06A10 /* MainMenu.xib */; };
 		6F41029F22607DC900F06A10 /* HorizontalRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F41029E22607DC900F06A10 /* HorizontalRule.swift */; };
 /* End PBXBuildFile section */
@@ -51,14 +51,14 @@
 		507FED41227FFF5300BD77DC /* PreferencesController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesController.swift; sourceTree = "<group>"; };
 		507FED42227FFF5300BD77DC /* PreferencesController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PreferencesController.xib; sourceTree = "<group>"; };
 		507FED5F2280E13200BD77DC /* Prefs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prefs.swift; sourceTree = "<group>"; };
-		50CCB205227FCD26004645C5 /* AppIconHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconHelper.swift; sourceTree = "<group>"; };
+		50C6D890228BDBAD0091F19E /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		50CCB205227FCD26004645C5 /* AppIconLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconLayout.swift; sourceTree = "<group>"; };
 		50D7BEE6227D42FD0008B95E /* RulerController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RulerController.swift; sourceTree = "<group>"; };
 		50D7BEE8227D43270008B95E /* Ruler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ruler.swift; sourceTree = "<group>"; };
 		50D7BEEA227D432E0008B95E /* RulerWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RulerWindow.swift; sourceTree = "<group>"; };
 		50D7BEEC227D5C810008B95E /* RuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleView.swift; sourceTree = "<group>"; };
 		6F4102852260712F00F06A10 /* Free Ruler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Free Ruler.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F4102882260712F00F06A10 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		6F41028A2260713100F06A10 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6F41028D2260713100F06A10 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		6F41028F2260713100F06A10 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6F4102902260713100F06A10 /* Free_Ruler.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Free_Ruler.entitlements; sourceTree = "<group>"; };
@@ -107,10 +107,10 @@
 				5012CAAC226AB09000BD9565 /* VerticalRule.swift */,
 				507FED41227FFF5300BD77DC /* PreferencesController.swift */,
 				507FED42227FFF5300BD77DC /* PreferencesController.xib */,
-				50CCB205227FCD26004645C5 /* AppIconHelper.swift */,
-				6F41028A2260713100F06A10 /* Assets.xcassets */,
+				50CCB205227FCD26004645C5 /* AppIconLayout.swift */,
 				6F4102902260713100F06A10 /* Free_Ruler.entitlements */,
 				6F41028F2260713100F06A10 /* Info.plist */,
+				50C6D890228BDBAD0091F19E /* Images.xcassets */,
 			);
 			path = "Free Ruler";
 			sourceTree = "<group>";
@@ -175,8 +175,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				50C6D891228BDBAD0091F19E /* Images.xcassets in Resources */,
 				507FED44227FFF5300BD77DC /* PreferencesController.xib in Resources */,
-				6F41028B2260713100F06A10 /* Assets.xcassets in Resources */,
 				6F41028E2260713100F06A10 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -190,7 +190,7 @@
 			files = (
 				50008B6122846FCD001E3EE4 /* Notifications.swift in Sources */,
 				507FED602280E13200BD77DC /* Prefs.swift in Sources */,
-				50CCB206227FCD26004645C5 /* AppIconHelper.swift in Sources */,
+				50CCB206227FCD26004645C5 /* AppIconLayout.swift in Sources */,
 				6F41029F22607DC900F06A10 /* HorizontalRule.swift in Sources */,
 				50D7BEEB227D432E0008B95E /* RulerWindow.swift in Sources */,
 				507FED43227FFF5300BD77DC /* PreferencesController.swift in Sources */,
@@ -339,10 +339,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = X88CY268NZ;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/Mac",
-				);
 				INFOPLIST_FILE = "Free Ruler/Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = com.pascal.freeruler;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -358,11 +354,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = X88CY268NZ;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/Mac",
-					"$(PROJECT_DIR)/Frameworks",
-				);
 				INFOPLIST_FILE = "Free Ruler/Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = com.pascal.freeruler;
 				PRODUCT_NAME = "$(TARGET_NAME)";
