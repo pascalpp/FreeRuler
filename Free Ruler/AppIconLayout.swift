@@ -30,13 +30,9 @@ let targetHeight = CGFloat(820)
 let aspect = targetWidth / targetHeight
 let boundsMultiplier = CGFloat(3.3) // used to render the layout at a larger scale
 
-class AppIconHelper: NSObject {
+class AppIconLayout: NSObject {
     
     func show() {
-        self.showAppIconLayout()
-    }
-
-    func showAppIconLayout() {
         let frame = NSRect(x: 100, y: 100, width: 1024, height: 1024 )
         let window = NSWindow(contentRect: frame, styleMask: [], backing: .buffered, defer: false)
         window.isOpaque = false
@@ -74,6 +70,10 @@ class ScaleView: NSView {
 }
 
 class RulerLayoutView: NSView {
+
+    required init?(coder decoder: NSCoder) {
+        super.init(coder: decoder)
+    }
 
     override init(frame: NSRect) {
         super.init(frame: frame)
@@ -158,20 +158,14 @@ class RulerLayoutView: NSView {
 
     }
 
-    required init?(coder decoder: NSCoder) {
-        super.init(coder: decoder)
-    }
-
-    @objc func testClick() {
-
-    }
-
 }
 
 class ButtonView: NSView {
+
     required init?(coder decoder: NSCoder) {
         fatalError()
     }
+
     init(frame frameRect: NSRect, color: CGColor) {
         super.init(frame: frameRect)
         self.wantsLayer = true
@@ -180,4 +174,5 @@ class ButtonView: NSView {
         self.layer?.borderColor = CGColor(gray: 0, alpha: 0.2)
         self.layer?.borderWidth = 1.0
     }
+
 }
