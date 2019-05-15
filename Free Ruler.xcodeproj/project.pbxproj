@@ -339,10 +339,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = X88CY268NZ;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/Mac",
-				);
 				INFOPLIST_FILE = "Free Ruler/Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = com.pascal.freeruler;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -358,11 +354,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = X88CY268NZ;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/Mac",
-					"$(PROJECT_DIR)/Frameworks",
-				);
 				INFOPLIST_FILE = "Free Ruler/Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = com.pascal.freeruler;
 				PRODUCT_NAME = "$(TARGET_NAME)";

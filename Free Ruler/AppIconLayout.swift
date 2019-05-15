@@ -22,7 +22,7 @@ import Cocoa
  
  */
 
-let titlebarHeight = CGFloat(40)
+let titlebarHeight = CGFloat(30)
 
 let renderWidth = CGFloat(210)
 let targetWidth = CGFloat(680)
@@ -126,14 +126,14 @@ class RulerLayoutView: NSView {
         )
         let toolbar = NSView(frame: toolbarRect)
         toolbar.wantsLayer = true
-        toolbar.layer?.backgroundColor = CGColor(gray: 0.8, alpha: 1)
+        toolbar.layer?.backgroundColor = CGColor(gray: 0.9, alpha: 1)
         toolbar.layer?.borderColor = CGColor(gray: 0, alpha: 0.2)
         toolbar.layer?.borderWidth = 1.0
 
-        let buttonFrame = NSRect(x: 0, y: 0, width: 14, height: 14)
-        let buttonsX = CGFloat(21)
-        let buttonsY = CGFloat(13)
-        let buttonSpace = CGFloat(21)
+        let buttonFrame = NSRect(x: 0, y: 0, width: 12, height: 12)
+        let buttonsX = CGFloat(20)
+        let buttonsY = CGFloat(8.5)
+        let buttonSpace = CGFloat(18)
 
         let closeColor = CGColor(red: 250.0/255.0, green: 97.0/255.0, blue: 92.0/255.0, alpha: 255.0/255.0)
         let closeButton = ButtonView(frame: buttonFrame, color: closeColor)
