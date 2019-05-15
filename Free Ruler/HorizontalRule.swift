@@ -34,14 +34,16 @@ class HorizontalRule: RuleView {
         let width = Int(dirtyRect.width)
         let path = NSBezierPath()
 
-        for i in 1...width {
+        // substract two so ticks don't overlap with border
+        // subtract from this range so width var is accurate
+        for i in 1...width - 2 {
             if i.isMultiple(of: 50) {
-                path.move(to: CGPoint(x: i, y: 0))
+                path.move(to: CGPoint(x: i, y: 1))
                 path.line(to: CGPoint(x: i, y: 10))
 
                 let label = String(i)
                 label.draw(
-                    with: CGRect(x: i-20, y: 3, width: 40, height: 20),
+                    with: CGRect(x: i - 20, y: 3, width: 40, height: 20),
                     options: .usesLineFragmentOrigin,
                     attributes: attrs,
                     context: nil
@@ -49,11 +51,11 @@ class HorizontalRule: RuleView {
 
             }
             else if i.isMultiple(of: 10) {
-                path.move(to: CGPoint(x: i, y: 0))
+                path.move(to: CGPoint(x: i, y: 1))
                 path.line(to: CGPoint(x: i, y: 8))
             }
             else if i.isMultiple(of: 2) {
-                path.move(to: CGPoint(x: i, y: 0))
+                path.move(to: CGPoint(x: i, y: 1))
                 path.line(to: CGPoint(x: i, y: 5))
             }
         }

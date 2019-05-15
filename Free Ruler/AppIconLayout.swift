@@ -6,17 +6,16 @@ import Cocoa
  
  Steps taken to generate the icon:
  - choose the 'App Icon Layout' scheme and run.
- - take screenshot
+ - take screenshot on a retina screen
     - press cmd-shift-4
     - press and release the space bar to switch to object mode
     - click on the window
     - the rulers are set as child windows, so they'll be included in the screenshot
- - create 1024x1024 image in Photoshop, Pixelmator, etc
- - add drop shadow:
-    - black, 25% opacity
-    - 270° (straight down)
-    - 10px offset
-    - 30px blur
+ - open Pixelmator file in this repo
+ - paste into new layer (red squares should position it correctly for you)
+ - move mask from old layer to new layer (to hide red squares)
+ - move shadow from old layer to new layer
+ - delete old layer
  - export 1024x1024 png
  - convert to ICNS file with Image2Icon or similar
  
@@ -24,9 +23,9 @@ import Cocoa
 
 let titlebarHeight = CGFloat(30)
 
-let renderWidth = CGFloat(210)
+let renderWidth = CGFloat(211)
 let targetWidth = CGFloat(680)
-let targetHeight = CGFloat(820)
+let targetHeight = CGFloat(816)
 let aspect = targetWidth / targetHeight
 let boundsMultiplier = CGFloat(3.3) // used to render the layout at a larger scale
 
@@ -54,9 +53,14 @@ class ScaleView: NSView {
     override init(frame: NSRect) {
         super.init(frame: frame)
 
+        // border
+//        self.wantsLayer = true
+//        self.layer?.borderColor = CGColor(gray: 0, alpha: 0.5)
+//        self.layer?.borderWidth = 1.0
+
         let layoutRect = NSRect(
-            x: 240,
-            y: 70,
+            x: 237,
+            y: 54,
             width: frame.width,
             height: frame.height
         )
@@ -65,6 +69,21 @@ class ScaleView: NSView {
         layout.rotate(byDegrees: 9)
 
         self.addSubview(layout)
+
+        let squareSize = CGFloat(10)
+        let red = CGColor(red: 1, green: 0, blue: 0, alpha: 1)
+        self.addSubview(
+            ColorSquare(
+                frame: NSRect(x: 0, y: frame.height - squareSize, width: squareSize, height: squareSize),
+                color: red
+            )
+        )
+        self.addSubview(
+            ColorSquare(
+                frame: NSRect(x: frame.width - squareSize, y: 0, width: squareSize, height: squareSize),
+                color: red
+            )
+        )
     }
 
 }
@@ -173,6 +192,20 @@ class ButtonView: NSView {
         self.layer?.cornerRadius = frame.width / 2
         self.layer?.borderColor = CGColor(gray: 0, alpha: 0.2)
         self.layer?.borderWidth = 1.0
+    }
+
+}
+
+class ColorSquare: NSView {
+
+    required init?(coder decoder: NSCoder) {
+        fatalError()
+    }
+
+    init(frame frameRect: NSRect, color: CGColor) {
+        super.init(frame: frameRect)
+        self.wantsLayer = true
+        self.layer?.backgroundColor = color
     }
 
 }
