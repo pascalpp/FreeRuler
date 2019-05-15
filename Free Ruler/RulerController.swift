@@ -10,7 +10,10 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     let rulerWindow: RulerWindow
     var otherWindow: RulerWindow?
     var keyListener: Any?
-    
+
+    let activeBorderColor = CGColor(gray: 0, alpha: 0.5)
+    let inactiveBorderColor = CGColor(gray: 0, alpha: 0.2)
+
     var preferencesWindowOpen = false {
         didSet {
             updateIsFloatingPanel()
@@ -79,11 +82,13 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
+        rulerWindow.borderColor = activeBorderColor
         updateChildWindow()
         startKeyListener()
     }
 
     func windowDidResignKey(_ notification: Notification) {
+        rulerWindow.borderColor = inactiveBorderColor
         updateChildWindow()
         stopKeyListener()
     }

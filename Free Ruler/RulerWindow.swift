@@ -4,6 +4,12 @@ class RulerWindow: NSPanel {
     
     var ruler: Ruler
     var rule: RuleView
+
+    var borderColor = CGColor(gray: 0, alpha: 0.5) {
+        didSet {
+            updateBorderColor()
+        }
+    }
     
     convenience init(_ ruler: Ruler) {
         self.init(ruler: ruler)
@@ -36,15 +42,27 @@ class RulerWindow: NSPanel {
         self.hasShadow = prefs.rulerShadow
 
         rule.wantsLayer = true
-        rule.layer?.borderColor = CGColor(gray: 0, alpha: 0.5)
         rule.layer?.borderWidth = 1.0
+        updateBorderColor()
         
         rule.nextResponder = self
         self.contentView = rule
+
+        let mask: NSPanel.StyleMask = [
+            .titled,
+            .closable,
+        ]
+        if let button = NSPanel.standardWindowButton(.closeButton, for: mask) {
+            rule.addSubview(button)
+        }
     }
     
     override var canBecomeKey: Bool {
         return true
+    }
+
+    func updateBorderColor() {
+        rule.layer?.borderColor = borderColor
     }
 
 }
