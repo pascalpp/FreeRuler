@@ -17,6 +17,7 @@
 		50D7BEE9227D43270008B95E /* Ruler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEE8227D43270008B95E /* Ruler.swift */; };
 		50D7BEEB227D432E0008B95E /* RulerWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEEA227D432E0008B95E /* RulerWindow.swift */; };
 		50D7BEED227D5C810008B95E /* RuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEEC227D5C810008B95E /* RuleView.swift */; };
+		50F7ED6A228BD3AF00B9728E /* Free Ruler Icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 50F7ED69228BD3AE00B9728E /* Free Ruler Icon.icns */; };
 		6F4102892260712F00F06A10 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F4102882260712F00F06A10 /* AppDelegate.swift */; };
 		6F41028B2260713100F06A10 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6F41028A2260713100F06A10 /* Assets.xcassets */; };
 		6F41028E2260713100F06A10 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6F41028C2260713100F06A10 /* MainMenu.xib */; };
@@ -56,6 +57,7 @@
 		50D7BEE8227D43270008B95E /* Ruler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ruler.swift; sourceTree = "<group>"; };
 		50D7BEEA227D432E0008B95E /* RulerWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RulerWindow.swift; sourceTree = "<group>"; };
 		50D7BEEC227D5C810008B95E /* RuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleView.swift; sourceTree = "<group>"; };
+		50F7ED69228BD3AE00B9728E /* Free Ruler Icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = "Free Ruler Icon.icns"; path = "Assets.xcassets/Free Ruler Icon.icns"; sourceTree = "<group>"; };
 		6F4102852260712F00F06A10 /* Free Ruler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Free Ruler.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F4102882260712F00F06A10 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6F41028A2260713100F06A10 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -111,6 +113,7 @@
 				6F41028A2260713100F06A10 /* Assets.xcassets */,
 				6F4102902260713100F06A10 /* Free_Ruler.entitlements */,
 				6F41028F2260713100F06A10 /* Info.plist */,
+				50F7ED69228BD3AE00B9728E /* Free Ruler Icon.icns */,
 			);
 			path = "Free Ruler";
 			sourceTree = "<group>";
@@ -175,6 +178,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				50F7ED6A228BD3AF00B9728E /* Free Ruler Icon.icns in Resources */,
 				507FED44227FFF5300BD77DC /* PreferencesController.xib in Resources */,
 				6F41028B2260713100F06A10 /* Assets.xcassets in Resources */,
 				6F41028E2260713100F06A10 /* MainMenu.xib in Resources */,
@@ -334,15 +338,11 @@
 		6F4102942260713100F06A10 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "Free Ruler Icon";
 				CODE_SIGN_ENTITLEMENTS = "Free Ruler/Free_Ruler.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = X88CY268NZ;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/Mac",
-				);
 				INFOPLIST_FILE = "Free Ruler/Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = com.pascal.freeruler;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -353,16 +353,11 @@
 		6F4102952260713100F06A10 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "Free Ruler Icon";
 				CODE_SIGN_ENTITLEMENTS = "Free Ruler/Free_Ruler.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = X88CY268NZ;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/Mac",
-					"$(PROJECT_DIR)/Frameworks",
-				);
 				INFOPLIST_FILE = "Free Ruler/Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = com.pascal.freeruler;
 				PRODUCT_NAME = "$(TARGET_NAME)";

@@ -5,175 +5,179 @@ import Cocoa
  This file draws a special set of windows to be used as the app icon, with some additional image manipulation.
  
  Steps taken to generate the icon:
- - choose the 'App Icon Helper' scheme and run.
+ - choose the 'App Icon Layout' scheme and run.
  - take screenshot
     - press cmd-shift-4
     - press and release the space bar to switch to object mode
     - click on the window
     - the rulers are set as child windows, so they'll be included in the screenshot
  - create 1024x1024 image in Photoshop, Pixelmator, etc
- - rotate 351°
- - scale screenshot proportionately to match size of Apple Notes icon
-   (okay to size up a bit if needed to fill 1024px cuz it'll almost never be seen that large.)
  - add drop shadow:
-    - black, 75% opacity
+    - black, 25% opacity
     - 270° (straight down)
     - 10px offset
-    - 32px blur
- - export 1024, 512, 256, 128, 64, 32, and 16px sizes
- 
- There's probably a better way to generate the sizes, some research needed. I'm not overly concerned with hand-tuning the smaller sizes at this point.
+    - 30px blur
+ - export 1024x1024 png
+ - convert to ICNS file with Image2Icon or similar
  
  */
 
-let titlebarHeight: CGFloat = 22
+let titlebarHeight = CGFloat(40)
+
+let renderWidth = CGFloat(210)
+let targetWidth = CGFloat(680)
+let targetHeight = CGFloat(820)
+let aspect = targetWidth / targetHeight
+let boundsMultiplier = CGFloat(3.3) // used to render the layout at a larger scale
 
 class AppIconHelper: NSObject {
     
     func show() {
-        self.showAppIconBackdrop()
-        self.showAppIconRulers()
-//        self.showAppIconRulersEffShape()
-//        self.showAppIconRulersEffShapeAsViews()
+        self.showAppIconLayout()
     }
-    
-    func showAppIconBackdrop() {
-        guard
-            let screen = NSScreen.main?.frame
-            else { return }
-        
-        let backdrop = NSWindow(contentRect: screen, styleMask: [], backing: .buffered, defer: false)
-        backdrop.backgroundColor = NSColor.white
-        backdrop.orderFront(nil)
-    }
-    
-    func showAppIconRulers() {
-        guard
-            let screen = NSScreen.main?.frame
-            else { return }
-        
-        let titlebarHeight: CGFloat = 22
-        
-        let styleMask: NSWindow.StyleMask = [.titled, .closable, .miniaturizable, .resizable]
-        let frame = NSRect(x: 200, y: screen.height - 700, width: 215, height: 265 - titlebarHeight)
-        let window = NSWindow(contentRect: frame, styleMask: styleMask, backing: .buffered, defer: false)
-        
-        let topRect = NSRect(x: frame.minX, y: frame.maxY + titlebarHeight, width: frame.width, height: Ruler.thickness)
-        let topRuler = Ruler(.horizontal, frame: topRect)
-        let top = RulerController(topRuler)
-        top.showWindow(nil)
-        
-        let leftRect = NSRect(x: frame.minX - Ruler.thickness, y: frame.minY, width: Ruler.thickness, height: frame.height + titlebarHeight)
-        let leftRuler = Ruler(.vertical, frame: leftRect)
-        let left = RulerController(leftRuler)
-        left.showWindow(nil)
-        
-        window.addChildWindow(top.rulerWindow, ordered: .below)
-        window.addChildWindow(left.rulerWindow, ordered: .below)
-        
-        top.rulerWindow.hasShadow = false
-        left.rulerWindow.hasShadow = false
-        window.hasShadow = false
+
+    func showAppIconLayout() {
+        let frame = NSRect(x: 100, y: 100, width: 1024, height: 1024 )
+        let window = NSWindow(contentRect: frame, styleMask: [], backing: .buffered, defer: false)
+        window.isOpaque = false
+        window.backgroundColor = NSColor(white: 1, alpha: 0)
+
+        window.isMovableByWindowBackground = true
+        window.contentView = ScaleView(frame: frame)
         window.orderFront(nil)
-        window.makeKey()
-        window.makeMain()
-        
     }
-    
-    func showAppIconRulersEffShape() {
-        guard
-            let screen = NSScreen.main?.frame
-            else { return }
-        
-        let styleMask: NSWindow.StyleMask = [.titled, .closable, .miniaturizable, .resizable]
-        let frame = NSRect(x: 500, y: screen.height - 700, width: 200, height: 250)
-        let window = NSWindow(contentRect: frame, styleMask: styleMask, backing: .buffered, defer: false)
-        
-        let topRect = NSRect(x: frame.minX, y: frame.maxY - Ruler.thickness, width: frame.width, height: Ruler.thickness)
-        let topRuler = Ruler(.horizontal, frame: topRect)
-        let top = RulerController(topRuler)
-        top.showWindow(nil)
-        
-        let leftRect = NSRect(x: frame.minX, y: frame.minY, width: Ruler.thickness, height: frame.height)
-        let leftRuler = Ruler(.vertical, frame: leftRect)
-        let left = RulerController(leftRuler)
-        left.showWindow(nil)
-        
-        let middleRect = NSRect(x: frame.minX, y: frame.minY + frame.height / 2 - Ruler.thickness / 2, width: frame.width - Ruler.thickness, height: Ruler.thickness)
-        let middleRuler = Ruler(.horizontal, frame: middleRect)
-        let middle = RulerController(middleRuler)
-        middle.showWindow(nil)
-        
-        window.orderFront(nil)
-        window.makeKey()
-        window.makeMain()
-        
-        window.addChildWindow(middle.rulerWindow, ordered: .above)
-        window.addChildWindow(top.rulerWindow, ordered: .above)
-        window.addChildWindow(left.rulerWindow, ordered: .above)
-        
-    }
-    
-    func showAppIconRulersEffShapeAsViews() {
-        guard
-            let screen = NSScreen.main?.frame
-            else { return }
-        
-        let styleMask: NSWindow.StyleMask = [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView]
-        let frame = NSRect(x: 800, y: screen.height - 700, width: 150, height: 220)
-        let window = NSWindow(contentRect: frame, styleMask: styleMask, backing: .buffered, defer: false)
-        
-        window.hasShadow = false
-        window.orderFront(nil)
-        window.makeKey()
-        window.makeMain()
-        
-        window.contentView = EffRulerView(frame: frame)
-        
-    }
-    
+
 }
 
+class ScaleView: NSView {
 
-class EffRulerView: NSView {
-    
+    required init?(coder decoder: NSCoder) {
+        fatalError()
+    }
+
     override init(frame: NSRect) {
         super.init(frame: frame)
-        
-        let topRect = NSRect(x: Ruler.thickness / 2, y: frame.height - Ruler.thickness - titlebarHeight, width: frame.width - Ruler.thickness / 2, height: Ruler.thickness)
+
+        let layoutRect = NSRect(
+            x: 240,
+            y: 70,
+            width: frame.width,
+            height: frame.height
+        )
+        let layout = RulerLayoutView(frame: layoutRect)
+        layout.setBoundsSize(NSSize(width: frame.width / boundsMultiplier, height: frame.height / boundsMultiplier))
+        layout.rotate(byDegrees: 9)
+
+        self.addSubview(layout)
+    }
+
+}
+
+class RulerLayoutView: NSView {
+
+    override init(frame: NSRect) {
+        super.init(frame: frame)
+
+        let width = renderWidth
+        let height = width / aspect
+
+        let topRect = NSRect(
+            x: Ruler.thickness,
+            y: height - Ruler.thickness - 1,
+            width: width - Ruler.thickness,
+            height: Ruler.thickness
+        )
         let topRuler = Ruler(.horizontal, frame: topRect)
         let top = getRulerView(ruler: topRuler)
-        addBorder(view: top)
-        
-        let leftRect = NSRect(x: 0, y: 0, width: Ruler.thickness, height: frame.height - titlebarHeight)
+        top.wantsLayer = true
+        top.layer?.borderColor = CGColor(gray: 0, alpha: 0.5)
+        top.layer?.borderWidth = 1.0
+
+        let leftRect = NSRect(
+            x: 1,
+            y: 0,
+            width: Ruler.thickness,
+            height: height - Ruler.thickness
+        )
         let leftRuler = Ruler(.vertical, frame: leftRect)
         let left = getRulerView(ruler: leftRuler)
-        addBorder(view: left)
-        
-        let middleRect = NSRect(x: Ruler.thickness / 2, y: 0 + frame.height / 2 - Ruler.thickness + 10, width: frame.width - Ruler.thickness - Ruler.thickness / 2, height: Ruler.thickness)
-        let middleRuler = Ruler(.horizontal, frame: middleRect)
-        let middle = getRulerView(ruler: middleRuler)
-        addBorder(view: middle)
-        
+        left.wantsLayer = true
+        left.layer?.borderColor = CGColor(gray: 0, alpha: 0.5)
+        left.layer?.borderWidth = 1.0
+
+        let paperRect = NSRect(
+            x: Ruler.thickness,
+            y: 0,
+            width: topRect.width,
+            height: leftRect.height
+        )
+        let paperView = NSView(frame: paperRect)
+        paperView.wantsLayer = true
+        paperView.layer?.borderColor = CGColor(gray: 0, alpha: 0.5)
+        paperView.layer?.borderWidth = 1.0
+        paperView.layer?.backgroundColor = CGColor(gray: 1, alpha: 1)
+        paperView.layer?.cornerRadius = 10.0
+
+        let toolbarRect = NSRect(
+            x: -10,
+            y: leftRect.height - titlebarHeight + 1,
+            width: topRect.width + 20,
+            height: titlebarHeight
+        )
+        let toolbar = NSView(frame: toolbarRect)
+        toolbar.wantsLayer = true
+        toolbar.layer?.backgroundColor = CGColor(gray: 0.8, alpha: 1)
+        toolbar.layer?.borderColor = CGColor(gray: 0, alpha: 0.2)
+        toolbar.layer?.borderWidth = 1.0
+
+        let buttonFrame = NSRect(x: 0, y: 0, width: 14, height: 14)
+        let buttonsX = CGFloat(21)
+        let buttonsY = CGFloat(13)
+        let buttonSpace = CGFloat(21)
+
+        let closeColor = CGColor(red: 250.0/255.0, green: 97.0/255.0, blue: 92.0/255.0, alpha: 255.0/255.0)
+        let closeButton = ButtonView(frame: buttonFrame, color: closeColor)
+        closeButton.setFrameOrigin(NSPoint(x: buttonsX, y: buttonsY))
+        toolbar.addSubview(closeButton)
+
+        let minimizeColor = CGColor(red: 252.0/255.0, green: 188.0/255.0, blue: 63.0/255.0, alpha: 255.0/255.0)
+        let minimizeButton = ButtonView(frame: buttonFrame, color: minimizeColor)
+        minimizeButton.setFrameOrigin(NSPoint(x: buttonsX + buttonSpace, y: buttonsY))
+        toolbar.addSubview(minimizeButton)
+
+        let zoomColor = CGColor(red: 59.0/255.0, green: 200.0/255.0, blue: 73.0/255.0, alpha: 255.0/255.0)
+        let zoomButton = ButtonView(frame: buttonFrame, color: zoomColor)
+        zoomButton.setFrameOrigin(NSPoint(x: buttonsX + buttonSpace + buttonSpace, y: buttonsY))
+        toolbar.addSubview(zoomButton)
+
+        paperView.addSubview(toolbar)
+
+        self.addSubview(paperView)
         self.addSubview(top)
-        self.addSubview(middle)
         self.addSubview(left)
-        
+
     }
-    
+
     required init?(coder decoder: NSCoder) {
         super.init(coder: decoder)
     }
-    
+
+    @objc func testClick() {
+
+    }
+
 }
 
-func addBorder(view: NSView) {
-    let frame = view.frame
-    let border = NSBox(frame: NSRect(x: 0, y: 0, width: frame.width, height: frame.height))
-    border.boxType = .custom
-    border.borderColor = #colorLiteral(red: 0.3098039329, green: 0.2039215714, blue: 0.03921568766, alpha: 0.5)
-    border.borderType = .lineBorder
-    border.borderWidth = 1
-    view.addSubview(border)
+class ButtonView: NSView {
+    required init?(coder decoder: NSCoder) {
+        fatalError()
+    }
+    init(frame frameRect: NSRect, color: CGColor) {
+        super.init(frame: frameRect)
+        self.wantsLayer = true
+        self.layer?.backgroundColor = color
+        self.layer?.cornerRadius = frame.width / 2
+        self.layer?.borderColor = CGColor(gray: 0, alpha: 0.2)
+        self.layer?.borderWidth = 1.0
+    }
 }
-
