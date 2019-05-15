@@ -1,7 +1,7 @@
 # Free Ruler
 A ruler application for Mac OS X
 
-![icon_512x512](https://user-images.githubusercontent.com/1355312/57776614-f8805f00-76ed-11e9-947d-8a4a1a79443c.png)
+![icon_512x512](https://user-images.githubusercontent.com/1355312/57780292-f0c4b880-76f5-11e9-8933-36ab3bfccb14.png)
 
 ### A work in progress
 
