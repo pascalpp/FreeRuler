@@ -93,3 +93,11 @@ func getMaxSize(ruler: Ruler) -> NSSize {
     }
 }
 
+func getRulerView(ruler: Ruler) -> RuleView {
+    switch ruler.orientation {
+    case .horizontal:
+        return HorizontalRule(frame: ruler.frame)
+    case .vertical:
+        return VerticalRule(frame: ruler.frame)
+    }
+}
