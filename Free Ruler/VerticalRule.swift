@@ -39,7 +39,7 @@ class VerticalRule: RuleView {
         // substract from this range so we can use the height var for position calculations
         for i in 1...height - 2 {
             if i.isMultiple(of: 50) {
-                path.move(to: CGPoint(x: width - 0, y: height - i))
+                path.move(to: CGPoint(x: width - 1, y: height - i))
                 path.line(to: CGPoint(x: width - 10, y: height - i))
 
                 let label = String(i)
@@ -52,11 +52,11 @@ class VerticalRule: RuleView {
 
             }
             else if i.isMultiple(of: 10) {
-                path.move(to: CGPoint(x: width - 0, y: height - i))
+                path.move(to: CGPoint(x: width - 1, y: height - i))
                 path.line(to: CGPoint(x: width - 8, y: height - i))
             }
             else if i.isMultiple(of: 2) {
-                path.move(to: CGPoint(x: width - 0, y: height - i))
+                path.move(to: CGPoint(x: width - 1, y: height - i))
                 path.line(to: CGPoint(x: width - 5, y: height - i))
             }
         }
