@@ -338,7 +338,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Free Ruler/Free_Ruler.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = X88CY268NZ;
+				DEVELOPMENT_TEAM = LHA84NAPNA;
 				INFOPLIST_FILE = "Free Ruler/Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = com.pascal.freeruler;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -353,7 +353,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Free Ruler/Free_Ruler.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = X88CY268NZ;
+				DEVELOPMENT_TEAM = LHA84NAPNA;
 				INFOPLIST_FILE = "Free Ruler/Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = com.pascal.freeruler;
 				PRODUCT_NAME = "$(TARGET_NAME)";
