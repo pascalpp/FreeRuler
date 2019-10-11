@@ -83,7 +83,7 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     func windowDidMove(_ notification: Notification) {
         rulerWindow.invalidateShadow()
     }
-
+    
     func windowDidBecomeKey(_ notification: Notification) {
         updateChildWindow()
         startKeyListener()
@@ -96,7 +96,7 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
 
     override func mouseEntered(with event: NSEvent) {
         openHand.push()
-}
+    }
 
     override func mouseExited(with event: NSEvent) {
         openHand.pop()
