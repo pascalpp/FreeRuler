@@ -11,10 +11,12 @@ struct RulerColors {
 class RuleView: NSView {
 
     let color = RulerColors()
+
     var trackingArea: NSTrackingArea?
     let trackingAreaOptions: NSTrackingArea.Options = [
         .mouseMoved,
-        .activeInKeyWindow,
+        .mouseEnteredAndExited,
+        .activeAlways,
         .inVisibleRect,
     ]
 
@@ -31,7 +33,7 @@ class RuleView: NSView {
         )
         addTrackingArea(trackingArea!)
     }
-    
+
     func drawMouseTick(at mouseLoc: NSPoint) {
         // required override
         // TODO: is there a better way to do this, maybe via a protocol?

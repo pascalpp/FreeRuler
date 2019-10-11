@@ -13,6 +13,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var timer: Timer?
     let foregroundTimerInterval: TimeInterval = 1 / 60 // 60 fps
     let backgroundTimerInterval: TimeInterval = 1 / 30 // 30 fps
+    
+    let crosshair = NSCursor.crosshair
 
     @IBOutlet weak var floatRulersMenuItem: NSMenuItem!
     @IBOutlet weak var groupRulersMenuItem: NSMenuItem!
@@ -88,6 +90,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         startTimer(timeInterval: foregroundTimerInterval)
+
+        crosshair.push()
     }
 
     func applicationDidResignActive(_ notification: Notification) {
@@ -96,6 +100,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         startTimer(timeInterval: backgroundTimerInterval)
+
+        crosshair.pop()
     }
 
     @IBAction func toggleFloatRulers(_ sender: Any) {

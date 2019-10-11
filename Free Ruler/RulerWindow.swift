@@ -47,6 +47,11 @@ class RulerWindow: NSPanel {
         return true
     }
 
+    override var acceptsMouseMovedEvents: Bool {
+        get { return true }
+        set {}
+    }
+
 }
 
 extension RulerWindow {
