@@ -11,6 +11,7 @@ struct RulerColors {
 class RuleView: NSView {
 
     let color = RulerColors()
+
     var trackingArea: NSTrackingArea?
     let trackingAreaOptions: NSTrackingArea.Options = [
         .mouseMoved,
