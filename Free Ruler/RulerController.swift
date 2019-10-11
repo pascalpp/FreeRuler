@@ -15,7 +15,6 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
 
     let openHand = NSCursor.openHand
     let closedHand = NSCursor.closedHand
-    let crosshair = NSCursor.crosshair
 
     var preferencesWindowOpen = false {
         didSet {
