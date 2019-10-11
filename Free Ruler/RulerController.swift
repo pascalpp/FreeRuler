@@ -180,16 +180,16 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
         if prefs.groupRulers {
             // if grouped, ungroup rulers, move both, regroup
             prefs.groupRulers = false
-            alignRuler(window: rulerWindow, at: point)
-            alignRuler(window: otherWindow, at: point)
+            alignRulerWindow(window: rulerWindow, at: point)
+            alignRulerWindow(window: otherWindow, at: point)
             prefs.groupRulers = true
         } else {
             // if not groups, just move key window
-            alignRuler(window: rulerWindow, at: point)
+            alignRulerWindow(window: rulerWindow, at: point)
         }
     }
     
-    private func alignRuler(window: RulerWindow?, at point: NSPoint) {
+    func alignRulerWindow(window: RulerWindow?, at point: NSPoint) {
         guard let window = window else { return }
 
         let frame = window.frame
@@ -198,13 +198,13 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
         
         switch window.ruler.orientation {
         case .horizontal:
-            // offset horizontal by 1px downward to compensate for ruler border
-            x = point.x
-            y = point.y - 1.0
+            // offset horizontal by 1px leftward to compensate for ruler border
+            x = point.x - 1.0
+            y = point.y
         case .vertical:
-            // offset vertical by 1px rightward to compensate for ruler border
-            x = point.x - frame.width + 1.0
-            y = point.y - frame.height
+            // offset vertical by 1px upward to compensate for ruler border
+            x = point.x - frame.width
+            y = point.y - frame.height + 1.0
         }
         
         let rect = NSRect(
