@@ -111,9 +111,6 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     }
 
     override func mouseMoved(with event: NSEvent) {
-//        if NSCursor.current != openHand {
-//            openHand.push()
-//        }
         enableMouseTicks()
     }
 
