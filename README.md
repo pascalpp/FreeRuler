@@ -14,6 +14,10 @@ A ruler application for Mac OS X
 - Align rulers at mouse location (press O for origin).
 - Reset ruler locations with Command-R.
 
+### Download
+
+See the [releases page](https://github.com/pascalpp/FreeRuler/releases).
+
 ### Todo
 
 See [the list of open issues](https://github.com/pascalpp/FreeRuler/issues). For feature requests, [open a new issue](https://github.com/pascalpp/FreeRuler/issues/new).
