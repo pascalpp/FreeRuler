@@ -15,6 +15,7 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
 
     let openHand = NSCursor.openHand
     let closedHand = NSCursor.closedHand
+    let crosshair = NSCursor.crosshair
 
     var preferencesWindowOpen = false {
         didSet {
@@ -95,15 +96,15 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
 
     override func mouseEntered(with event: NSEvent) {
         openHand.push()
-    }
+}
 
     override func mouseExited(with event: NSEvent) {
-        openHand.pop()
+        crosshair.push()
     }
 
     override func mouseDown(with event: NSEvent) {
         closedHand.push()
-    }
+}
 
     override func mouseUp(with event: NSEvent) {
         closedHand.pop()

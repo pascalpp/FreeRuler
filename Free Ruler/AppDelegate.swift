@@ -100,8 +100,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         startTimer(timeInterval: backgroundTimerInterval)
-        
-        crosshair.pop()
     }
 
     @IBAction func toggleFloatRulers(_ sender: Any) {
