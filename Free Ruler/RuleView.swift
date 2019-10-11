@@ -10,12 +10,6 @@ struct RulerColors {
 
 class RuleView: NSView {
 
-//    override func viewDidMoveToWindow() {
-//        print("viewDidMoveToWindow")
-//        super.viewDidMoveToWindow()
-//        self.addCursorRect(self.frame, cursor: .crosshair)
-//    }
-
     let color = RulerColors()
     var trackingArea: NSTrackingArea?
     let trackingAreaOptions: NSTrackingArea.Options = [
