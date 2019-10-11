@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Free Ruler</key>
+	<array>
+		<dict>
+			<key>architectures</key>
+			<array>
+				<string>x86_64</string>
+			</array>
+			<key>certificate</key>
+			<dict>
+				<key>SHA1</key>
+				<string>C8A8FDB4C5BBDC72DEA8FC1E98F26BF1AA45A4BA</string>
+				<key>dateExpires</key>
+				<string>10/11/24</string>
+				<key>type</key>
+				<string>Developer ID Application</string>
+			</dict>
+			<key>entitlements</key>
+			<dict>
+				<key>com.apple.security.app-sandbox</key>
+				<true/>
+				<key>com.apple.security.files.user-selected.read-only</key>
+				<true/>
+			</dict>
+			<key>name</key>
+			<string>Free Ruler.app</string>
+			<key>team</key>
+			<dict>
+				<key>id</key>
+				<string>X88CY268NZ</string>
+				<key>name</key>
+				<string>Pascal Balthrop</string>
+			</dict>
+		</dict>
+	</array>
+</dict>
+</plist>
