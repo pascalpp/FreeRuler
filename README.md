@@ -16,12 +16,12 @@ A ruler application for Mac OS X
 
 ### Todo
 
-See [the list of open issues](/pascalpp/FreeRuler/issues). For feature requests, [open a new issue](/pascalpp/FreeRuler/issues/new).
+See [the list of open issues](https://github.com/pascalpp/FreeRuler/issues). For feature requests, [open a new issue](https://github.com/pascalpp/FreeRuler/issues/new).
 
 ### Contributing
 
 As this is my first Cocoa application, any help is appreciated!
 
-If you have experience with Mac app development in Swift, please look at the [help wanted issues](/pascalpp/FreeRuler/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22+sort%3Aupdated-desc).
+If you have experience with Mac app development in Swift, please look at the [help wanted issues](https://github.com/pascalpp/FreeRuler/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22+sort%3Aupdated-desc).
 
 Or you can [make a donation](https://www.paypal.me/pascalpp).
