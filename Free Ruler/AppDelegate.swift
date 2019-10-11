@@ -70,8 +70,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func showRulers() {
         rulers = [
-            RulerController(Ruler(.horizontal, name: "horizontal-ruler")),
             RulerController(Ruler(.vertical, name: "vertical-ruler")),
+            RulerController(Ruler(.horizontal, name: "horizontal-ruler")),
         ]
 
         // let rulers know about each other
