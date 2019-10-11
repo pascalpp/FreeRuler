@@ -99,7 +99,7 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
 }
 
     override func mouseExited(with event: NSEvent) {
-        crosshair.push()
+        openHand.pop()
     }
 
     override func mouseDown(with event: NSEvent) {
