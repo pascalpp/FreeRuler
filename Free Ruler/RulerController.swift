@@ -83,7 +83,7 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     func windowDidMove(_ notification: Notification) {
         rulerWindow.invalidateShadow()
     }
-    
+
     func windowDidBecomeKey(_ notification: Notification) {
         updateChildWindow()
         startKeyListener()
