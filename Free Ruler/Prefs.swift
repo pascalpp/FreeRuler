@@ -14,7 +14,7 @@ import Foundation
 let prefs = Prefs.shared
 
 class Prefs: NSObject {
-    
+
     // MARK: - shared singleton instance
     static let shared = Prefs()
 
@@ -50,14 +50,14 @@ class Prefs: NSObject {
         rulerShadow       = defaults.bool(forKey: "rulerShadow")
         foregroundOpacity = defaults.integer(forKey: "foregroundOpacity")
         backgroundOpacity = defaults.integer(forKey: "backgroundOpacity")
-        
+
         super.init()
 
         addObservers()
     }
 
     private var observers: [NSKeyValueObservation] = []
-    
+
     private func addObservers() {
         observers = [
             observe(\Prefs.floatRulers, options: .new) { prefs, changed in

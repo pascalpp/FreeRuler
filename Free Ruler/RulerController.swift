@@ -35,7 +35,7 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     convenience init(_ ruler: Ruler) {
         self.init(ruler: ruler)
     }
-    
+
     init(ruler: Ruler) {
         self.ruler = ruler
         self.rulerWindow = RulerWindow(ruler)
@@ -51,22 +51,22 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
         if let windowFrameAutosaveName = ruler.name {
             self.windowFrameAutosaveName = windowFrameAutosaveName
         }
-        
+
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented. Use init(ruler: Ruler)")
     }
-    
+
     deinit {
         removeObserver()
     }
-    
+
     func createObservers() {
         addObserver(.preferencesWindowOpened) { _ in self.preferencesWindowOpen = true }
         addObserver(.preferencesWindowClosed) { _ in self.preferencesWindowOpen = false }
     }
-    
+
     func windowWillStartLiveResize(_ notification: Notification) {
         disableMouseTicks()
     }
@@ -136,7 +136,7 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
             rulerWindow.removeChildWindow(otherWindow)
         }
     }
-    
+
     func updateIsFloatingPanel() {
         // never float while preferences window is open
         if preferencesWindowOpen {
@@ -172,7 +172,7 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
             },
         ]
     }
-    
+
     func alignRuler(at point: NSPoint) {
         // only key window controller should respond to this command
         guard rulerWindow.isKeyWindow else { return }
@@ -188,14 +188,14 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
             alignRulerWindow(window: rulerWindow, at: point)
         }
     }
-    
+
     func alignRulerWindow(window: RulerWindow?, at point: NSPoint) {
         guard let window = window else { return }
 
         let frame = window.frame
         var x: CGFloat
         var y: CGFloat
-        
+
         switch window.ruler.orientation {
         case .horizontal:
             // offset horizontal by 1px leftward to compensate for ruler border
@@ -206,17 +206,17 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
             x = point.x - frame.width
             y = point.y - frame.height + 1.0
         }
-        
+
         let rect = NSRect(
             x: x,
             y: y,
             width: frame.width,
             height: frame.height
         )
-        
+
         window.setFrame(rect, display: false)
     }
-    
+
     func resetPosition() {
         let frame = getDefaultContentRect(orientation: ruler.orientation)
         rulerWindow.setFrame(frame, display: true)

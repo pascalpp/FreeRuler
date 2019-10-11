@@ -11,7 +11,7 @@ class Ruler {
     let orientation: Orientation
     let frame: NSRect
     let name: String? // used for frameAutosaveName
-    
+
     init(orientation: Orientation, frame: NSRect?, name: String?) {
         self.orientation = orientation
         self.name = name
@@ -25,7 +25,7 @@ class Ruler {
     convenience init(_ orientation: Orientation, name: String) {
         self.init(orientation, frame: nil, name: name)
     }
-    
+
     convenience init(_ orientation: Orientation, frame: NSRect) {
         self.init(orientation, frame: frame, name: nil)
     }
@@ -45,15 +45,15 @@ func getDefaultContentRect(orientation: Orientation) -> NSRect {
         screenWidth = screen.width
         screenHeight = screen.height
     }
-    
+
     let aspectRatio = screenWidth / screenHeight
     let xOffset: CGFloat = 30
     let yOffset: CGFloat = 50
     let rulerThickness: CGFloat = 40
-    
+
     let horizontalLength = screenWidth / 2
     let verticalLength = horizontalLength / aspectRatio
-    
+
     switch orientation {
     case .horizontal:
         return NSRect(
@@ -72,7 +72,7 @@ func getDefaultContentRect(orientation: Orientation) -> NSRect {
             height: verticalLength
         )
     }
-    
+
 }
 
 func getMinSize(ruler: Ruler) -> NSSize {

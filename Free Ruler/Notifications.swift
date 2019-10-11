@@ -19,11 +19,11 @@ extension NotificationPoster {
 
 protocol NotificationObserver {}
 extension NotificationObserver {
-    
+
     func addObserver(_ forName: Notification.Name, using: @escaping (Notification) -> Void) {
         NotificationCenter.default.addObserver(forName: forName, object: nil, queue: nil, using: using)
     }
-    
+
     // call removeObserver in your class deinit
     // deinit {
     //    removeObserver()

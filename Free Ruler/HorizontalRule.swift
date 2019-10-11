@@ -59,7 +59,7 @@ class HorizontalRule: RuleView {
                 path.line(to: CGPoint(x: i, y: 5))
             }
         }
-        
+
         path.transform(using: transformer)
 
         color.ticks.setStroke()
@@ -71,17 +71,17 @@ class HorizontalRule: RuleView {
             drawMouseNumber(mouseTickX)
         }
     }
-    
+
     override func drawMouseTick(at mouseLoc: NSPoint) {
         let windowX = self.window?.frame.origin.x ?? 0
         let mouseX = mouseLoc.x
         self.mouseTickX = mouseX - windowX
     }
-    
+
     func drawMouseTick(_ mouseTickX: CGFloat) {
         let mouseTick = NSBezierPath()
         let height: CGFloat = 40
-        
+
         mouseTick.move(to: CGPoint(x: mouseTickX, y: 0))
         mouseTick.line(to: CGPoint(x: mouseTickX, y: height))
 
@@ -94,7 +94,7 @@ class HorizontalRule: RuleView {
     func drawMouseNumber(_ mouseTickX: CGFloat) {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .left
-        
+
         let number = mouseTickX
         let labelWidth: CGFloat = 40
 

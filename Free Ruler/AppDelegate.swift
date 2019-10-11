@@ -7,20 +7,20 @@ let APP_ICON_HELPER = env["APP_ICON_HELPER"] != nil
 class AppDelegate: NSObject, NSApplicationDelegate {
 
     var observers: [NSKeyValueObservation] = []
-    
+
     var rulers: [RulerController] = []
 
     var timer: Timer?
     let foregroundTimerInterval: TimeInterval = 1 / 60 // 60 fps
     let backgroundTimerInterval: TimeInterval = 1 / 30 // 30 fps
-    
+
     let crosshair = NSCursor.crosshair
 
     @IBOutlet weak var floatRulersMenuItem: NSMenuItem!
     @IBOutlet weak var groupRulersMenuItem: NSMenuItem!
     @IBOutlet weak var rulerShadowMenuItem: NSMenuItem!
     @IBOutlet weak var alignRulersMenuItem: NSMenuItem!
-    
+
     var preferencesController: PreferencesController? = nil
 
     // MARK: - Lifecycle
@@ -38,7 +38,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
     }
-    
+
     func subscribeToPrefs() {
         observers = [
             prefs.observe(\Prefs.floatRulers, options: .new) { prefs, changed in
@@ -59,7 +59,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func updateFloatRulersMenuItem() {
         floatRulersMenuItem?.state = prefs.floatRulers ? .on : .off
     }
-    
+
     func updateGroupRulersMenuItem() {
         groupRulersMenuItem?.state = prefs.groupRulers ? .on : .off
     }
@@ -67,7 +67,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func updateRulerShadowMenuItem() {
         rulerShadowMenuItem?.state = prefs.rulerShadow ? .on : .off
     }
-    
+
     func showRulers() {
         rulers = [
             RulerController(Ruler(.vertical, name: "vertical-ruler")),
@@ -133,7 +133,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             ruler.alignRuler(at: mouseLoc)
         }
     }
-    
+
     @IBAction func resetRulerPositions(_ sender: Any) {
         // ungroup rulers during reset operation
         let groupRulers = prefs.groupRulers
@@ -146,7 +146,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     // MARK: - Application Quit
-    
+
     func applicationWillTerminate(_ aNotification: Notification) {
         prefs.save()
     }

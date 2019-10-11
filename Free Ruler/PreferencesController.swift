@@ -1,7 +1,7 @@
 import Cocoa
 
 class PreferencesController: NSWindowController, NSWindowDelegate, NotificationPoster {
-    
+
     var observers: [NSKeyValueObservation] = []
 
     @IBOutlet weak var foregroundOpacitySlider: NSSlider!
@@ -9,7 +9,7 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
 
     @IBOutlet weak var foregroundOpacityLabel: NSTextField!
     @IBOutlet weak var backgroundOpacityLabel: NSTextField!
-    
+
     @IBOutlet weak var floatRulersCheckbox: NSButton!
     @IBOutlet weak var groupRulersCheckbox: NSButton!
     @IBOutlet weak var rulerShadowCheckbox: NSButton!
@@ -17,16 +17,16 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
     override var windowNibName: String {
         return "PreferencesController"
     }
-    
+
     override func windowDidLoad() {
         super.windowDidLoad()
 
         window?.isMovableByWindowBackground = true
-        
+
         subscribeToPrefs()
         updateView()
     }
-    
+
     override func showWindow(_ sender: Any?) {
 
         // send opened notification
@@ -35,7 +35,7 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
         window?.makeKeyAndOrderFront(sender)
         window?.center()
     }
-    
+
     func windowWillClose(_ notification: Notification) {
         // send closed notification
         post(.preferencesWindowClosed)
@@ -84,17 +84,17 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
         updateGroupRulersCheckbox()
         updateRulerShadowCheckbox()
     }
-    
+
     func updateForegroundSlider() {
         foregroundOpacitySlider.integerValue = prefs.foregroundOpacity
         foregroundOpacityLabel.stringValue = "\(prefs.foregroundOpacity)%"
     }
-    
+
     func updateBackgroundSlider() {
         backgroundOpacitySlider.integerValue = prefs.backgroundOpacity
         backgroundOpacityLabel.stringValue = "\(prefs.backgroundOpacity)%"
     }
-    
+
     func updateFloatRulersCheckbox() {
         floatRulersCheckbox.state = prefs.floatRulers ? .on : .off
     }

@@ -1,9 +1,9 @@
 import Cocoa
 
 /*
- 
+
  This file draws a special set of windows to be used as the app icon, with some additional image manipulation.
- 
+
  Steps taken to generate the icon:
  - choose the 'App Icon Layout' scheme and run.
  - take screenshot on a retina screen
@@ -18,7 +18,7 @@ import Cocoa
  - delete old layer
  - export 1024x1024 png
  - convert to ICNS file with Image2Icon or similar
- 
+
  */
 
 let titlebarHeight = CGFloat(30)
@@ -30,7 +30,7 @@ let aspect = targetWidth / targetHeight
 let boundsMultiplier = CGFloat(3.3) // used to render the layout at a larger scale
 
 class AppIconLayout: NSObject {
-    
+
     func show() {
         let frame = NSRect(x: 100, y: 100, width: 1024, height: 1024 )
         let window = NSWindow(contentRect: frame, styleMask: [], backing: .buffered, defer: false)
