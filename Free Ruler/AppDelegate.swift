@@ -47,6 +47,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             prefs.observe(\Prefs.groupRulers, options: .new) { prefs, changed in
                 self.updateGroupRulersMenuItem()
             },
+            prefs.observe(\Prefs.rulerShadow, options: .new) { prefs, changed in
+                self.updateRulerShadowMenuItem()
+            },
         ]
     }
 
