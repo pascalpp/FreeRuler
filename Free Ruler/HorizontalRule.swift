@@ -114,7 +114,7 @@ class HorizontalRule: RuleView {
         ]
 
         let label = String(Int(number))
-        label.draw(with: CGRect(x: labelX, y: 30, width: labelWidth, height: 10), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
+        label.draw(with: CGRect(x: labelX, y: 20, width: labelWidth, height: 20), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
 
     }
 
