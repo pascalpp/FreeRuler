@@ -100,11 +100,11 @@ class VerticalRule: RuleView {
         let number = windowHeight - mouseTickY
 
         // draw below the tick
-        var labelY = number + 13
+        var labelY = number + 23
 
         if labelY > windowHeight - 15 {
             // switch to above the tick
-            labelY = number - 5
+            labelY = number
         }
 
         let attrs = [
@@ -115,7 +115,7 @@ class VerticalRule: RuleView {
         ]
 
         let label = String(Int(number))
-        label.draw(with: CGRect(x: 5, y: windowHeight - labelY, width: 40, height: 10), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
+        label.draw(with: CGRect(x: 5, y: windowHeight - labelY, width: 40, height: 20), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
 
     }
 
