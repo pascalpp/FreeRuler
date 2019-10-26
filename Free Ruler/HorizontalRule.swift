@@ -78,6 +78,15 @@ class HorizontalRule: RuleView {
         self.mouseTickX = mouseX - windowX
     }
 
+    func relativeX(mouseTickX: CGFloat) -> CGFloat {
+        if let refLoc = getReferencePoint() {
+            let windowX = self.window?.frame.origin.x ?? 0
+            let correction = refLoc.x - windowX
+            return mouseTickX - correction
+        }
+        return mouseTickX
+    }
+
     func drawMouseTick(_ mouseTickX: CGFloat) {
         let mouseTick = NSBezierPath()
         let height: CGFloat = 40
@@ -94,7 +103,6 @@ class HorizontalRule: RuleView {
     func drawMouseNumber(_ mouseTickX: CGFloat) {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .left
-
         let number = mouseTickX
         let labelWidth: CGFloat = 40
 
@@ -113,7 +121,7 @@ class HorizontalRule: RuleView {
             NSAttributedString.Key.backgroundColor: color.fill,
         ]
 
-        let label = String(Int(number))
+        let label = String(Int(relativeX(mouseTickX: number)))
         label.draw(with: CGRect(x: labelX, y: 20, width: labelWidth, height: 20), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
 
     }

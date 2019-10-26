@@ -20,6 +20,21 @@ class RuleView: NSView {
         .inVisibleRect,
     ]
 
+    private var referencePoint: NSPoint?
+
+    func setReferencePoint(location: NSPoint) {
+        referencePoint = location
+        drawMouseTick(at: location)
+    }
+
+    func clearReferencePoint() {
+        referencePoint = nil
+    }
+
+    func getReferencePoint() -> NSPoint? {
+        return referencePoint
+    }
+
     override func updateTrackingAreas() {
         if trackingArea != nil {
             removeTrackingArea(trackingArea!)

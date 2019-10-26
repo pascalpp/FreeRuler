@@ -21,6 +21,7 @@
 		6F4102892260712F00F06A10 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F4102882260712F00F06A10 /* AppDelegate.swift */; };
 		6F41028E2260713100F06A10 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6F41028C2260713100F06A10 /* MainMenu.xib */; };
 		6F41029F22607DC900F06A10 /* HorizontalRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F41029E22607DC900F06A10 /* HorizontalRule.swift */; };
+		9DC872BB23550CF600C455EA /* DebugUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DC872BA23550CF600C455EA /* DebugUtil.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -63,6 +64,7 @@
 		6F41028F2260713100F06A10 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6F4102902260713100F06A10 /* Free_Ruler.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Free_Ruler.entitlements; sourceTree = "<group>"; };
 		6F41029E22607DC900F06A10 /* HorizontalRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalRule.swift; sourceTree = "<group>"; };
+		9DC872BA23550CF600C455EA /* DebugUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DebugUtil.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,6 +97,7 @@
 		6F4102872260712F00F06A10 /* Free Ruler */ = {
 			isa = PBXGroup;
 			children = (
+				9DC872BA23550CF600C455EA /* DebugUtil.swift */,
 				507FED5F2280E13200BD77DC /* Prefs.swift */,
 				50008B6022846FCD001E3EE4 /* Notifications.swift */,
 				6F4102882260712F00F06A10 /* AppDelegate.swift */,
@@ -199,6 +202,7 @@
 				6F4102892260712F00F06A10 /* AppDelegate.swift in Sources */,
 				50D7BEED227D5C810008B95E /* RuleView.swift in Sources */,
 				50D7BEE9227D43270008B95E /* Ruler.swift in Sources */,
+				9DC872BB23550CF600C455EA /* DebugUtil.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -222,6 +222,7 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     func resetPosition() {
         let frame = getDefaultContentRect(orientation: ruler.orientation)
         rulerWindow.setFrame(frame, display: true)
+        rulerWindow.rule.clearReferencePoint()
     }
 
 }
@@ -249,7 +250,6 @@ extension RulerController {
         // print(ruler.orientation, "onKeyDown")
 
         let shift = event.modifierFlags.contains(.shift)
-
         switch Int(event.keyCode) {
         case kVK_LeftArrow:
             rulerWindow.nudgeLeft(withShift: shift)
@@ -262,6 +262,10 @@ extension RulerController {
             return nil
         case kVK_DownArrow:
             rulerWindow.nudgeDown(withShift: shift)
+            return nil
+        case 47: // "."
+            rulerWindow.rule.setReferencePoint(location: NSEvent.mouseLocation)
+            otherWindow?.rule.setReferencePoint(location: NSEvent.mouseLocation)
             return nil
         default:
             return event
