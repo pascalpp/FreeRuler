@@ -1,1 +1,3 @@
 xcuserdata
+node_modules
+help/build/*.html
