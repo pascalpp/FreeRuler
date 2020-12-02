@@ -51,6 +51,8 @@ class RuleView: NSView {
 
 }
 
+fileprivate let mmPerIn: CGFloat = 25.4
+
 public extension NSScreen {
     
     var dpmm: CGSize {
@@ -62,12 +64,11 @@ public extension NSScreen {
         } else {
             // This is the same as what CoreGraphics assumes if no EDID data is available from the display device
             // https://developer.apple.com/documentation/coregraphics/1456599-cgdisplayscreensize
-            return CGSize(width: 72.0, height: 72.0)
+            return CGSize(width: 72.0 / mmPerIn, height: 72.0 / mmPerIn)
         }
     }
     
     var dpi: CGSize {
-        let mmPerIn: CGFloat = 25.4
         return CGSize(width: mmPerIn * dpmm.width,
                       height: mmPerIn * dpmm.height)
     }
