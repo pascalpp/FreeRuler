@@ -31,33 +31,68 @@ class VerticalRule: RuleView {
             .foregroundColor: color.numbers
        ]
 
-        let width = Int(dirtyRect.width)
-        let height = Int(dirtyRect.height)
+        let width = dirtyRect.width
+        let height = dirtyRect.height
         let path = NSBezierPath()
+        let tickScale: CGFloat
+        let textScale: Int
+        let largeTicks: Int
+        let mediumTicks: Int
+        let smallTicks: Int
+        let tinyTicks: Int?
+        
+        switch unit {
+        case .millimetres:
+            tickScale = NSScreen.main!.dpmm.width       // TODO: handle .main == nil
+            textScale = 1
+            largeTicks = 10
+            mediumTicks = 5
+            smallTicks = 1
+            tinyTicks = nil
+        case .inches:
+            tickScale = NSScreen.main!.dpi.width / 16   // TODO: handle .main == nil
+            textScale = 16
+            largeTicks = 16
+            mediumTicks = 8
+            smallTicks = 4
+            tinyTicks = 1
+        default:
+            tickScale = 1
+            textScale = 1
+            largeTicks = 50
+            mediumTicks = 10
+            smallTicks = 2
+            tinyTicks = nil
+        }
 
         // substract two so ticks don't overlap with border
         // substract from this range so we can use the height var for position calculations
-        for i in 1...height - 2 {
-            if i.isMultiple(of: 50) {
-                path.move(to: CGPoint(x: width - 1, y: height - i))
-                path.line(to: CGPoint(x: width - 10, y: height - i))
+        for i in 1...Int((height - 2) / tickScale) {
+            let pos = CGFloat(i) * tickScale
+            if i.isMultiple(of: largeTicks) {
+                path.move(to: CGPoint(x: width - 1, y: height - pos))
+                path.line(to: CGPoint(x: width - 10, y: height - pos))
 
-                let label = String(i)
+                let label = String(i / textScale)
                 label.draw(
-                    with: CGRect(x: 3, y: CGFloat(height - i) - 13.5, width: 24, height: 20),
+                    with: CGRect(x: 3, y: height - pos - 13.5, width: 24, height: 20),
                     options: .usesLineFragmentOrigin,
                     attributes: attrs,
                     context: nil
                 )
 
             }
-            else if i.isMultiple(of: 10) {
-                path.move(to: CGPoint(x: width - 1, y: height - i))
-                path.line(to: CGPoint(x: width - 8, y: height - i))
+            else if i.isMultiple(of: mediumTicks) {
+                path.move(to: CGPoint(x: width - 1, y: height - pos))
+                path.line(to: CGPoint(x: width - 8, y: height - pos))
             }
-            else if i.isMultiple(of: 2) {
-                path.move(to: CGPoint(x: width - 1, y: height - i))
-                path.line(to: CGPoint(x: width - 5, y: height - i))
+            else if i.isMultiple(of: smallTicks) {
+                path.move(to: CGPoint(x: width - 1, y: height - pos))
+                path.line(to: CGPoint(x: width - 5, y: height - pos))
+            }
+            else if let tinyTicks = tinyTicks, i.isMultiple(of: tinyTicks) {
+                path.move(to: CGPoint(x: width - 1, y: height - pos))
+                path.line(to: CGPoint(x: width - 3, y: height - pos))
             }
         }
 
@@ -114,7 +149,16 @@ class VerticalRule: RuleView {
             NSAttributedString.Key.backgroundColor: color.fill,
         ]
 
-        let label = String(Int(number))
+        let label: String
+        switch unit {
+        case .millimetres:
+            label = String(format: "%.1f", number / NSScreen.main!.dpmm.width)  // TODO: handle .main == nil
+        case .inches:
+            label = String(format: "%.3f", number / NSScreen.main!.dpi.width)   // TODO: handle .main == nil
+        default:
+            label = String(Int(number))
+        }
+
         label.draw(with: CGRect(x: 5, y: windowHeight - labelY, width: 40, height: 20), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
 
     }
