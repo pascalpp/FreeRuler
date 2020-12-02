@@ -48,12 +48,24 @@ class RuleView: NSView {
             }
         }
     }
+    
+    var screen: NSScreen? {
+        guard let window = window else {
+            return nil
+        }
+        return NSScreen.screens.first { $0.frame.contains(window.convertToScreen(frame).origin) }
+    }
 
 }
 
 fileprivate let mmPerIn: CGFloat = 25.4
 
 public extension NSScreen {
+
+    // This is the same as what CoreGraphics assumes if no EDID data is available from the display device
+    // https://developer.apple.com/documentation/coregraphics/1456599-cgdisplayscreensize
+    static let defaultDpi: CGFloat = 72.0
+    static let defaultDpmm: CGFloat = defaultDpi / mmPerIn
     
     var dpmm: CGSize {
         if let resolution = (deviceDescription[.size] as? NSValue)?.sizeValue,
@@ -62,9 +74,7 @@ public extension NSScreen {
             return CGSize(width: resolution.width / physicalSize.width,
                           height: resolution.height / physicalSize.height)
         } else {
-            // This is the same as what CoreGraphics assumes if no EDID data is available from the display device
-            // https://developer.apple.com/documentation/coregraphics/1456599-cgdisplayscreensize
-            return CGSize(width: 72.0 / mmPerIn, height: 72.0 / mmPerIn)
+            return CGSize(width: NSScreen.defaultDpmm, height: NSScreen.defaultDpmm)
         }
     }
     
