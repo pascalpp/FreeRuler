@@ -8,9 +8,16 @@ struct RulerColors {
     let mouseNumber = #colorLiteral(red: 0.3098039329, green: 0.2039215714, blue: 0.03921568766, alpha: 1)
 }
 
+enum Unit {
+    case pixels
+    case millimetres
+    case inches
+}
+
 class RuleView: NSView {
 
     let color = RulerColors()
+    let unit = Unit.millimetres
 
     var trackingArea: NSTrackingArea?
     let trackingAreaOptions: NSTrackingArea.Options = [
