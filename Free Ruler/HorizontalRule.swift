@@ -39,7 +39,7 @@ class HorizontalRule: RuleView {
         let smallTicks: Int
         let tinyTicks: Int?
         
-        switch unit {
+        switch prefs.unit {
         case .millimetres:
             tickScale = NSScreen.main!.dpmm.width       // TODO: handle .main == nil
             textScale = 1
@@ -148,7 +148,7 @@ class HorizontalRule: RuleView {
         ]
 
         let label: String
-        switch unit {
+        switch prefs.unit {
         case .millimetres:
             label = String(format: "%.1f", number / NSScreen.main!.dpmm.width)  // TODO: handle .main == nil
         case .inches:

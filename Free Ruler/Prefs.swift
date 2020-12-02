@@ -13,6 +13,12 @@ import Foundation
 // MARK: - global shortcut to shared prefs instance
 let prefs = Prefs.shared
 
+@objc enum Unit: Int {
+    case pixels
+    case millimetres
+    case inches
+}
+
 class Prefs: NSObject {
 
     // MARK: - shared singleton instance
@@ -24,6 +30,7 @@ class Prefs: NSObject {
     @objc dynamic var rulerShadow       : Bool
     @objc dynamic var foregroundOpacity : Int
     @objc dynamic var backgroundOpacity : Int
+    @objc dynamic var unit              : Unit
 
     // MARK: - public save method
     func save() {
@@ -40,6 +47,7 @@ class Prefs: NSObject {
         "rulerShadow":       false,
         "foregroundOpacity": 90,
         "backgroundOpacity": 50,
+        "unit":              Unit.pixels.rawValue
     ]
 
     private override init() {
@@ -50,6 +58,7 @@ class Prefs: NSObject {
         rulerShadow       = defaults.bool(forKey: "rulerShadow")
         foregroundOpacity = defaults.integer(forKey: "foregroundOpacity")
         backgroundOpacity = defaults.integer(forKey: "backgroundOpacity")
+        unit              = Unit(rawValue: defaults.integer(forKey: "unit")) ?? .pixels
 
         super.init()
 
@@ -74,6 +83,9 @@ class Prefs: NSObject {
             },
             observe(\Prefs.backgroundOpacity, options: .new) { prefs, changed in
                 self.defaults.set(changed.newValue, forKey: "backgroundOpacity")
+            },
+            observe(\Prefs.unit, options: .new) { prefs, changed in
+                self.defaults.set(prefs.unit.rawValue, forKey: "unit")
             },
         ]
     }

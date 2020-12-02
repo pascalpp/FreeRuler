@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14868" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17506" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14868"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17506"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -17,6 +17,9 @@
                 <outlet property="alignRulersMenuItem" destination="iKV-uW-hwy" id="KQ1-Wu-ShT"/>
                 <outlet property="floatRulersMenuItem" destination="GDK-AC-uC8" id="552-nT-5F2"/>
                 <outlet property="groupRulersMenuItem" destination="7Ga-Fb-LLc" id="WrL-X9-6QE"/>
+                <outlet property="inchesMenuItem" destination="lt1-Hj-2TR" id="yV0-oN-4bC"/>
+                <outlet property="millimetresMenuItem" destination="B6Y-Hi-AkN" id="9Cc-tZ-RRZ"/>
+                <outlet property="pixelsMenuItem" destination="pYR-Ba-kKi" id="Wus-JK-rs3"/>
                 <outlet property="rulerShadowMenuItem" destination="a8D-hN-A59" id="FZM-pS-71y"/>
             </connections>
         </customObject>
@@ -133,6 +136,31 @@
                         </items>
                     </menu>
                 </menuItem>
+                <menuItem title="Unit" id="iDP-2z-irv">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Unit" id="z2p-dA-zcS">
+                        <items>
+                            <menuItem title="Pixels" state="on" id="pYR-Ba-kKi">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="setUnitPixels:" target="Voe-Tx-rLC" id="CKT-cD-v5a"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Millimetres" id="B6Y-Hi-AkN">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="setUnitMillimetres:" target="Voe-Tx-rLC" id="jOc-Pv-TID"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Inches" id="lt1-Hj-2TR">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="setUnitInches:" target="Voe-Tx-rLC" id="Apf-6P-Oz8"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
                 <menuItem title="Options" id="H8h-7b-M4v">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Options" id="HyV-fh-RgO">
@@ -208,6 +236,7 @@
                     </menu>
                 </menuItem>
             </items>
+            <point key="canvasLocation" x="-147" y="125"/>
         </menu>
         <menuItem title="Group Rulers" state="on" keyEquivalent="g" id="7SO-Lm-Ylr">
             <modifierMask key="keyEquivalentModifierMask"/>
