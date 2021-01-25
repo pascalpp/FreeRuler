@@ -28,5 +28,7 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>CFBundleHelpBookName</key>
+	<string>com.pascal.freeruler.help</string>
 </dict>
 </plist>
