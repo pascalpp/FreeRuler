@@ -1,0 +1,27 @@
+
+/* Class = "NSButtonCell"; title = "Reset Ruler Positions"; ObjectID = "10f-9L-qca"; */
+"10f-9L-qca.title" = "Nollaa viivainten sijainnit";
+
+/* Class = "NSTextFieldCell"; title = "Foreground Opacity"; ObjectID = "BgV-9N-IVn"; */
+"BgV-9N-IVn.title" = "Peittävyys edustalla";
+
+/* Class = "NSWindow"; title = "Free Ruler Preferences"; ObjectID = "F0z-JX-Cv5"; */
+"F0z-JX-Cv5.title" = "Free Rulerin asetukset";
+
+/* Class = "NSButtonCell"; title = "Group rulers"; ObjectID = "N2Y-8B-L9c"; */
+"N2Y-8B-L9c.title" = "Ryhmitä viivaimet";
+
+/* Class = "NSTextFieldCell"; title = "Label"; ObjectID = "VXi-Ch-Jf5"; */
+"VXi-Ch-Jf5.title" = "Label";
+
+/* Class = "NSTextFieldCell"; title = "Label"; ObjectID = "Vqd-CI-vmd"; */
+"Vqd-CI-vmd.title" = "Label";
+
+/* Class = "NSTextFieldCell"; title = "Background Opacity"; ObjectID = "cRb-8z-VZj"; */
+"cRb-8z-VZj.title" = "Peittävyys taustalla";
+
+/* Class = "NSButtonCell"; title = "Show ruler shadow"; ObjectID = "l53-85-hoA"; */
+"l53-85-hoA.title" = "Näytä viivainten varjot";
+
+/* Class = "NSButtonCell"; title = "Float rulers above other applications"; ObjectID = "yPM-Cw-Qsi"; */
+"yPM-Cw-Qsi.title" = "Kelluta viivaimia muiden sovellusten päällä";
