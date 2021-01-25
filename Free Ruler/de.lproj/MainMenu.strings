@@ -118,3 +118,18 @@
 
 /* Class = "NSMenuItem"; title = "Copy"; ObjectID = "x3v-GG-iWU"; */
 "x3v-GG-iWU.title" = "Kopieren";
+
+/* Class = "NSMenu"; title = "Unit"; ObjectID = "z2p-dA-zcS"; */
+"z2p-dA-zcS.title" = "Einheit";
+
+/* Class = "NSMenuItem"; title = "Unit"; ObjectID = "iDP-2z-irv"; */
+"iDP-2z-irv.title" = "Einheit";
+
+/* Class = "NSMenuItem"; title = "Pixels"; ObjectID = "pYR-Ba-kKi"; */
+"pYR-Ba-kKi.title" = "Pixel";
+
+/* Class = "NSMenuItem"; title = "Millimetres"; ObjectID = "B6Y-Hi-AkN"; */
+"B6Y-Hi-AkN.title" = "Millimeter";
+
+/* Class = "NSMenuItem"; title = "Inches"; ObjectID = "lt1-Hj-2TR"; */
+"lt1-Hj-2TR.title" = "Inch";

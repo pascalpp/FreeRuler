@@ -31,32 +31,66 @@ class HorizontalRule: RuleView {
             .foregroundColor: color.numbers
         ]
 
-        let width = Int(dirtyRect.width)
         let path = NSBezierPath()
+        let tickScale: CGFloat
+        let textScale: Int
+        let largeTicks: Int
+        let mediumTicks: Int
+        let smallTicks: Int
+        let tinyTicks: Int?
+        
+        switch prefs.unit {
+        case .millimetres:
+            tickScale = screen?.dpmm.width ?? NSScreen.defaultDpmm
+            textScale = 1
+            largeTicks = 10
+            mediumTicks = 5
+            smallTicks = 1
+            tinyTicks = nil
+        case .inches:
+            tickScale = (screen?.dpi.width ?? NSScreen.defaultDpi) / 16
+            textScale = 16
+            largeTicks = 16
+            mediumTicks = 8
+            smallTicks = 4
+            tinyTicks = 1
+        default:
+            tickScale = 1
+            textScale = 1
+            largeTicks = 50
+            mediumTicks = 10
+            smallTicks = 2
+            tinyTicks = nil
+        }
 
         // substract two so ticks don't overlap with border
         // subtract from this range so width var is accurate
-        for i in 1...width - 2 {
-            if i.isMultiple(of: 50) {
-                path.move(to: CGPoint(x: i, y: 1))
-                path.line(to: CGPoint(x: i, y: 10))
+        for i in 1...Int((dirtyRect.width - 2) / tickScale) {
+            let pos = CGFloat(i) * tickScale
+            if i.isMultiple(of: largeTicks) {
+                path.move(to: CGPoint(x: pos, y: 1))
+                path.line(to: CGPoint(x: pos, y: 10))
 
-                let label = String(i)
+                let label = String(i / textScale)
                 label.draw(
-                    with: CGRect(x: i - 20, y: 3, width: 40, height: 20),
+                    with: CGRect(x: pos - 20, y: 3, width: 40, height: 20),
                     options: .usesLineFragmentOrigin,
                     attributes: attrs,
                     context: nil
                 )
 
             }
-            else if i.isMultiple(of: 10) {
-                path.move(to: CGPoint(x: i, y: 1))
-                path.line(to: CGPoint(x: i, y: 8))
+            else if i.isMultiple(of: mediumTicks) {
+                path.move(to: CGPoint(x: pos, y: 1))
+                path.line(to: CGPoint(x: pos, y: 8))
             }
-            else if i.isMultiple(of: 2) {
-                path.move(to: CGPoint(x: i, y: 1))
-                path.line(to: CGPoint(x: i, y: 5))
+            else if i.isMultiple(of: smallTicks) {
+                path.move(to: CGPoint(x: pos, y: 1))
+                path.line(to: CGPoint(x: pos, y: 5))
+            }
+            else if let tinyTicks = tinyTicks, i.isMultiple(of: tinyTicks) {
+                path.move(to: CGPoint(x: pos, y: 1))
+                path.line(to: CGPoint(x: pos, y: 3))
             }
         }
 
@@ -113,7 +147,16 @@ class HorizontalRule: RuleView {
             NSAttributedString.Key.backgroundColor: color.fill,
         ]
 
-        let label = String(Int(number))
+        let label: String
+        switch prefs.unit {
+        case .millimetres:
+            label = String(format: "%.1f", number / (screen?.dpmm.width ?? NSScreen.defaultDpmm))
+        case .inches:
+            label = String(format: "%.3f", number / (screen?.dpi.width ?? NSScreen.defaultDpi))
+        default:
+            label = String(Int(number))
+        }
+        
         label.draw(with: CGRect(x: labelX, y: 20, width: labelWidth, height: 20), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
 
     }
