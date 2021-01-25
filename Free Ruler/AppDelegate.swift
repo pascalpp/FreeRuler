@@ -16,6 +16,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     let crosshair = NSCursor.crosshair
 
+    @IBOutlet weak var pixelsMenuItem: NSMenuItem!
+    @IBOutlet weak var millimetresMenuItem: NSMenuItem!
+    @IBOutlet weak var inchesMenuItem: NSMenuItem!
+    
     @IBOutlet weak var floatRulersMenuItem: NSMenuItem!
     @IBOutlet weak var groupRulersMenuItem: NSMenuItem!
     @IBOutlet weak var rulerShadowMenuItem: NSMenuItem!
@@ -41,6 +45,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func subscribeToPrefs() {
         observers = [
+            prefs.observe(\Prefs.unit, options: .new) { prefs, changed in
+                self.updateUnitMenu()
+            },
             prefs.observe(\Prefs.floatRulers, options: .new) { prefs, changed in
                 self.updateFloatRulersMenuItem()
             },
@@ -54,9 +61,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func updateDisplay() {
+        updateUnitMenu()
         updateFloatRulersMenuItem()
         updateGroupRulersMenuItem()
         updateRulerShadowMenuItem()
+    }
+    
+    func updateUnitMenu() {
+        pixelsMenuItem?.state      = prefs.unit == .pixels ? .on : .off
+        millimetresMenuItem?.state = prefs.unit == .millimetres ? .on : .off
+        inchesMenuItem?.state      = prefs.unit == .inches ? .on : .off
     }
 
     func updateFloatRulersMenuItem() {
@@ -106,7 +120,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         crosshair.pop()
     }
-
+    
+    @IBAction func setUnitPixels(_ sender: Any) {
+        prefs.unit = .pixels
+    }
+    @IBAction func setUnitMillimetres(_ sender: Any) {
+        prefs.unit = .millimetres
+    }
+    @IBAction func setUnitInches(_ sender: Any) {
+        prefs.unit = .inches
+    }
+    
     @IBAction func toggleFloatRulers(_ sender: Any) {
         prefs.floatRulers = !prefs.floatRulers
     }
