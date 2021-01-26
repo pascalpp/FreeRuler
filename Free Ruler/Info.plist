@@ -6,6 +6,10 @@
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleHelpBookFolder</key>
+	<string>FreeRuler.help</string>
+	<key>CFBundleHelpBookName</key>
+	<string>com.pascal.freeruler.help</string>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -28,9 +32,5 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-	<key>CFBundleHelpBookName</key>
-	<string>com.pascal.freeruler.help</string>
-	<key>CFBundleHelpBookFolder</key>
-	<string>FreeRuler.help</string>
 </dict>
 </plist>
