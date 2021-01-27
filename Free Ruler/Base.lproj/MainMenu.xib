@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17506" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17506"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -18,7 +18,7 @@
                 <outlet property="floatRulersMenuItem" destination="GDK-AC-uC8" id="552-nT-5F2"/>
                 <outlet property="groupRulersMenuItem" destination="7Ga-Fb-LLc" id="WrL-X9-6QE"/>
                 <outlet property="inchesMenuItem" destination="lt1-Hj-2TR" id="yV0-oN-4bC"/>
-                <outlet property="millimetresMenuItem" destination="B6Y-Hi-AkN" id="9Cc-tZ-RRZ"/>
+                <outlet property="millimetersMenuItem" destination="B6Y-Hi-AkN" id="9Cc-tZ-RRZ"/>
                 <outlet property="pixelsMenuItem" destination="pYR-Ba-kKi" id="Wus-JK-rs3"/>
                 <outlet property="rulerShadowMenuItem" destination="a8D-hN-A59" id="FZM-pS-71y"/>
             </connections>
@@ -146,7 +146,7 @@
                                     <action selector="setUnitPixels:" target="Voe-Tx-rLC" id="CKT-cD-v5a"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Millimetres" id="B6Y-Hi-AkN">
+                            <menuItem title="Millimeters" id="B6Y-Hi-AkN">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="setUnitMillimetres:" target="Voe-Tx-rLC" id="jOc-Pv-TID"/>
@@ -207,8 +207,8 @@
                                     <action selector="performMiniaturize:" target="-1" id="VwT-WD-YPe"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Zoom" id="R4o-n2-Eq4">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                            <menuItem title="Zoom" keyEquivalent="z" id="R4o-n2-Eq4">
+                                <modifierMask key="keyEquivalentModifierMask" control="YES"/>
                                 <connections>
                                     <action selector="performZoom:" target="-1" id="DIl-cC-cCs"/>
                                 </connections>
