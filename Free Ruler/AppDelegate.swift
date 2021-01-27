@@ -17,7 +17,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let crosshair = NSCursor.crosshair
 
     @IBOutlet weak var pixelsMenuItem: NSMenuItem!
-    @IBOutlet weak var millimetresMenuItem: NSMenuItem!
+    @IBOutlet weak var millimetersMenuItem: NSMenuItem!
     @IBOutlet weak var inchesMenuItem: NSMenuItem!
     
     @IBOutlet weak var floatRulersMenuItem: NSMenuItem!
@@ -69,7 +69,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func updateUnitMenu() {
         pixelsMenuItem?.state      = prefs.unit == .pixels ? .on : .off
-        millimetresMenuItem?.state = prefs.unit == .millimetres ? .on : .off
+        millimetersMenuItem?.state = prefs.unit == .millimeters ? .on : .off
         inchesMenuItem?.state      = prefs.unit == .inches ? .on : .off
     }
 
@@ -125,7 +125,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         prefs.unit = .pixels
     }
     @IBAction func setUnitMillimetres(_ sender: Any) {
-        prefs.unit = .millimetres
+        prefs.unit = .millimeters
     }
     @IBAction func setUnitInches(_ sender: Any) {
         prefs.unit = .inches

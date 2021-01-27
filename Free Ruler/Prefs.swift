@@ -15,7 +15,7 @@ let prefs = Prefs.shared
 
 @objc enum Unit: Int {
     case pixels
-    case millimetres
+    case millimeters
     case inches
 }
 

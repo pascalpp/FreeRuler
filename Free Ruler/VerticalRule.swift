@@ -42,7 +42,7 @@ class VerticalRule: RuleView {
         let tinyTicks: Int?
         
         switch prefs.unit {
-        case .millimetres:
+        case .millimeters:
             tickScale = screen?.dpmm.width ?? NSScreen.defaultDpmm
             textScale = 1
             largeTicks = 10
@@ -151,7 +151,7 @@ class VerticalRule: RuleView {
 
         let label: String
         switch prefs.unit {
-        case .millimetres:
+        case .millimeters:
             label = String(format: "%.1f", number / (screen?.dpmm.width ?? NSScreen.defaultDpmm))
         case .inches:
             label = String(format: "%.3f", number / (screen?.dpi.width ?? NSScreen.defaultDpi))
