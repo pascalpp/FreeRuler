@@ -19,7 +19,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBOutlet weak var pixelsMenuItem: NSMenuItem!
     @IBOutlet weak var millimetersMenuItem: NSMenuItem!
     @IBOutlet weak var inchesMenuItem: NSMenuItem!
-    
+    @IBOutlet weak var cycleUnitsMenuItem: NSMenuItem!
+
     @IBOutlet weak var floatRulersMenuItem: NSMenuItem!
     @IBOutlet weak var groupRulersMenuItem: NSMenuItem!
     @IBOutlet weak var rulerShadowMenuItem: NSMenuItem!
@@ -47,6 +48,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         observers = [
             prefs.observe(\Prefs.unit, options: .new) { prefs, changed in
                 self.updateUnitMenu()
+                self.redrawRulers()
             },
             prefs.observe(\Prefs.floatRulers, options: .new) { prefs, changed in
                 self.updateFloatRulersMenuItem()
@@ -71,6 +73,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         pixelsMenuItem?.state      = prefs.unit == .pixels ? .on : .off
         millimetersMenuItem?.state = prefs.unit == .millimeters ? .on : .off
         inchesMenuItem?.state      = prefs.unit == .inches ? .on : .off
+    }
+
+    func redrawRulers() {
+        for ruler in rulers {
+            ruler.rulerWindow.rule.setNeedsDisplay(ruler.rulerWindow.rule.visibleRect)
+        }
     }
 
     func updateFloatRulersMenuItem() {
@@ -130,7 +138,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBAction func setUnitInches(_ sender: Any) {
         prefs.unit = .inches
     }
-    
+    @IBAction func cycleUnits(_ sender: Any) {
+        switch prefs.unit {
+        case .pixels:
+            prefs.unit = .millimeters
+        case .millimeters:
+            prefs.unit = .inches
+        case .inches:
+            prefs.unit = .pixels
+        }
+    }
+
     @IBAction func toggleFloatRulers(_ sender: Any) {
         prefs.floatRulers = !prefs.floatRulers
     }
