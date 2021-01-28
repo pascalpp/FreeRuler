@@ -25,12 +25,14 @@ class HorizontalRule: RuleView {
 
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .center
+        paragraphStyle.lineHeightMultiple = 1
         let attrs: [NSAttributedString.Key: Any] = [
             .font: NSFont(name: "HelveticaNeue", size: 10)!,
             .paragraphStyle: paragraphStyle,
             .foregroundColor: color.numbers
         ]
 
+        let width = dirtyRect.width
         let path = NSBezierPath()
         let tickScale: CGFloat
         let textScale: Int
@@ -63,18 +65,26 @@ class HorizontalRule: RuleView {
             tinyTicks = nil
         }
 
+        let labelWidth: CGFloat = 50
+        let labelHeight: CGFloat = 20
+        let labelOffset: CGFloat = 13 // offset of label from bottom edge of ruler
+
         // substract two so ticks don't overlap with border
         // subtract from this range so width var is accurate
-        for i in 1...Int((dirtyRect.width - 2) / tickScale) {
+        for i in 1...Int((width - 2) / tickScale) {
             let pos = CGFloat(i) * tickScale
             if i.isMultiple(of: largeTicks) {
                 path.move(to: CGPoint(x: pos, y: 1))
                 path.line(to: CGPoint(x: pos, y: 10))
 
                 let label = String(i / textScale)
+                let labelX: CGFloat = pos - (labelWidth / 2) + 0.5 // half-pixel nudge /shrug
+                let labelY: CGFloat = labelOffset
+                let labelRect = CGRect(x: labelX, y: labelY, width: labelWidth, height: labelHeight)
+                // labelRect.frame() // for debugging
+
                 label.draw(
-                    with: CGRect(x: pos - 20, y: 3, width: 40, height: 20),
-                    options: .usesLineFragmentOrigin,
+                    with: labelRect,
                     attributes: attrs,
                     context: nil
                 )

@@ -25,6 +25,7 @@ class VerticalRule: RuleView {
 
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .right
+        paragraphStyle.lineHeightMultiple = 1
         let attrs: [NSAttributedString.Key: Any] = [
             .font: NSFont(name: "HelveticaNeue", size: 10)!,
             .paragraphStyle: paragraphStyle,
@@ -65,6 +66,11 @@ class VerticalRule: RuleView {
             tinyTicks = nil
         }
 
+        let labelWidth: CGFloat = 50
+        let labelHeight: CGFloat = 20
+        let labelOffset: CGFloat = 13 // offset of label from right edge of ruler
+        let textHeight: CGFloat = 8   // height of text, used to center the label next to the tick
+
         // substract two so ticks don't overlap with border
         // substract from this range so we can use the height var for position calculations
         for i in 1...Int((height - 2) / tickScale) {
@@ -74,9 +80,13 @@ class VerticalRule: RuleView {
                 path.line(to: CGPoint(x: width - 10, y: height - pos))
 
                 let label = String(i / textScale)
+                let labelX = width - labelWidth - labelOffset
+                let labelY = height - pos - (textHeight / 2)
+                let labelRect = CGRect(x: labelX, y: labelY, width: labelWidth, height: labelHeight)
+                // labelRect.frame() // for debugging
+
                 label.draw(
-                    with: CGRect(x: 3, y: height - pos - 13.5, width: 24, height: 20),
-                    options: .usesLineFragmentOrigin,
+                    with: labelRect,
                     attributes: attrs,
                     context: nil
                 )
@@ -152,14 +162,21 @@ class VerticalRule: RuleView {
         let label: String
         switch prefs.unit {
         case .millimeters:
-            label = String(format: "%.1f", number / (screen?.dpmm.width ?? NSScreen.defaultDpmm))
+            label = String(format: "%.1f  ", number / (screen?.dpmm.width ?? NSScreen.defaultDpmm))
         case .inches:
-            label = String(format: "%.3f", number / (screen?.dpi.width ?? NSScreen.defaultDpi))
+            label = String(format: "%.3f  ", number / (screen?.dpi.width ?? NSScreen.defaultDpi))
         default:
-            label = String(Int(number))
+            label = String(format: "%d  ", Int(number))
         }
 
-        label.draw(with: CGRect(x: 5, y: windowHeight - labelY, width: 40, height: 20), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
+        let labeRect = CGRect(x: 5, y: windowHeight - labelY, width: 40, height: 20)
+
+        label.draw(
+            with: labeRect,
+            options: .usesLineFragmentOrigin,
+            attributes: attrs,
+            context: nil
+        )
 
     }
 
