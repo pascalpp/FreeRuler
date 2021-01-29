@@ -41,6 +41,14 @@ class RuleView: NSView {
         fatalError("RuleView subclass must override drawMouseTick method.")
     }
 
+    var windowWidth: CGFloat {
+        return self.window?.frame.width ?? 0
+    }
+
+    var windowHeight: CGFloat {
+        return self.window?.frame.height ?? 0
+    }
+
     var showMouseTick: Bool = true {
         didSet {
             if showMouseTick != oldValue {
@@ -54,6 +62,28 @@ class RuleView: NSView {
             return nil
         }
         return NSScreen.screens.first { $0.frame.contains(window.convertToScreen(frame).origin) }
+    }
+
+    func getUnitLabel() -> String {
+        switch prefs.unit {
+        case .pixels:
+            return "PX"
+        case .millimeters:
+            return "MM"
+        case .inches:
+            return "IN"
+        }
+    }
+
+    func getMouseNumberLabel(_ number: CGFloat) -> String {
+        switch prefs.unit {
+        case .pixels:
+            return String(format: "%d", Int(number))
+        case .millimeters:
+            return String(format: "%.1f", number / (screen?.dpmm.width ?? NSScreen.defaultDpmm))
+        case .inches:
+            return String(format: "%.3f", number / (screen?.dpi.width ?? NSScreen.defaultDpi))
+        }
     }
 
 }
@@ -84,3 +114,22 @@ public extension NSScreen {
     }
     
 }
+
+//public extension CGRect {
+//
+//    func verticalCenteredRectForString(string:NSString,withAttributes attributes : [String:AnyObject])->CGRect {
+//        let size = string.sizeWithAttributes(attributes)
+//        return CGRectMake(self.origin.x, self.origin.y + (self.size.height-size.height)/2.0 , self.size.width, size.height)
+//    }
+//
+//}
+
+
+//public extension String {
+
+//    func drawVerticallyCentered(in rect: CGRect, withAttributes attributes: [NSAttributedStringKey : Any]? = nil) {
+//        let size = self.size(withAttributes: attributes)
+//        let centeredRect = CGRect(x: rect.origin.x, y: rect.origin.y + (rect.size.height-size.height)/2.0, width: rect.size.width, height: size.height)
+//        self.draw(in: centeredRect, withAttributes: attributes)
+//    }
+//}

@@ -12,10 +12,6 @@ class VerticalRule: RuleView {
         }
     }
 
-    var windowHeight: CGFloat {
-        return self.window?.frame.height ?? 0
-    }
-
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
 
@@ -111,6 +107,10 @@ class VerticalRule: RuleView {
         color.ticks.setStroke()
         path.stroke()
 
+        if self.windowHeight - mouseTickY < 0 || windowHeight - mouseTickY > 10 {
+            drawUnitLabel()
+        }
+
         // Draw the MouseTick & number
         if showMouseTick && mouseTickY >= 1 && mouseTickY < windowHeight {
             drawMouseTick(mouseTickY)
@@ -139,45 +139,61 @@ class VerticalRule: RuleView {
     }
 
     func drawMouseNumber(_ mouseTickY: CGFloat) {
+        let height = self.frame.height
+        let number = height - mouseTickY
+        let labelOffset: CGFloat = 2
+
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .left
 
-        let number = windowHeight - mouseTickY
-
-        // draw below the tick
-        var labelY = number + 23
-
-        if labelY > windowHeight - 15 {
-            // switch to above the tick
-            labelY = number
-        }
-
-        let attrs = [
+        let attributes = [
             NSAttributedString.Key.font: NSFont(name: "HelveticaNeue", size: 10)!,
             NSAttributedString.Key.paragraphStyle: paragraphStyle,
             NSAttributedString.Key.foregroundColor: color.mouseNumber,
-            NSAttributedString.Key.backgroundColor: color.fill,
         ]
 
-        let label: String
-        switch prefs.unit {
-        case .millimeters:
-            label = String(format: "%.1f  ", number / (screen?.dpmm.width ?? NSScreen.defaultDpmm))
-        case .inches:
-            label = String(format: "%.3f  ", number / (screen?.dpi.width ?? NSScreen.defaultDpi))
-        default:
-            label = String(format: "%d  ", Int(number))
-        }
+        let mouseNumber = self.getMouseNumberLabel(number)
+        let label = NSAttributedString(string: mouseNumber, attributes: attributes)
+        let labelSize = label.size()
 
-        let labeRect = CGRect(x: 5, y: windowHeight - labelY, width: 40, height: 20)
+        // manually offsetting bottom position til i can figure out how to center text vertically in the label rect
+        let bottomPosition = number + 1;
+        let topPosition = number - labelOffset - labelSize.height
+        let enoughRoomToTheBottom = bottomPosition + labelSize.height < height - labelOffset
+        let labelY = enoughRoomToTheBottom ? bottomPosition : topPosition
+
+        let labelRect = CGRect(x: 7, y: height - (labelY + labelSize.height), width: 22, height: 15)
+        color.fill.setFill()
+        labelRect.fill()
 
         label.draw(
-            with: labeRect,
+            with: labelRect,
             options: .usesLineFragmentOrigin,
-            attributes: attrs,
             context: nil
         )
-
     }
+
+    func drawUnitLabel() {
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .left
+
+        let attributes = [
+            NSAttributedString.Key.font: NSFont(name: "HelveticaNeue", size: 10)!,
+            NSAttributedString.Key.paragraphStyle: paragraphStyle,
+            NSAttributedString.Key.foregroundColor: color.ticks,
+        ]
+
+        let unitlabel = self.getUnitLabel()
+        let label = NSAttributedString(string: unitlabel, attributes: attributes)
+        let height = self.frame.height
+        let labelSize = label.size()
+        let labelRect = CGRect(x: 8, y: height - labelSize.height - 2, width: labelSize.width, height: labelSize.height)
+
+        label.draw(
+            with: labelRect,
+            context: nil
+        )
+    }
+
 
 }

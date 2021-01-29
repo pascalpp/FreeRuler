@@ -12,10 +12,6 @@ class HorizontalRule: RuleView {
         }
     }
 
-    var windowWidth: CGFloat {
-        return self.window?.frame.width ?? 0
-    }
-
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
 
@@ -109,11 +105,16 @@ class HorizontalRule: RuleView {
         color.ticks.setStroke()
         path.stroke()
 
+        if mouseTickX < 0 || mouseTickX > 20 {
+            drawUnitLabel()
+        }
+
         // Draw the MouseTick & number
-        if showMouseTick && mouseTickX > 0 && mouseTickX < windowWidth {
+        if showMouseTick && mouseTickX > 0 && mouseTickX < self.windowWidth {
             drawMouseTick(mouseTickX)
             drawMouseNumber(mouseTickX)
         }
+
     }
 
     override func drawMouseTick(at mouseLoc: NSPoint) {
@@ -136,39 +137,57 @@ class HorizontalRule: RuleView {
     }
 
     func drawMouseNumber(_ mouseTickX: CGFloat) {
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.alignment = .left
-
         let number = mouseTickX
-        let labelWidth: CGFloat = 40
+        let width = self.frame.width
+        let height = self.frame.height
+        let labelOffset: CGFloat = 5
 
-        var labelX = number + 5 // 3px padding from the line
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .center
 
-        if labelX + labelWidth > windowWidth {
-            // Switch to the left of the tick
-            labelX = number - labelWidth - 5
-            paragraphStyle.alignment = .right
-        }
-
-        let attrs = [
+        let attributes = [
             NSAttributedString.Key.font: NSFont(name: "HelveticaNeue", size: 10)!,
             NSAttributedString.Key.paragraphStyle: paragraphStyle,
             NSAttributedString.Key.foregroundColor: color.mouseNumber,
-            NSAttributedString.Key.backgroundColor: color.fill,
         ]
 
-        let label: String
-        switch prefs.unit {
-        case .millimeters:
-            label = String(format: "%.1f", number / (screen?.dpmm.width ?? NSScreen.defaultDpmm))
-        case .inches:
-            label = String(format: "%.3f", number / (screen?.dpi.width ?? NSScreen.defaultDpi))
-        default:
-            label = String(Int(number))
-        }
-        
-        label.draw(with: CGRect(x: labelX, y: 20, width: labelWidth, height: 20), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
+        let mouseNumber = self.getMouseNumberLabel(number)
+        let label = NSAttributedString(string: mouseNumber, attributes: attributes)
+        let labelSize = label.size()
 
+        let rightPosition = number + labelOffset;
+        let leftPosition = number - labelOffset - labelSize.width
+        let enoughRoomToTheRight = rightPosition + labelSize.width < width - labelOffset
+        let labelX = enoughRoomToTheRight ? rightPosition : leftPosition
+
+        let labelRect = CGRect(x: labelX, y: height - labelSize.height, width: labelSize.width, height: labelSize.height)
+
+        label.draw(
+            with: labelRect,
+            context: nil
+        )
+    }
+
+    func drawUnitLabel() {
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .left
+
+        let attributes = [
+            NSAttributedString.Key.font: NSFont(name: "HelveticaNeue", size: 10)!,
+            NSAttributedString.Key.paragraphStyle: paragraphStyle,
+            NSAttributedString.Key.foregroundColor: color.ticks,
+        ]
+
+        let unitlabel = self.getUnitLabel()
+        let label = NSAttributedString(string: unitlabel, attributes: attributes)
+        let height = self.frame.height
+        let labelSize = label.size()
+        let labelRect = CGRect(x: 10, y: height - labelSize.height, width: labelSize.width, height: labelSize.height)
+
+        label.draw(
+            with: labelRect,
+            context: nil
+        )
     }
 
 }
