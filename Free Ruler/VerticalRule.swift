@@ -106,7 +106,7 @@ class VerticalRule: RuleView {
         color.ticks.setStroke()
         path.stroke()
 
-        if self.windowHeight - mouseTickY < 0 || windowHeight - mouseTickY > 10 {
+        if self.windowHeight - mouseTickY < 0 || windowHeight - mouseTickY > 18 {
             drawUnitLabel()
         }
 
