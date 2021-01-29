@@ -79,7 +79,6 @@ class VerticalRule: RuleView {
                 let labelX = width - labelWidth - labelOffset
                 let labelY = height - pos - (textHeight / 2)
                 let labelRect = CGRect(x: labelX, y: labelY, width: labelWidth, height: labelHeight)
-                // labelRect.frame() // for debugging
 
                 label.draw(
                     with: labelRect,

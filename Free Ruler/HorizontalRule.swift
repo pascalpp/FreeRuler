@@ -77,8 +77,7 @@ class HorizontalRule: RuleView {
                 let labelX: CGFloat = pos - (labelWidth / 2) + 0.5 // half-pixel nudge /shrug
                 let labelY: CGFloat = labelOffset
                 let labelRect = CGRect(x: labelX, y: labelY, width: labelWidth, height: labelHeight)
-                // labelRect.frame() // for debugging
-
+                
                 label.draw(
                     with: labelRect,
                     attributes: attrs,

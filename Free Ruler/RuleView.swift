@@ -114,22 +114,3 @@ public extension NSScreen {
     }
     
 }
-
-//public extension CGRect {
-//
-//    func verticalCenteredRectForString(string:NSString,withAttributes attributes : [String:AnyObject])->CGRect {
-//        let size = string.sizeWithAttributes(attributes)
-//        return CGRectMake(self.origin.x, self.origin.y + (self.size.height-size.height)/2.0 , self.size.width, size.height)
-//    }
-//
-//}
-
-
-//public extension String {
-
-//    func drawVerticallyCentered(in rect: CGRect, withAttributes attributes: [NSAttributedStringKey : Any]? = nil) {
-//        let size = self.size(withAttributes: attributes)
-//        let centeredRect = CGRect(x: rect.origin.x, y: rect.origin.y + (rect.size.height-size.height)/2.0, width: rect.size.width, height: size.height)
-//        self.draw(in: centeredRect, withAttributes: attributes)
-//    }
-//}
