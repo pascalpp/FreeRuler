@@ -246,11 +246,5 @@
             </items>
             <point key="canvasLocation" x="-147" y="125"/>
         </menu>
-        <menuItem title="Group Rulers" state="on" keyEquivalent="g" id="7SO-Lm-Ylr">
-            <modifierMask key="keyEquivalentModifierMask"/>
-            <connections>
-                <action selector="toggleGroupRulers:" target="Voe-Tx-rLC" id="RkN-cz-hMe"/>
-            </connections>
-        </menuItem>
     </objects>
 </document>
