@@ -21,7 +21,6 @@ class VerticalRule: RuleView {
 
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .right
-        paragraphStyle.lineHeightMultiple = 1
         let attrs: [NSAttributedString.Key: Any] = [
             .font: NSFont(name: "HelveticaNeue", size: 10)!,
             .paragraphStyle: paragraphStyle,
@@ -66,6 +65,7 @@ class VerticalRule: RuleView {
         let labelHeight: CGFloat = 20
         let labelOffset: CGFloat = 13 // offset of label from right edge of ruler
         let textHeight: CGFloat = 8   // height of text, used to center the label next to the tick
+        // TODO: refactor this to use label.size() logic (see func drawUnitLabel)
 
         // substract two so ticks don't overlap with border
         // substract from this range so we can use the height var for position calculations

@@ -21,7 +21,6 @@ class HorizontalRule: RuleView {
 
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .center
-        paragraphStyle.lineHeightMultiple = 1
         let attrs: [NSAttributedString.Key: Any] = [
             .font: NSFont(name: "HelveticaNeue", size: 10)!,
             .paragraphStyle: paragraphStyle,
@@ -64,6 +63,7 @@ class HorizontalRule: RuleView {
         let labelWidth: CGFloat = 50
         let labelHeight: CGFloat = 20
         let labelOffset: CGFloat = 13 // offset of label from bottom edge of ruler
+        // TODO: refactor this to use label.size() logic (see func drawUnitLabel)
 
         // substract two so ticks don't overlap with border
         // subtract from this range so width var is accurate
