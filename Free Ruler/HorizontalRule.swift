@@ -104,7 +104,7 @@ class HorizontalRule: RuleView {
         color.ticks.setStroke()
         path.stroke()
 
-        if mouseTickX < 0 || mouseTickX > 20 {
+        if !showMouseTick || mouseTickX < 0 || mouseTickX > 26 {
             drawUnitLabel()
         }
 
