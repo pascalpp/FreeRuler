@@ -132,7 +132,7 @@
 "B6Y-Hi-AkN.title" = "Millimeter";
 
 /* Class = "NSMenuItem"; title = "Inches"; ObjectID = "lt1-Hj-2TR"; */
-"lt1-Hj-2TR.title" = "Inch";
+"lt1-Hj-2TR.title" = "Zoll";
 
 /* Class = "NSMenuItem"; title = "Cycle Units"; ObjectID = "2nm-aL-kZd"; */
-"2nm-aL-kZd.title" = "Einheiten Durchlaufen";
+"2nm-aL-kZd.title" = "Nächste Einheit auswählen";
