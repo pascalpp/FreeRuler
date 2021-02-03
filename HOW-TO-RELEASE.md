@@ -3,6 +3,7 @@
 Mostly notes for myself.
 
 - Merge any PRs to be included in the release.
+- Create a new branch from master named vX.X.X
 - Get the number of commits:
 ```
 git log --pretty=oneline | wc -l
@@ -15,9 +16,16 @@ git log --pretty=oneline | wc -l
 - In the XCode Archives window, click Distribute App > Copy App.
 - Export the build to the `dist` folder in the repo. Compress just Free Ruler.app as free-ruler-X.X.X.zip. Delete the app and any extra folders created by the build process.
 - Commit the modified XCode project and the new zip file with the commit message 'Build vX.X.X'
+- Create a PR for the branch back to master.
+- Review and merge the PR.
 - Draft a new Github release https://github.com/pascalpp/FreeRuler/releases/new. Use v.X.X.X as the title and tag for the release. Describe changes with #XX references to closed tickets. Attach the new zip file to the release.
 - Publish.
 
 ## App Store Release
 - In the XCode Archives window, click Distribute App > App Store Connect > Upload.
 - Visit https://appstoreconnect.apple.com and submit the new build for review.
+- Create a new version (green plus button).
+- Add the new build.
+- Update release information with new features, etc.
+- Save
+- Submit for Review
