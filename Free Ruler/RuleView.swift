@@ -61,7 +61,7 @@ class RuleView: NSView {
         guard let window = window else {
             return nil
         }
-        return NSScreen.screens.first { $0.frame.contains(window.convertToScreen(frame).origin) }
+        return NSScreen.screens.first { $0.frame.intersects(window.convertToScreen(frame)) }
     }
 
     func getUnitLabel() -> String {
