@@ -15,6 +15,7 @@
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="Free_Ruler" customModuleProvider="target">
             <connections>
                 <outlet property="alignRulersMenuItem" destination="iKV-uW-hwy" id="KQ1-Wu-ShT"/>
+                <outlet property="cycleUnitsMenuItem" destination="2nm-aL-kZd" id="cec-5d-z3z"/>
                 <outlet property="floatRulersMenuItem" destination="GDK-AC-uC8" id="552-nT-5F2"/>
                 <outlet property="groupRulersMenuItem" destination="7Ga-Fb-LLc" id="WrL-X9-6QE"/>
                 <outlet property="inchesMenuItem" destination="lt1-Hj-2TR" id="yV0-oN-4bC"/>
@@ -158,6 +159,13 @@
                                     <action selector="setUnitInches:" target="Voe-Tx-rLC" id="Apf-6P-Oz8"/>
                                 </connections>
                             </menuItem>
+                            <menuItem isSeparatorItem="YES" id="tK2-3l-lAd"/>
+                            <menuItem title="Cycle Units" keyEquivalent="u" id="2nm-aL-kZd">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="cycleUnits:" target="Voe-Tx-rLC" id="jzB-to-aha"/>
+                                </connections>
+                            </menuItem>
                         </items>
                     </menu>
                 </menuItem>
@@ -238,11 +246,5 @@
             </items>
             <point key="canvasLocation" x="-147" y="125"/>
         </menu>
-        <menuItem title="Group Rulers" state="on" keyEquivalent="g" id="7SO-Lm-Ylr">
-            <modifierMask key="keyEquivalentModifierMask"/>
-            <connections>
-                <action selector="toggleGroupRulers:" target="Voe-Tx-rLC" id="RkN-cz-hMe"/>
-            </connections>
-        </menuItem>
     </objects>
 </document>

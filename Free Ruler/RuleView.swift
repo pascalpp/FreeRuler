@@ -41,6 +41,14 @@ class RuleView: NSView {
         fatalError("RuleView subclass must override drawMouseTick method.")
     }
 
+    var windowWidth: CGFloat {
+        return self.window?.frame.width ?? 0
+    }
+
+    var windowHeight: CGFloat {
+        return self.window?.frame.height ?? 0
+    }
+
     var showMouseTick: Bool = true {
         didSet {
             if showMouseTick != oldValue {
@@ -54,6 +62,28 @@ class RuleView: NSView {
             return nil
         }
         return NSScreen.screens.first { $0.frame.intersects(window.convertToScreen(frame)) }
+    }
+
+    func getUnitLabel() -> String {
+        switch prefs.unit {
+        case .pixels:
+            return "px"
+        case .millimeters:
+            return "mm"
+        case .inches:
+            return "in"
+        }
+    }
+
+    func getMouseNumberLabel(_ number: CGFloat) -> String {
+        switch prefs.unit {
+        case .pixels:
+            return String(format: "%d", Int(number))
+        case .millimeters:
+            return String(format: "%.1f", number / (screen?.dpmm.width ?? NSScreen.defaultDpmm))
+        case .inches:
+            return String(format: "%.3f", number / (screen?.dpi.width ?? NSScreen.defaultDpi))
+        }
     }
 
 }

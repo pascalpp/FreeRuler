@@ -7,7 +7,7 @@ A ruler application for Mac OS X
 ### Features
 
 - Horizontal and vertical rulers.
-- Pixel units.
+- Choose from units: pixels, millimeters, or inches (press U to cycle).
 - Float rulers above other applications (press F to toggle).
 - Move windows independently or as a group (press G to toggle).
 - Show or hide the shadow behind rulers (press S to toggle).
