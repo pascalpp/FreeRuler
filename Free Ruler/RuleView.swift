@@ -67,11 +67,11 @@ class RuleView: NSView {
     func getUnitLabel() -> String {
         switch prefs.unit {
         case .pixels:
-            return "PX"
+            return "px"
         case .millimeters:
-            return "MM"
+            return "mm"
         case .inches:
-            return "IN"
+            return "in"
         }
     }
 
