@@ -263,6 +263,10 @@ extension RulerController {
         case kVK_DownArrow:
             rulerWindow.nudgeDown(withShift: shift)
             return nil
+        case 47: // "."
+            rulerWindow.rule.flipReferencePoint(location: NSEvent.mouseLocation)
+            otherWindow?.rule.flipReferencePoint(location: NSEvent.mouseLocation)
+            return nil
         default:
             return event
         }

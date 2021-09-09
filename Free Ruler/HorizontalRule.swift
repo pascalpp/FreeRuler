@@ -35,7 +35,7 @@ class HorizontalRule: RuleView {
         let mediumTicks: Int
         let smallTicks: Int
         let tinyTicks: Int?
-        
+
         switch prefs.unit {
         case .millimeters:
             tickScale = screen?.dpmm.width ?? NSScreen.defaultDpmm
@@ -77,7 +77,7 @@ class HorizontalRule: RuleView {
                 let labelX: CGFloat = pos - (labelWidth / 2) + 0.5 // half-pixel nudge /shrug
                 let labelY: CGFloat = labelOffset
                 let labelRect = CGRect(x: labelX, y: labelY, width: labelWidth, height: labelHeight)
-                
+
                 label.draw(
                     with: labelRect,
                     attributes: attrs,
@@ -122,6 +122,15 @@ class HorizontalRule: RuleView {
         self.mouseTickX = mouseX - windowX
     }
 
+    func relativeX(mouseTickX: CGFloat) -> CGFloat {
+        if let refLoc = getReferencePoint() {
+            let windowX = self.window?.frame.origin.x ?? 0
+            let correction = refLoc.x - windowX
+            return mouseTickX - correction
+        }
+        return mouseTickX
+    }
+
     func drawMouseTick(_ mouseTickX: CGFloat) {
         let mouseTick = NSBezierPath()
         let height: CGFloat = 40
@@ -150,7 +159,7 @@ class HorizontalRule: RuleView {
             NSAttributedString.Key.foregroundColor: color.mouseNumber,
         ]
 
-        let mouseNumber = self.getMouseNumberLabel(number)
+        let mouseNumber = self.getMouseNumberLabel(relativeX(mouseTickX: number))
         let label = NSAttributedString(string: mouseNumber, attributes: attributes)
         let labelSize = label.size()
 
