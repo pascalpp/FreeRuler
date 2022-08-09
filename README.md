@@ -1,12 +1,13 @@
 # Free Ruler
 
-A ruler application for Mac OS X
+A ruler application for macOS.
 
 ![icon_512x512](https://user-images.githubusercontent.com/1355312/57780292-f0c4b880-76f5-11e9-8933-36ab3bfccb14.png)
 
 ### Features
 
 - Horizontal and vertical rulers.
+- Pull on the ends of the rulers to lengthen (or shorten) them.
 - Choose from units: pixels, millimeters, or inches (press U to cycle).
 - Float rulers above other applications (press F to toggle).
 - Move windows independently or as a group (press G to toggle).
@@ -26,6 +27,6 @@ See [the list of open issues](https://github.com/pascalpp/FreeRuler/issues). For
 
 As this is my first Cocoa application, any help is appreciated!
 
-If you have experience with Mac app development in Swift, please look at the [help wanted issues](https://github.com/pascalpp/FreeRuler/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22+sort%3Aupdated-desc).
+If you have experience with macOS app development in Swift, please look at the [help wanted issues](https://github.com/pascalpp/FreeRuler/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22+sort%3Aupdated-desc).
 
 Or you can [make a donation](https://www.paypal.me/pascalpp).
