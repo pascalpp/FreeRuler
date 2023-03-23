@@ -1,0 +1,138 @@
+
+/* Class = "NSMenuItem"; title = "Free Ruler"; ObjectID = "1Xt-HY-uBw"; */
+"1Xt-HY-uBw.title" = "Free Ruler";
+
+/* Class = "NSMenuItem"; title = "Quit Free Ruler"; ObjectID = "4sb-4s-VLi"; */
+"4sb-4s-VLi.title" = "退出 Free Ruler";
+
+/* Class = "NSMenuItem"; title = "Edit"; ObjectID = "5QF-Oa-p0T"; */
+"5QF-Oa-p0T.title" = "编辑";
+
+/* Class = "NSMenuItem"; title = "About Free Ruler"; ObjectID = "5kV-Vb-QxS"; */
+"5kV-Vb-QxS.title" = "关于 Free Ruler";
+
+/* Class = "NSMenuItem"; title = "Redo"; ObjectID = "6dh-zS-Vam"; */
+"6dh-zS-Vam.title" = "重做";
+
+/* Class = "NSMenuItem"; title = "Reset Ruler Positions"; ObjectID = "6ph-5N-O9R"; */
+"6ph-5N-O9R.title" = "重置尺子位置";
+
+/* Class = "NSMenuItem"; title = "Group Rulers"; ObjectID = "7Ga-Fb-LLc"; */
+"7Ga-Fb-LLc.title" = "组合尺子";
+
+/* Class = "NSMenuItem"; title = "Group Rulers"; ObjectID = "7SO-Lm-Ylr"; */
+"7SO-Lm-Ylr.title" = "组合尺子";
+
+/* Class = "NSMenu"; title = "Main Menu"; ObjectID = "AYu-sK-qS6"; */
+"AYu-sK-qS6.title" = "Main Menu";
+
+/* Class = "NSMenuItem"; title = "Preferences…"; ObjectID = "BOF-NM-1cW"; */
+"BOF-NM-1cW.title" = "偏好设置…";
+
+/* Class = "NSMenuItem"; title = "Close"; ObjectID = "DVo-aG-piG"; */
+"DVo-aG-piG.title" = "关闭";
+
+/* Class = "NSMenu"; title = "Help"; ObjectID = "F2S-fz-NVQ"; */
+"F2S-fz-NVQ.title" = "帮助";
+
+/* Class = "NSMenuItem"; title = "Free Ruler Help"; ObjectID = "FKE-Sm-Kum"; */
+"FKE-Sm-Kum.title" = "Free Ruler 帮助";
+
+/* Class = "NSMenuItem"; title = "Float Rulers"; ObjectID = "GDK-AC-uC8"; */
+"GDK-AC-uC8.title" = "悬浮尺子";
+
+/* Class = "NSMenuItem"; title = "Options"; ObjectID = "H8h-7b-M4v"; */
+"H8h-7b-M4v.title" = "选项";
+
+/* Class = "NSMenu"; title = "Options"; ObjectID = "HyV-fh-RgO"; */
+"HyV-fh-RgO.title" = "选项";
+
+/* Class = "NSMenuItem"; title = "Show All"; ObjectID = "Kd2-mp-pUS"; */
+"Kd2-mp-pUS.title" = "显示全部";
+
+/* Class = "NSMenuItem"; title = "Bring All to Front"; ObjectID = "LE2-aR-0XJ"; */
+"LE2-aR-0XJ.title" = "全部置于顶层";
+
+/* Class = "NSMenuItem"; title = "Services"; ObjectID = "NMo-om-nkz"; */
+"NMo-om-nkz.title" = "服务";
+
+/* Class = "NSMenuItem"; title = "Minimize"; ObjectID = "OY7-WF-poV"; */
+"OY7-WF-poV.title" = "最小化";
+
+/* Class = "NSMenuItem"; title = "Hide Free Ruler"; ObjectID = "Olw-nP-bQN"; */
+"Olw-nP-bQN.title" = "隐藏 Free Ruler";
+
+/* Class = "NSMenuItem"; title = "Zoom"; ObjectID = "R4o-n2-Eq4"; */
+"R4o-n2-Eq4.title" = "缩放";
+
+/* Class = "NSMenuItem"; title = "Select All"; ObjectID = "Ruw-6m-B2m"; */
+"Ruw-6m-B2m.title" = "选择全部";
+
+/* Class = "NSMenu"; title = "Window"; ObjectID = "Td7-aD-5lo"; */
+"Td7-aD-5lo.title" = "窗口";
+
+/* Class = "NSMenuItem"; title = "Hide Others"; ObjectID = "Vdr-fp-XzO"; */
+"Vdr-fp-XzO.title" = "隐藏其他";
+
+/* Class = "NSMenu"; title = "Edit"; ObjectID = "W48-6f-4Dl"; */
+"W48-6f-4Dl.title" = "编辑";
+
+/* Class = "NSMenuItem"; title = "Paste and Match Style"; ObjectID = "WeT-3V-zwk"; */
+"WeT-3V-zwk.title" = "粘贴并匹配样式";
+
+/* Class = "NSMenuItem"; title = "Show Ruler Shadow"; ObjectID = "a8D-hN-A59"; */
+"a8D-hN-A59.title" = "显示尺子阴影";
+
+/* Class = "NSMenuItem"; title = "Window"; ObjectID = "aUF-d1-5bR"; */
+"aUF-d1-5bR.title" = "窗口";
+
+/* Class = "NSMenu"; title = "Ruler"; ObjectID = "bib-Uj-vzu"; */
+"bib-Uj-vzu.title" = "尺子";
+
+/* Class = "NSMenuItem"; title = "Ruler"; ObjectID = "dMs-cI-mzQ"; */
+"dMs-cI-mzQ.title" = "尺子";
+
+/* Class = "NSMenuItem"; title = "Undo"; ObjectID = "dRJ-4n-Yzg"; */
+"dRJ-4n-Yzg.title" = "撤销";
+
+/* Class = "NSMenuItem"; title = "Paste"; ObjectID = "gVA-U4-sdL"; */
+"gVA-U4-sdL.title" = "粘贴";
+
+/* Class = "NSMenu"; title = "Services"; ObjectID = "hz9-B4-Xy5"; */
+"hz9-B4-Xy5.title" = "服务";
+
+/* Class = "NSMenuItem"; title = "Align Rulers at Mouse Location"; ObjectID = "iKV-uW-hwy"; */
+"iKV-uW-hwy.title" = "将尺子与鼠标位置对齐";
+
+/* Class = "NSMenuItem"; title = "Delete"; ObjectID = "pa3-QI-u2k"; */
+"pa3-QI-u2k.title" = "删除";
+
+/* Class = "NSMenu"; title = "Free Ruler"; ObjectID = "uQy-DD-JDr"; */
+"uQy-DD-JDr.title" = "Free Ruler";
+
+/* Class = "NSMenuItem"; title = "Cut"; ObjectID = "uRl-iY-unG"; */
+"uRl-iY-unG.title" = "剪切";
+
+/* Class = "NSMenuItem"; title = "Help"; ObjectID = "wpr-3q-Mcd"; */
+"wpr-3q-Mcd.title" = "帮助";
+
+/* Class = "NSMenuItem"; title = "Copy"; ObjectID = "x3v-GG-iWU"; */
+"x3v-GG-iWU.title" = "拷贝";
+
+/* Class = "NSMenu"; title = "Unit"; ObjectID = "z2p-dA-zcS"; */
+"z2p-dA-zcS.title" = "单位";
+
+/* Class = "NSMenuItem"; title = "Unit"; ObjectID = "iDP-2z-irv"; */
+"iDP-2z-irv.title" = "单位";
+
+/* Class = "NSMenuItem"; title = "Pixels"; ObjectID = "pYR-Ba-kKi"; */
+"pYR-Ba-kKi.title" = "像素";
+
+/* Class = "NSMenuItem"; title = "Millimeters"; ObjectID = "B6Y-Hi-AkN"; */
+"B6Y-Hi-AkN.title" = "毫米";
+
+/* Class = "NSMenuItem"; title = "Inches"; ObjectID = "lt1-Hj-2TR"; */
+"lt1-Hj-2TR.title" = "英寸";
+
+/* Class = "NSMenuItem"; title = "Cycle Units"; ObjectID = "2nm-aL-kZd"; */
+"2nm-aL-kZd.title" = "循环单位";
