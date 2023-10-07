@@ -25,7 +25,7 @@ See [the list of open issues](https://github.com/pascalpp/FreeRuler/issues). For
 
 ### Contributing
 
-As this is my first Cocoa application, any help is appreciated!
+As this is my first Swift application, any help is appreciated!
 
 If you have experience with Mac app development in Swift, please look at the [help wanted issues](https://github.com/pascalpp/FreeRuler/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22+sort%3Aupdated-desc).
 
