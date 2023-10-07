@@ -7,6 +7,7 @@ A ruler application for Mac OS
 ### Features
 
 - Horizontal and vertical rulers.
+- Drag the end of each ruler to resize.
 - Choose from units: pixels, millimeters, or inches (press U to cycle).
 - Float rulers above other applications (press F to toggle).
 - Move windows independently or as a group (press G to toggle).
