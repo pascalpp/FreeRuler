@@ -16,7 +16,7 @@ git log --pretty=oneline | wc -l
 
 ## Github Release
 
-- In the XCode Archives window, click Distribute App > Copy App.
+- In the XCode Archives window, click Distribute App > Direct Distribution > Distribute.
 - Export the build to the `dist` folder in the repo. Compress just Free Ruler.app as free-ruler-X.X.X.zip. Delete the app and any extra folders created by the build process.
 - Commit the modified XCode project and the new zip file with the commit message 'Build vX.X.X'
 - Create a PR for the branch back to master.
