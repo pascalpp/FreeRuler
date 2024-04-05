@@ -15,14 +15,17 @@ Mostly notes for myself.
 ## Github Release
 
 - In the XCode Archives window, click Distribute App > Direct Distribution > Distribute.
-- Wait for notification from Apple notary service. Usually less than a minute.
-- Export the build to the `dist` folder in the repo. Compress Free Ruler.app as free-ruler-X.X.X.zip. `npm run zip`
-- Delete the app and any extra folders created by the build process.
+- Wait for notification from Apple notary service, usually less than a minute.
+- Export the build to `dist/Free Ruler.app`. Compress Free Ruler.app as free-ruler-X.X.X.zip. `npm run build:zip`
+- Delete the app and any extra folders created by the build process. (Should be handled by above command.)
 - Commit the modified XCode project and the new zip file with the commit message 'Build vX.X.X' `npm run build:commit`
-- Create a PR for the branch back to main.
+- Create a PR for the branch back to main. `npm run build:pr`
 - Review and merge the PR.
-- Draft a new Github release https://github.com/pascalpp/FreeRuler/releases/new. Use v.X.X.X as the title and tag for the release. Describe changes with #XX references to closed tickets. Attach the new zip file to the release.
-- Publish.
+- Switch to main and pull latest.
+- Create a tag for the release. `git build:tag`
+- Create a draft release: `git build:release`
+- Update the release notes. Describe changes with #XX references to closed tickets.
+- Publish the release.
 
 ## App Store Release
 
