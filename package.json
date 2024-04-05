@@ -10,7 +10,7 @@
     "bump:version": "npm version patch",
     "zip": "cd dist && zip -r free-ruler-$(npm run --silent get:version).zip 'Free Ruler.app' && rm -rf 'Free Ruler.app' && cd ..",
     "build:commit": "git add --all && git commit -am \"Build v$(npm run --silent get:version)\" && git push",
-    "build:pr": "gh pr create --title \"Build v$(npm run --silent get:version)\" --body \"Build v$(npm run --silent get:version)\" --base main",
+    "build:pr": "gh pr create --title \"Build v$(npm run --silent get:version)\" --body \"Build v$(npm run --silent get:version)\" --base main"
   },
   "repository": {
     "type": "git",
