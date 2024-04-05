@@ -21,7 +21,7 @@ Mostly notes for myself.
 - Commit the modified XCode project and the new zip file with the commit message 'Build vX.X.X' `npm run build:commit`
 - Create a PR for the branch back to main. `npm run build:pr`
 - Review and merge the PR.
-- Switch to main and pull latest.
+- Switch to main and pull latest. `git checkout main && git pull`
 - Create a tag for the release. `git build:tag`
 - Create a draft release: `git build:release`
 - Update the release notes. Describe changes with #XX references to closed tickets.
