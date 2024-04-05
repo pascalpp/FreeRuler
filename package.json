@@ -1,0 +1,21 @@
+{
+  "name": "freeruler",
+  "version": "2.0.8",
+  "description": "A free ruler for macOS",
+  "main": "none",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "get:version": "cat package.json | jq -r '.version'",
+    "get:commits": "git log --pretty=oneline | wc -l"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pascalpp/FreeRuler.git"
+  },
+  "author": "Pascal <pascal@pascal.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pascalpp/FreeRuler/issues"
+  },
+  "homepage": "https://github.com/pascalpp/FreeRuler#readme"
+}
