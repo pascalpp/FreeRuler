@@ -156,7 +156,7 @@ class VerticalRule: RuleView {
         let labelSize = label.size()
 
         // manually offsetting bottom position til i can figure out how to center text vertically in the label rect
-        let bottomPosition = number + 1;
+        let bottomPosition = number + 7;
         let topPosition = number - labelOffset - labelSize.height
         let enoughRoomToTheBottom = bottomPosition + labelSize.height < height - labelOffset
         let labelY = enoughRoomToTheBottom ? bottomPosition : topPosition
