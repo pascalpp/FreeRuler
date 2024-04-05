@@ -3,12 +3,10 @@
 Mostly notes for myself.
 
 - Merge any PRs to be included in the release.
+- Read the current version: `npm get:version`
 - Create a new branch from main named vX.X.X
-- Get the number of commits:
-
-```
-git log --pretty=oneline | wc -l
-```
+- Get the number of commits: `npm get:commits`
+- Bump the version number in package.json, using `npm version patch` (or minor, or major)
 
 - In XCode, bump the version and build number, using the number of commits as the build number. Example https://github.com/pascalpp/FreeRuler/commit/ed9f8db186b00125a78629a5e5569dfda9dd6285
 - In Xcode, choose Product > Archive
@@ -17,8 +15,10 @@ git log --pretty=oneline | wc -l
 ## Github Release
 
 - In the XCode Archives window, click Distribute App > Direct Distribution > Distribute.
-- Export the build to the `dist` folder in the repo. Compress just Free Ruler.app as free-ruler-X.X.X.zip. Delete the app and any extra folders created by the build process.
-- Commit the modified XCode project and the new zip file with the commit message 'Build vX.X.X'
+- Wait for notification from Apple notary service. Usually less than a minute.
+- Export the build to the `dist` folder in the repo. Compress Free Ruler.app as free-ruler-X.X.X.zip. `npm run zip`
+- Delete the app and any extra folders created by the build process.
+- Commit the modified XCode project and the new zip file with the commit message 'Build vX.X.X' `npm run build:commit`
 - Create a PR for the branch back to main.
 - Review and merge the PR.
 - Draft a new Github release https://github.com/pascalpp/FreeRuler/releases/new. Use v.X.X.X as the title and tag for the release. Describe changes with #XX references to closed tickets. Attach the new zip file to the release.
