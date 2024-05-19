@@ -1,0 +1,27 @@
+
+/* Class = "NSButtonCell"; title = "Reset Ruler Positions"; ObjectID = "10f-9L-qca"; */
+"10f-9L-qca.title" = "定規の位置を元に戻す";
+
+/* Class = "NSTextFieldCell"; title = "Foreground Opacity"; ObjectID = "BgV-9N-IVn"; */
+"BgV-9N-IVn.title" = "前景の不透明度";
+
+/* Class = "NSWindow"; title = "Free Ruler Preferences"; ObjectID = "F0z-JX-Cv5"; */
+"F0z-JX-Cv5.title" = "Free Rulerの環境設定";
+
+/* Class = "NSButtonCell"; title = "Group rulers"; ObjectID = "N2Y-8B-L9c"; */
+"N2Y-8B-L9c.title" = "定規をグループ化";
+
+/* Class = "NSTextFieldCell"; title = "Label"; ObjectID = "VXi-Ch-Jf5"; */
+"VXi-Ch-Jf5.title" = "ラベル";
+
+/* Class = "NSTextFieldCell"; title = "Label"; ObjectID = "Vqd-CI-vmd"; */
+"Vqd-CI-vmd.title" = "ラベル";
+
+/* Class = "NSTextFieldCell"; title = "Background Opacity"; ObjectID = "cRb-8z-VZj"; */
+"cRb-8z-VZj.title" = "背景の不透明度";
+
+/* Class = "NSButtonCell"; title = "Show ruler shadow"; ObjectID = "l53-85-hoA"; */
+"l53-85-hoA.title" = "定規の影を表示";
+
+/* Class = "NSButtonCell"; title = "Float rulers above other applications"; ObjectID = "yPM-Cw-Qsi"; */
+"yPM-Cw-Qsi.title" = "定規を常に手前に表示";
