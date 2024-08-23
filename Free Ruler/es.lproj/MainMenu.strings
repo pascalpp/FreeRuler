@@ -1,0 +1,135 @@
+
+/* Class = "NSMenuItem"; title = "Free Ruler"; ObjectID = "1Xt-HY-uBw"; */
+"1Xt-HY-uBw.title" = "Free Ruler";
+
+/* Class = "NSMenuItem"; title = "Cycle Units"; ObjectID = "2nm-aL-kZd"; */
+"2nm-aL-kZd.title" = "Alternar Unidades";
+
+/* Class = "NSMenuItem"; title = "Quit Free Ruler"; ObjectID = "4sb-4s-VLi"; */
+"4sb-4s-VLi.title" = "Salir de Free Ruler";
+
+/* Class = "NSMenuItem"; title = "Edit"; ObjectID = "5QF-Oa-p0T"; */
+"5QF-Oa-p0T.title" = "Editar";
+
+/* Class = "NSMenuItem"; title = "About Free Ruler"; ObjectID = "5kV-Vb-QxS"; */
+"5kV-Vb-QxS.title" = "Acerca de Free Ruler";
+
+/* Class = "NSMenuItem"; title = "Redo"; ObjectID = "6dh-zS-Vam"; */
+"6dh-zS-Vam.title" = "Rehacer";
+
+/* Class = "NSMenuItem"; title = "Reset Ruler Positions"; ObjectID = "6ph-5N-O9R"; */
+"6ph-5N-O9R.title" = "Reiniciar Posiciones de la Regla";
+
+/* Class = "NSMenuItem"; title = "Group Rulers"; ObjectID = "7Ga-Fb-LLc"; */
+"7Ga-Fb-LLc.title" = "Agrupar reglas";
+
+/* Class = "NSMenu"; title = "Main Menu"; ObjectID = "AYu-sK-qS6"; */
+"AYu-sK-qS6.title" = "Menú Principal";
+
+/* Class = "NSMenuItem"; title = "Millimeters"; ObjectID = "B6Y-Hi-AkN"; */
+"B6Y-Hi-AkN.title" = "Milímetros";
+
+/* Class = "NSMenuItem"; title = "Preferences…"; ObjectID = "BOF-NM-1cW"; */
+"BOF-NM-1cW.title" = "Preferencias…";
+
+/* Class = "NSMenuItem"; title = "Close"; ObjectID = "DVo-aG-piG"; */
+"DVo-aG-piG.title" = "Cerrar";
+
+/* Class = "NSMenu"; title = "Help"; ObjectID = "F2S-fz-NVQ"; */
+"F2S-fz-NVQ.title" = "Ayuda";
+
+/* Class = "NSMenuItem"; title = "Free Ruler Help"; ObjectID = "FKE-Sm-Kum"; */
+"FKE-Sm-Kum.title" = "Ayuda de Free Ruler";
+
+/* Class = "NSMenuItem"; title = "Float Rulers"; ObjectID = "GDK-AC-uC8"; */
+"GDK-AC-uC8.title" = "Reglas Flotantes";
+
+/* Class = "NSMenuItem"; title = "Options"; ObjectID = "H8h-7b-M4v"; */
+"H8h-7b-M4v.title" = "Opciones";
+
+/* Class = "NSMenu"; title = "Options"; ObjectID = "HyV-fh-RgO"; */
+"HyV-fh-RgO.title" = "Opciones";
+
+/* Class = "NSMenuItem"; title = "Show All"; ObjectID = "Kd2-mp-pUS"; */
+"Kd2-mp-pUS.title" = "Mostrar Todo";
+
+/* Class = "NSMenuItem"; title = "Bring All to Front"; ObjectID = "LE2-aR-0XJ"; */
+"LE2-aR-0XJ.title" = "Traer Todo al Frente";
+
+/* Class = "NSMenuItem"; title = "Services"; ObjectID = "NMo-om-nkz"; */
+"NMo-om-nkz.title" = "Servicios";
+
+/* Class = "NSMenuItem"; title = "Minimize"; ObjectID = "OY7-WF-poV"; */
+"OY7-WF-poV.title" = "Minimizar";
+
+/* Class = "NSMenuItem"; title = "Hide Free Ruler"; ObjectID = "Olw-nP-bQN"; */
+"Olw-nP-bQN.title" = "Ocultar Free Ruler";
+
+/* Class = "NSMenuItem"; title = "Zoom"; ObjectID = "R4o-n2-Eq4"; */
+"R4o-n2-Eq4.title" = "Zoom";
+
+/* Class = "NSMenuItem"; title = "Select All"; ObjectID = "Ruw-6m-B2m"; */
+"Ruw-6m-B2m.title" = "Seleccionar Todo";
+
+/* Class = "NSMenu"; title = "Window"; ObjectID = "Td7-aD-5lo"; */
+"Td7-aD-5lo.title" = "Ventana";
+
+/* Class = "NSMenuItem"; title = "Hide Others"; ObjectID = "Vdr-fp-XzO"; */
+"Vdr-fp-XzO.title" = "Ocultar Otras";
+
+/* Class = "NSMenu"; title = "Edit"; ObjectID = "W48-6f-4Dl"; */
+"W48-6f-4Dl.title" = "Editar";
+
+/* Class = "NSMenuItem"; title = "Paste and Match Style"; ObjectID = "WeT-3V-zwk"; */
+"WeT-3V-zwk.title" = "Pegar con el Mismo Estilo";
+
+/* Class = "NSMenuItem"; title = "Show Ruler Shadow"; ObjectID = "a8D-hN-A59"; */
+"a8D-hN-A59.title" = "Mostrar Sombra de la Regla";
+
+/* Class = "NSMenuItem"; title = "Window"; ObjectID = "aUF-d1-5bR"; */
+"aUF-d1-5bR.title" = "Ventana";
+
+/* Class = "NSMenu"; title = "Ruler"; ObjectID = "bib-Uj-vzu"; */
+"bib-Uj-vzu.title" = "Regla";
+
+/* Class = "NSMenuItem"; title = "Ruler"; ObjectID = "dMs-cI-mzQ"; */
+"dMs-cI-mzQ.title" = "Regla";
+
+/* Class = "NSMenuItem"; title = "Undo"; ObjectID = "dRJ-4n-Yzg"; */
+"dRJ-4n-Yzg.title" = "Deshacer";
+
+/* Class = "NSMenuItem"; title = "Paste"; ObjectID = "gVA-U4-sdL"; */
+"gVA-U4-sdL.title" = "Pegar";
+
+/* Class = "NSMenu"; title = "Services"; ObjectID = "hz9-B4-Xy5"; */
+"hz9-B4-Xy5.title" = "Servicios";
+
+/* Class = "NSMenuItem"; title = "Unit"; ObjectID = "iDP-2z-irv"; */
+"iDP-2z-irv.title" = "Unidad";
+
+/* Class = "NSMenuItem"; title = "Align Rulers at Mouse Location"; ObjectID = "iKV-uW-hwy"; */
+"iKV-uW-hwy.title" = "Alinear Reglas con el Ratón";
+
+/* Class = "NSMenuItem"; title = "Inches"; ObjectID = "lt1-Hj-2TR"; */
+"lt1-Hj-2TR.title" = "Pulgadas";
+
+/* Class = "NSMenuItem"; title = "Pixels"; ObjectID = "pYR-Ba-kKi"; */
+"pYR-Ba-kKi.title" = "Píxeles";
+
+/* Class = "NSMenuItem"; title = "Delete"; ObjectID = "pa3-QI-u2k"; */
+"pa3-QI-u2k.title" = "Borrar";
+
+/* Class = "NSMenu"; title = "Free Ruler"; ObjectID = "uQy-DD-JDr"; */
+"uQy-DD-JDr.title" = "Free Ruler";
+
+/* Class = "NSMenuItem"; title = "Cut"; ObjectID = "uRl-iY-unG"; */
+"uRl-iY-unG.title" = "Cortar";
+
+/* Class = "NSMenuItem"; title = "Help"; ObjectID = "wpr-3q-Mcd"; */
+"wpr-3q-Mcd.title" = "Ayuda";
+
+/* Class = "NSMenuItem"; title = "Copy"; ObjectID = "x3v-GG-iWU"; */
+"x3v-GG-iWU.title" = "Copiar";
+
+/* Class = "NSMenu"; title = "Unit"; ObjectID = "z2p-dA-zcS"; */
+"z2p-dA-zcS.title" = "Unidad";

@@ -1,0 +1,27 @@
+
+/* Class = "NSButtonCell"; title = "Reset Ruler Positions"; ObjectID = "10f-9L-qca"; */
+"10f-9L-qca.title" = "Reiniciar Posiciones de la Regla";
+
+/* Class = "NSTextFieldCell"; title = "Foreground Opacity"; ObjectID = "BgV-9N-IVn"; */
+"BgV-9N-IVn.title" = "Opacidad en Primer Plano";
+
+/* Class = "NSWindow"; title = "Free Ruler Preferences"; ObjectID = "F0z-JX-Cv5"; */
+"F0z-JX-Cv5.title" = "Preferencias de Free Rulers";
+
+/* Class = "NSButtonCell"; title = "Group rulers"; ObjectID = "N2Y-8B-L9c"; */
+"N2Y-8B-L9c.title" = "Agrupar reglas";
+
+/* Class = "NSTextFieldCell"; title = "Label"; ObjectID = "VXi-Ch-Jf5"; */
+"VXi-Ch-Jf5.title" = "Etiqueta";
+
+/* Class = "NSTextFieldCell"; title = "Label"; ObjectID = "Vqd-CI-vmd"; */
+"Vqd-CI-vmd.title" = "Etiqueta";
+
+/* Class = "NSTextFieldCell"; title = "Background Opacity"; ObjectID = "cRb-8z-VZj"; */
+"cRb-8z-VZj.title" = "Opacidad del Fondo";
+
+/* Class = "NSButtonCell"; title = "Show ruler shadow"; ObjectID = "l53-85-hoA"; */
+"l53-85-hoA.title" = "Mostrar sombra de la regla";
+
+/* Class = "NSButtonCell"; title = "Float rulers above other applications"; ObjectID = "yPM-Cw-Qsi"; */
+"yPM-Cw-Qsi.title" = "Reglas flotantes sobre otras aplicaciones";

@@ -73,6 +73,8 @@
 		8F629828243003FF004F9099 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/PreferencesController.strings; sourceTree = "<group>"; };
 		B894A5002BBFE61A005A3B6F /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		B894A5012BBFE61A005A3B6F /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/PreferencesController.strings; sourceTree = "<group>"; };
+		D9DBE8A12C791B1600A42589 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/MainMenu.strings; sourceTree = "<group>"; };
+		D9DBE8A22C791B1600A42589 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/PreferencesController.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -175,6 +177,7 @@
 				fi,
 				"zh-Hans",
 				ja,
+				es,
 			);
 			mainGroup = 6F41027C2260712F00F06A10;
 			productRefGroup = 6F4102862260712F00F06A10 /* Products */;
@@ -230,6 +233,7 @@
 				53AF6A4325A456E30076AAB7 /* fi */,
 				6F8CAA3A29CC8F7D00C4ED57 /* zh-Hans */,
 				B894A5012BBFE61A005A3B6F /* ja */,
+				D9DBE8A22C791B1600A42589 /* es */,
 			);
 			name = PreferencesController.xib;
 			sourceTree = "<group>";
@@ -242,6 +246,7 @@
 				53AF6A4225A456E30076AAB7 /* fi */,
 				6F8CAA3929CC8F7D00C4ED57 /* zh-Hans */,
 				B894A5002BBFE61A005A3B6F /* ja */,
+				D9DBE8A12C791B1600A42589 /* es */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
@@ -385,7 +390,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 302;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = X88CY268NZ;
+				DEVELOPMENT_TEAM = ER43ZD2S4U;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Free Ruler/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -412,7 +417,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 302;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = X88CY268NZ;
+				DEVELOPMENT_TEAM = ER43ZD2S4U;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Free Ruler/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
