@@ -19,6 +19,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBOutlet weak var pixelsMenuItem: NSMenuItem!
     @IBOutlet weak var millimetersMenuItem: NSMenuItem!
     @IBOutlet weak var inchesMenuItem: NSMenuItem!
+    @IBOutlet weak var scaledMenuItem: NSMenuItem!
     @IBOutlet weak var cycleUnitsMenuItem: NSMenuItem!
 
     @IBOutlet weak var floatRulersMenuItem: NSMenuItem!
@@ -27,6 +28,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBOutlet weak var alignRulersMenuItem: NSMenuItem!
 
     var preferencesController: PreferencesController? = nil
+    var scaleController: ScaleController? = nil
 
     // MARK: - Lifecycle
 
@@ -73,6 +75,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         pixelsMenuItem?.state      = prefs.unit == .pixels ? .on : .off
         millimetersMenuItem?.state = prefs.unit == .millimeters ? .on : .off
         inchesMenuItem?.state      = prefs.unit == .inches ? .on : .off
+        scaledMenuItem?.state      = prefs.unit == .scaled ? .on : .off
     }
 
     func redrawRulers() {
@@ -138,6 +141,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBAction func setUnitInches(_ sender: Any) {
         prefs.unit = .inches
     }
+    @IBAction func setUnitScaled(_ sender: Any) {
+        prefs.unit = .scaled
+    }
     @IBAction func cycleUnits(_ sender: Any) {
         switch prefs.unit {
         case .pixels:
@@ -145,6 +151,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         case .millimeters:
             prefs.unit = .inches
         case .inches:
+            prefs.unit = .scaled
+        case .scaled:
             prefs.unit = .pixels
         }
     }
@@ -170,6 +178,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    @IBAction func openScale(_ sender: Any) {
+        if scaleController == nil {
+            scaleController = ScaleController()            
+        }
+        
+        if scaleController != nil {
+            scaleController?.xRulerWidth = rulers[1].rulerWindow.frame.width;
+            scaleController?.yRulerHeight = rulers[0].rulerWindow.frame.height;
+            scaleController?.showWindow(self)
+        }
+    }
+    
     @IBAction func alignRulersAtMouseLocation(_ sender: Any) {
         var mouseLoc = NSEvent.mouseLocation
         mouseLoc.x = mouseLoc.x.rounded()

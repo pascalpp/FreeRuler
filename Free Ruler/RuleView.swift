@@ -72,10 +72,12 @@ class RuleView: NSView {
             return "mm"
         case .inches:
             return "in"
+        case .scaled:
+            return "sc"
         }
     }
 
-    func getMouseNumberLabel(_ number: CGFloat) -> String {
+    func getXMouseNumberLabel(_ number: CGFloat) -> String {
         switch prefs.unit {
         case .pixels:
             return String(format: "%d", Int(number))
@@ -83,6 +85,20 @@ class RuleView: NSView {
             return String(format: "%.1f", number / (screen?.dpmm.width ?? NSScreen.defaultDpmm))
         case .inches:
             return String(format: "%.3f", number / (screen?.dpi.width ?? NSScreen.defaultDpi))
+        case .scaled:
+            return String(format: "%.3f", number * prefs.xscale )
+        }
+    }
+    func getYMouseNumberLabel(_ number: CGFloat) -> String {
+        switch prefs.unit {
+        case .pixels:
+            return String(format: "%d", Int(number))
+        case .millimeters:
+            return String(format: "%.1f", number / (screen?.dpmm.width ?? NSScreen.defaultDpmm))
+        case .inches:
+            return String(format: "%.3f", number / (screen?.dpi.width ?? NSScreen.defaultDpi))
+        case .scaled:
+            return String(format: "%.3f", number * prefs.yscale )
         }
     }
 

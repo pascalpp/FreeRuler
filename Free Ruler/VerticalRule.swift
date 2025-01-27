@@ -52,6 +52,13 @@ class VerticalRule: RuleView {
             mediumTicks = 8
             smallTicks = 4
             tinyTicks = 1
+        case .scaled:
+            tickScale =  1 / prefs.yscale
+            textScale = 1
+            largeTicks = 10
+            mediumTicks = 5
+            smallTicks = 1
+            tinyTicks = nil
         default:
             tickScale = 1
             textScale = 1
@@ -151,7 +158,7 @@ class VerticalRule: RuleView {
             NSAttributedString.Key.foregroundColor: color.mouseNumber,
         ]
 
-        let mouseNumber = self.getMouseNumberLabel(number)
+        let mouseNumber = self.getYMouseNumberLabel(number)
         let label = NSAttributedString(string: mouseNumber, attributes: attributes)
         let labelSize = label.size()
 

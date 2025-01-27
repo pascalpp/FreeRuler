@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="23504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23504"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -22,6 +21,7 @@
                 <outlet property="millimetersMenuItem" destination="B6Y-Hi-AkN" id="9Cc-tZ-RRZ"/>
                 <outlet property="pixelsMenuItem" destination="pYR-Ba-kKi" id="Wus-JK-rs3"/>
                 <outlet property="rulerShadowMenuItem" destination="a8D-hN-A59" id="FZM-pS-71y"/>
+                <outlet property="scaledMenuItem" destination="4bj-UZ-A13" id="tRT-QG-OXU"/>
             </connections>
         </customObject>
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
@@ -159,11 +159,23 @@
                                     <action selector="setUnitInches:" target="Voe-Tx-rLC" id="Apf-6P-Oz8"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Scaled" id="4bj-UZ-A13">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="setUnitScaled:" target="Voe-Tx-rLC" id="qEj-TJ-1HO"/>
+                                </connections>
+                            </menuItem>
                             <menuItem isSeparatorItem="YES" id="tK2-3l-lAd"/>
                             <menuItem title="Cycle Units" keyEquivalent="u" id="2nm-aL-kZd">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="cycleUnits:" target="Voe-Tx-rLC" id="jzB-to-aha"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Set Scale..." keyEquivalent="s" id="efg-xu-6jd">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="openScale:" target="Voe-Tx-rLC" id="gYC-VA-6er"/>
                                 </connections>
                             </menuItem>
                         </items>

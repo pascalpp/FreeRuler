@@ -17,6 +17,7 @@ let prefs = Prefs.shared
     case pixels
     case millimeters
     case inches
+    case scaled
 }
 
 class Prefs: NSObject {
@@ -31,6 +32,8 @@ class Prefs: NSObject {
     @objc dynamic var foregroundOpacity : Int
     @objc dynamic var backgroundOpacity : Int
     @objc dynamic var unit              : Unit
+    @objc dynamic var xscale             : CGFloat
+    @objc dynamic var yscale             : CGFloat
 
     // MARK: - public save method
     func save() {
@@ -47,7 +50,9 @@ class Prefs: NSObject {
         "rulerShadow":       false,
         "foregroundOpacity": 90,
         "backgroundOpacity": 50,
-        "unit":              Unit.pixels.rawValue
+        "unit":              Unit.pixels.rawValue,
+        "xscale":            1.0,
+        "yscale":            1.0
     ]
 
     private override init() {
@@ -59,7 +64,9 @@ class Prefs: NSObject {
         foregroundOpacity = defaults.integer(forKey: "foregroundOpacity")
         backgroundOpacity = defaults.integer(forKey: "backgroundOpacity")
         unit              = Unit(rawValue: defaults.integer(forKey: "unit")) ?? .pixels
-
+        xscale             = CGFloat(defaults.float(forKey: "xscale"))
+        yscale             = CGFloat(defaults.float(forKey: "yscale"))
+        
         super.init()
 
         addObservers()
@@ -86,6 +93,12 @@ class Prefs: NSObject {
             },
             observe(\Prefs.unit, options: .new) { prefs, changed in
                 self.defaults.set(prefs.unit.rawValue, forKey: "unit")
+            },
+            observe(\Prefs.xscale, options: .new) { prefs, changed in
+                self.defaults.set(prefs.xscale.description, forKey: "xscale")
+            },
+            observe(\Prefs.yscale, options: .new) { prefs, changed in
+                self.defaults.set(prefs.yscale.description, forKey: "yscale")
             },
         ]
     }

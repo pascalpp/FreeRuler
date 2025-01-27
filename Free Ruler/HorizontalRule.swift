@@ -51,6 +51,13 @@ class HorizontalRule: RuleView {
             mediumTicks = 8
             smallTicks = 4
             tinyTicks = 1
+        case .scaled:
+            tickScale =  1 / prefs.xscale
+            textScale = 1 
+            largeTicks = 10
+            mediumTicks = 5
+            smallTicks = 1
+            tinyTicks = nil
         default:
             tickScale = 1
             textScale = 1
@@ -150,7 +157,7 @@ class HorizontalRule: RuleView {
             NSAttributedString.Key.foregroundColor: color.mouseNumber,
         ]
 
-        let mouseNumber = self.getMouseNumberLabel(number)
+        let mouseNumber = self.getXMouseNumberLabel(number)
         let label = NSAttributedString(string: mouseNumber, attributes: attributes)
         let labelSize = label.size()
 
@@ -188,5 +195,5 @@ class HorizontalRule: RuleView {
             context: nil
         )
     }
-
+ 
 }
