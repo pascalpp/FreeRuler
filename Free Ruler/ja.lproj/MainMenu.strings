@@ -62,6 +62,9 @@
 /* Class = "NSMenuItem"; title = "Minimize"; ObjectID = "OY7-WF-poV"; */
 "OY7-WF-poV.title" = "しまう";
 
+/* Class = "NSMenuItem"; title = "Close"; ObjectID = "n0M-rw-v5l"; */
+"n0M-rw-v5l.title" = "閉じる";
+
 /* Class = "NSMenuItem"; title = "Hide Free Ruler"; ObjectID = "Olw-nP-bQN"; */
 "Olw-nP-bQN.title" = "Free Rulerを非表示";
 

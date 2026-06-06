@@ -93,7 +93,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         rulerShadowMenuItem?.state = prefs.rulerShadow ? .on : .off
     }
 
-    func showRulers() {
+    func createRulersIfNeeded() {
+        guard rulers.isEmpty else { return }
+
         rulers = [
             RulerController(Ruler(.vertical, name: "vertical-ruler")),
             RulerController(Ruler(.horizontal, name: "horizontal-ruler")),
@@ -103,10 +105,89 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // TODO: provide each ruler with otherRulers: [RulerWindow]
         rulers[0].otherWindow = rulers[1].rulerWindow
         rulers[1].otherWindow = rulers[0].rulerWindow
+    }
+
+    func showRulers() {
+        createRulersIfNeeded()
 
         for ruler in rulers {
-            ruler.showWindow(self)
+            showRuler(ruler)
         }
+    }
+
+    func toggleRuler(orientation: Orientation) {
+        guard canToggleRulerVisibility else { return }
+        guard let ruler = rulerController(orientation: orientation) else { return }
+
+        if prefs.groupRulers {
+            prefs.groupRulers = false
+            detachRulerWindows()
+        }
+
+        if ruler.rulerWindow.isVisible {
+            detachRulerWindow(ruler.rulerWindow)
+            ruler.rulerWindow.orderOut(self)
+            updateRulerGrouping()
+        } else {
+            showRuler(ruler)
+        }
+    }
+
+    private func detachRulerWindows() {
+        for ruler in rulers {
+            detachRulerWindow(ruler.rulerWindow)
+        }
+    }
+
+    private func rulerController(orientation: Orientation) -> RulerController? {
+        createRulersIfNeeded()
+        return existingRulerController(orientation: orientation)
+    }
+
+    private func existingRulerController(orientation: Orientation) -> RulerController? {
+        return rulers.first { $0.ruler.orientation == orientation }
+    }
+
+    private func showRuler(_ ruler: RulerController) {
+        ruler.showWindow(self)
+        ruler.rulerWindow.orderFrontRegardless()
+        updateRulerGrouping()
+    }
+
+    private func detachRulerWindow(_ window: RulerWindow) {
+        for ruler in rulers {
+            guard ruler.rulerWindow != window else { continue }
+
+            ruler.rulerWindow.removeChildWindow(window)
+            window.removeChildWindow(ruler.rulerWindow)
+        }
+    }
+
+    private func updateRulerGrouping() {
+        for ruler in rulers {
+            ruler.updateChildWindow()
+        }
+    }
+
+    private var isRulerFrontmost: Bool {
+        return rulers.contains { $0.rulerWindow.isKeyWindow }
+    }
+
+    private var hasVisibleRuler: Bool {
+        return rulers.contains { $0.rulerWindow.isVisible }
+    }
+
+    private var canToggleRulerVisibility: Bool {
+        return isRulerFrontmost || !hasVisibleRuler
+    }
+
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        if !flag {
+            showRulers()
+            return false
+        }
+
+        return true
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
@@ -170,6 +251,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    @IBAction func closePreferences(_ sender: Any) {
+        guard preferencesController?.window?.isKeyWindow == true else { return }
+        preferencesController?.close()
+    }
+
     @IBAction func alignRulersAtMouseLocation(_ sender: Any) {
         var mouseLoc = NSEvent.mouseLocation
         mouseLoc.x = mouseLoc.x.rounded()
@@ -180,20 +266,64 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @IBAction func resetRulerPositions(_ sender: Any) {
+        createRulersIfNeeded()
+
         // ungroup rulers during reset operation
         let groupRulers = prefs.groupRulers
         prefs.groupRulers = false
         for ruler in rulers {
             ruler.resetPosition()
+            showRuler(ruler)
         }
         // reset groupRulers to previous value
         prefs.groupRulers = groupRulers
+        updateRulerGrouping()
+    }
+
+    @IBAction func showRulers(_ sender: Any) {
+        showRulers()
+    }
+
+    @IBAction func toggleHorizontalRuler(_ sender: Any) {
+        toggleRuler(orientation: .horizontal)
+    }
+
+    @IBAction func toggleVerticalRuler(_ sender: Any) {
+        toggleRuler(orientation: .vertical)
     }
 
     // MARK: - Application Quit
 
     func applicationWillTerminate(_ aNotification: Notification) {
         prefs.save()
+    }
+
+}
+
+extension AppDelegate: NSMenuItemValidation {
+
+    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        switch menuItem.action {
+        case #selector(closePreferences(_:)):
+            return preferencesController?.window?.isKeyWindow == true
+        case #selector(toggleHorizontalRuler(_:)):
+            let ruler = existingRulerController(orientation: .horizontal)
+            menuItem.title = ruler?.rulerWindow.isVisible == true
+                ? NSLocalizedString("Hide Horizontal Ruler", comment: "Menu item title to hide the horizontal ruler")
+                : NSLocalizedString("Show Horizontal Ruler", comment: "Menu item title to show the horizontal ruler")
+            return canToggleRulerVisibility
+        case #selector(toggleVerticalRuler(_:)):
+            let ruler = existingRulerController(orientation: .vertical)
+            menuItem.title = ruler?.rulerWindow.isVisible == true
+                ? NSLocalizedString("Hide Vertical Ruler", comment: "Menu item title to hide the vertical ruler")
+                : NSLocalizedString("Show Vertical Ruler", comment: "Menu item title to show the vertical ruler")
+            return canToggleRulerVisibility
+        case #selector(showRulers(_:)):
+            menuItem.title = NSLocalizedString("Show All Rulers", comment: "Menu item title to show all ruler windows")
+            return true
+        default:
+            return true
+        }
     }
 
 }

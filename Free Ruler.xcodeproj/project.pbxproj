@@ -21,6 +21,7 @@
 		50D7BEEB227D432E0008B95E /* RulerWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEEA227D432E0008B95E /* RulerWindow.swift */; };
 		50D7BEED227D5C810008B95E /* RuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEEC227D5C810008B95E /* RuleView.swift */; };
 		50FC527E25BF326800B84228 /* FreeRuler.help in Resources */ = {isa = PBXBuildFile; fileRef = 50FC527D25BF326800B84228 /* FreeRuler.help */; };
+		50B146262D03B00000146C0D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 50B146202D03B00000146C0D /* Localizable.strings */; };
 		6F4102892260712F00F06A10 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F4102882260712F00F06A10 /* AppDelegate.swift */; };
 		6F41028E2260713100F06A10 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6F41028C2260713100F06A10 /* MainMenu.xib */; };
 		6F41029F22607DC900F06A10 /* HorizontalRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F41029E22607DC900F06A10 /* HorizontalRule.swift */; };
@@ -72,6 +73,11 @@
 		50D7BEE8227D43270008B95E /* Ruler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ruler.swift; sourceTree = "<group>"; };
 		50D7BEEA227D432E0008B95E /* RulerWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RulerWindow.swift; sourceTree = "<group>"; };
 		50D7BEEC227D5C810008B95E /* RuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleView.swift; sourceTree = "<group>"; };
+		50B146212D03B00000146C0D /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
+		50B146222D03B00000146C0D /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
+		50B146232D03B00000146C0D /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/Localizable.strings; sourceTree = "<group>"; };
+		50B146242D03B00000146C0D /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		50B146252D03B00000146C0D /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		50FC527D25BF326800B84228 /* FreeRuler.help */ = {isa = PBXFileReference; lastKnownFileType = folder; path = FreeRuler.help; sourceTree = "<group>"; };
 		53AF6A4225A456E30076AAB7 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		53AF6A4325A456E30076AAB7 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/PreferencesController.strings; sourceTree = "<group>"; };
@@ -81,8 +87,8 @@
 		6F41028F2260713100F06A10 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6F4102902260713100F06A10 /* Free_Ruler.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Free_Ruler.entitlements; sourceTree = "<group>"; };
 		6F41029E22607DC900F06A10 /* HorizontalRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalRule.swift; sourceTree = "<group>"; };
-		6F8CAA3929CC8F7D00C4ED57 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/MainMenu.strings"; sourceTree = "<group>"; };
-		6F8CAA3A29CC8F7D00C4ED57 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/PreferencesController.strings"; sourceTree = "<group>"; };
+		6F8CAA3929CC8F7D00C4ED57 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-hans.lproj/MainMenu.strings"; sourceTree = "<group>"; };
+		6F8CAA3A29CC8F7D00C4ED57 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-hans.lproj/PreferencesController.strings"; sourceTree = "<group>"; };
 		8F629823243003EA004F9099 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		8F629825243003F6004F9099 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PreferencesController.xib; sourceTree = "<group>"; };
 		8F629828243003FF004F9099 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/PreferencesController.strings; sourceTree = "<group>"; };
@@ -152,6 +158,7 @@
 				50008B6022846FCD001E3EE4 /* Notifications.swift */,
 				6F4102882260712F00F06A10 /* AppDelegate.swift */,
 				6F41028C2260713100F06A10 /* MainMenu.xib */,
+				50B146202D03B00000146C0D /* Localizable.strings */,
 				50D7BEE8227D43270008B95E /* Ruler.swift */,
 				50D7BEE6227D42FD0008B95E /* RulerController.swift */,
 				50D7BEEA227D432E0008B95E /* RulerWindow.swift */,
@@ -266,6 +273,7 @@
 				50C6D891228BDBAD0091F19E /* Images.xcassets in Resources */,
 				50FC527E25BF326800B84228 /* FreeRuler.help in Resources */,
 				507FED44227FFF5300BD77DC /* PreferencesController.xib in Resources */,
+				50B146262D03B00000146C0D /* Localizable.strings in Resources */,
 				6F41028E2260713100F06A10 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -320,6 +328,18 @@
 				B894A5012BBFE61A005A3B6F /* ja */,
 			);
 			name = PreferencesController.xib;
+			sourceTree = "<group>";
+		};
+		50B146202D03B00000146C0D /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				50B146212D03B00000146C0D /* Base */,
+				50B146222D03B00000146C0D /* de */,
+				50B146232D03B00000146C0D /* fi */,
+				50B146242D03B00000146C0D /* zh-Hans */,
+				50B146252D03B00000146C0D /* ja */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 		6F41028C2260713100F06A10 /* MainMenu.xib */ = {

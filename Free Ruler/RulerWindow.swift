@@ -27,6 +27,7 @@ class RulerWindow: NSPanel {
         )
 
         self.alphaValue = windowAlphaValue(prefs.foregroundOpacity)
+        self.title = getTitle(for: ruler.orientation)
         self.minSize = getMinSize(ruler: ruler)
         self.maxSize = getMaxSize(ruler: ruler)
 
@@ -52,6 +53,21 @@ class RulerWindow: NSPanel {
         set {}
     }
 
+}
+
+private func getTitle(for orientation: Orientation) -> String {
+    switch orientation {
+    case .horizontal:
+        return NSLocalizedString(
+            "Horizontal Ruler",
+            comment: "Window title for the horizontal ruler"
+        )
+    case .vertical:
+        return NSLocalizedString(
+            "Vertical Ruler",
+            comment: "Window title for the vertical ruler"
+        )
+    }
 }
 
 extension RulerWindow {

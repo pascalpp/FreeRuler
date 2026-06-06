@@ -79,9 +79,23 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Ruler" id="bib-Uj-vzu">
                         <items>
-                            <menuItem title="Close" keyEquivalent="w" id="DVo-aG-piG">
+                            <menuItem title="Hide Horizontal Ruler" keyEquivalent="h" id="fLB-gk-0Jy">
+                                <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="performClose:" target="-1" id="HmO-Ls-i7Q"/>
+                                    <action selector="toggleHorizontalRuler:" target="Voe-Tx-rLC" id="vy9-mG-eOp"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Hide Vertical Ruler" keyEquivalent="v" id="NgD-7h-fjO">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="toggleVerticalRuler:" target="Voe-Tx-rLC" id="vGH-ND-x37"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="mwO-GY-nrW"/>
+                            <menuItem title="Show All Rulers" id="qVa-aF-DQ8">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="showRulers:" target="Voe-Tx-rLC" id="NLA-hk-Wbc"/>
                                 </connections>
                             </menuItem>
                         </items>
@@ -210,6 +224,11 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Window" systemMenu="window" id="Td7-aD-5lo">
                         <items>
+                            <menuItem title="Close" keyEquivalent="w" id="n0M-rw-v5l">
+                                <connections>
+                                    <action selector="closePreferences:" target="Voe-Tx-rLC" id="X4C-ak-CJh"/>
+                                </connections>
+                            </menuItem>
                             <menuItem title="Minimize" keyEquivalent="m" id="OY7-WF-poV">
                                 <connections>
                                     <action selector="performMiniaturize:" target="-1" id="VwT-WD-YPe"/>
