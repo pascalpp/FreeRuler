@@ -85,6 +85,7 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
 
     func windowDidMove(_ notification: Notification) {
         rulerWindow.invalidateShadow()
+        enableMouseTicks()
     }
 
     func windowDidBecomeKey(_ notification: Notification) {

@@ -31,9 +31,6 @@ final class MouseTickTimerPolicy {
 
     func updateVisibleRulers(_ hasVisibleRulers: Bool) {
         self.hasVisibleRulers = hasVisibleRulers
-        if !hasVisibleRulers {
-            suspendedOwners.removeAll()
-        }
     }
 
     func suspend(owner: AnyObject) {
