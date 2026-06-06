@@ -21,6 +21,7 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
     override func windowDidLoad() {
         super.windowDidLoad()
 
+        window?.delegate = self
         window?.isMovableByWindowBackground = true
 
         subscribeToPrefs()

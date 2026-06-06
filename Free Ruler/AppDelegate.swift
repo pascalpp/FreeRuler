@@ -119,10 +119,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         guard canToggleRulerVisibility else { return }
         guard let ruler = rulerController(orientation: orientation) else { return }
 
+        if prefs.groupRulers {
+            prefs.groupRulers = false
+            detachRulerWindows()
+        }
+
         if ruler.rulerWindow.isVisible {
+            detachRulerWindow(ruler.rulerWindow)
             ruler.rulerWindow.orderOut(self)
         } else {
             showRuler(ruler)
+        }
+
+        updateRulerGrouping()
+    }
+
+    private func detachRulerWindows() {
+        for ruler in rulers {
+            detachRulerWindow(ruler.rulerWindow)
         }
     }
 
@@ -134,6 +148,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func showRuler(_ ruler: RulerController) {
         ruler.showWindow(self)
         ruler.rulerWindow.orderFrontRegardless()
+        updateRulerGrouping()
+    }
+
+    private func detachRulerWindow(_ window: RulerWindow) {
+        for ruler in rulers {
+            ruler.rulerWindow.removeChildWindow(window)
+            window.removeChildWindow(ruler.rulerWindow)
+        }
+    }
+
+    private func updateRulerGrouping() {
+        for ruler in rulers {
+            ruler.updateChildWindow()
+        }
     }
 
     private var isRulerFrontmost: Bool {
@@ -218,6 +246,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    @IBAction func closePreferences(_ sender: Any) {
+        guard preferencesController?.window?.isKeyWindow == true else { return }
+        preferencesController?.close()
+    }
+
     @IBAction func alignRulersAtMouseLocation(_ sender: Any) {
         var mouseLoc = NSEvent.mouseLocation
         mouseLoc.x = mouseLoc.x.rounded()
@@ -228,14 +261,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @IBAction func resetRulerPositions(_ sender: Any) {
+        createRulersIfNeeded()
+
         // ungroup rulers during reset operation
         let groupRulers = prefs.groupRulers
         prefs.groupRulers = false
         for ruler in rulers {
             ruler.resetPosition()
+            showRuler(ruler)
         }
         // reset groupRulers to previous value
         prefs.groupRulers = groupRulers
+        updateRulerGrouping()
     }
 
     @IBAction func showRulers(_ sender: Any) {
@@ -262,6 +299,8 @@ extension AppDelegate: NSMenuItemValidation {
 
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         switch menuItem.action {
+        case #selector(closePreferences(_:)):
+            return preferencesController?.window?.isKeyWindow == true
         case #selector(toggleHorizontalRuler(_:)):
             let ruler = rulerController(orientation: .horizontal)
             menuItem.title = ruler?.rulerWindow.isVisible == true
