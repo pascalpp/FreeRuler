@@ -13,6 +13,8 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     var otherWindow: RulerWindow?
 
     var keyListener: Any?
+    private var mouseTickResumeTimer: Timer?
+    private let mouseTickResumeDelay: TimeInterval = 0.15
 
     var preferencesWindowOpen = false {
         didSet {
@@ -57,6 +59,7 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     }
 
     deinit {
+        mouseTickResumeTimer?.invalidate()
         removeObservers(&notificationObservers)
     }
 
@@ -80,12 +83,14 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     }
 
     func windowWillMove(_ notification: Notification) {
+        mouseTickResumeTimer?.invalidate()
+        mouseTickResumeTimer = nil
         disableMouseTicks()
     }
 
     func windowDidMove(_ notification: Notification) {
         rulerWindow.invalidateShadow()
-        enableMouseTicks()
+        scheduleMouseTickResume()
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
@@ -128,6 +133,17 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
         rulerWindow.rule.showMouseTick = true
         otherWindow?.rule.showMouseTick = true
         appDelegate?.resumeMouseTickUpdates(owner: self)
+    }
+
+    private func scheduleMouseTickResume() {
+        mouseTickResumeTimer?.invalidate()
+        mouseTickResumeTimer = Timer.scheduledTimer(
+            withTimeInterval: mouseTickResumeDelay,
+            repeats: false
+        ) { [weak self] _ in
+            self?.enableMouseTicks()
+            self?.mouseTickResumeTimer = nil
+        }
     }
 
     private var rulerCursorController: RulerCursorController? {
