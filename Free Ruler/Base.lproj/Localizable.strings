@@ -5,3 +5,13 @@
 "Hide Vertical Ruler" = "Hide Vertical Ruler";
 "Show Vertical Ruler" = "Show Vertical Ruler";
 "Show All Rulers" = "Show All Rulers";
+"HotkeyBezel.RulersFloated" = "Rulers floated";
+"HotkeyBezel.RulersUnfloated" = "Rulers unfloated";
+"HotkeyBezel.RulersGrouped" = "Rulers grouped";
+"HotkeyBezel.RulersUngrouped" = "Rulers ungrouped";
+"HotkeyBezel.ShadowEnabled" = "Shadow enabled";
+"HotkeyBezel.ShadowDisabled" = "Shadow disabled";
+"HotkeyBezel.UnitsFormat" = "Units: %@";
+"Unit.Pixels.Abbreviation" = "px";
+"Unit.Millimeters.Abbreviation" = "mm";
+"Unit.Inches.Abbreviation" = "in";

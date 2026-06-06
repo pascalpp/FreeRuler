@@ -152,6 +152,39 @@ final class FreeRulerUITests: XCTestCase {
         XCTAssertEqual(horizontalRulerView.value as? String, "px")
     }
 
+    func testOptionHotkeysShowStatusBezel() {
+        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
+        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
+
+        horizontalRuler.click()
+        app.typeKey("f", modifierFlags: [])
+        XCTAssertTrue(waitForHotkeyBezel("Rulers unfloated"))
+
+        app.typeKey("f", modifierFlags: [])
+        XCTAssertTrue(waitForHotkeyBezel("Rulers floated"))
+
+        app.typeKey("s", modifierFlags: [])
+        XCTAssertTrue(waitForHotkeyBezel("Shadow enabled"))
+
+        app.typeKey("s", modifierFlags: [])
+        XCTAssertTrue(waitForHotkeyBezel("Shadow disabled"))
+
+        app.typeKey("g", modifierFlags: [])
+        XCTAssertTrue(waitForHotkeyBezel("Rulers ungrouped"))
+
+        app.typeKey("g", modifierFlags: [])
+        XCTAssertTrue(waitForHotkeyBezel("Rulers grouped"))
+
+        app.typeKey("u", modifierFlags: [])
+        XCTAssertTrue(waitForHotkeyBezel("Units: mm"))
+
+        app.typeKey("u", modifierFlags: [])
+        XCTAssertTrue(waitForHotkeyBezel("Units: in"))
+
+        app.typeKey("u", modifierFlags: [])
+        XCTAssertTrue(waitForHotkeyBezel("Units: px"))
+    }
+
     func testAlignRulersAtMouseLocationKeyboardCommand() {
         XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
         XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
@@ -194,6 +227,14 @@ final class FreeRulerUITests: XCTestCase {
         app.checkBoxes["ruler-shadow-checkbox"]
     }
 
+    private var hotkeyBezelLabel: XCUIElement {
+        app.staticTexts["hotkey-bezel-label"]
+    }
+
+    private var hotkeyBezel: XCUIElement {
+        app.otherElements["hotkey-bezel"]
+    }
+
     private func openPreferences() {
         if !preferencesWindow.exists {
             app.typeKey(",", modifierFlags: .command)
@@ -215,29 +256,40 @@ final class FreeRulerUITests: XCTestCase {
         if groupRulersCheckbox.isChecked != enabled {
             groupRulersCheckbox.click()
         }
-
-        closePreferences()
     }
 
     private func groupRulersEnabledInPreferences() -> Bool {
         openPreferences()
-        let enabled = groupRulersCheckbox.isChecked
-        closePreferences()
-        return enabled
+        return groupRulersCheckbox.isChecked
     }
 
     private func floatRulersEnabledInPreferences() -> Bool {
         openPreferences()
-        let enabled = floatRulersCheckbox.isChecked
-        closePreferences()
-        return enabled
+        return floatRulersCheckbox.isChecked
     }
 
     private func rulerShadowEnabledInPreferences() -> Bool {
         openPreferences()
-        let enabled = rulerShadowCheckbox.isChecked
-        closePreferences()
-        return enabled
+        return rulerShadowCheckbox.isChecked
+    }
+
+    private func waitForHotkeyBezel(_ expectedLabel: String, timeout: TimeInterval = 2) -> Bool {
+        let deadline = Date().addingTimeInterval(timeout)
+
+        while Date() < deadline {
+            if hotkeyBezel.exists && hotkeyBezel.value as? String == expectedLabel {
+                return true
+            }
+
+            if hotkeyBezelLabel.exists && hotkeyBezelLabel.label == expectedLabel {
+                return true
+            }
+
+            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
+        }
+
+        return (hotkeyBezel.exists && hotkeyBezel.value as? String == expectedLabel)
+            || (hotkeyBezelLabel.exists && hotkeyBezelLabel.label == expectedLabel)
     }
 }
 

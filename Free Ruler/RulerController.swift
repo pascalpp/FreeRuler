@@ -251,6 +251,13 @@ extension RulerController {
         let shift = event.modifierFlags.contains(.shift)
         let keyboardModifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
 
+        if keyboardModifiers.isEmpty,
+           rulerWindow.isKeyWindow,
+           let appDelegate = NSApp.delegate as? AppDelegate,
+           appDelegate.performRulerHotkey(keyCode: Int(event.keyCode), sender: self) {
+            return nil
+        }
+
         switch Int(event.keyCode) {
         case kVK_LeftArrow:
             rulerWindow.nudgeLeft(withShift: shift)
@@ -263,9 +270,6 @@ extension RulerController {
             return nil
         case kVK_DownArrow:
             rulerWindow.nudgeDown(withShift: shift)
-            return nil
-        case kVK_ANSI_G where keyboardModifiers.isEmpty:
-            prefs.groupRulers = !prefs.groupRulers
             return nil
         default:
             return event

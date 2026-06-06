@@ -1,8 +1,51 @@
 import Cocoa
+import Carbon.HIToolbox
 
 let env = ProcessInfo.processInfo.environment
 let APP_ICON_HELPER = env["APP_ICON_HELPER"] != nil
 let UI_TESTS = env["FREE_RULER_UI_TESTS"] != nil
+
+private enum HotkeyBezelLocalizationKey: String {
+    case rulersFloated = "HotkeyBezel.RulersFloated"
+    case rulersUnfloated = "HotkeyBezel.RulersUnfloated"
+    case rulersGrouped = "HotkeyBezel.RulersGrouped"
+    case rulersUngrouped = "HotkeyBezel.RulersUngrouped"
+    case shadowEnabled = "HotkeyBezel.ShadowEnabled"
+    case shadowDisabled = "HotkeyBezel.ShadowDisabled"
+    case unitsFormat = "HotkeyBezel.UnitsFormat"
+    case pixelsUnit = "Unit.Pixels.Abbreviation"
+    case millimetersUnit = "Unit.Millimeters.Abbreviation"
+    case inchesUnit = "Unit.Inches.Abbreviation"
+
+    var localizedString: String {
+        NSLocalizedString(rawValue, comment: comment)
+    }
+
+    private var comment: String {
+        switch self {
+        case .rulersFloated:
+            return "Hotkey status bezel text indicating rulers now float above other windows"
+        case .rulersUnfloated:
+            return "Hotkey status bezel text indicating rulers no longer float above other windows"
+        case .rulersGrouped:
+            return "Hotkey status bezel text indicating rulers are grouped"
+        case .rulersUngrouped:
+            return "Hotkey status bezel text indicating rulers are ungrouped"
+        case .shadowEnabled:
+            return "Hotkey status bezel text indicating ruler shadow is enabled"
+        case .shadowDisabled:
+            return "Hotkey status bezel text indicating ruler shadow is disabled"
+        case .unitsFormat:
+            return "Hotkey status bezel format for the selected measurement unit"
+        case .pixelsUnit:
+            return "Pixels unit abbreviation"
+        case .millimetersUnit:
+            return "Millimeters unit abbreviation"
+        case .inchesUnit:
+            return "Inches unit abbreviation"
+        }
+    }
+}
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -28,6 +71,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBOutlet weak var alignRulersMenuItem: NSMenuItem!
 
     var preferencesController: PreferencesController? = nil
+    private let hotkeyBezel = HotkeyBezel()
 
     // MARK: - Lifecycle
 
@@ -255,17 +299,28 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         case .inches:
             prefs.unit = .pixels
         }
+
+        showHotkeyBezel(format: .unitsFormat, unitLabel(prefs.unit), on: bezelScreen(for: sender))
     }
 
     @IBAction func toggleFloatRulers(_ sender: Any) {
         prefs.floatRulers = !prefs.floatRulers
+        showHotkeyBezel(
+            prefs.floatRulers ? .rulersFloated : .rulersUnfloated,
+            on: bezelScreen(for: sender)
+        )
     }
 
     @IBAction func toggleGroupRulers(_ sender: Any) {
         prefs.groupRulers = !prefs.groupRulers
+        showGroupRulersHotkeyBezel(on: bezelScreen(for: sender))
     }
     @IBAction func toggleRulerShadow(_ sender: Any) {
         prefs.rulerShadow = !prefs.rulerShadow
+        showHotkeyBezel(
+            prefs.rulerShadow ? .shadowEnabled : .shadowDisabled,
+            on: bezelScreen(for: sender)
+        )
     }
 
     @IBAction func openPreferences(_ sender: Any) {
@@ -317,6 +372,60 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @IBAction func toggleVerticalRuler(_ sender: Any) {
         toggleRuler(orientation: .vertical)
+    }
+
+    func performRulerHotkey(keyCode: Int, sender: Any) -> Bool {
+        switch keyCode {
+        case kVK_ANSI_H:
+            toggleHorizontalRuler(sender)
+        case kVK_ANSI_V:
+            toggleVerticalRuler(sender)
+        case kVK_ANSI_U:
+            cycleUnits(sender)
+        case kVK_ANSI_F:
+            toggleFloatRulers(sender)
+        case kVK_ANSI_G:
+            toggleGroupRulers(sender)
+        case kVK_ANSI_S:
+            toggleRulerShadow(sender)
+        case kVK_ANSI_O:
+            alignRulersAtMouseLocation(sender)
+        default:
+            return false
+        }
+
+        return true
+    }
+
+    private func showHotkeyBezel(_ key: HotkeyBezelLocalizationKey, on screen: NSScreen?) {
+        hotkeyBezel.show(key.localizedString, on: screen)
+    }
+
+    private func showHotkeyBezel(format key: HotkeyBezelLocalizationKey, _ value: String, on screen: NSScreen?) {
+        hotkeyBezel.show(String(format: key.localizedString, value), on: screen)
+    }
+
+    private func showGroupRulersHotkeyBezel(on screen: NSScreen?) {
+        showHotkeyBezel(prefs.groupRulers ? .rulersGrouped : .rulersUngrouped, on: screen)
+    }
+
+    private func bezelScreen(for sender: Any) -> NSScreen? {
+        if let rulerController = sender as? RulerController {
+            return rulerController.rulerWindow.screen
+        }
+
+        return rulers.first { $0.rulerWindow.isKeyWindow }?.rulerWindow.screen
+    }
+
+    private func unitLabel(_ unit: Unit) -> String {
+        switch unit {
+        case .pixels:
+            return HotkeyBezelLocalizationKey.pixelsUnit.localizedString
+        case .millimeters:
+            return HotkeyBezelLocalizationKey.millimetersUnit.localizedString
+        case .inches:
+            return HotkeyBezelLocalizationKey.inchesUnit.localizedString
+        }
     }
 
     // MARK: - Application Quit
