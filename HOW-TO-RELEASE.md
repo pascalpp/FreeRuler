@@ -1,38 +1,189 @@
 # Free Ruler Release Process
 
-Mostly notes for myself.
+Free Ruler has two release tracks:
 
-- Merge any PRs to be included in the release.
-- Read the current version: `npm get:version`
-- Create a new branch from main named vX.X.X
-- Get the number of commits: `npm get:commits`
-- Bump the version number in package.json, using `npm version patch` (or minor, or major)
+- GitHub release: a signed, notarized zip for direct download from GitHub.
+- App Store release: an uploaded build submitted through App Store Connect.
 
-- In XCode, bump the version and build number, using the number of commits as the build number. Example https://github.com/pascalpp/FreeRuler/commit/ed9f8db186b00125a78629a5e5569dfda9dd6285
-- In Xcode, choose Product > Archive
-- In the Archives window, click Validate App. May require visiting https://developer.apple.com to accept updated licensing agreements, etc.
+This document covers the GitHub release path. The App Store path is still manual
+for now.
 
-## Github Release
+## GitHub Release
 
-- In the XCode Archives window, click Distribute App > Direct Distribution > Distribute.
-- Wait for notification from Apple notary service, usually less than a minute.
-- Export the build to `dist/Free Ruler.app`. Compress Free Ruler.app as free-ruler-X.X.X.zip. `npm run build:zip`
-- Delete the app and any extra folders created by the build process. (Should be handled by above command.)
-- Commit the modified XCode project and the new zip file with the commit message 'Build vX.X.X' `npm run build:commit`
-- Create a PR for the branch back to main. `npm run build:pr`
-- Review and merge the PR.
-- Switch to main and pull latest. `git checkout main && git pull`
-- Create a tag for the release. `git build:tag`
-- Create a draft release: `git build:release`
-- Update the release notes. Describe changes with #XX references to closed tickets.
-- Publish the release.
+Assuming you have the prerequisites listed below, follow these steps from a terminal in the Free Ruler repository.
 
-## App Store Release
+1. Start from the latest `main`.
 
-- In the XCode Archives window, click Distribute App > App Store Connect > Upload.
-- Visit https://appstoreconnect.apple.com and submit the new build for review.
-- Create a new version (green plus button).
-- Add the new build.
-- Update release information with new features, etc.
-- Save
-- Submit for Review
+   ```sh
+   git switch main
+   git pull --ff-only origin main
+   ```
+
+2. Bump the version.
+
+   ```sh
+   npm run bump:version
+   ```
+
+   Choose `M`, `m`, or `p` when prompted. This updates `package.json` and the
+   Xcode `MARKETING_VERSION`, which is the version shown in the app's About
+   dialog.
+
+3. Commit and push the version bump.
+
+   ```sh
+   git add package.json "Free Ruler.xcodeproj/project.pbxproj"
+   git commit -m "Bump version to X.Y.Z"
+   git push origin main
+   ```
+
+   Replace `X.Y.Z` with the version you just created.
+
+4. Build, notarize, zip, and create a draft GitHub Release.
+
+   ```sh
+   NOTARYTOOL_PROFILE=FreeRulerNotary npm run release:github
+   ```
+
+5. Publish the draft release.
+
+   Open the [GitHub Releases
+   page](https://github.com/pascalpp/FreeRuler/releases), review the draft,
+   download and test the zip, then click **Publish release**.
+
+## Testing the Release Process
+
+Use this when you want to test the release machinery without making a real
+public release.
+
+1. Test local archive/export/zip mechanics.
+
+   ```sh
+   npm run github:release:dryrun
+   ```
+
+   This is the fastest check. It does not contact Apple's notary service and it
+   does not create a GitHub release. It replaces any existing dry-run zip for
+   the current version.
+
+2. Test the full path with a temporary draft release.
+
+   ```sh
+   RELEASE_TAG=vX.Y.Z-test.1 NOTARYTOOL_PROFILE=FreeRulerNotary npm run release:github
+   ```
+
+   Replace `X.Y.Z` with the version currently in `package.json`. This creates a
+   temporary tag and a draft GitHub Release. Draft releases are not public until
+   they are published.
+
+3. Download the zip from the draft release, open the app, and confirm it runs.
+
+4. Delete the test release and tag before testing again.
+
+   ```sh
+   gh release delete vX.Y.Z-test.1 --yes
+   git tag -d vX.Y.Z-test.1
+   git push origin :refs/tags/vX.Y.Z-test.1
+   ```
+
+## Details
+
+<details>
+
+<summary>Prerequisites</summary>
+
+The GitHub release command expects:
+
+- A clean git working tree.
+- `gh` authenticated with permission to create releases.
+- Xcode signing working for the Free Ruler app target.
+- A Developer ID Application certificate installed.
+- Notary credentials saved in Keychain.
+
+The documented commands assume the notary profile is named `FreeRulerNotary`.
+Create that profile once with:
+
+```sh
+xcrun notarytool store-credentials "FreeRulerNotary"
+```
+
+If Xcode needs to create or update signing assets during archive/export, add
+`ALLOW_PROVISIONING_UPDATES=1`:
+
+```sh
+ALLOW_PROVISIONING_UPDATES=1 NOTARYTOOL_PROFILE=FreeRulerNotary npm run release:github
+```
+
+</details>
+
+<details>
+<summary>What the release command does</summary>
+
+`npm run release:github` runs:
+
+```sh
+npm run release:github:check
+npm run release:github:archive
+npm run release:github:export
+npm run release:github:notarize
+npm run release:github:zip
+npm run release:github:publish
+```
+
+The final zip is written to:
+
+```sh
+build/release/free-ruler-X.Y.Z.zip
+```
+
+`build/release/` is ignored by git. Historical release zips in `dist/` are left
+alone.
+
+The GitHub release is created as a draft so release notes and the uploaded zip
+can be reviewed before publishing.
+
+</details>
+
+<details>
+<summary>Version commands</summary>
+
+Show the current version:
+
+```sh
+npm run get:version
+```
+
+Bump the version interactively:
+
+```sh
+npm run bump:version
+```
+
+Set an exact version:
+
+```sh
+npm run release:version -- X.Y.Z
+```
+
+Set an exact version and Xcode build number:
+
+```sh
+npm run release:version -- X.Y.Z 303
+```
+
+</details>
+
+## Manual App Store Release
+
+The App Store path is not automated yet.
+
+1. Archive the app in Xcode.
+2. Choose **Distribute App > App Store Connect > Upload**.
+3. Visit App Store Connect.
+4. Create a new version if needed.
+5. Select the uploaded build.
+6. Update release notes and metadata.
+7. Submit for review.
+
+Future automation should add a separate App Store export/upload path instead of
+overloading the GitHub release scripts.

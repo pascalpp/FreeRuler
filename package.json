@@ -5,14 +5,18 @@
   "main": "none",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "get:version": "cat package.json | jq -r '.version'",
+    "get:version": "node -p \"require('./package.json').version\"",
     "get:commits": "git log --pretty=oneline | wc -l",
-    "bump:version": "npm version patch",
-    "build:zip": "cd dist && zip -r free-ruler-$(npm run --silent get:version).zip 'Free Ruler.app' && rm -rf 'Free Ruler.app' && cd ..",
-    "build:commit": "git add --all && git commit -am \"Build v$(npm run --silent get:version)\" && git push --set-upstream origin $(currentbranch)",
-    "build:pr": "gh pr create --title \"Build v$(npm run --silent get:version)\" --body \"Build v$(npm run --silent get:version)\" --base main --web",
-    "build:tag": "git tag -a v$(npm run --silent get:version) -m \"v$(npm run --silent get:version)\" && git push origin v$(npm run --silent get:version)",
-    "build:release": "gh release create v$(npm run --silent get:version) dist/free-ruler-$(npm run --silent get:version).zip --title \"v$(npm run --silent get:version)\" --notes \"v$(npm run --silent get:version)\" --draft"
+    "bump:version": "node scripts/release/bump-version.js",
+    "release:version": "node scripts/release/set-version.js",
+    "release:github:check": "scripts/release/check-github-release.sh",
+    "release:github:archive": "scripts/release/archive-github-release.sh",
+    "release:github:export": "scripts/release/export-github-release.sh",
+    "release:github:notarize": "scripts/release/notarize-github-release.sh",
+    "release:github:zip": "scripts/release/zip-github-release.sh",
+    "release:github:publish": "scripts/release/publish-github-release.sh",
+    "release:github": "scripts/release/github-release.sh",
+    "github:release:dryrun": "RELEASE_DRY_RUN=1 RELEASE_SKIP_NOTARIZE=1 RELEASE_OVERWRITE=1 scripts/release/github-release.sh"
   },
   "repository": {
     "type": "git",

@@ -1,2 +1,5 @@
 xcuserdata
 .DS_Store
+build/
+.*bak
+*.bak.*
