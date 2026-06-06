@@ -7,16 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		50A137012D03A00000137C0D /* RulerCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A137002D03A00000137C0D /* RulerCoreTests.swift */; };
-		50A137032D03A00000137C0D /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50A137022D03A00000137C0D /* XCTest.framework */; };
-		50A147012D03C00000147C0D /* FreeRulerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A147002D03C00000147C0D /* FreeRulerUITests.swift */; };
-		50A147032D03C00000147C0D /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50A137022D03A00000137C0D /* XCTest.framework */; };
-		50B149012D04A00000149C0D /* HotkeyBezel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B149002D04A00000149C0D /* HotkeyBezel.swift */; };
 		50008B6122846FCD001E3EE4 /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50008B6022846FCD001E3EE4 /* Notifications.swift */; };
 		5012CAAD226AB09000BD9565 /* VerticalRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5012CAAC226AB09000BD9565 /* VerticalRule.swift */; };
 		507FED43227FFF5300BD77DC /* PreferencesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507FED41227FFF5300BD77DC /* PreferencesController.swift */; };
 		507FED44227FFF5300BD77DC /* PreferencesController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 507FED42227FFF5300BD77DC /* PreferencesController.xib */; };
 		507FED602280E13200BD77DC /* Prefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507FED5F2280E13200BD77DC /* Prefs.swift */; };
+		50A137012D03A00000137C0D /* RulerCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A137002D03A00000137C0D /* RulerCoreTests.swift */; };
+		50A137032D03A00000137C0D /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50A137022D03A00000137C0D /* XCTest.framework */; };
+		50A147012D03C00000147C0D /* FreeRulerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A147002D03C00000147C0D /* FreeRulerUITests.swift */; };
+		50A147032D03C00000147C0D /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50A137022D03A00000137C0D /* XCTest.framework */; };
+		50B146262D03B00000146C0D /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 50B146202D03B00000146C0D /* Localizable.xcstrings */; };
+		50B149012D04A00000149C0D /* HotkeyBezel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B149002D04A00000149C0D /* HotkeyBezel.swift */; };
 		50C6D891228BDBAD0091F19E /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 50C6D890228BDBAD0091F19E /* Images.xcassets */; };
 		50CCB206227FCD26004645C5 /* AppIconLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CCB205227FCD26004645C5 /* AppIconLayout.swift */; };
 		50D7BEE7227D42FD0008B95E /* RulerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEE6227D42FD0008B95E /* RulerController.swift */; };
@@ -24,7 +25,6 @@
 		50D7BEEB227D432E0008B95E /* RulerWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEEA227D432E0008B95E /* RulerWindow.swift */; };
 		50D7BEED227D5C810008B95E /* RuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEEC227D5C810008B95E /* RuleView.swift */; };
 		50FC527E25BF326800B84228 /* FreeRuler.help in Resources */ = {isa = PBXBuildFile; fileRef = 50FC527D25BF326800B84228 /* FreeRuler.help */; };
-		50B146262D03B00000146C0D /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 50B146202D03B00000146C0D /* Localizable.xcstrings */; };
 		6F4102892260712F00F06A10 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F4102882260712F00F06A10 /* AppDelegate.swift */; };
 		6F41028E2260713100F06A10 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6F41028C2260713100F06A10 /* MainMenu.xib */; };
 		6F41029F22607DC900F06A10 /* HorizontalRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F41029E22607DC900F06A10 /* HorizontalRule.swift */; };
@@ -70,23 +70,23 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		50008B6022846FCD001E3EE4 /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
+		5012CAAC226AB09000BD9565 /* VerticalRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerticalRule.swift; sourceTree = "<group>"; };
+		507FED41227FFF5300BD77DC /* PreferencesController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesController.swift; sourceTree = "<group>"; };
+		507FED5F2280E13200BD77DC /* Prefs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prefs.swift; sourceTree = "<group>"; };
 		50A137002D03A00000137C0D /* RulerCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulerCoreTests.swift; sourceTree = "<group>"; };
 		50A137022D03A00000137C0D /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = System/Library/Frameworks/XCTest.framework; sourceTree = SDKROOT; };
 		50A137042D03A00000137C0D /* FreeRulerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FreeRulerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		50A147002D03C00000147C0D /* FreeRulerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeRulerUITests.swift; sourceTree = "<group>"; };
 		50A147022D03C00000147C0D /* FreeRulerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FreeRulerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		50B146202D03B00000146C0D /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		50B149002D04A00000149C0D /* HotkeyBezel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyBezel.swift; sourceTree = "<group>"; };
-		50008B6022846FCD001E3EE4 /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
-		5012CAAC226AB09000BD9565 /* VerticalRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerticalRule.swift; sourceTree = "<group>"; };
-		507FED41227FFF5300BD77DC /* PreferencesController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesController.swift; sourceTree = "<group>"; };
-		507FED5F2280E13200BD77DC /* Prefs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prefs.swift; sourceTree = "<group>"; };
 		50C6D890228BDBAD0091F19E /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		50CCB205227FCD26004645C5 /* AppIconLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconLayout.swift; sourceTree = "<group>"; };
 		50D7BEE6227D42FD0008B95E /* RulerController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RulerController.swift; sourceTree = "<group>"; };
 		50D7BEE8227D43270008B95E /* Ruler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ruler.swift; sourceTree = "<group>"; };
 		50D7BEEA227D432E0008B95E /* RulerWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RulerWindow.swift; sourceTree = "<group>"; };
 		50D7BEEC227D5C810008B95E /* RuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleView.swift; sourceTree = "<group>"; };
-		50B146202D03B00000146C0D /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		50FC527D25BF326800B84228 /* FreeRuler.help */ = {isa = PBXFileReference; lastKnownFileType = folder; path = FreeRuler.help; sourceTree = "<group>"; };
 		53AF6A4225A456E30076AAB7 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		53AF6A4325A456E30076AAB7 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/PreferencesController.strings; sourceTree = "<group>"; };
@@ -132,6 +132,30 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		50A137062D03A00000137C0D /* FreeRulerTests */ = {
+			isa = PBXGroup;
+			children = (
+				50A137002D03A00000137C0D /* RulerCoreTests.swift */,
+			);
+			path = FreeRulerTests;
+			sourceTree = "<group>";
+		};
+		50A137072D03A00000137C0D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				50A137022D03A00000137C0D /* XCTest.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		50A147072D03C00000147C0D /* FreeRulerUITests */ = {
+			isa = PBXGroup;
+			children = (
+				50A147002D03C00000147C0D /* FreeRulerUITests.swift */,
+			);
+			path = FreeRulerUITests;
+			sourceTree = "<group>";
+		};
 		6F41027C2260712F00F06A10 = {
 			isa = PBXGroup;
 			children = (
@@ -151,30 +175,6 @@
 				50A147022D03C00000147C0D /* FreeRulerUITests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		50A137062D03A00000137C0D /* FreeRulerTests */ = {
-			isa = PBXGroup;
-			children = (
-				50A137002D03A00000137C0D /* RulerCoreTests.swift */,
-			);
-			path = FreeRulerTests;
-			sourceTree = "<group>";
-		};
-		50A147072D03C00000147C0D /* FreeRulerUITests */ = {
-			isa = PBXGroup;
-			children = (
-				50A147002D03C00000147C0D /* FreeRulerUITests.swift */,
-			);
-			path = FreeRulerUITests;
-			sourceTree = "<group>";
-		};
-		50A137072D03A00000137C0D /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				50A137022D03A00000137C0D /* XCTest.framework */,
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		6F4102872260712F00F06A10 /* Free Ruler */ = {
@@ -614,7 +614,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 302;
+				CURRENT_PROJECT_VERSION = 339;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Free Ruler/Info.plist";
@@ -623,7 +623,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.0.8;
+				MARKETING_VERSION = 2.0.9;
 				PRODUCT_BUNDLE_IDENTIFIER = com.pascal.freeruler;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -640,7 +640,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 302;
+				CURRENT_PROJECT_VERSION = 339;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Free Ruler/Info.plist";
@@ -649,7 +649,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.0.8;
+				MARKETING_VERSION = 2.0.9;
 				PRODUCT_BUNDLE_IDENTIFIER = com.pascal.freeruler;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
