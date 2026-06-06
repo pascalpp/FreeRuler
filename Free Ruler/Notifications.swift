@@ -21,7 +21,7 @@ protocol NotificationObserver {}
 extension NotificationObserver {
 
     func addObserver(_ forName: Notification.Name, using: @escaping (Notification) -> Void) -> NSObjectProtocol {
-        NotificationCenter.default.addObserver(forName: forName, object: nil, queue: nil, using: using)
+        return NotificationCenter.default.addObserver(forName: forName, object: nil, queue: nil, using: using)
     }
 
     func removeObserver(_ observer: NSObjectProtocol) {
