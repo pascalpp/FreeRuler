@@ -28,6 +28,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBOutlet weak var alignRulersMenuItem: NSMenuItem!
 
     var preferencesController: PreferencesController? = nil
+    private let hotkeyBezel = HotkeyBezel()
 
     // MARK: - Lifecycle
 
@@ -255,17 +256,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         case .inches:
             prefs.unit = .pixels
         }
+
+        showHotkeyBezel(format: "Units: %@", unitLabel(prefs.unit))
     }
 
     @IBAction func toggleFloatRulers(_ sender: Any) {
         prefs.floatRulers = !prefs.floatRulers
+        showHotkeyBezel(prefs.floatRulers ? "Rulers floated" : "Rulers unfloated")
     }
 
     @IBAction func toggleGroupRulers(_ sender: Any) {
         prefs.groupRulers = !prefs.groupRulers
+        showHotkeyBezel(prefs.groupRulers ? "Rulers grouped" : "Rulers ungrouped")
     }
     @IBAction func toggleRulerShadow(_ sender: Any) {
         prefs.rulerShadow = !prefs.rulerShadow
+        showHotkeyBezel(prefs.rulerShadow ? "Shadow enabled" : "Shadow disabled")
     }
 
     @IBAction func openPreferences(_ sender: Any) {
@@ -317,6 +323,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @IBAction func toggleVerticalRuler(_ sender: Any) {
         toggleRuler(orientation: .vertical)
+    }
+
+    private func showHotkeyBezel(_ key: String) {
+        hotkeyBezel.show(NSLocalizedString(key, comment: "Hotkey status bezel text"))
+    }
+
+    private func showHotkeyBezel(format key: String, _ value: String) {
+        let format = NSLocalizedString(key, comment: "Hotkey status bezel text")
+        hotkeyBezel.show(String(format: format, value))
+    }
+
+    private func unitLabel(_ unit: Unit) -> String {
+        switch unit {
+        case .pixels:
+            return NSLocalizedString("px", comment: "Pixels unit abbreviation")
+        case .millimeters:
+            return NSLocalizedString("mm", comment: "Millimeters unit abbreviation")
+        case .inches:
+            return NSLocalizedString("in", comment: "Inches unit abbreviation")
+        }
     }
 
     // MARK: - Application Quit

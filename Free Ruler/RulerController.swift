@@ -265,7 +265,7 @@ extension RulerController {
             rulerWindow.nudgeDown(withShift: shift)
             return nil
         case kVK_ANSI_G where keyboardModifiers.isEmpty:
-            prefs.groupRulers = !prefs.groupRulers
+          (NSApp.delegate as? AppDelegate)?.toggleGroupRulers(self)
             return nil
         default:
             return event

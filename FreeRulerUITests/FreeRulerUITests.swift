@@ -152,6 +152,39 @@ final class FreeRulerUITests: XCTestCase {
         XCTAssertEqual(horizontalRulerView.value as? String, "px")
     }
 
+    func testOptionHotkeysShowStatusBezel() {
+        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
+        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
+
+        horizontalRuler.click()
+        app.typeKey("f", modifierFlags: [])
+        XCTAssertTrue(waitForHotkeyBezel("Rulers unfloated"))
+
+        app.typeKey("f", modifierFlags: [])
+        XCTAssertTrue(waitForHotkeyBezel("Rulers floated"))
+
+        app.typeKey("s", modifierFlags: [])
+        XCTAssertTrue(waitForHotkeyBezel("Shadow enabled"))
+
+        app.typeKey("s", modifierFlags: [])
+        XCTAssertTrue(waitForHotkeyBezel("Shadow disabled"))
+
+        app.typeKey("g", modifierFlags: [])
+        XCTAssertTrue(waitForHotkeyBezel("Rulers ungrouped"))
+
+        app.typeKey("g", modifierFlags: [])
+        XCTAssertTrue(waitForHotkeyBezel("Rulers grouped"))
+
+        app.typeKey("u", modifierFlags: [])
+        XCTAssertTrue(waitForHotkeyBezel("Units: mm"))
+
+        app.typeKey("u", modifierFlags: [])
+        XCTAssertTrue(waitForHotkeyBezel("Units: in"))
+
+        app.typeKey("u", modifierFlags: [])
+        XCTAssertTrue(waitForHotkeyBezel("Units: px"))
+    }
+
     func testAlignRulersAtMouseLocationKeyboardCommand() {
         XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
         XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
@@ -192,6 +225,10 @@ final class FreeRulerUITests: XCTestCase {
 
     private var rulerShadowCheckbox: XCUIElement {
         app.checkBoxes["ruler-shadow-checkbox"]
+    }
+
+    private var hotkeyBezelLabel: XCUIElement {
+        app.staticTexts["hotkey-bezel-label"]
     }
 
     private func openPreferences() {
@@ -238,6 +275,20 @@ final class FreeRulerUITests: XCTestCase {
         let enabled = rulerShadowCheckbox.isChecked
         closePreferences()
         return enabled
+    }
+
+    private func waitForHotkeyBezel(_ expectedLabel: String, timeout: TimeInterval = 2) -> Bool {
+        let deadline = Date().addingTimeInterval(timeout)
+
+        while Date() < deadline {
+            if hotkeyBezelLabel.exists && hotkeyBezelLabel.label == expectedLabel {
+                return true
+            }
+
+            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
+        }
+
+        return hotkeyBezelLabel.exists && hotkeyBezelLabel.label == expectedLabel
     }
 }
 

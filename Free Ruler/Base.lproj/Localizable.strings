@@ -5,3 +5,13 @@
 "Hide Vertical Ruler" = "Hide Vertical Ruler";
 "Show Vertical Ruler" = "Show Vertical Ruler";
 "Show All Rulers" = "Show All Rulers";
+"Rulers floated" = "Rulers floated";
+"Rulers unfloated" = "Rulers unfloated";
+"Rulers grouped" = "Rulers grouped";
+"Rulers ungrouped" = "Rulers ungrouped";
+"Shadow enabled" = "Shadow enabled";
+"Shadow disabled" = "Shadow disabled";
+"Units: %@" = "Units: %@";
+"px" = "px";
+"mm" = "mm";
+"in" = "in";
