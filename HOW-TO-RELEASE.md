@@ -42,6 +42,9 @@ Assuming you have the prerequisites listed below, follow these steps from a term
    page](https://github.com/pascalpp/FreeRuler/releases), review the draft,
    download and test the zip, then click **Publish release**.
 
+GitHub Releases are the canonical home for downloadable release zips. Do not
+commit release zips to the repository.
+
 ## Testing the Release Process
 
 Use this when you want to test the release machinery without making a real
@@ -127,8 +130,9 @@ The final zip is written to:
 build/release/free-ruler-X.Y.Z.zip
 ```
 
-`build/release/` is ignored by git. Historical release zips in `dist/` are left
-alone.
+`build/release/` is ignored by git. New release zips are uploaded to the draft
+GitHub Release and should not be copied into the repository. `.gitignore`
+prevents future `dist/*.zip` artifacts from being added accidentally.
 
 The GitHub release is created as a draft so release notes and the uploaded zip
 can be reviewed before publishing.
