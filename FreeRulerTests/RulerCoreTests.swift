@@ -157,4 +157,19 @@ final class RulerCoreTests: XCTestCase {
         policy.resume(owner: owner)
         XCTAssertEqual(policy.desiredInterval, 1 / 60)
     }
+
+    func testMouseTickTimerPolicyClearsSuspensionWhenOwnerDeallocates() {
+        let policy = MouseTickTimerPolicy(foregroundInterval: 1 / 60, backgroundInterval: 1 / 30)
+
+        policy.applicationDidBecomeActive()
+        policy.updateVisibleRulers(true)
+
+        autoreleasepool {
+            let owner = NSObject()
+            policy.suspend(owner: owner)
+            XCTAssertNil(policy.desiredInterval)
+        }
+
+        XCTAssertEqual(policy.desiredInterval, 1 / 60)
+    }
 }

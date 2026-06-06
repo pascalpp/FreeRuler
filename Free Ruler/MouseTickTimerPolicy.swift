@@ -7,7 +7,7 @@ final class MouseTickTimerPolicy {
     private var hasApplicationState = false
     private var appIsActive = false
     private var hasVisibleRulers = false
-    private var suspendedOwners: Set<ObjectIdentifier> = []
+    private let suspendedOwners = NSHashTable<AnyObject>.weakObjects()
 
     init(foregroundInterval: TimeInterval, backgroundInterval: TimeInterval) {
         self.foregroundInterval = foregroundInterval
@@ -15,7 +15,7 @@ final class MouseTickTimerPolicy {
     }
 
     var desiredInterval: TimeInterval? {
-        guard hasApplicationState, hasVisibleRulers, suspendedOwners.isEmpty else { return nil }
+        guard hasApplicationState, hasVisibleRulers, suspendedOwners.allObjects.isEmpty else { return nil }
         return appIsActive ? foregroundInterval : backgroundInterval
     }
 
@@ -34,10 +34,10 @@ final class MouseTickTimerPolicy {
     }
 
     func suspend(owner: AnyObject) {
-        suspendedOwners.insert(ObjectIdentifier(owner))
+        suspendedOwners.add(owner)
     }
 
     func resume(owner: AnyObject) {
-        suspendedOwners.remove(ObjectIdentifier(owner))
+        suspendedOwners.remove(owner)
     }
 }
