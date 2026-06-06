@@ -12,10 +12,14 @@ final class HotkeyBezel {
         hostingView.frame = NSRect(x: 0, y: 0, width: 420, height: 116)
         hostingView.setAccessibilityElement(true)
         hostingView.setAccessibilityIdentifier("hotkey-bezel")
+        hostingView.setAccessibilityLabel("")
+        hostingView.setAccessibilityValue("")
 
         let contentView = NSView(frame: hostingView.frame)
         contentView.setAccessibilityElement(true)
         contentView.setAccessibilityIdentifier("hotkey-bezel")
+        contentView.setAccessibilityLabel("")
+        contentView.setAccessibilityValue("")
         contentView.addSubview(hostingView)
 
         panel = NSPanel(
@@ -36,11 +40,15 @@ final class HotkeyBezel {
         panel.alphaValue = 0
     }
 
-    func show(_ message: String) {
+    func show(_ message: String, on screen: NSScreen? = nil) {
         hideWorkItem?.cancel()
         hostingView.rootView = HotkeyBezelView(message: message)
+        hostingView.setAccessibilityLabel(message)
+        hostingView.setAccessibilityValue(message)
+        panel.contentView?.setAccessibilityLabel(message)
+        panel.contentView?.setAccessibilityValue(message)
 
-        panel.setFrame(centeredFrame(), display: true)
+        panel.setFrame(centeredFrame(on: screen), display: true)
         panel.orderFrontRegardless()
 
         NSAnimationContext.runAnimationGroup { context in
@@ -67,8 +75,8 @@ final class HotkeyBezel {
         })
     }
 
-    private func centeredFrame() -> NSRect {
-        let screenFrame = (panel.screen ?? NSScreen.main ?? NSScreen.screens.first)?.visibleFrame
+    private func centeredFrame(on screen: NSScreen?) -> NSRect {
+        let screenFrame = (screen ?? panel.screen ?? NSScreen.main ?? NSScreen.screens.first)?.visibleFrame
             ?? NSRect(x: 0, y: 0, width: 1024, height: 768)
         let size = NSSize(width: 420, height: 116)
 
@@ -98,6 +106,8 @@ struct HotkeyBezelView: View {
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
                   .fill(.black.opacity(0.3))
             )
+            .accessibilityLabel(message)
+            .accessibilityValue(message)
             .accessibilityIdentifier("hotkey-bezel-label")
     }
 

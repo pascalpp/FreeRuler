@@ -5,3 +5,13 @@
 "Hide Vertical Ruler" = "垂直定規を非表示";
 "Show Vertical Ruler" = "垂直定規を表示";
 "Show All Rulers" = "すべての定規を表示";
+"HotkeyBezel.RulersFloated" = "定規を前面に表示";
+"HotkeyBezel.RulersUnfloated" = "定規を前面に固定しない";
+"HotkeyBezel.RulersGrouped" = "定規をグループ化";
+"HotkeyBezel.RulersUngrouped" = "定規のグループ化を解除";
+"HotkeyBezel.ShadowEnabled" = "影を有効";
+"HotkeyBezel.ShadowDisabled" = "影を無効";
+"HotkeyBezel.UnitsFormat" = "単位: %@";
+"Unit.Pixels.Abbreviation" = "px";
+"Unit.Millimeters.Abbreviation" = "mm";
+"Unit.Inches.Abbreviation" = "in";

@@ -5,3 +5,13 @@
 "Hide Vertical Ruler" = "Kätke pystyviivain";
 "Show Vertical Ruler" = "Näytä pystyviivain";
 "Show All Rulers" = "Näytä kaikki viivaimet";
+"HotkeyBezel.RulersFloated" = "Viivaimet päällimmäisinä";
+"HotkeyBezel.RulersUnfloated" = "Viivaimet eivät ole päällimmäisinä";
+"HotkeyBezel.RulersGrouped" = "Viivaimet ryhmitelty";
+"HotkeyBezel.RulersUngrouped" = "Viivaimia ei ole ryhmitelty";
+"HotkeyBezel.ShadowEnabled" = "Varjo käytössä";
+"HotkeyBezel.ShadowDisabled" = "Varjo pois käytöstä";
+"HotkeyBezel.UnitsFormat" = "Yksiköt: %@";
+"Unit.Pixels.Abbreviation" = "px";
+"Unit.Millimeters.Abbreviation" = "mm";
+"Unit.Inches.Abbreviation" = "in";
