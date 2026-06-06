@@ -127,11 +127,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if ruler.rulerWindow.isVisible {
             detachRulerWindow(ruler.rulerWindow)
             ruler.rulerWindow.orderOut(self)
+            updateRulerGrouping()
         } else {
             showRuler(ruler)
         }
-
-        updateRulerGrouping()
     }
 
     private func detachRulerWindows() {
