@@ -17,6 +17,7 @@ let prefs = Prefs.shared
     case pixels
     case millimeters
     case inches
+    case user
 }
 
 class Prefs: NSObject {
@@ -25,12 +26,16 @@ class Prefs: NSObject {
     static let shared = Prefs()
 
     // MARK: - public properties
-    @objc dynamic var floatRulers       : Bool
-    @objc dynamic var groupRulers       : Bool
-    @objc dynamic var rulerShadow       : Bool
-    @objc dynamic var foregroundOpacity : Int
-    @objc dynamic var backgroundOpacity : Int
-    @objc dynamic var unit              : Unit
+    @objc dynamic var floatRulers         : Bool
+    @objc dynamic var groupRulers         : Bool
+    @objc dynamic var rulerShadow         : Bool
+    @objc dynamic var foregroundOpacity   : Int
+    @objc dynamic var backgroundOpacity   : Int
+    @objc dynamic var unit                : Unit
+    @objc dynamic var userUnitScreenValue : Float
+    @objc dynamic var userUnitScreenUnit  : Unit
+    @objc dynamic var userUnitValue       : Float
+    @objc dynamic var userUnitUnit        : String
 
     // MARK: - public save method
     func save() {
@@ -47,18 +52,26 @@ class Prefs: NSObject {
         "rulerShadow":       false,
         "foregroundOpacity": 90,
         "backgroundOpacity": 50,
-        "unit":              Unit.pixels.rawValue
+        "unit":              Unit.pixels.rawValue,
+        "userUnitScreenValue": 1,
+        "userUnitScreenUnit":  Unit.millimeters.rawValue,
+        "userUnitValue":       1,
+        "userUnitUnit":        "mm"
     ]
 
     private override init() {
         defaults.register(defaults: defaultValues)
 
-        floatRulers       = defaults.bool(forKey: "floatRulers")
-        groupRulers       = defaults.bool(forKey: "groupRulers")
-        rulerShadow       = defaults.bool(forKey: "rulerShadow")
-        foregroundOpacity = defaults.integer(forKey: "foregroundOpacity")
-        backgroundOpacity = defaults.integer(forKey: "backgroundOpacity")
-        unit              = Unit(rawValue: defaults.integer(forKey: "unit")) ?? .pixels
+        floatRulers         = defaults.bool(forKey: "floatRulers")
+        groupRulers         = defaults.bool(forKey: "groupRulers")
+        rulerShadow         = defaults.bool(forKey: "rulerShadow")
+        foregroundOpacity   = defaults.integer(forKey: "foregroundOpacity")
+        backgroundOpacity   = defaults.integer(forKey: "backgroundOpacity")
+        userUnitScreenValue = defaults.float(forKey: "userUnitScreenValue")
+        userUnitScreenUnit  = Unit(rawValue: defaults.integer(forKey: "userUnitScreenUnit")) ?? .millimeters
+        userUnitValue       = defaults.float(forKey: "userUnitValue")
+        userUnitUnit        = defaults.string(forKey: "userUnitUnit") ?? "mm"
+        unit                = Unit(rawValue: defaults.integer(forKey: "unit")) ?? .pixels
 
         super.init()
 
@@ -86,6 +99,18 @@ class Prefs: NSObject {
             },
             observe(\Prefs.unit, options: .new) { prefs, changed in
                 self.defaults.set(prefs.unit.rawValue, forKey: "unit")
+            },
+            observe(\Prefs.userUnitScreenValue, options:.new){ prefs, changed in
+                self.defaults.set(changed.newValue, forKey: "userUnitScreenValue")
+            },
+            observe(\Prefs.userUnitScreenUnit, options:.new){ prefs, changed in
+                self.defaults.set(prefs.userUnitScreenUnit.rawValue, forKey: "userUnitScreenUnit")
+            },
+            observe(\Prefs.userUnitValue, options:.new){ prefs, changed in
+                self.defaults.set(changed.newValue, forKey: "userUnitValue")
+            },
+            observe(\Prefs.userUnitUnit, options:.new){ prefs, changed in
+                self.defaults.set(changed.newValue, forKey: "userUnitUnit")
             },
         ]
     }

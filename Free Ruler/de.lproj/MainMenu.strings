@@ -134,5 +134,8 @@
 /* Class = "NSMenuItem"; title = "Inches"; ObjectID = "lt1-Hj-2TR"; */
 "lt1-Hj-2TR.title" = "Zoll";
 
+/* Class = "NSMenuItem"; title = "user defined"; ObjectID = "irY-SC-eqL"; */
+"irY-SC-eqL.title" = "benutzerdefiniert";
+
 /* Class = "NSMenuItem"; title = "Cycle Units"; ObjectID = "2nm-aL-kZd"; */
 "2nm-aL-kZd.title" = "Nächste Einheit auswählen";

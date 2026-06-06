@@ -22,6 +22,7 @@
                 <outlet property="millimetersMenuItem" destination="B6Y-Hi-AkN" id="9Cc-tZ-RRZ"/>
                 <outlet property="pixelsMenuItem" destination="pYR-Ba-kKi" id="Wus-JK-rs3"/>
                 <outlet property="rulerShadowMenuItem" destination="a8D-hN-A59" id="FZM-pS-71y"/>
+                <outlet property="userDefinedMenuItem" destination="irY-SC-eqL" id="LT1-bU-rbJ"/>
             </connections>
         </customObject>
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
@@ -157,6 +158,12 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="setUnitInches:" target="Voe-Tx-rLC" id="Apf-6P-Oz8"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="user defined" id="irY-SC-eqL">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="setUnitUserDefined:" target="Voe-Tx-rLC" id="iUa-FK-6bH"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="tK2-3l-lAd"/>

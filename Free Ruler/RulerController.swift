@@ -172,6 +172,18 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
             prefs.observe(\Prefs.rulerShadow, options: .new) { prefs, changed in
                 self.rulerWindow.hasShadow = prefs.rulerShadow
             },
+            prefs.observe(\Prefs.userUnitScreenValue, options: .new) { prefs, changed in
+                self.rulerWindow.rule.needsDisplay = true
+            },
+            prefs.observe(\Prefs.userUnitScreenUnit, options: .new) { prefs, changed in
+                self.rulerWindow.rule.needsDisplay = true
+            },
+            prefs.observe(\Prefs.userUnitValue, options: .new) { prefs, changed in
+                self.rulerWindow.rule.needsDisplay = true
+            },
+            prefs.observe(\Prefs.userUnitUnit, options: .new) { prefs, changed in
+                self.rulerWindow.rule.needsDisplay = true
+            },
         ]
     }
 

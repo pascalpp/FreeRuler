@@ -30,7 +30,7 @@ class HorizontalRule: RuleView {
         let width = dirtyRect.width
         let path = NSBezierPath()
         let tickScale: CGFloat
-        let textScale: Int
+        let textScale: CGFloat
         let largeTicks: Int
         let mediumTicks: Int
         let smallTicks: Int
@@ -51,6 +51,46 @@ class HorizontalRule: RuleView {
             mediumTicks = 8
             smallTicks = 4
             tinyTicks = 1
+        case .user:
+            let scale:Float
+            switch(prefs.userUnitScreenUnit) {
+            case .pixels:      scale = 1.0
+            case .millimeters: scale = Float(screen?.dpmm.width ?? NSScreen.defaultDpmm)
+            case .inches:      scale = Float(screen?.dpi.width ?? NSScreen.defaultDpi)
+            default:           scale = 1.0
+            }
+            var tickScale_:CGFloat = CGFloat(prefs.userUnitScreenValue * scale / prefs.userUnitValue)/10
+            var textScale_:CGFloat = 10.0
+            while (tickScale_ < 4) {
+                tickScale_ = tickScale_ * 10.0
+                textScale_ = textScale_ / 10.0
+            }
+            while (tickScale_ > 40) {
+                tickScale_ = tickScale_ / 10.0
+                textScale_ = textScale_ * 10.0
+            }
+            var largeTicks_: Int = 10
+            var mediumTicks_: Int = 5
+            if (tickScale_ > 25){
+                tickScale_ = tickScale_ / 5.0
+                textScale_ = textScale_ * 5.0
+                largeTicks_ = 5
+                mediumTicks_ = 1
+            }
+#if (false)
+            if (tickScale_ > 10){
+                tickScale_ = tickScale_ / 2
+                textScale_ = textScale_ * 2
+                largeTicks_ = 2
+                mediumTicks_ = 1
+            }
+#endif
+            textScale = textScale_
+            tickScale = tickScale_
+            largeTicks = largeTicks_
+            mediumTicks = mediumTicks_
+            smallTicks = 1
+            tinyTicks = nil
         default:
             tickScale = 1
             textScale = 1
@@ -73,7 +113,7 @@ class HorizontalRule: RuleView {
                 path.move(to: CGPoint(x: pos, y: 1))
                 path.line(to: CGPoint(x: pos, y: 10))
 
-                let label = String(i / textScale)
+                let label = String(CGFloat(i) / textScale)
                 let labelX: CGFloat = pos - (labelWidth / 2) + 0.5 // half-pixel nudge /shrug
                 let labelY: CGFloat = labelOffset
                 let labelRect = CGRect(x: labelX, y: labelY, width: labelWidth, height: labelHeight)

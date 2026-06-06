@@ -25,3 +25,13 @@
 
 /* Class = "NSButtonCell"; title = "Float rulers above other applications"; ObjectID = "yPM-Cw-Qsi"; */
 "yPM-Cw-Qsi.title" = "Lineale schweben über anderen Programmen";
+
+/* Class = "NSBox"; title = "user defined units"; ObjectID = "Fy5-7P-msT"; */
+"Fy5-7P-msT.title" = "Benutzerdefinierte Maßeinheit";
+
+/* Class = "NSTextFieldCell"; title = "on screen:"; ObjectID = "VHY-NQ-57D"; */
+"VHY-NQ-57D.title" = "auf dem Bildschirm:";
+
+/* Class = "NSTextFieldCell"; title = "in reality:"; ObjectID = "jIw-kS-bJd"; */
+"jIw-kS-bJd.title" = "in der Realität:";
+

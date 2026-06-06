@@ -72,6 +72,8 @@ class RuleView: NSView {
             return "mm"
         case .inches:
             return "in"
+        case .user:
+            return String(format:"user (%@)", prefs.userUnitUnit)
         }
     }
 
@@ -83,6 +85,20 @@ class RuleView: NSView {
             return String(format: "%.1f", number / (screen?.dpmm.width ?? NSScreen.defaultDpmm))
         case .inches:
             return String(format: "%.3f", number / (screen?.dpi.width ?? NSScreen.defaultDpi))
+        case .user:
+            let scale:Float
+            switch(prefs.userUnitScreenUnit) {
+            case .millimeters:
+                scale = Float(screen?.dpmm.width ?? NSScreen.defaultDpmm)
+                break
+            case .inches:
+                scale = Float(screen?.dpi.width ?? NSScreen.defaultDpi)
+                break
+            default:
+                scale = 1.0;
+                break
+            }
+            return String(format: "%.1f", Float(number) / prefs.userUnitScreenValue / scale * prefs.userUnitValue)
         }
     }
 
