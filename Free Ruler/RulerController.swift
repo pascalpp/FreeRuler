@@ -14,10 +14,6 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
 
     var keyListener: Any?
 
-    let openHand = NSCursor.openHand
-    let closedHand = NSCursor.closedHand
-    let crosshair = NSCursor.crosshair
-
     var preferencesWindowOpen = false {
         didSet {
             updateIsFloatingPanel()
@@ -102,20 +98,19 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     }
 
     override func mouseEntered(with event: NSEvent) {
-        openHand.push()
+        rulerCursorController?.mouseEnteredRuler()
     }
 
     override func mouseExited(with event: NSEvent) {
-        openHand.pop()
-        crosshair.push()
+        rulerCursorController?.mouseExitedRuler()
     }
 
     override func mouseDown(with event: NSEvent) {
-        closedHand.push()
-}
+        rulerCursorController?.mouseDownInRuler()
+    }
 
     override func mouseUp(with event: NSEvent) {
-        closedHand.pop()
+        rulerCursorController?.mouseUpInRuler(mouseIsInsideRuler: isMouseInsideRuler(with: event))
     }
 
     override func mouseMoved(with event: NSEvent) {
@@ -130,6 +125,15 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     func enableMouseTicks() {
         rulerWindow.rule.showMouseTick = true
         otherWindow?.rule.showMouseTick = true
+    }
+
+    private var rulerCursorController: RulerCursorController? {
+        return (NSApp.delegate as? AppDelegate)?.rulerCursorController
+    }
+
+    private func isMouseInsideRuler(with event: NSEvent) -> Bool {
+        let location = rulerWindow.rule.convert(event.locationInWindow, from: nil)
+        return rulerWindow.rule.bounds.contains(location)
     }
 
     func onChangeGrouped() {

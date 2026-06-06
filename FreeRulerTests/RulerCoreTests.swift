@@ -48,4 +48,60 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertEqual(horizontal.minY, screenHeight - 90.0, accuracy: 0.0001)
         XCTAssertEqual(vertical.maxY, horizontal.minY + 1.0, accuracy: 0.0001)
     }
+
+    func testRulerCursorControllerChoosesCursorForActiveRulerEvents() {
+        var appliedCursors: [RulerCursorController.CursorStyle] = []
+        let controller = RulerCursorController { appliedCursors.append($0) }
+
+        controller.applicationDidBecomeActive()
+        controller.mouseEnteredRuler()
+        controller.mouseDownInRuler()
+        controller.mouseUpInRuler(mouseIsInsideRuler: true)
+        controller.mouseExitedRuler()
+
+        XCTAssertEqual(appliedCursors, [
+            .crosshair,
+            .openHand,
+            .closedHand,
+            .openHand,
+            .crosshair,
+        ])
+    }
+
+    func testRulerCursorControllerReturnsToCrosshairWhenDragEndsOutsideRuler() {
+        var appliedCursors: [RulerCursorController.CursorStyle] = []
+        let controller = RulerCursorController { appliedCursors.append($0) }
+
+        controller.applicationDidBecomeActive()
+        controller.mouseEnteredRuler()
+        controller.mouseDownInRuler()
+        controller.mouseExitedRuler()
+        controller.mouseUpInRuler(mouseIsInsideRuler: false)
+
+        XCTAssertEqual(appliedCursors, [
+            .crosshair,
+            .openHand,
+            .closedHand,
+            .crosshair,
+        ])
+    }
+
+    func testRulerCursorControllerResetsWhenAppResignsActive() {
+        var appliedCursors: [RulerCursorController.CursorStyle] = []
+        let controller = RulerCursorController { appliedCursors.append($0) }
+
+        controller.applicationDidBecomeActive()
+        controller.mouseEnteredRuler()
+        controller.mouseDownInRuler()
+        controller.applicationDidResignActive()
+        controller.applicationDidBecomeActive()
+
+        XCTAssertEqual(appliedCursors, [
+            .crosshair,
+            .openHand,
+            .closedHand,
+            .arrow,
+            .crosshair,
+        ])
+    }
 }
