@@ -142,6 +142,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func rulerController(orientation: Orientation) -> RulerController? {
         createRulersIfNeeded()
+        return existingRulerController(orientation: orientation)
+    }
+
+    private func existingRulerController(orientation: Orientation) -> RulerController? {
         return rulers.first { $0.ruler.orientation == orientation }
     }
 
@@ -153,6 +157,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func detachRulerWindow(_ window: RulerWindow) {
         for ruler in rulers {
+            guard ruler.rulerWindow != window else { continue }
+
             ruler.rulerWindow.removeChildWindow(window)
             window.removeChildWindow(ruler.rulerWindow)
         }
@@ -302,13 +308,13 @@ extension AppDelegate: NSMenuItemValidation {
         case #selector(closePreferences(_:)):
             return preferencesController?.window?.isKeyWindow == true
         case #selector(toggleHorizontalRuler(_:)):
-            let ruler = rulerController(orientation: .horizontal)
+            let ruler = existingRulerController(orientation: .horizontal)
             menuItem.title = ruler?.rulerWindow.isVisible == true
                 ? NSLocalizedString("Hide Horizontal Ruler", comment: "Menu item title to hide the horizontal ruler")
                 : NSLocalizedString("Show Horizontal Ruler", comment: "Menu item title to show the horizontal ruler")
             return canToggleRulerVisibility
         case #selector(toggleVerticalRuler(_:)):
-            let ruler = rulerController(orientation: .vertical)
+            let ruler = existingRulerController(orientation: .vertical)
             menuItem.title = ruler?.rulerWindow.isVisible == true
                 ? NSLocalizedString("Hide Vertical Ruler", comment: "Menu item title to hide the vertical ruler")
                 : NSLocalizedString("Show Vertical Ruler", comment: "Menu item title to show the vertical ruler")
