@@ -3,6 +3,12 @@ import SwiftUI
 
 final class HotkeyBezel {
 
+    private enum AccessibilityIdentifier {
+        static let contentView = "hotkey-bezel"
+        static let hostingView = "hotkey-bezel-hosting-view"
+        static let panel = "hotkey-bezel-panel"
+    }
+
     private let panel: NSPanel
     private let hostingView: NSHostingView<HotkeyBezelView>
     private var hideWorkItem: DispatchWorkItem?
@@ -11,13 +17,13 @@ final class HotkeyBezel {
         hostingView = NSHostingView(rootView: HotkeyBezelView(message: ""))
         hostingView.frame = NSRect(x: 0, y: 0, width: 420, height: 116)
         hostingView.setAccessibilityElement(true)
-        hostingView.setAccessibilityIdentifier("hotkey-bezel")
+        hostingView.setAccessibilityIdentifier(AccessibilityIdentifier.hostingView)
         hostingView.setAccessibilityLabel("")
         hostingView.setAccessibilityValue("")
 
         let contentView = NSView(frame: hostingView.frame)
         contentView.setAccessibilityElement(true)
-        contentView.setAccessibilityIdentifier("hotkey-bezel")
+        contentView.setAccessibilityIdentifier(AccessibilityIdentifier.contentView)
         contentView.setAccessibilityLabel("")
         contentView.setAccessibilityValue("")
         contentView.addSubview(hostingView)
@@ -36,7 +42,7 @@ final class HotkeyBezel {
         panel.ignoresMouseEvents = true
         panel.hidesOnDeactivate = false
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .transient]
-        panel.setAccessibilityIdentifier("hotkey-bezel")
+        panel.setAccessibilityIdentifier(AccessibilityIdentifier.panel)
         panel.alphaValue = 0
     }
 
