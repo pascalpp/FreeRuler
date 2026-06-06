@@ -120,15 +120,21 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     func disableMouseTicks() {
         rulerWindow.rule.showMouseTick = false
         otherWindow?.rule.showMouseTick = false
+        appDelegate?.suspendMouseTickUpdates(owner: self)
     }
 
     func enableMouseTicks() {
         rulerWindow.rule.showMouseTick = true
         otherWindow?.rule.showMouseTick = true
+        appDelegate?.resumeMouseTickUpdates(owner: self)
     }
 
     private var rulerCursorController: RulerCursorController? {
-        return (NSApp.delegate as? AppDelegate)?.rulerCursorController
+        return appDelegate?.rulerCursorController
+    }
+
+    private var appDelegate: AppDelegate? {
+        return NSApp.delegate as? AppDelegate
     }
 
     private func isMouseInsideRuler(with event: NSEvent) -> Bool {

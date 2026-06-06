@@ -104,4 +104,39 @@ final class RulerCoreTests: XCTestCase {
             .crosshair,
         ])
     }
+
+    func testMouseTickTimerPolicyRunsOnlyWhenRulersAreVisible() {
+        let policy = MouseTickTimerPolicy(foregroundInterval: 1 / 60, backgroundInterval: 1 / 30)
+
+        policy.applicationDidBecomeActive()
+        XCTAssertNil(policy.desiredInterval)
+
+        policy.updateVisibleRulers(true)
+        XCTAssertEqual(policy.desiredInterval, 1 / 60)
+
+        policy.applicationDidResignActive()
+        XCTAssertEqual(policy.desiredInterval, 1 / 30)
+
+        policy.updateVisibleRulers(false)
+        XCTAssertNil(policy.desiredInterval)
+    }
+
+    func testMouseTickTimerPolicySuspendsUntilAllOwnersResume() {
+        let policy = MouseTickTimerPolicy(foregroundInterval: 1 / 60, backgroundInterval: 1 / 30)
+        let firstOwner = NSObject()
+        let secondOwner = NSObject()
+
+        policy.applicationDidBecomeActive()
+        policy.updateVisibleRulers(true)
+
+        policy.suspend(owner: firstOwner)
+        policy.suspend(owner: secondOwner)
+        XCTAssertNil(policy.desiredInterval)
+
+        policy.resume(owner: firstOwner)
+        XCTAssertNil(policy.desiredInterval)
+
+        policy.resume(owner: secondOwner)
+        XCTAssertEqual(policy.desiredInterval, 1 / 60)
+    }
 }

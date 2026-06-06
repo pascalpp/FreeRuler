@@ -47,92 +47,6 @@ private enum HotkeyBezelLocalizationKey: String {
     }
 }
 
-final class RulerCursorController {
-    enum CursorStyle: Equatable {
-        case arrow
-        case crosshair
-        case openHand
-        case closedHand
-
-        var nsCursor: NSCursor {
-            switch self {
-            case .arrow:
-                return .arrow
-            case .crosshair:
-                return .crosshair
-            case .openHand:
-                return .openHand
-            case .closedHand:
-                return .closedHand
-            }
-        }
-    }
-
-    private var appIsActive = false
-    private var mouseIsOverRuler = false
-    private var mouseIsDraggingRuler = false
-    private let applyCursor: (CursorStyle) -> Void
-
-    private(set) var currentCursor: CursorStyle?
-
-    init(applyCursor: @escaping (CursorStyle) -> Void = { $0.nsCursor.set() }) {
-        self.applyCursor = applyCursor
-    }
-
-    func applicationDidBecomeActive() {
-        appIsActive = true
-        updateCursor()
-    }
-
-    func applicationDidResignActive() {
-        appIsActive = false
-        mouseIsOverRuler = false
-        mouseIsDraggingRuler = false
-        setCursor(.arrow)
-    }
-
-    func mouseEnteredRuler() {
-        mouseIsOverRuler = true
-        updateCursor()
-    }
-
-    func mouseExitedRuler() {
-        mouseIsOverRuler = false
-        updateCursor()
-    }
-
-    func mouseDownInRuler() {
-        mouseIsOverRuler = true
-        mouseIsDraggingRuler = true
-        updateCursor()
-    }
-
-    func mouseUpInRuler(mouseIsInsideRuler: Bool) {
-        mouseIsOverRuler = mouseIsInsideRuler
-        mouseIsDraggingRuler = false
-        updateCursor()
-    }
-
-    private func updateCursor() {
-        guard appIsActive else { return }
-
-        if mouseIsDraggingRuler {
-            setCursor(.closedHand)
-        } else if mouseIsOverRuler {
-            setCursor(.openHand)
-        } else {
-            setCursor(.crosshair)
-        }
-    }
-
-    private func setCursor(_ cursor: CursorStyle) {
-        guard cursor != currentCursor else { return }
-
-        currentCursor = cursor
-        applyCursor(cursor)
-    }
-}
-
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
@@ -141,10 +55,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var rulers: [RulerController] = []
 
     var timer: Timer?
+    private var timerInterval: TimeInterval?
     let foregroundTimerInterval: TimeInterval = 1 / 60 // 60 fps
     let backgroundTimerInterval: TimeInterval = 1 / 30 // 30 fps
 
     let rulerCursorController = RulerCursorController()
+    lazy var mouseTickTimerPolicy = MouseTickTimerPolicy(
+        foregroundInterval: foregroundTimerInterval,
+        backgroundInterval: backgroundTimerInterval
+    )
 
     @IBOutlet weak var pixelsMenuItem: NSMenuItem!
     @IBOutlet weak var millimetersMenuItem: NSMenuItem!
@@ -285,6 +204,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             detachRulerWindow(ruler.rulerWindow)
             ruler.rulerWindow.orderOut(self)
             updateRulerGrouping()
+            updateMouseTickTimer()
         } else {
             showRuler(ruler)
         }
@@ -309,6 +229,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         ruler.showWindow(self)
         ruler.rulerWindow.orderFrontRegardless()
         updateRulerGrouping()
+        updateMouseTickTimer()
     }
 
     private func detachRulerWindow(_ window: RulerWindow) {
@@ -352,7 +273,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             ruler.foreground()
         }
 
-        startTimer(timeInterval: foregroundTimerInterval)
+        mouseTickTimerPolicy.applicationDidBecomeActive()
+        updateMouseTickTimer()
 
         rulerCursorController.applicationDidBecomeActive()
     }
@@ -362,7 +284,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             ruler.background()
         }
 
-        startTimer(timeInterval: backgroundTimerInterval)
+        mouseTickTimerPolicy.applicationDidResignActive()
+        updateMouseTickTimer()
 
         rulerCursorController.applicationDidResignActive()
     }
@@ -555,8 +478,32 @@ extension AppDelegate: NSMenuItemValidation {
 // MARK: - Timer
 extension AppDelegate {
 
+    func suspendMouseTickUpdates(owner: AnyObject) {
+        mouseTickTimerPolicy.suspend(owner: owner)
+        updateMouseTickTimer()
+    }
+
+    func resumeMouseTickUpdates(owner: AnyObject) {
+        mouseTickTimerPolicy.resume(owner: owner)
+        updateMouseTickTimer()
+    }
+
+    private func updateMouseTickTimer() {
+        mouseTickTimerPolicy.updateVisibleRulers(hasVisibleRuler)
+
+        guard let timeInterval = mouseTickTimerPolicy.desiredInterval else {
+            stopTimer()
+            return
+        }
+
+        startTimer(timeInterval: timeInterval)
+    }
+
     private func startTimer(timeInterval: TimeInterval) {
+        guard timer == nil || timerInterval != timeInterval else { return }
+
         timer?.invalidate()
+        timerInterval = timeInterval
 
         timer = Timer.scheduledTimer(
             timeInterval: timeInterval,
@@ -565,6 +512,12 @@ extension AppDelegate {
             userInfo: nil,
             repeats: true
         )
+    }
+
+    private func stopTimer() {
+        timer?.invalidate()
+        timer = nil
+        timerInterval = nil
     }
 
     @objc func onInterval() {
