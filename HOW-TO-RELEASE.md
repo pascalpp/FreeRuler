@@ -5,68 +5,120 @@ Free Ruler has two release tracks:
 - GitHub release: a signed, notarized zip for direct download from GitHub.
 - App Store release: an uploaded build submitted through App Store Connect.
 
-This document currently automates the GitHub release path with npm scripts. The
-App Store path is still manual and should be automated separately.
-
-## Versioning
-
-Free Ruler keeps the marketing version in both `package.json` and the Xcode
-project `MARKETING_VERSION`. Keep those values in sync before releasing.
-
-Useful commands:
-
-```sh
-npm run get:version
-npm run get:commits
-npm run bump:version
-```
-
-After bumping `package.json`, update Xcode's `MARKETING_VERSION` to match. Use
-the commit count or another intentional value for `CURRENT_PROJECT_VERSION`.
+This document covers the GitHub release path. The App Store path is still manual
+for now.
 
 ## GitHub Release
 
-The GitHub release scripts build and export a Developer ID app, notarize and
-staple it, zip it, then create or update a draft GitHub Release.
+Assuming you have the prerequites listed below, follow these steps from a terminal in the Free Ruler repository.
 
-### Prerequisites
+1. Start from the latest `main`.
 
-Required command line tools:
+   ```sh
+   git switch main
+   git pull --ff-only origin main
+   ```
+
+2. Bump the version.
+
+   ```sh
+   npm run bump:version
+   ```
+
+   Choose `M`, `m`, or `p` when prompted. This updates `package.json` and the
+   Xcode `MARKETING_VERSION`, which is the version shown in the app's About
+   dialog.
+
+3. Commit and push the version bump.
+
+   ```sh
+   git add package.json "Free Ruler.xcodeproj/project.pbxproj"
+   git commit -m "Bump version to X.Y.Z"
+   git push origin main
+   ```
+
+   Replace `X.Y.Z` with the version you just created.
+
+4. Build, notarize, zip, and create a draft GitHub Release.
+
+   ```sh
+   NOTARYTOOL_PROFILE=FreeRulerNotary npm run release:github
+   ```
+
+5. Publish the draft release.
+
+   Open the [GitHub Releases
+   page](https://github.com/pascalpp/FreeRuler/releases), review the draft,
+   download and test the zip, then click **Publish release**.
+
+## Testing the Release Process
+
+Use this when you want to test the release machinery without making a real
+public release.
+
+1. Test local archive/export/zip mechanics.
+
+   ```sh
+   npm run github:release:dryrun
+   ```
+
+   This is the fastest check. It does not contact Apple's notary service and it
+   does not create a GitHub release.
+
+2. Test the full path with a temporary draft release.
+
+   ```sh
+   RELEASE_TAG=vX.Y.Z-test.1 NOTARYTOOL_PROFILE=FreeRulerNotary npm run release:github
+   ```
+
+   Replace `X.Y.Z` with the version currently in `package.json`. This creates a
+   temporary tag and a draft GitHub Release. Draft releases are not public until
+   they are published.
+
+3. Download the zip from the draft release, open the app, and confirm it runs.
+
+4. Delete the test release and tag before testing again.
+
+   ```sh
+   gh release delete vX.Y.Z-test.1 --yes
+   git tag -d vX.Y.Z-test.1
+   git push origin :refs/tags/vX.Y.Z-test.1
+   ```
+
+## Details
+
+<details>
+
+<summary>Prerequisites</summary>
+
+The GitHub release command expects:
+
+- A clean git working tree.
+- `gh` authenticated with permission to create releases.
+- Xcode signing working for the Free Ruler app target.
+- A Developer ID Application certificate installed.
+- Notary credentials saved in Keychain.
+
+The documented commands assume the notary profile is named `FreeRulerNotary`.
+Create that profile once with:
 
 ```sh
-git
-gh
-node
-npm
-xcodebuild
-xcrun
-ditto
+xcrun notarytool store-credentials "FreeRulerNotary"
 ```
 
-Required signing/notarization setup:
-
-- A Developer ID Application certificate available to Xcode.
-- Xcode signing configured for the Free Ruler app target.
-- GitHub CLI authenticated with permission to create releases.
-- Notary credentials configured with either:
-  - `NOTARYTOOL_PROFILE`, created with `xcrun notarytool store-credentials`
-  - or `NOTARYTOOL_APPLE_ID`, `NOTARYTOOL_PASSWORD`, and `NOTARYTOOL_TEAM_ID`
-
-If Xcode needs to update signing assets during archive/export, run with:
+If Xcode needs to create or update signing assets during archive/export, add
+`ALLOW_PROVISIONING_UPDATES=1`:
 
 ```sh
-ALLOW_PROVISIONING_UPDATES=1 npm run release:github
+ALLOW_PROVISIONING_UPDATES=1 NOTARYTOOL_PROFILE=FreeRulerNotary npm run release:github
 ```
 
-### One-command flow
+</details>
 
-Run this from a clean checkout on the commit you want to release:
+<details>
+<summary>What the release command does</summary>
 
-```sh
-npm run release:github
-```
-
-This runs:
+`npm run release:github` runs:
 
 ```sh
 npm run release:github:check
@@ -77,82 +129,55 @@ npm run release:github:zip
 npm run release:github:publish
 ```
 
-The final zip is written to ignored release output:
+The final zip is written to:
 
 ```sh
 build/release/free-ruler-X.Y.Z.zip
 ```
 
-The release is created as a draft so release notes can be reviewed before
-publishing.
+`build/release/` is ignored by git. Historical release zips in `dist/` are left
+alone.
 
-### Rehearsal without publishing
+The GitHub release is created as a draft so release notes and the uploaded zip
+can be reviewed before publishing.
 
-To exercise the local build/export/zip flow without creating tags or GitHub
-releases, run:
+</details>
 
-```sh
-RELEASE_DRY_RUN=1 npm run release:github
-```
+<details>
+<summary>Version commands</summary>
 
-Dry-run mode allows an existing version tag, skips the clean-worktree check, and
-prints what the GitHub publish step would do.
-
-To rehearse without contacting Apple's notary service:
+Show the current version:
 
 ```sh
-npm run github:release:dryrun
+npm run get:version
 ```
 
-The resulting zip is useful for checking packaging mechanics, but it is not a
-notarized release artifact.
-
-To test publishing a real draft release without using the production version
-tag, override the tag:
+Bump the version interactively:
 
 ```sh
-RELEASE_TAG=vX.Y.Z-test.1 npm run release:github
+npm run bump:version
 ```
 
-After testing, delete the draft release and test tag:
+Set an exact version:
 
 ```sh
-gh release delete vX.Y.Z-test.1 --yes
-git tag -d vX.Y.Z-test.1
-git push origin :refs/tags/vX.Y.Z-test.1
+npm run release:version -- X.Y.Z
 ```
 
-### Step-by-step flow
-
-Use the step scripts when debugging signing, export, notarization, or GitHub
-release creation:
+Set an exact version and Xcode build number:
 
 ```sh
-npm run release:github:check
-npm run release:github:archive
-npm run release:github:export
-npm run release:github:notarize
-npm run release:github:zip
-npm run release:github:publish
+npm run release:version -- X.Y.Z 303
 ```
 
-Build products and the release zip are written under `build/release/`, which is
-ignored by git. Historical release zips in `dist/` are left alone; future policy
-for those checked-in artifacts is tracked separately.
+</details>
 
-If a zip for the current version already exists, the zip step fails. To replace
-it intentionally:
+## Manual App Store release</summary>
 
-```sh
-RELEASE_OVERWRITE=1 npm run release:github:zip
-```
-
-## App Store Release
-
-The App Store path is still manual for now:
+The App Store path is not automated yet.
 
 1. Archive the app in Xcode.
-2. Choose Distribute App > App Store Connect > Upload.
+2. Choose **Distribute App > App Store Connect > Upload**.
 3. Visit App Store Connect.
 4. Create a new version if needed.
 5. Select the uploaded build.
@@ -160,6 +185,6 @@ The App Store path is still manual for now:
 7. Submit for review.
 
 Future automation should add a separate App Store export/upload path instead of
-overloading the GitHub release scripts. That follow-up should cover App Store
-Connect API credentials, export options, upload validation, and review-submission
-steps.
+overloading the GitHub release scripts.
+
+</details>
