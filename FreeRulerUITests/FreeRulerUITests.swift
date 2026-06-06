@@ -163,6 +163,12 @@ final class FreeRulerUITests: XCTestCase {
 }
 
 private extension XCUIElement {
+    func waitForNonExistence(timeout: TimeInterval) -> Bool {
+        let predicate = NSPredicate(format: "exists == false")
+        let expectation = XCTNSPredicateExpectation(predicate: predicate, object: self)
+        return XCTWaiter.wait(for: [expectation], timeout: timeout) == .completed
+    }
+
     var isChecked: Bool {
         if let value = value as? String {
             return value == "1"
