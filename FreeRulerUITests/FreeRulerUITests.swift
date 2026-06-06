@@ -113,6 +113,59 @@ final class FreeRulerUITests: XCTestCase {
         XCTAssertTrue(verticalRuler.waitForExistence(timeout: 2))
     }
 
+    func testFloatShadowAndUnitKeyboardCommands() {
+        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
+        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
+
+        horizontalRuler.click()
+        XCTAssertTrue(floatRulersEnabledInPreferences())
+
+        horizontalRuler.click()
+        app.typeKey("f", modifierFlags: [])
+        XCTAssertFalse(floatRulersEnabledInPreferences())
+
+        horizontalRuler.click()
+        app.typeKey("f", modifierFlags: [])
+        XCTAssertTrue(floatRulersEnabledInPreferences())
+
+        horizontalRuler.click()
+        XCTAssertFalse(rulerShadowEnabledInPreferences())
+
+        horizontalRuler.click()
+        app.typeKey("s", modifierFlags: [])
+        XCTAssertTrue(rulerShadowEnabledInPreferences())
+
+        horizontalRuler.click()
+        app.typeKey("s", modifierFlags: [])
+        XCTAssertFalse(rulerShadowEnabledInPreferences())
+
+        horizontalRuler.click()
+        XCTAssertEqual(horizontalRulerView.value as? String, "px")
+
+        app.typeKey("u", modifierFlags: [])
+        XCTAssertEqual(horizontalRulerView.value as? String, "mm")
+
+        app.typeKey("u", modifierFlags: [])
+        XCTAssertEqual(horizontalRulerView.value as? String, "in")
+
+        app.typeKey("u", modifierFlags: [])
+        XCTAssertEqual(horizontalRulerView.value as? String, "px")
+    }
+
+    func testAlignRulersAtMouseLocationKeyboardCommand() {
+        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
+        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
+
+        let originalHorizontalFrame = horizontalRuler.frame
+        let originalVerticalFrame = verticalRuler.frame
+
+        verticalRuler.click()
+        app.typeKey("o", modifierFlags: [])
+
+        XCTAssertTrue(horizontalRuler.waitForFrameChange(from: originalHorizontalFrame, timeout: 2))
+        XCTAssertTrue(verticalRuler.waitForFrameChange(from: originalVerticalFrame, timeout: 2))
+    }
+
     private var horizontalRuler: XCUIElement {
         app.dialogs["horizontal-ruler-window"]
     }
@@ -121,12 +174,24 @@ final class FreeRulerUITests: XCTestCase {
         app.dialogs["vertical-ruler-window"]
     }
 
+    private var horizontalRulerView: XCUIElement {
+        app.otherElements["horizontal-ruler-view"]
+    }
+
     private var preferencesWindow: XCUIElement {
         app.windows["Free Ruler Preferences"]
     }
 
+    private var floatRulersCheckbox: XCUIElement {
+        app.checkBoxes["float-rulers-checkbox"]
+    }
+
     private var groupRulersCheckbox: XCUIElement {
         app.checkBoxes["group-rulers-checkbox"]
+    }
+
+    private var rulerShadowCheckbox: XCUIElement {
+        app.checkBoxes["ruler-shadow-checkbox"]
     }
 
     private func openPreferences() {
@@ -160,6 +225,20 @@ final class FreeRulerUITests: XCTestCase {
         closePreferences()
         return enabled
     }
+
+    private func floatRulersEnabledInPreferences() -> Bool {
+        openPreferences()
+        let enabled = floatRulersCheckbox.isChecked
+        closePreferences()
+        return enabled
+    }
+
+    private func rulerShadowEnabledInPreferences() -> Bool {
+        openPreferences()
+        let enabled = rulerShadowCheckbox.isChecked
+        closePreferences()
+        return enabled
+    }
 }
 
 private extension XCUIElement {
@@ -167,6 +246,20 @@ private extension XCUIElement {
         let predicate = NSPredicate(format: "exists == false")
         let expectation = XCTNSPredicateExpectation(predicate: predicate, object: self)
         return XCTWaiter.wait(for: [expectation], timeout: timeout) == .completed
+    }
+
+    func waitForFrameChange(from originalFrame: CGRect, timeout: TimeInterval) -> Bool {
+        let deadline = Date().addingTimeInterval(timeout)
+
+        while Date() < deadline {
+            if !frame.equalTo(originalFrame) {
+                return true
+            }
+
+            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
+        }
+
+        return !frame.equalTo(originalFrame)
     }
 
     var isChecked: Bool {

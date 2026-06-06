@@ -42,7 +42,7 @@ class RulerWindow: NSPanel {
         rule.layer?.borderColor = CGColor(gray: 0, alpha: 0.5)
         rule.layer?.borderWidth = 1.0
         rule.setAccessibilityElement(true)
-        rule.setAccessibilityIdentifier(getIdentifier(for: ruler.orientation))
+        rule.setAccessibilityIdentifier(getRuleIdentifier(for: ruler.orientation))
 
         rule.nextResponder = self
         self.contentView = rule
@@ -80,6 +80,15 @@ private func getIdentifier(for orientation: Orientation) -> String {
         return "horizontal-ruler-window"
     case .vertical:
         return "vertical-ruler-window"
+    }
+}
+
+private func getRuleIdentifier(for orientation: Orientation) -> String {
+    switch orientation {
+    case .horizontal:
+        return "horizontal-ruler-view"
+    case .vertical:
+        return "vertical-ruler-view"
     }
 }
 

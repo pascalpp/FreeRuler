@@ -75,6 +75,10 @@ class RuleView: NSView {
         }
     }
 
+    override func accessibilityValue() -> Any? {
+        return getUnitLabel()
+    }
+
     func getMouseNumberLabel(_ number: CGFloat) -> String {
         switch prefs.unit {
         case .pixels:
