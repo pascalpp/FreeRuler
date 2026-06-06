@@ -34,6 +34,20 @@
                ReferencedContainer = "container:Free Ruler.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "50A147082D03C00000147C0D"
+               BuildableName = "FreeRulerUITests.xctest"
+               BlueprintName = "FreeRulerUITests"
+               ReferencedContainer = "container:Free Ruler.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -59,6 +73,17 @@
                BlueprintIdentifier = "50A137082D03A00000137C0D"
                BuildableName = "FreeRulerTests.xctest"
                BlueprintName = "FreeRulerTests"
+               ReferencedContainer = "container:Free Ruler.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "50A147082D03C00000147C0D"
+               BuildableName = "FreeRulerUITests.xctest"
+               BlueprintName = "FreeRulerUITests"
                ReferencedContainer = "container:Free Ruler.xcodeproj">
             </BuildableReference>
          </TestableReference>

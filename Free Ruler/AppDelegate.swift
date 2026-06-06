@@ -2,6 +2,7 @@ import Cocoa
 
 let env = ProcessInfo.processInfo.environment
 let APP_ICON_HELPER = env["APP_ICON_HELPER"] != nil
+let UI_TESTS = env["FREE_RULER_UI_TESTS"] != nil
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -31,6 +32,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Lifecycle
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
+
+        if UI_TESTS {
+            resetStateForUITests()
+        }
 
         subscribeToPrefs()
         updateDisplay()
@@ -91,6 +96,28 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func updateRulerShadowMenuItem() {
         rulerShadowMenuItem?.state = prefs.rulerShadow ? .on : .off
+    }
+
+    private func resetStateForUITests() {
+        let defaults = UserDefaults.standard
+        [
+            "groupRulers",
+            "floatRulers",
+            "rulerShadow",
+            "foregroundOpacity",
+            "backgroundOpacity",
+            "unit",
+            "NSWindow Frame horizontal-ruler",
+            "NSWindow Frame vertical-ruler",
+            "NSWindow Frame preferencesWindow",
+        ].forEach(defaults.removeObject(forKey:))
+
+        prefs.groupRulers = true
+        prefs.floatRulers = true
+        prefs.rulerShadow = false
+        prefs.foregroundOpacity = 90
+        prefs.backgroundOpacity = 50
+        prefs.unit = .pixels
     }
 
     func createRulersIfNeeded() {

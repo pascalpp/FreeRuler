@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		50A137012D03A00000137C0D /* RulerCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A137002D03A00000137C0D /* RulerCoreTests.swift */; };
 		50A137032D03A00000137C0D /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50A137022D03A00000137C0D /* XCTest.framework */; };
+		50A147012D03C00000147C0D /* FreeRulerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A147002D03C00000147C0D /* FreeRulerUITests.swift */; };
+		50A147032D03C00000147C0D /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50A137022D03A00000137C0D /* XCTest.framework */; };
 		50008B6122846FCD001E3EE4 /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50008B6022846FCD001E3EE4 /* Notifications.swift */; };
 		5012CAAD226AB09000BD9565 /* VerticalRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5012CAAC226AB09000BD9565 /* VerticalRule.swift */; };
 		507FED43227FFF5300BD77DC /* PreferencesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507FED41227FFF5300BD77DC /* PreferencesController.swift */; };
@@ -29,6 +31,13 @@
 
 /* Begin PBXContainerItemProxy section */
 		50A137102D03A00000137C0D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6F41027D2260712F00F06A10 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6F4102842260712F00F06A10;
+			remoteInfo = "Free Ruler";
+		};
+		50A1470C2D03C00000147C0D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 6F41027D2260712F00F06A10 /* Project object */;
 			proxyType = 1;
@@ -63,6 +72,8 @@
 		50A137002D03A00000137C0D /* RulerCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulerCoreTests.swift; sourceTree = "<group>"; };
 		50A137022D03A00000137C0D /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = System/Library/Frameworks/XCTest.framework; sourceTree = SDKROOT; };
 		50A137042D03A00000137C0D /* FreeRulerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FreeRulerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		50A147002D03C00000147C0D /* FreeRulerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeRulerUITests.swift; sourceTree = "<group>"; };
+		50A147022D03C00000147C0D /* FreeRulerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FreeRulerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		50008B6022846FCD001E3EE4 /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 		5012CAAC226AB09000BD9565 /* VerticalRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerticalRule.swift; sourceTree = "<group>"; };
 		507FED41227FFF5300BD77DC /* PreferencesController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesController.swift; sourceTree = "<group>"; };
@@ -105,6 +116,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		50A147042D03C00000147C0D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				50A147032D03C00000147C0D /* XCTest.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6F4102822260712F00F06A10 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -120,6 +139,7 @@
 			children = (
 				6F4102872260712F00F06A10 /* Free Ruler */,
 				50A137062D03A00000137C0D /* FreeRulerTests */,
+				50A147072D03C00000147C0D /* FreeRulerUITests */,
 				50A137072D03A00000137C0D /* Frameworks */,
 				6F4102862260712F00F06A10 /* Products */,
 			);
@@ -130,6 +150,7 @@
 			children = (
 				6F4102852260712F00F06A10 /* Free Ruler.app */,
 				50A137042D03A00000137C0D /* FreeRulerTests.xctest */,
+				50A147022D03C00000147C0D /* FreeRulerUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -140,6 +161,14 @@
 				50A137002D03A00000137C0D /* RulerCoreTests.swift */,
 			);
 			path = FreeRulerTests;
+			sourceTree = "<group>";
+		};
+		50A147072D03C00000147C0D /* FreeRulerUITests */ = {
+			isa = PBXGroup;
+			children = (
+				50A147002D03C00000147C0D /* FreeRulerUITests.swift */,
+			);
+			path = FreeRulerUITests;
 			sourceTree = "<group>";
 		};
 		50A137072D03A00000137C0D /* Frameworks */ = {
@@ -196,6 +225,24 @@
 			productReference = 50A137042D03A00000137C0D /* FreeRulerTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		50A147082D03C00000147C0D /* FreeRulerUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 50A1470B2D03C00000147C0D /* Build configuration list for PBXNativeTarget "FreeRulerUITests" */;
+			buildPhases = (
+				50A147052D03C00000147C0D /* Sources */,
+				50A147042D03C00000147C0D /* Frameworks */,
+				50A147062D03C00000147C0D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				50A1470D2D03C00000147C0D /* PBXTargetDependency */,
+			);
+			name = FreeRulerUITests;
+			productName = FreeRulerUITests;
+			productReference = 50A147022D03C00000147C0D /* FreeRulerUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		6F4102842260712F00F06A10 /* Free Ruler */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6F4102932260713100F06A10 /* Build configuration list for PBXNativeTarget "Free Ruler" */;
@@ -230,6 +277,10 @@
 						CreatedOnToolsVersion = 26.3;
 						TestTargetID = 6F4102842260712F00F06A10;
 					};
+					50A147082D03C00000147C0D = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = 6F4102842260712F00F06A10;
+					};
 					6F4102842260712F00F06A10 = {
 						CreatedOnToolsVersion = 10.2;
 					};
@@ -254,12 +305,20 @@
 			targets = (
 				6F4102842260712F00F06A10 /* Free Ruler */,
 				50A137082D03A00000137C0D /* FreeRulerTests */,
+				50A147082D03C00000147C0D /* FreeRulerUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		50A1370A2D03A00000137C0D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		50A147062D03C00000147C0D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -289,6 +348,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		50A147052D03C00000147C0D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				50A147012D03C00000147C0D /* FreeRulerUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6F4102812260712F00F06A10 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -314,6 +381,11 @@
 			isa = PBXTargetDependency;
 			target = 6F4102842260712F00F06A10 /* Free Ruler */;
 			targetProxy = 50A137102D03A00000137C0D /* PBXContainerItemProxy */;
+		};
+		50A1470D2D03C00000147C0D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6F4102842260712F00F06A10 /* Free Ruler */;
+			targetProxy = 50A1470C2D03C00000147C0D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -386,6 +458,36 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Free Ruler.app/Contents/MacOS/Free Ruler";
+			};
+			name = Release;
+		};
+		50A147092D03C00000147C0D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = FreeRulerUITests;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pascal.freeruler.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = "Free Ruler";
+			};
+			name = Debug;
+		};
+		50A1470A2D03C00000147C0D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = FreeRulerUITests;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pascal.freeruler.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = "Free Ruler";
 			};
 			name = Release;
 		};
@@ -574,6 +676,15 @@
 			buildConfigurations = (
 				50A1370B2D03A00000137C0D /* Debug */,
 				50A1370C2D03A00000137C0D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		50A1470B2D03C00000147C0D /* Build configuration list for PBXNativeTarget "FreeRulerUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				50A147092D03C00000147C0D /* Debug */,
+				50A1470A2D03C00000147C0D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
