@@ -19,33 +19,24 @@ Assuming you have the prerequisites listed below, follow these steps from a term
    git pull --ff-only origin main
    ```
 
-2. Bump the version.
+2. Bump, commit, and push the version.
 
    ```sh
    npm run bump:version
    ```
 
-   Choose `M`, `m`, or `p` when prompted. This updates `package.json` and the
+   Press `M`, `m`, or `p` when prompted. This updates `package.json` and the
    Xcode `MARKETING_VERSION`, which is the version shown in the app's About
-   dialog.
+   dialog. It also updates the Xcode build number from the current git commit
+   count. Confirm the second prompt to commit the changed files and push `main`.
 
-3. Commit and push the version bump.
-
-   ```sh
-   git add package.json "Free Ruler.xcodeproj/project.pbxproj"
-   git commit -m "Bump version to X.Y.Z"
-   git push origin main
-   ```
-
-   Replace `X.Y.Z` with the version you just created.
-
-4. Build, notarize, zip, and create a draft GitHub Release.
+3. Build, notarize, zip, and create a draft GitHub Release.
 
    ```sh
    NOTARYTOOL_PROFILE=FreeRulerNotary npm run release:github
    ```
 
-5. Publish the draft release.
+4. Publish the draft release.
 
    Open the [GitHub Releases
    page](https://github.com/pascalpp/FreeRuler/releases), review the draft,
@@ -158,6 +149,9 @@ Bump the version interactively:
 ```sh
 npm run bump:version
 ```
+
+This also sets the Xcode build number from the current git commit count and can
+commit and push the bump when confirmed.
 
 Set an exact version:
 
