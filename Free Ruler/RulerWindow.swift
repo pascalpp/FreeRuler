@@ -28,6 +28,8 @@ class RulerWindow: NSPanel {
 
         self.alphaValue = windowAlphaValue(prefs.foregroundOpacity)
         self.title = getTitle(for: ruler.orientation)
+        self.identifier = NSUserInterfaceItemIdentifier(getIdentifier(for: ruler.orientation))
+        self.setAccessibilityIdentifier(getIdentifier(for: ruler.orientation))
         self.minSize = getMinSize(ruler: ruler)
         self.maxSize = getMaxSize(ruler: ruler)
 
@@ -39,6 +41,8 @@ class RulerWindow: NSPanel {
         rule.wantsLayer = true
         rule.layer?.borderColor = CGColor(gray: 0, alpha: 0.5)
         rule.layer?.borderWidth = 1.0
+        rule.setAccessibilityElement(true)
+        rule.setAccessibilityIdentifier(getIdentifier(for: ruler.orientation))
 
         rule.nextResponder = self
         self.contentView = rule
@@ -67,6 +71,15 @@ private func getTitle(for orientation: Orientation) -> String {
             "Vertical Ruler",
             comment: "Window title for the vertical ruler"
         )
+    }
+}
+
+private func getIdentifier(for orientation: Orientation) -> String {
+    switch orientation {
+    case .horizontal:
+        return "horizontal-ruler-window"
+    case .vertical:
+        return "vertical-ruler-window"
     }
 }
 

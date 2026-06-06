@@ -22,7 +22,10 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
         super.windowDidLoad()
 
         window?.delegate = self
+        window?.identifier = NSUserInterfaceItemIdentifier("preferences-window")
         window?.isMovableByWindowBackground = true
+        groupRulersCheckbox.identifier = NSUserInterfaceItemIdentifier("group-rulers-checkbox")
+        groupRulersCheckbox.setAccessibilityIdentifier("group-rulers-checkbox")
 
         subscribeToPrefs()
         updateView()

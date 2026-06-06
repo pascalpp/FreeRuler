@@ -249,6 +249,7 @@ extension RulerController {
         // print(ruler.orientation, "onKeyDown")
 
         let shift = event.modifierFlags.contains(.shift)
+        let commandModifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
 
         switch Int(event.keyCode) {
         case kVK_LeftArrow:
@@ -262,6 +263,9 @@ extension RulerController {
             return nil
         case kVK_DownArrow:
             rulerWindow.nudgeDown(withShift: shift)
+            return nil
+        case kVK_ANSI_G where commandModifiers.isEmpty:
+            prefs.groupRulers = !prefs.groupRulers
             return nil
         default:
             return event
