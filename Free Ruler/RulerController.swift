@@ -5,6 +5,7 @@ import Carbon.HIToolbox // For key constants
 class RulerController: NSWindowController, NSWindowDelegate, NotificationObserver {
 
     var observers: [NSKeyValueObservation] = []
+    var notificationObservers: [NSObjectProtocol] = []
 
     let ruler: Ruler
 
@@ -60,12 +61,18 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     }
 
     deinit {
-        removeObserver()
+        removeObservers(&notificationObservers)
     }
 
     func createObservers() {
-        addObserver(.preferencesWindowOpened) { _ in self.preferencesWindowOpen = true }
-        addObserver(.preferencesWindowClosed) { _ in self.preferencesWindowOpen = false }
+        notificationObservers = [
+            addObserver(.preferencesWindowOpened) { [weak self] _ in
+                self?.preferencesWindowOpen = true
+            },
+            addObserver(.preferencesWindowClosed) { [weak self] _ in
+                self?.preferencesWindowOpen = false
+            },
+        ]
     }
 
     func windowWillStartLiveResize(_ notification: Notification) {

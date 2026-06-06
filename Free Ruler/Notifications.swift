@@ -20,15 +20,16 @@ extension NotificationPoster {
 protocol NotificationObserver {}
 extension NotificationObserver {
 
-    func addObserver(_ forName: Notification.Name, using: @escaping (Notification) -> Void) {
+    func addObserver(_ forName: Notification.Name, using: @escaping (Notification) -> Void) -> NSObjectProtocol {
         NotificationCenter.default.addObserver(forName: forName, object: nil, queue: nil, using: using)
     }
 
-    // call removeObserver in your class deinit
-    // deinit {
-    //    removeObserver()
-    // }
-    func removeObserver() {
-        NotificationCenter.default.removeObserver(self)
+    func removeObserver(_ observer: NSObjectProtocol) {
+        NotificationCenter.default.removeObserver(observer)
+    }
+
+    func removeObservers(_ observers: inout [NSObjectProtocol]) {
+        observers.forEach(removeObserver)
+        observers.removeAll()
     }
 }
