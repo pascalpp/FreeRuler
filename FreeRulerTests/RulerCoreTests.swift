@@ -1,3 +1,4 @@
+import AppKit
 import XCTest
 @testable import Free_Ruler
 
@@ -45,6 +46,6 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertEqual(horizontal.minX, 69.0, accuracy: 0.0001)
         XCTAssertEqual(vertical.minX, 30.0, accuracy: 0.0001)
         XCTAssertEqual(horizontal.minY, screenHeight - 90.0, accuracy: 0.0001)
-        XCTAssertEqual(vertical.maxY, horizontal.minY + 1.0)
+        XCTAssertEqual(vertical.maxY, horizontal.minY + 1.0, accuracy: 0.0001)
     }
 }
