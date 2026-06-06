@@ -6,6 +6,7 @@ source "$(dirname "$0")/common.sh"
 
 run_from_root
 require_tool git
+require_tool node
 
 tag="$(release_tag)"
 zip_path="$(release_zip_path)"

@@ -51,5 +51,18 @@ process.stdin.once("data", input => {
     stdio: "inherit",
   });
 
-  process.exit(result.status || 0);
+  if (result.error) {
+    console.error(result.error.message);
+    process.exit(1);
+  }
+
+  if (result.status !== null) {
+    process.exit(result.status);
+  }
+
+  if (result.signal) {
+    console.error(`set-version.js exited due to signal ${result.signal}.`);
+  }
+
+  process.exit(1);
 });

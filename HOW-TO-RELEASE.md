@@ -10,7 +10,7 @@ for now.
 
 ## GitHub Release
 
-Assuming you have the prerequites listed below, follow these steps from a terminal in the Free Ruler repository.
+Assuming you have the prerequisites listed below, follow these steps from a terminal in the Free Ruler repository.
 
 1. Start from the latest `main`.
 
@@ -63,7 +63,8 @@ public release.
    ```
 
    This is the fastest check. It does not contact Apple's notary service and it
-   does not create a GitHub release.
+   does not create a GitHub release. It replaces any existing dry-run zip for
+   the current version.
 
 2. Test the full path with a temporary draft release.
 
@@ -172,7 +173,7 @@ npm run release:version -- X.Y.Z 303
 
 </details>
 
-## Manual App Store release</summary>
+## Manual App Store Release
 
 The App Store path is not automated yet.
 
@@ -186,5 +187,3 @@ The App Store path is not automated yet.
 
 Future automation should add a separate App Store export/upload path instead of
 overloading the GitHub release scripts.
-
-</details>

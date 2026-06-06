@@ -6,6 +6,7 @@ source "$(dirname "$0")/common.sh"
 
 run_from_root
 require_tool ditto
+require_tool node
 
 app_path="$(exported_app_path)"
 zip_path="$(release_zip_path)"
