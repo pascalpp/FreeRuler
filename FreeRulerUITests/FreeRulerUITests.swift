@@ -96,6 +96,7 @@ final class FreeRulerUITests: XCTestCase {
 
         XCTAssertTrue(horizontalRuler.waitForNonExistence(timeout: 2))
         XCTAssertTrue(verticalRuler.exists)
+    }
 
     func testHiddenRulersCanBeRestoredAndResetRestoresVisibility() {
         XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
