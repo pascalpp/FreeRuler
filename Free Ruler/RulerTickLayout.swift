@@ -32,7 +32,7 @@ struct RulerTickLayout {
             mediumTicks = 8
             smallTicks = 4
             tinyTicks = 1
-        default:
+        case .pixels:
             tickScale = 1
             textScale = 1
             largeTicks = 50

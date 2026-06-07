@@ -81,9 +81,10 @@ class RuleView: NSView {
     ) -> [NSAttributedString.Key: Any] {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = alignment
+        let font = NSFont(name: "HelveticaNeue", size: 10) ?? .systemFont(ofSize: 10)
 
         return [
-            .font: NSFont(name: "HelveticaNeue", size: 10)!,
+            .font: font,
             .paragraphStyle: paragraphStyle,
             .foregroundColor: foregroundColor,
         ]
