@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Check for Updates..." : {
+      "comment" : "Application menu item title for manually checking for software updates"
+    },
     "Hide Horizontal Ruler" : {
       "comment" : "Menu item title to hide the horizontal ruler",
       "extractionState" : "manual",
