@@ -83,8 +83,6 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     }
 
     func windowWillMove(_ notification: Notification) {
-        mouseTickResumeTimer?.invalidate()
-        mouseTickResumeTimer = nil
         disableMouseTicks()
     }
 
@@ -124,6 +122,8 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     }
 
     func disableMouseTicks() {
+        mouseTickResumeTimer?.invalidate()
+        mouseTickResumeTimer = nil
         rulerWindow.rule.showMouseTick = false
         otherWindow?.rule.showMouseTick = false
         appDelegate?.suspendMouseTickUpdates(owner: self)
