@@ -29,6 +29,6 @@ if [[ -e "$zip_path" ]]; then
   fi
 fi
 
-ditto -c -k --keepParent "$app_path" "$zip_path"
+ditto -c -k --keepParent --norsrc --noextattr --noqtn "$app_path" "$zip_path"
 
 echo "Created zip: $zip_path"
