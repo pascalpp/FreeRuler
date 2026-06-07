@@ -145,7 +145,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         let insertionIndex = appMenu.items.firstIndex { $0.isSeparatorItem } ?? appMenu.items.count
         appMenu.insertItem(item, at: insertionIndex)
-        appMenu.insertItem(.separator(), at: insertionIndex + 1)
     }
 
     @objc private func checkForUpdates(_ sender: Any?) {
