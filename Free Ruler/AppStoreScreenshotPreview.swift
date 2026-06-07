@@ -143,8 +143,8 @@ private enum AppStoreScreenshotLayout {
     static let screen3PreferencesWindowScale: CGFloat = 4.5
     static let screen3PreferencesContentWidth: CGFloat = 400
     static let screen3PreferencesContentHeight: CGFloat = 295
-    static let screen3PreferencesWindowShadowOpacity: CGFloat = 0
-    static let screen3PreferencesWindowShadowYOffset: CGFloat = 0
+    static let screen3PreferencesWindowShadowOpacity: CGFloat = 0.28
+    static let screen3PreferencesWindowShadowYOffset: CGFloat = -5
 
     static var screen3ForegroundOpacityPercent: Int {
         Int((screen3RulerOpacity * 100).rounded())
