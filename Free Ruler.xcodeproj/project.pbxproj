@@ -136,6 +136,8 @@
 		AB053EE93E1DC9AF341A8D4F /* Free Ruler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = "Free Ruler.app"; path = "Free Ruler.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B894A5002BBFE61A005A3B6F /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		B894A5012BBFE61A005A3B6F /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/PreferencesController.strings; sourceTree = "<group>"; };
+		D9DBE8A12C791B1600A42589 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/MainMenu.strings; sourceTree = "<group>"; };
+		D9DBE8A22C791B1600A42589 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/PreferencesController.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -372,6 +374,7 @@
 				fi,
 				"zh-Hans",
 				ja,
+				es,
 			);
 			mainGroup = 6F41027C2260712F00F06A10;
 			packageReferences = (
@@ -517,6 +520,7 @@
 				53AF6A4325A456E30076AAB7 /* fi */,
 				6F8CAA3A29CC8F7D00C4ED57 /* zh-Hans */,
 				B894A5012BBFE61A005A3B6F /* ja */,
+				D9DBE8A22C791B1600A42589 /* es */,
 			);
 			name = PreferencesController.xib;
 			sourceTree = "<group>";
@@ -529,6 +533,7 @@
 				53AF6A4225A456E30076AAB7 /* fi */,
 				6F8CAA3929CC8F7D00C4ED57 /* zh-Hans */,
 				B894A5002BBFE61A005A3B6F /* ja */,
+				D9DBE8A12C791B1600A42589 /* es */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";

@@ -17,6 +17,12 @@
             "value" : "Check for Updates…"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar actualizaciones…"
+          }
+        },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
@@ -51,6 +57,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hide Horizontal Ruler"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar regla horizontal"
           }
         },
         "fi" : {
@@ -89,6 +101,12 @@
             "value" : "Hide Vertical Ruler"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar regla vertical"
+          }
+        },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
@@ -123,6 +141,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Horizontal Ruler"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regla horizontal"
           }
         },
         "fi" : {
@@ -161,6 +185,12 @@
             "value" : "Rulers floated"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reglas flotantes"
+          }
+        },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
@@ -195,6 +225,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rulers grouped"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reglas agrupadas"
           }
         },
         "fi" : {
@@ -233,6 +269,12 @@
             "value" : "Rulers unfloated"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reglas no flotantes"
+          }
+        },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
@@ -267,6 +309,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rulers ungrouped"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reglas desagrupadas"
           }
         },
         "fi" : {
@@ -305,6 +353,12 @@
             "value" : "Shadow disabled"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sombra desactivada"
+          }
+        },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
@@ -339,6 +393,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Shadow enabled"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sombra activada"
           }
         },
         "fi" : {
@@ -377,6 +437,12 @@
             "value" : "Units: %@"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unidades: %@"
+          }
+        },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
@@ -411,6 +477,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Show All Rulers"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar todas las reglas"
           }
         },
         "fi" : {
@@ -449,6 +521,12 @@
             "value" : "Show Horizontal Ruler"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar regla horizontal"
+          }
+        },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
@@ -485,6 +563,12 @@
             "value" : "Show Vertical Ruler"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar regla vertical"
+          }
+        },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
@@ -516,6 +600,12 @@
           }
         },
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "in"
+          }
+        },
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "in"
@@ -557,6 +647,12 @@
             "value" : "mm"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mm"
+          }
+        },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
@@ -588,6 +684,12 @@
           }
         },
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "px"
+          }
+        },
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "px"
@@ -627,6 +729,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vertical Ruler"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regla vertical"
           }
         },
         "fi" : {
