@@ -91,7 +91,8 @@ The GitHub release command expects:
 - A clean git working tree.
 - `gh` authenticated with permission to create releases.
 - Xcode signing working for the Free Ruler app target.
-- A Developer ID Application certificate installed.
+- A Developer ID Application certificate installed. If Keychain has more than
+  one, use `DEVELOPER_ID_APPLICATION_IDENTITY` in `.env`.
 - Notary credentials saved in Keychain.
 - Local release environment configured. See **Release environment** below.
 - Sparkle signing configured. See **Sparkle updates** below.
@@ -108,6 +109,7 @@ Create a local `.env` file with release settings:
 ```sh
 cat > .env <<'EOF'
 NOTARYTOOL_PROFILE=FreeRulerNotary
+DEVELOPER_ID_APPLICATION_IDENTITY=<Developer ID Application SHA-1>
 SPARKLE_PUBLIC_ED_KEY=...
 EOF
 ```
@@ -131,6 +133,7 @@ Example:
 
 ```sh
 NOTARYTOOL_PROFILE=FreeRulerNotary
+DEVELOPER_ID_APPLICATION_IDENTITY=<Developer ID Application SHA-1>
 SPARKLE_PUBLIC_ED_KEY=...
 ```
 

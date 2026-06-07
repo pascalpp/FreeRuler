@@ -5,6 +5,7 @@ set -euo pipefail
 source "$(dirname "$0")/common.sh"
 
 run_from_root
+require_tool codesign
 require_tool xcodebuild
 
 if [[ ! -d "$ARCHIVE_PATH" ]]; then
@@ -22,4 +23,16 @@ xcodebuild -exportArchive \
   -exportOptionsPlist "$EXPORT_OPTIONS_PLIST" \
   $(xcodebuild_provisioning_flags)
 
-echo "Exported app: $(exported_app_path)"
+app_path="$(exported_app_path)"
+developer_id_identity="${DEVELOPER_ID_APPLICATION_IDENTITY:-Developer ID Application}"
+
+codesign \
+  --force \
+  --deep \
+  --options runtime \
+  --preserve-metadata=identifier,entitlements,requirements \
+  --sign "$developer_id_identity" \
+  "$app_path"
+codesign --verify --deep --strict --verbose=4 "$app_path"
+
+echo "Exported and signed app: $app_path"
