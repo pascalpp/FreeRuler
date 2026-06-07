@@ -199,6 +199,13 @@ private enum AppStoreScreenshotLayout {
     static let sampleWindowShadowYOffset: CGFloat = 12
     static let sampleWindowShadowOpacity: CGFloat = 0.28
 
+    static let screen1BoxGutter: CGFloat = 70
+    static let screen1Box1Width: CGFloat = 800
+    static let screen1Box2Height: CGFloat = 180
+    static let screen1BoxBorderColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.24)
+    static let screen1BoxBorderWidth: CGFloat = 4
+    static let screen1BoxBorderRadius: CGFloat = 16
+
     static let titlebarHorizontalOutset: CGFloat = 0
     static let titlebarHeight: CGFloat = 150
     static let trafficLightDiameter: CGFloat = 48
@@ -288,6 +295,44 @@ private enum AppStoreScreenshotLayout {
             y: sampleWindowRect.minY,
             width: sampleWindowRect.width + (titlebarHorizontalOutset * 2),
             height: titlebarHeight
+        )
+    }
+
+    static var sampleWindowContentRect: NSRect {
+        NSRect(
+            x: sampleWindowRect.minX,
+            y: sampleWindowRect.minY + titlebarHeight,
+            width: sampleWindowRect.width,
+            height: sampleWindowRect.height - titlebarHeight
+        )
+    }
+
+    static var screen1Box1Rect: NSRect {
+        NSRect(
+            x: sampleWindowContentRect.minX + screen1BoxGutter,
+            y: sampleWindowContentRect.minY + screen1BoxGutter,
+            width: screen1Box1Width,
+            height: sampleWindowContentRect.height - (screen1BoxGutter * 2)
+        )
+    }
+
+    static var screen1Box2Rect: NSRect {
+        let x = screen1Box1Rect.maxX + screen1BoxGutter
+        return NSRect(
+            x: x,
+            y: sampleWindowContentRect.minY + screen1BoxGutter,
+            width: sampleWindowContentRect.maxX - x - screen1BoxGutter,
+            height: screen1Box2Height
+        )
+    }
+
+    static var screen1Box3Rect: NSRect {
+        let y = screen1Box2Rect.maxY + screen1BoxGutter
+        return NSRect(
+            x: screen1Box2Rect.minX,
+            y: y,
+            width: screen1Box2Rect.width,
+            height: sampleWindowContentRect.maxY - y - screen1BoxGutter
         )
     }
 
@@ -864,6 +909,7 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         switch screen {
         case .screen1:
             drawSampleWindow(AppStoreScreenshotLayout.sampleWindowRect)
+            drawScreen1Boxes()
         case .screen2:
             break
         case .screen3:
@@ -929,6 +975,21 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         ).fill()
         drawTitlebarDivider(in: titlebarRect)
         drawTrafficLights(at: sampleWindowTrafficLightOrigin(for: rect))
+    }
+
+    private func drawScreen1Boxes() {
+        for rect in [
+            AppStoreScreenshotLayout.screen1Box1Rect,
+            AppStoreScreenshotLayout.screen1Box2Rect,
+            AppStoreScreenshotLayout.screen1Box3Rect,
+        ] {
+            stroke(
+                rect,
+                color: AppStoreScreenshotLayout.screen1BoxBorderColor,
+                width: AppStoreScreenshotLayout.screen1BoxBorderWidth,
+                radius: AppStoreScreenshotLayout.screen1BoxBorderRadius
+            )
+        }
     }
 
     private func drawTitlebarDivider(in titlebarRect: NSRect) {
@@ -1014,8 +1075,15 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
     }
 
     private func stroke(_ rect: NSRect, color: NSColor, width: CGFloat) {
+        stroke(rect, color: color, width: width, radius: 0)
+    }
+
+    private func stroke(_ rect: NSRect, color: NSColor, width: CGFloat, radius: CGFloat) {
         color.setStroke()
-        let path = NSBezierPath(rect: rect.insetBy(dx: width / 2, dy: width / 2))
+        let insetRect = rect.insetBy(dx: width / 2, dy: width / 2)
+        let path = radius > 0
+            ? NSBezierPath(roundedRect: insetRect, xRadius: radius, yRadius: radius)
+            : NSBezierPath(rect: insetRect)
         path.lineWidth = width
         path.stroke()
     }
