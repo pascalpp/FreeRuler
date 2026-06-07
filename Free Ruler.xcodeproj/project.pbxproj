@@ -118,6 +118,7 @@
 		53AF6A4225A456E30076AAB7 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		53AF6A4325A456E30076AAB7 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/PreferencesController.strings; sourceTree = "<group>"; };
 		55ACACE1604925BB61E9D74C /* Info.github.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.github.plist; sourceTree = "<group>"; };
+		55ACACE2604925BB61E9D74C /* Free_Ruler.github.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Free_Ruler.github.entitlements; sourceTree = "<group>"; };
 		6F4102852260712F00F06A10 /* Free Ruler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Free Ruler.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F4102882260712F00F06A10 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6F41028D2260713100F06A10 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
@@ -246,6 +247,7 @@
 				507FED42227FFF5300BD77DC /* PreferencesController.xib */,
 				50CCB205227FCD26004645C5 /* AppIconLayout.swift */,
 				6F4102902260713100F06A10 /* Free_Ruler.entitlements */,
+				55ACACE2604925BB61E9D74C /* Free_Ruler.github.entitlements */,
 				6F41028F2260713100F06A10 /* Info.plist */,
 				50C6D890228BDBAD0091F19E /* Images.xcassets */,
 				55ACACE1604925BB61E9D74C /* Info.github.plist */,
@@ -532,7 +534,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "Free Ruler/Free_Ruler.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "Free Ruler/Free_Ruler.github.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -561,7 +563,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "Free Ruler/Free_Ruler.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "Free Ruler/Free_Ruler.github.entitlements";
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
