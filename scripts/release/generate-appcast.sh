@@ -13,12 +13,18 @@ require_tool "$sign_update_tool"
 zip_path="$(release_zip_path)"
 zip_url="$(release_zip_url)"
 version="$(version)"
+build_version="$(build_setting CURRENT_PROJECT_VERSION)"
 tag="$(release_tag)"
 release_notes_url="https://github.com/pascalpp/FreeRuler/releases/tag/$tag"
 
 if [[ ! -f "$zip_path" ]]; then
   echo "Release zip not found: $zip_path" >&2
   echo "Run npm run release:github:zip first." >&2
+  exit 1
+fi
+
+if [[ -z "$build_version" ]]; then
+  echo "Unable to determine Xcode CURRENT_PROJECT_VERSION." >&2
   exit 1
 fi
 
@@ -32,12 +38,13 @@ fi
 
 mkdir -p "$RELEASE_DIR"
 
-node - "$APPCAST_PATH" "$version" "$tag" "$zip_url" "$release_notes_url" "$signature_output" <<'NODE'
+node - "$APPCAST_PATH" "$version" "$build_version" "$tag" "$zip_url" "$release_notes_url" "$signature_output" <<'NODE'
 const fs = require('fs');
 
 const [
   appcastPath,
   version,
+  buildVersion,
   tag,
   zipURL,
   releaseNotesURL,
@@ -66,7 +73,7 @@ const appcast = `<?xml version="1.0" encoding="utf-8"?>
       <pubDate>${escapeXML(pubDate)}</pubDate>
       <enclosure
         url="${escapeXML(zipURL)}"
-        sparkle:version="${escapeXML(version)}"
+        sparkle:version="${escapeXML(buildVersion)}"
         sparkle:shortVersionString="${escapeXML(version)}"
         ${signatureAttributes}
         type="application/octet-stream" />
