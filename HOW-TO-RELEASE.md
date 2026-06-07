@@ -33,7 +33,7 @@ Assuming you have the prerequisites listed below, follow these steps from a term
 3. Build, notarize, zip, and create a draft GitHub Release.
 
    ```sh
-   NOTARYTOOL_PROFILE=FreeRulerNotary npm run release:github
+   npm run release:github
    ```
 
 4. Publish the draft release.
@@ -63,7 +63,7 @@ public release.
 2. Test the full path with a temporary draft release.
 
    ```sh
-   RELEASE_TAG=vX.Y.Z-test.1 NOTARYTOOL_PROFILE=FreeRulerNotary npm run release:github
+   RELEASE_TAG=vX.Y.Z-test.1 npm run release:github
    ```
 
    Replace `X.Y.Z` with the version currently in `package.json`. This creates a
@@ -93,6 +93,8 @@ The GitHub release command expects:
 - Xcode signing working for the Free Ruler app target.
 - A Developer ID Application certificate installed.
 - Notary credentials saved in Keychain.
+- Local release environment configured. See **Release environment** below.
+- Sparkle signing configured. See **Sparkle updates** below.
 
 The documented commands assume the notary profile is named `FreeRulerNotary`.
 Create that profile once with:
@@ -101,11 +103,41 @@ Create that profile once with:
 xcrun notarytool store-credentials "FreeRulerNotary"
 ```
 
-If Xcode needs to create or update signing assets during archive/export, add
+Create a local `.env` file with release settings:
+
+```sh
+cat > .env <<'EOF'
+NOTARYTOOL_PROFILE=FreeRulerNotary
+SPARKLE_PUBLIC_ED_KEY=...
+EOF
+```
+
+If Xcode needs to create or update signing assets during archive/export, set
 `ALLOW_PROVISIONING_UPDATES=1`:
 
 ```sh
-ALLOW_PROVISIONING_UPDATES=1 NOTARYTOOL_PROFILE=FreeRulerNotary npm run release:github
+ALLOW_PROVISIONING_UPDATES=1 npm run release:github
+```
+
+</details>
+
+<details>
+<summary>Release environment</summary>
+
+Release scripts read local settings from `.env` at the repository root. That
+file is ignored by git. Values already set in the shell override `.env` values.
+
+Example:
+
+```sh
+NOTARYTOOL_PROFILE=FreeRulerNotary
+SPARKLE_PUBLIC_ED_KEY=...
+```
+
+To use a different file, set `RELEASE_ENV_FILE`:
+
+```sh
+RELEASE_ENV_FILE=~/FreeRuler.release.env npm run release:github
 ```
 
 </details>
@@ -121,6 +153,7 @@ npm run release:github:archive
 npm run release:github:export
 npm run release:github:notarize
 npm run release:github:zip
+npm run release:github:appcast
 npm run release:github:publish
 ```
 
@@ -167,6 +200,35 @@ Set an exact version and Xcode build number:
 
 ```sh
 npm run release:version -- X.Y.Z 303
+```
+
+</details>
+
+<details>
+<summary>Sparkle updates</summary>
+
+GitHub release builds enable Sparkle updates. The App Store target does not
+include Sparkle.
+
+Sparkle expects:
+
+- Sparkle's `sign_update` tool on `PATH`, or `SPARKLE_SIGN_UPDATE` set to its
+  full path.
+- `SPARKLE_PUBLIC_ED_KEY` set to the public EdDSA update key. The matching
+  private key must be available to Sparkle's signing tool when generating the
+  appcast. `SPARKLE_PUBLIC_ED_KEY` can live in `.env`.
+
+The release command writes the appcast to:
+
+```sh
+build/release/appcast.xml
+```
+
+The draft GitHub Release uploads both the zip and `appcast.xml`. Published
+GitHub releases serve the update feed at:
+
+```text
+https://github.com/pascalpp/FreeRuler/releases/latest/download/appcast.xml
 ```
 
 </details>

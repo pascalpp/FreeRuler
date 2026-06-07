@@ -3,8 +3,10 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+RELEASE_ENV_FILE="${RELEASE_ENV_FILE:-$ROOT_DIR/.env}"
 PROJECT_PATH="$ROOT_DIR/Free Ruler.xcodeproj"
 SCHEME_NAME="Free Ruler"
+GITHUB_SCHEME_NAME="Free Ruler GitHub"
 CONFIGURATION="Release"
 APP_NAME="Free Ruler"
 APP_BUNDLE_NAME="$APP_NAME.app"
@@ -12,6 +14,48 @@ RELEASE_DIR="$ROOT_DIR/build/release"
 ARCHIVE_PATH="$RELEASE_DIR/$APP_NAME.xcarchive"
 EXPORT_DIR="$RELEASE_DIR/export"
 EXPORT_OPTIONS_PLIST="$ROOT_DIR/scripts/release/ExportOptions.github.plist"
+APPCAST_PATH="$RELEASE_DIR/appcast.xml"
+
+load_release_env() {
+  [[ -f "$RELEASE_ENV_FILE" ]] || return 0
+
+  local line key value
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    line="${line#"${line%%[![:space:]]*}"}"
+    line="${line%"${line##*[![:space:]]}"}"
+
+    [[ -z "$line" || "${line:0:1}" == "#" ]] && continue
+
+    if [[ "$line" == export[[:space:]]* ]]; then
+      line="${line#export}"
+      line="${line#"${line%%[![:space:]]*}"}"
+    fi
+
+    [[ "$line" == *=* ]] || continue
+    key="${line%%=*}"
+    value="${line#*=}"
+    key="${key%"${key##*[![:space:]]}"}"
+    value="${value#"${value%%[![:space:]]*}"}"
+    value="${value%"${value##*[![:space:]]}"}"
+
+    [[ "$key" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]] || continue
+    [[ -z "${!key+x}" ]] || continue
+
+    if [[ "${#value}" -ge 2 ]]; then
+      if [[ "${value:0:1}" == '"' && "${value: -1}" == '"' ]]; then
+        value="${value:1:${#value}-2}"
+      elif [[ "${value:0:1}" == "'" && "${value: -1}" == "'" ]]; then
+        value="${value:1:${#value}-2}"
+      fi
+    fi
+
+    export "$key=$value"
+  done <"$RELEASE_ENV_FILE"
+}
+
+load_release_env
+
+SPARKLE_FEED_URL="${SPARKLE_FEED_URL:-https://github.com/pascalpp/FreeRuler/releases/latest/download/appcast.xml}"
 
 version() {
   node -p "require('./package.json').version"
@@ -27,6 +71,14 @@ release_tag() {
 
 release_zip_path() {
   printf "%s/free-ruler-%s.zip" "$RELEASE_DIR" "$(version)"
+}
+
+release_zip_name() {
+  printf "free-ruler-%s.zip" "$(version)"
+}
+
+release_zip_url() {
+  printf "https://github.com/pascalpp/FreeRuler/releases/download/%s/%s" "$(release_tag)" "$(release_zip_name)"
 }
 
 exported_app_path() {
@@ -53,8 +105,9 @@ ensure_clean_worktree() {
 
 build_setting() {
   local setting="$1"
+  local scheme="${2:-$SCHEME_NAME}"
   xcodebuild -project "$PROJECT_PATH" \
-    -scheme "$SCHEME_NAME" \
+    -scheme "$scheme" \
     -configuration "$CONFIGURATION" \
     -showBuildSettings 2>/dev/null \
     | awk -F ' = ' -v key="$setting" '$1 ~ key "$" { print $2; exit }'

@@ -14,6 +14,7 @@
     "release:github:export": "scripts/release/export-github-release.sh",
     "release:github:notarize": "scripts/release/notarize-github-release.sh",
     "release:github:zip": "scripts/release/zip-github-release.sh",
+    "release:github:appcast": "scripts/release/generate-appcast.sh",
     "release:github:publish": "scripts/release/publish-github-release.sh",
     "release:github": "scripts/release/github-release.sh",
     "github:release:dryrun": "RELEASE_DRY_RUN=1 RELEASE_SKIP_NOTARIZE=1 RELEASE_OVERWRITE=1 scripts/release/github-release.sh"

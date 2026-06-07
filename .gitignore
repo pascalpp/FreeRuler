@@ -1,5 +1,6 @@
 xcuserdata
 .DS_Store
+.env
 build/
 dist/*.zip
 .*bak

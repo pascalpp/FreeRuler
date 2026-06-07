@@ -15,4 +15,5 @@ else
 fi
 
 "$script_dir/zip-github-release.sh"
+"$script_dir/generate-appcast.sh"
 "$script_dir/publish-github-release.sh"

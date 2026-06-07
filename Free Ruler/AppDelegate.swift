@@ -1,5 +1,8 @@
 import Cocoa
 import Carbon.HIToolbox
+#if SPARKLE
+import Sparkle
+#endif
 
 let env = ProcessInfo.processInfo.environment
 let APP_ICON_HELPER = env["APP_ICON_HELPER"] != nil
@@ -77,6 +80,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     var preferencesController: PreferencesController? = nil
     private let hotkeyBezel = HotkeyBezel()
+#if SPARKLE
+    private var updaterController: SPUStandardUpdaterController?
+#endif
 
     // MARK: - Lifecycle
 
@@ -88,6 +94,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         subscribeToPrefs()
         updateDisplay()
+#if SPARKLE
+        configureUpdater()
+#endif
 
         if APP_ICON_HELPER {
             let helper = AppIconLayout()
@@ -97,6 +106,51 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
     }
+
+#if SPARKLE
+    private func configureUpdater() {
+        guard !APP_ICON_HELPER else { return }
+        guard hasSparkleConfiguration else { return }
+
+        updaterController = SPUStandardUpdaterController(
+            startingUpdater: true,
+            updaterDelegate: nil,
+            userDriverDelegate: nil
+        )
+        installCheckForUpdatesMenuItem()
+    }
+
+    private var hasSparkleConfiguration: Bool {
+        let info = Bundle.main.infoDictionary ?? [:]
+        let feedURL = info["SUFeedURL"] as? String
+        let publicKey = info["SUPublicEDKey"] as? String
+
+        return feedURL?.isEmpty == false && publicKey?.isEmpty == false
+    }
+
+    private func installCheckForUpdatesMenuItem() {
+        guard let appMenu = NSApp.mainMenu?.item(at: 0)?.submenu else { return }
+        guard !appMenu.items.contains(where: { $0.action == #selector(checkForUpdates(_:)) }) else { return }
+
+        let title = NSLocalizedString(
+            "Check for Updates…",
+            comment: "Application menu item title for manually checking for software updates"
+        )
+        let item = NSMenuItem(
+            title: title,
+            action: #selector(checkForUpdates(_:)),
+            keyEquivalent: ""
+        )
+        item.target = self
+
+        let insertionIndex = appMenu.items.firstIndex { $0.isSeparatorItem } ?? appMenu.items.count
+        appMenu.insertItem(item, at: insertionIndex)
+    }
+
+    @objc private func checkForUpdates(_ sender: Any?) {
+        updaterController?.checkForUpdates(sender)
+    }
+#endif
 
     func subscribeToPrefs() {
         observers = [
