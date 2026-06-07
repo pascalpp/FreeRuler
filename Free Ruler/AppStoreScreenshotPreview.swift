@@ -55,9 +55,9 @@ private enum AppStoreScreenshotLayout {
     static let rulerScale: CGFloat = 4.4
     static let rulerBorderWidth: CGFloat = 1
 
-    static let rulerCornerX: CGFloat = 500
+    static let rulerCornerX: CGFloat = 420
     static let rulerCornerY: CGFloat = 500
-    static let horizontalRulerLength: CGFloat = 1780
+    static let horizontalRulerLength: CGFloat = 1850
     static let verticalRulerLength: CGFloat = 1040
 
     static let sampleWindowCornerRadius: CGFloat = 34
