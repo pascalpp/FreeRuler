@@ -13,6 +13,8 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     var otherWindow: RulerWindow?
 
     var keyListener: Any?
+    private var mouseTickResumeTimer: Timer?
+    private let mouseTickResumeDelay: TimeInterval = 0.15
 
     var preferencesWindowOpen = false {
         didSet {
@@ -57,6 +59,7 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     }
 
     deinit {
+        mouseTickResumeTimer?.invalidate()
         removeObservers(&notificationObservers)
     }
 
@@ -85,6 +88,7 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
 
     func windowDidMove(_ notification: Notification) {
         rulerWindow.invalidateShadow()
+        scheduleMouseTickResume()
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
@@ -118,17 +122,38 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     }
 
     func disableMouseTicks() {
+        mouseTickResumeTimer?.invalidate()
+        mouseTickResumeTimer = nil
         rulerWindow.rule.showMouseTick = false
         otherWindow?.rule.showMouseTick = false
+        appDelegate?.suspendMouseTickUpdates(owner: self)
     }
 
     func enableMouseTicks() {
+        guard !rulerWindow.rule.showMouseTick || otherWindow?.rule.showMouseTick == false else { return }
+
         rulerWindow.rule.showMouseTick = true
         otherWindow?.rule.showMouseTick = true
+        appDelegate?.resumeMouseTickUpdates(owner: self)
+    }
+
+    private func scheduleMouseTickResume() {
+        mouseTickResumeTimer?.invalidate()
+        mouseTickResumeTimer = Timer.scheduledTimer(
+            withTimeInterval: mouseTickResumeDelay,
+            repeats: false
+        ) { [weak self] _ in
+            self?.enableMouseTicks()
+            self?.mouseTickResumeTimer = nil
+        }
     }
 
     private var rulerCursorController: RulerCursorController? {
-        return (NSApp.delegate as? AppDelegate)?.rulerCursorController
+        return appDelegate?.rulerCursorController
+    }
+
+    private var appDelegate: AppDelegate? {
+        return NSApp.delegate as? AppDelegate
     }
 
     private func isMouseInsideRuler(with event: NSEvent) -> Bool {
