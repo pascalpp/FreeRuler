@@ -87,6 +87,15 @@ final class FreeRulerUITests: XCTestCase {
         XCTAssertTrue(preferences.waitForNonExistence(timeout: 2))
     }
 
+    func testRulerCloseWithCommandW() {
+        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
+
+        horizontalRuler.click()
+        app.typeKey("w", modifierFlags: .command)
+
+        XCTAssertTrue(horizontalRuler.waitForNonExistence(timeout: 2))
+    }
+
     func testHiddenRulersCanBeRestoredAndResetRestoresVisibility() {
         XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
         XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
