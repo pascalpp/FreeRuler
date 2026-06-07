@@ -35,6 +35,8 @@
 		50B1D3602D06000600B1D139 /* AppIconGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D35F2D06000600B1D139 /* AppIconGenerator.swift */; };
 		50B1D35D2D06000400B1D139 /* AppIconRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3582D06000100B1D139 /* AppIconRenderer.swift */; };
 		50B1D3612D06000700B1D139 /* AppIconGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D35F2D06000600B1D139 /* AppIconGenerator.swift */; };
+		50B1D3652D06010100B1D139 /* AppStoreScreenshotPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3642D06010100B1D139 /* AppStoreScreenshotPreview.swift */; };
+		50B1D3662D06010200B1D139 /* AppStoreScreenshotPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3642D06010100B1D139 /* AppStoreScreenshotPreview.swift */; };
 		50C6D891228BDBAD0091F19E /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 50C6D890228BDBAD0091F19E /* Images.xcassets */; };
 		50D7BEE7227D42FD0008B95E /* RulerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEE6227D42FD0008B95E /* RulerController.swift */; };
 		50D7BEE9227D43270008B95E /* Ruler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEE8227D43270008B95E /* Ruler.swift */; };
@@ -112,6 +114,7 @@
 		50B1D3542D05E00000B1D138 /* RulerTickLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulerTickLayout.swift; sourceTree = "<group>"; };
 		50B1D3582D06000100B1D139 /* AppIconRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconRenderer.swift; sourceTree = "<group>"; };
 		50B1D35F2D06000600B1D139 /* AppIconGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconGenerator.swift; sourceTree = "<group>"; };
+		50B1D3642D06010100B1D139 /* AppStoreScreenshotPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStoreScreenshotPreview.swift; sourceTree = "<group>"; };
 		50C6D890228BDBAD0091F19E /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		50D7BEE6227D42FD0008B95E /* RulerController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RulerController.swift; sourceTree = "<group>"; };
 		50D7BEE8227D43270008B95E /* Ruler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ruler.swift; sourceTree = "<group>"; };
@@ -248,6 +251,7 @@
 				5012CAAC226AB09000BD9565 /* VerticalRule.swift */,
 				50B1D3582D06000100B1D139 /* AppIconRenderer.swift */,
 				50B1D35F2D06000600B1D139 /* AppIconGenerator.swift */,
+				50B1D3642D06010100B1D139 /* AppStoreScreenshotPreview.swift */,
 				507FED41227FFF5300BD77DC /* PreferencesController.swift */,
 				507FED42227FFF5300BD77DC /* PreferencesController.xib */,
 				6F4102902260713100F06A10 /* Free_Ruler.entitlements */,
@@ -460,6 +464,7 @@
 				6F41029F22607DC900F06A10 /* HorizontalRule.swift in Sources */,
 				50B1D3592D06000100B1D139 /* AppIconRenderer.swift in Sources */,
 				50B1D3602D06000600B1D139 /* AppIconGenerator.swift in Sources */,
+				50B1D3652D06010100B1D139 /* AppStoreScreenshotPreview.swift in Sources */,
 				50D7BEEB227D432E0008B95E /* RulerWindow.swift in Sources */,
 				507FED43227FFF5300BD77DC /* PreferencesController.swift in Sources */,
 				50D7BEE7227D42FD0008B95E /* RulerController.swift in Sources */,
@@ -483,6 +488,7 @@
 				56B1A9290A8ADEA46E1D3129 /* HorizontalRule.swift in Sources */,
 				50B1D35D2D06000400B1D139 /* AppIconRenderer.swift in Sources */,
 				50B1D3612D06000700B1D139 /* AppIconGenerator.swift in Sources */,
+				50B1D3662D06010200B1D139 /* AppStoreScreenshotPreview.swift in Sources */,
 				274FA3FF1BA7829144BBEB70 /* RulerWindow.swift in Sources */,
 				F73A5B5C974E514FD2663412 /* PreferencesController.swift in Sources */,
 				0C56237FE08F4155F0B63FFB /* RulerController.swift in Sources */,
