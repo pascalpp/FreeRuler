@@ -1,38 +1,38 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Check for Updates..." : {
+    "Check for Updates…" : {
       "comment" : "Application menu item title for manually checking for software updates",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nach Updates suchen..."
+            "value" : "Nach Updates suchen…"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Check for Updates..."
+            "value" : "Check for Updates…"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tarkista päivitykset..."
+            "value" : "Tarkista päivitykset…"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "アップデートを確認..."
+            "value" : "アップデートを確認…"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "检查更新..."
+            "value" : "检查更新…"
           }
         }
       }

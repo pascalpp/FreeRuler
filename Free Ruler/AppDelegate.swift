@@ -133,7 +133,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         guard !appMenu.items.contains(where: { $0.action == #selector(checkForUpdates(_:)) }) else { return }
 
         let title = NSLocalizedString(
-            "Check for Updates...",
+            "Check for Updates…",
             comment: "Application menu item title for manually checking for software updates"
         )
         let item = NSMenuItem(
