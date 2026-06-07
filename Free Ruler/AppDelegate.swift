@@ -201,10 +201,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         if ruler.rulerWindow.isVisible {
-            detachRulerWindow(ruler.rulerWindow)
-            ruler.rulerWindow.orderOut(self)
-            updateRulerGrouping()
-            updateMouseTickTimer()
+            hideRuler(ruler)
         } else {
             showRuler(ruler)
         }
@@ -228,6 +225,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func showRuler(_ ruler: RulerController) {
         ruler.showWindow(self)
         ruler.rulerWindow.orderFrontRegardless()
+        updateRulerGrouping()
+        updateMouseTickTimer()
+    }
+
+    private func hideRuler(_ ruler: RulerController) {
+        detachRulerWindow(ruler.rulerWindow)
+        ruler.rulerWindow.orderOut(self)
         updateRulerGrouping()
         updateMouseTickTimer()
     }
@@ -342,9 +346,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    @IBAction func closePreferences(_ sender: Any) {
-        guard preferencesController?.window?.isKeyWindow == true else { return }
-        preferencesController?.close()
+    @IBAction func closeKeyWindow(_ sender: Any) {
+        if let ruler = rulers.first(where: { $0.rulerWindow.isKeyWindow }) {
+            if prefs.groupRulers {
+                prefs.groupRulers = false
+                detachRulerWindows()
+            }
+
+            hideRuler(ruler)
+            return
+        }
+
+        NSApp.keyWindow?.performClose(sender)
     }
 
     @IBAction func alignRulersAtMouseLocation(_ sender: Any) {
@@ -449,8 +462,8 @@ extension AppDelegate: NSMenuItemValidation {
 
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         switch menuItem.action {
-        case #selector(closePreferences(_:)):
-            return preferencesController?.window?.isKeyWindow == true
+        case #selector(closeKeyWindow(_:)):
+            return NSApp.keyWindow?.isVisible == true
         case #selector(toggleHorizontalRuler(_:)):
             let ruler = existingRulerController(orientation: .horizontal)
             menuItem.title = ruler?.rulerWindow.isVisible == true
