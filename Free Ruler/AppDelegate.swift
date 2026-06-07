@@ -5,7 +5,6 @@ import Sparkle
 #endif
 
 let env = ProcessInfo.processInfo.environment
-let APP_ICON_HELPER = env["APP_ICON_HELPER"] != nil
 let UI_TESTS = env["FREE_RULER_UI_TESTS"] != nil
 
 private enum HotkeyBezelLocalizationKey: String {
@@ -98,18 +97,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         configureUpdater()
 #endif
 
-        if APP_ICON_HELPER {
-            let helper = AppIconLayout()
-            helper.show()
-        } else {
-            showRulers()
-        }
+        showRulers()
 
     }
 
 #if SPARKLE
     private func configureUpdater() {
-        guard !APP_ICON_HELPER else { return }
         guard hasSparkleConfiguration else { return }
 
         updaterController = SPUStandardUpdaterController(

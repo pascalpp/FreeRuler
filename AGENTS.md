@@ -73,8 +73,8 @@ normal test suite. `npm test` is intentionally not wired to the Xcode tests.
   timers independently unless the policy is updated too.
 - UI tests can launch with `FREE_RULER_UI_TESTS` set. `AppDelegate` resets
   defaults in that mode for deterministic tests.
-- `APP_ICON_HELPER` changes startup behavior to show the icon layout helper
-  instead of the normal rulers.
+- `scripts/generate-app-icon.sh` regenerates the app icon PNGs from the
+  AppKit icon renderer.
 
 ## Localization And Resources
 
