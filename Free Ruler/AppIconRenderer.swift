@@ -1,9 +1,40 @@
 import Cocoa
+#if DEBUG
+import SwiftUI
+#endif
 
 private struct AppIconPalette {
     let fill = #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1)
-    let numbers = #colorLiteral(red: 0.6829560399, green: 0.4503545761, blue: 0.09706548601, alpha: 1)
-    let ticks = #colorLiteral(red: 0.7254902124, green: 0.4784313738, blue: 0.09803921729, alpha: 1)
+    let numbers = #colorLiteral(red: 0.4, green: 0.2637678268, blue: 0.05685021017, alpha: 1)
+    let ticks = #colorLiteral(red: 0.8, green: 0.5275675571, blue: 0.1081081074, alpha: 1)
+}
+
+private enum AppIconFontFamily {
+    case helveticaNeue
+    case system
+}
+
+private enum AppIconLayout {
+    static let canvasSize: CGFloat = 1024
+    static let cornerRadius: CGFloat = 185
+    static let rulerEndTick: CGFloat = 65
+
+    static let tickWidth: CGFloat = 20
+    static let largeTickLength: CGFloat = 200
+    static let mediumTickLength: CGFloat = 150
+    static let smallTickLength: CGFloat = 100
+    static let smallTickWidth: CGFloat = 20
+
+    static let labelFontSize: CGFloat = 260
+    static let labelFontFamily: AppIconFontFamily = .helveticaNeue
+    static let labelFontWeight: NSFont.Weight = .semibold
+
+    static let unitLabelLeftPadding: CGFloat = 170
+    static let unitLabelTopPadding: CGFloat = 40
+
+    static let tickLabelWidth: CGFloat = 440
+    static let tickLabelHeight: CGFloat = 240
+    static let tickLabelBottomOffset: CGFloat = 250
 }
 
 enum AppIconRenderer {
@@ -60,9 +91,9 @@ enum AppIconRenderer {
 
         NSGraphicsContext.saveGraphicsState()
         NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: bitmap)
-        image(size: 1024).draw(
+        image(size: AppIconLayout.canvasSize).draw(
             in: NSRect(x: 0, y: 0, width: pixels, height: pixels),
-            from: NSRect(x: 0, y: 0, width: 1024, height: 1024),
+            from: NSRect(x: 0, y: 0, width: AppIconLayout.canvasSize, height: AppIconLayout.canvasSize),
             operation: .sourceOver,
             fraction: 1
         )
@@ -76,60 +107,34 @@ enum AppIconRenderer {
     }
 
     private static func draw(in canvas: NSRect) {
-        NSColor.clear.setFill()
+        NSGraphicsContext.saveGraphicsState()
+        NSBezierPath(
+            roundedRect: canvas,
+            xRadius: AppIconLayout.cornerRadius * (canvas.width / AppIconLayout.canvasSize),
+            yRadius: AppIconLayout.cornerRadius * (canvas.height / AppIconLayout.canvasSize)
+        ).addClip()
+
+        AppIconPalette().fill.setFill()
         canvas.fill()
 
-        let scale = canvas.width / 1024
-        let rulerRect = NSRect(
-            x: 54 * scale,
-            y: 44 * scale,
-            width: 1124 * scale,
-            height: 936 * scale
-        )
-        let cornerRadius = 78 * scale
+        let scale = canvas.width / AppIconLayout.canvasSize
         let colors = AppIconPalette()
-        let rulerPath = NSBezierPath(roundedRect: rulerRect, xRadius: cornerRadius, yRadius: cornerRadius)
-
-        drawShadow(for: rulerPath, scale: scale)
-
-        NSGraphicsContext.saveGraphicsState()
-        rulerPath.addClip()
-
-        colors.fill.setFill()
-        rulerRect.fill()
-
-        drawTicks(in: rulerRect, colors: colors, scale: scale)
-        drawUnitLabel(in: rulerRect, colors: colors, scale: scale)
-
-        NSGraphicsContext.restoreGraphicsState()
-
-        rulerPath.lineWidth = 8 * scale
-        colors.ticks.setStroke()
-        rulerPath.stroke()
-    }
-
-    private static func drawShadow(for path: NSBezierPath, scale: CGFloat) {
-        NSGraphicsContext.saveGraphicsState()
-        let shadow = NSShadow()
-        shadow.shadowOffset = NSSize(width: 0, height: -18 * scale)
-        shadow.shadowBlurRadius = 28 * scale
-        shadow.shadowColor = NSColor.black.withAlphaComponent(0.24)
-        shadow.set()
-
-        NSColor.black.withAlphaComponent(0.01).setFill()
-        path.fill()
+        drawTicks(in: canvas, colors: colors, scale: scale)
+        drawUnitLabel(in: canvas, colors: colors, scale: scale)
         NSGraphicsContext.restoreGraphicsState()
     }
 
     private static func drawTicks(in rect: NSRect, colors: AppIconPalette, scale: CGFloat) {
         let path = NSBezierPath()
-        path.lineWidth = 6 * scale
+        path.lineWidth = AppIconLayout.tickWidth * scale
+        let smallTickPath = NSBezierPath()
+        smallTickPath.lineWidth = AppIconLayout.smallTickWidth * scale
 
-        let tickSpacing = 14 * scale
-        let largeTickLength = 120 * scale
-        let mediumTickLength = 84 * scale
-        let smallTickLength = 52 * scale
-        let tickCount = Int((rect.width - (2 * scale)) / tickSpacing)
+        let tickSpacing = rect.width / AppIconLayout.rulerEndTick
+        let largeTickLength = AppIconLayout.largeTickLength * scale
+        let mediumTickLength = AppIconLayout.mediumTickLength * scale
+        let smallTickLength = AppIconLayout.smallTickLength * scale
+        let tickCount = Int(rect.width / tickSpacing)
         guard tickCount > 0 else { return }
 
         for i in 1...tickCount {
@@ -142,16 +147,18 @@ enum AppIconRenderer {
             } else if i.isMultiple(of: 10) {
                 path.move(to: CGPoint(x: x, y: rect.minY + scale))
                 path.line(to: CGPoint(x: x, y: rect.minY + mediumTickLength))
-            } else if i.isMultiple(of: 2) {
-                path.move(to: CGPoint(x: x, y: rect.minY + scale))
-                path.line(to: CGPoint(x: x, y: rect.minY + smallTickLength))
+            } else if i % 10 == 5 {
+                smallTickPath.move(to: CGPoint(x: x, y: rect.minY + scale))
+                smallTickPath.line(to: CGPoint(x: x, y: rect.minY + smallTickLength))
             }
         }
 
         path.transform(using: AffineTransform(translationByX: 0.5 * scale, byY: 0))
+        smallTickPath.transform(using: AffineTransform(translationByX: 0.5 * scale, byY: 0))
 
         colors.ticks.setStroke()
         path.stroke()
+        smallTickPath.stroke()
     }
 
     private static func drawTickLabel(
@@ -162,16 +169,16 @@ enum AppIconRenderer {
         scale: CGFloat
     ) {
         let labelRect = CGRect(
-            x: x - (90 * scale),
-            y: rect.minY + (160 * scale),
-            width: 180 * scale,
-            height: 92 * scale
+            x: x - ((AppIconLayout.tickLabelWidth / 2) * scale),
+            y: rect.minY + (AppIconLayout.tickLabelBottomOffset * scale),
+            width: AppIconLayout.tickLabelWidth * scale,
+            height: AppIconLayout.tickLabelHeight * scale
         )
 
         label.draw(
             with: labelRect,
             attributes: labelAttributes(
-                fontSize: 56 * scale,
+                fontSize: AppIconLayout.labelFontSize * scale,
                 alignment: .center,
                 foregroundColor: colors.numbers
             ),
@@ -183,15 +190,15 @@ enum AppIconRenderer {
         let label = NSAttributedString(
             string: "px",
             attributes: labelAttributes(
-                fontSize: 56 * scale,
+                fontSize: AppIconLayout.labelFontSize * scale,
                 alignment: .left,
-                foregroundColor: colors.ticks
+                foregroundColor: colors.numbers
             )
         )
         let labelSize = label.size()
         let labelRect = CGRect(
-            x: rect.minX + (64 * scale),
-            y: rect.maxY - labelSize.height,
+            x: rect.minX + (AppIconLayout.unitLabelLeftPadding * scale),
+            y: rect.maxY - labelSize.height - (AppIconLayout.unitLabelTopPadding * scale),
             width: labelSize.width,
             height: labelSize.height
         )
@@ -206,7 +213,7 @@ enum AppIconRenderer {
     ) -> [NSAttributedString.Key: Any] {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = alignment
-        let font = NSFont(name: "HelveticaNeue", size: fontSize) ?? .systemFont(ofSize: fontSize)
+        let font = labelFont(size: fontSize)
 
         return [
             .font: font,
@@ -214,9 +221,79 @@ enum AppIconRenderer {
             .foregroundColor: foregroundColor,
         ]
     }
+
+    private static func labelFont(size: CGFloat) -> NSFont {
+        switch AppIconLayout.labelFontFamily {
+        case .helveticaNeue:
+            return NSFontManager.shared.font(
+                withFamily: "Helvetica Neue",
+                traits: [],
+                weight: fontManagerWeight(for: AppIconLayout.labelFontWeight),
+                size: size
+            ) ?? NSFont.systemFont(ofSize: size, weight: AppIconLayout.labelFontWeight)
+        case .system:
+            return NSFont.systemFont(ofSize: size, weight: AppIconLayout.labelFontWeight)
+        }
+    }
+
+    private static func fontManagerWeight(for weight: NSFont.Weight) -> Int {
+        switch weight {
+        case .ultraLight:
+            return 2
+        case .thin:
+            return 3
+        case .light:
+            return 4
+        case .regular:
+            return 5
+        case .medium:
+            return 6
+        case .semibold:
+            return 8
+        case .bold:
+            return 9
+        case .heavy:
+            return 12
+        case .black:
+            return 14
+        default:
+            return 5
+        }
+    }
 }
 
 enum AppIconRendererError: Error {
     case couldNotCreateBitmap(Int)
     case couldNotEncodePNG(Int)
 }
+
+#if DEBUG
+struct AppIconPreview: View {
+    var body: some View {
+        VStack(spacing: 24) {
+            previewIcon(size: 256)
+
+            HStack(spacing: 20) {
+                previewIcon(size: 128)
+                previewIcon(size: 64)
+                previewIcon(size: 32)
+            }
+        }
+        .padding(32)
+        .background(.regularMaterial)
+    }
+
+    private func previewIcon(size: CGFloat) -> some View {
+        Image(nsImage: AppIconRenderer.image(size: AppIconLayout.canvasSize))
+            .resizable()
+            .frame(width: size, height: size)
+    }
+}
+
+struct AppIconPreview_Previews: PreviewProvider {
+    static var previews: some View {
+        AppIconPreview()
+            .previewLayout(.sizeThatFits)
+    }
+}
+#endif
