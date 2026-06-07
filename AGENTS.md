@@ -14,16 +14,16 @@ The main app target lives in `Free Ruler/` and the Xcode project is
 
 ## Repository Layout
 
-- `Free Ruler/AppDelegate.swift`: app lifecycle, menu actions, ruler creation,
+- `AppDelegate.swift`: app lifecycle, menu actions, ruler creation,
   hotkey behavior, timer policy wiring, and UI test state reset.
-- `Free Ruler/Ruler.swift`: ruler model plus default placement and min/max size
+- `Ruler.swift`: ruler model plus default placement and min/max size
   helpers.
-- `Free Ruler/RulerController.swift`, `RulerWindow.swift`, `RuleView.swift`,
+- `RulerController.swift`, `RulerWindow.swift`, `RuleView.swift`,
   `HorizontalRule.swift`, `VerticalRule.swift`: ruler window/view behavior and
   drawing.
-- `Free Ruler/Prefs.swift`: persisted app preferences.
-- `Free Ruler/Base.lproj/*.xib`: AppKit interface files for menus/preferences.
-- `Free Ruler/*.lproj/*.strings` and `Free Ruler/Localizable.xcstrings`:
+- `Prefs.swift`: persisted app preferences.
+- `Base.lproj/*.xib`: AppKit interface files for menus/preferences.
+- `*.lproj/*.strings` and `Localizable.xcstrings`:
   localized resources.
 - `FreeRulerTests/`: unit tests for core non-UI behavior.
 - `FreeRulerUITests/`: UI tests.
@@ -83,8 +83,7 @@ normal test suite. `npm test` is intentionally not wired to the Xcode tests.
 - Menu and preferences UI still come from XIB files. Be careful when editing
   `Base.lproj/*.xib` and keep localized `.strings` files consistent with UI
   text changes.
-- The project file has paths containing spaces, especially `Free Ruler/` and
-  `Free Ruler.xcodeproj`; quote paths in shell commands.
+- The project file has paths containing spaces, especially ``and`Free Ruler.xcodeproj`; quote paths in shell commands.
 
 ## Release Notes
 
