@@ -15,8 +15,13 @@ final class MouseTickTimerPolicy {
     }
 
     var desiredInterval: TimeInterval? {
-        guard hasApplicationState, hasVisibleRulers, suspendedOwners.allObjects.isEmpty else { return nil }
+        guard hasApplicationState, hasVisibleRulers, !hasSuspendedOwners else { return nil }
         return appIsActive ? foregroundInterval : backgroundInterval
+    }
+
+    private var hasSuspendedOwners: Bool {
+        guard suspendedOwners.count > 0 else { return false }
+        return suspendedOwners.anyObject != nil
     }
 
     func applicationDidBecomeActive() {

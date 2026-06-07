@@ -130,6 +130,8 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     }
 
     func enableMouseTicks() {
+        guard !rulerWindow.rule.showMouseTick || otherWindow?.rule.showMouseTick == false else { return }
+
         rulerWindow.rule.showMouseTick = true
         otherWindow?.rule.showMouseTick = true
         appDelegate?.resumeMouseTickUpdates(owner: self)
