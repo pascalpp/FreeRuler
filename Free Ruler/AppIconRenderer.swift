@@ -16,8 +16,9 @@ private enum AppIconFontFamily {
 
 private enum AppIconLayout {
     static let canvasSize: CGFloat = 1024
-    static let cornerRadius: CGFloat = 185
-    static let rulerEndTick: CGFloat = 65
+    static let cornerRadius: CGFloat = 200
+    static let rulerStartTick: CGFloat = 2
+    static let rulerEndTick: CGFloat = 68
 
     static let tickWidth: CGFloat = 20
     static let largeTickLength: CGFloat = 200
@@ -25,8 +26,14 @@ private enum AppIconLayout {
     static let smallTickLength: CGFloat = 100
     static let smallTickWidth: CGFloat = 20
 
+    static let borderEnabled = true
+    static let borderWidth: CGFloat = 30
+    static let borderOpacity: CGFloat = 1
+    static let insetBorderWidth: CGFloat = 40
+    static let insetBorderOpacity: CGFloat = 0.25
+
     static let labelFontSize: CGFloat = 260
-    static let labelFontFamily: AppIconFontFamily = .helveticaNeue
+    static let labelFontFamily: AppIconFontFamily = .system
     static let labelFontWeight: NSFont.Weight = .semibold
 
     static let unitLabelLeftPadding: CGFloat = 170
@@ -121,6 +128,7 @@ enum AppIconRenderer {
         let colors = AppIconPalette()
         drawTicks(in: canvas, colors: colors, scale: scale)
         drawUnitLabel(in: canvas, colors: colors, scale: scale)
+        drawBorder(in: canvas, colors: colors, scale: scale)
         NSGraphicsContext.restoreGraphicsState()
     }
 
@@ -130,15 +138,19 @@ enum AppIconRenderer {
         let smallTickPath = NSBezierPath()
         smallTickPath.lineWidth = AppIconLayout.smallTickWidth * scale
 
-        let tickSpacing = rect.width / AppIconLayout.rulerEndTick
+        let rulerTickSpan = AppIconLayout.rulerEndTick - AppIconLayout.rulerStartTick
+        guard rulerTickSpan > 0 else { return }
+
+        let tickSpacing = rect.width / rulerTickSpan
         let largeTickLength = AppIconLayout.largeTickLength * scale
         let mediumTickLength = AppIconLayout.mediumTickLength * scale
         let smallTickLength = AppIconLayout.smallTickLength * scale
-        let tickCount = Int(rect.width / tickSpacing)
-        guard tickCount > 0 else { return }
+        let startTick = Int(floor(AppIconLayout.rulerStartTick)) + 1
+        let endTick = Int(floor(AppIconLayout.rulerEndTick))
+        guard startTick <= endTick else { return }
 
-        for i in 1...tickCount {
-            let x = rect.minX + (CGFloat(i) * tickSpacing)
+        for i in startTick...endTick {
+            let x = rect.minX + ((CGFloat(i) - AppIconLayout.rulerStartTick) * tickSpacing)
 
             if i.isMultiple(of: 50) {
                 path.move(to: CGPoint(x: x, y: rect.minY + scale))
@@ -159,6 +171,47 @@ enum AppIconRenderer {
         colors.ticks.setStroke()
         path.stroke()
         smallTickPath.stroke()
+    }
+
+    private static func drawBorder(in rect: NSRect, colors: AppIconPalette, scale: CGFloat) {
+        guard AppIconLayout.borderEnabled else { return }
+
+        let lineWidth = AppIconLayout.borderWidth * scale
+        strokeBorder(
+            in: rect,
+            colors: colors,
+            scale: scale,
+            inset: lineWidth / 2,
+            opacity: AppIconLayout.borderOpacity
+        )
+        strokeBorder(
+            in: rect,
+            colors: colors,
+            scale: scale,
+            inset: lineWidth * 1.5,
+            opacity: AppIconLayout.insetBorderOpacity
+        )
+    }
+
+    private static func strokeBorder(
+        in rect: NSRect,
+        colors: AppIconPalette,
+        scale: CGFloat,
+        inset: CGFloat,
+        opacity: CGFloat
+    ) {
+        guard opacity > 0 else { return }
+
+        let lineWidth = AppIconLayout.borderWidth * scale
+        let borderPath = NSBezierPath(
+            roundedRect: rect.insetBy(dx: inset, dy: inset),
+            xRadius: max(0, (AppIconLayout.cornerRadius * scale) - inset),
+            yRadius: max(0, (AppIconLayout.cornerRadius * scale) - inset)
+        )
+        borderPath.lineWidth = lineWidth
+
+        colors.ticks.withAlphaComponent(opacity).setStroke()
+        borderPath.stroke()
     }
 
     private static func drawTickLabel(
