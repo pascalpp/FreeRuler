@@ -16,9 +16,10 @@ private enum AppIconFontFamily {
 
 private enum AppIconLayout {
     static let canvasSize: CGFloat = 1024
+    static let iconInset: CGFloat = 84
     static let cornerRadius: CGFloat = 200
     static let rulerStartTick: CGFloat = 2
-    static let rulerEndTick: CGFloat = 68
+    static let rulerEndTick: CGFloat = 69
 
     static let tickWidth: CGFloat = 20
     static let largeTickLength: CGFloat = 200
@@ -32,12 +33,18 @@ private enum AppIconLayout {
     static let insetBorderWidth: CGFloat = 40
     static let insetBorderOpacity: CGFloat = 0.25
 
-    static let labelFontSize: CGFloat = 260
+    static let shadowEnabled = true
+    static let shadowYOffset: CGFloat = -18
+    static let shadowBlurRadius: CGFloat = 24
+    static let shadowOpacity: CGFloat = 0.28
+
+    static let unitLabelFontSize: CGFloat = 260
+    static let tickLabelFontSize: CGFloat = 200
     static let labelFontFamily: AppIconFontFamily = .system
     static let labelFontWeight: NSFont.Weight = .semibold
 
-    static let unitLabelLeftPadding: CGFloat = 170
-    static let unitLabelTopPadding: CGFloat = 40
+    static let unitLabelLeftPadding: CGFloat = 150
+    static let unitLabelTopPadding: CGFloat = 20
 
     static let tickLabelWidth: CGFloat = 440
     static let tickLabelHeight: CGFloat = 240
@@ -114,21 +121,48 @@ enum AppIconRenderer {
     }
 
     private static func draw(in canvas: NSRect) {
-        NSGraphicsContext.saveGraphicsState()
-        NSBezierPath(
-            roundedRect: canvas,
-            xRadius: AppIconLayout.cornerRadius * (canvas.width / AppIconLayout.canvasSize),
-            yRadius: AppIconLayout.cornerRadius * (canvas.height / AppIconLayout.canvasSize)
-        ).addClip()
-
-        AppIconPalette().fill.setFill()
-        canvas.fill()
-
         let scale = canvas.width / AppIconLayout.canvasSize
+        let iconRect = canvas.insetBy(
+            dx: AppIconLayout.iconInset * scale,
+            dy: AppIconLayout.iconInset * scale
+        )
+        let cornerRadius = AppIconLayout.cornerRadius * scale
+        let iconShape = NSBezierPath(
+            roundedRect: iconRect,
+            xRadius: cornerRadius,
+            yRadius: cornerRadius
+        )
         let colors = AppIconPalette()
-        drawTicks(in: canvas, colors: colors, scale: scale)
-        drawUnitLabel(in: canvas, colors: colors, scale: scale)
-        drawBorder(in: canvas, colors: colors, scale: scale)
+
+        drawShadow(for: iconShape, scale: scale)
+
+        NSGraphicsContext.saveGraphicsState()
+        iconShape.addClip()
+
+        colors.fill.setFill()
+        iconRect.fill()
+
+        drawTicks(in: iconRect, colors: colors, scale: scale)
+        drawUnitLabel(in: iconRect, colors: colors, scale: scale)
+        drawBorder(in: iconRect, colors: colors, scale: scale)
+        NSGraphicsContext.restoreGraphicsState()
+    }
+
+    private static func drawShadow(for path: NSBezierPath, scale: CGFloat) {
+        guard AppIconLayout.shadowEnabled else { return }
+
+        NSGraphicsContext.saveGraphicsState()
+        let shadow = NSShadow()
+        shadow.shadowColor = NSColor.black.withAlphaComponent(AppIconLayout.shadowOpacity)
+        shadow.shadowBlurRadius = AppIconLayout.shadowBlurRadius * scale
+        shadow.shadowOffset = NSSize(
+            width: 0,
+            height: AppIconLayout.shadowYOffset * scale
+        )
+        shadow.set()
+
+        NSColor.black.setFill()
+        path.fill()
         NSGraphicsContext.restoreGraphicsState()
     }
 
@@ -231,7 +265,7 @@ enum AppIconRenderer {
         label.draw(
             with: labelRect,
             attributes: labelAttributes(
-                fontSize: AppIconLayout.labelFontSize * scale,
+                fontSize: AppIconLayout.tickLabelFontSize * scale,
                 alignment: .center,
                 foregroundColor: colors.numbers
             ),
@@ -243,7 +277,7 @@ enum AppIconRenderer {
         let label = NSAttributedString(
             string: "px",
             attributes: labelAttributes(
-                fontSize: AppIconLayout.labelFontSize * scale,
+                fontSize: AppIconLayout.unitLabelFontSize * scale,
                 alignment: .left,
                 foregroundColor: colors.numbers
             )
