@@ -30,7 +30,7 @@ private enum AppIconLayout {
     static let borderEnabled = true
     static let borderWidth: CGFloat = 30
     static let borderOpacity: CGFloat = 1
-    static let insetBorderWidth: CGFloat = 40
+    static let insetBorderWidth: CGFloat = 30
     static let insetBorderOpacity: CGFloat = 0.25
 
     static let shadowEnabled = true
@@ -215,20 +215,23 @@ enum AppIconRenderer {
     private static func drawBorder(in rect: NSRect, colors: AppIconPalette, scale: CGFloat) {
         guard AppIconLayout.borderEnabled else { return }
 
-        let lineWidth = AppIconLayout.borderWidth * scale
+        let borderWidth = AppIconLayout.borderWidth * scale
+        let insetBorderWidth = AppIconLayout.insetBorderWidth * scale
         strokeBorder(
             in: rect,
             colors: colors,
             scale: scale,
-            inset: lineWidth / 2,
-            opacity: AppIconLayout.borderOpacity
+            inset: borderWidth / 2,
+            opacity: AppIconLayout.borderOpacity,
+            lineWidth: borderWidth
         )
         strokeBorder(
             in: rect,
             colors: colors,
             scale: scale,
-            inset: lineWidth * 1.5,
-            opacity: AppIconLayout.insetBorderOpacity
+            inset: borderWidth + insetBorderWidth / 2,
+            opacity: AppIconLayout.insetBorderOpacity,
+            lineWidth: insetBorderWidth
         )
     }
 
@@ -237,11 +240,11 @@ enum AppIconRenderer {
         colors: AppIconPalette,
         scale: CGFloat,
         inset: CGFloat,
-        opacity: CGFloat
+        opacity: CGFloat,
+        lineWidth: CGFloat
     ) {
         guard opacity > 0 else { return }
 
-        let lineWidth = AppIconLayout.borderWidth * scale
         let borderPath = NSBezierPath(
             roundedRect: rect.insetBy(dx: inset, dy: inset),
             xRadius: max(0, (AppIconLayout.cornerRadius * scale) - inset),
@@ -388,7 +391,7 @@ struct AppIconPreview: View {
     }
 
     private func previewIcon(size: CGFloat) -> some View {
-        Image(nsImage: AppIconRenderer.image(size: AppIconLayout.canvasSize))
+        Image(nsImage: AppIconRenderer.image(size: size))
             .resizable()
             .frame(width: size, height: size)
     }
