@@ -6,6 +6,7 @@ source "$(dirname "$0")/common.sh"
 
 run_from_root
 require_tool node
+require_tool xcodebuild
 
 sign_update_tool="${SPARKLE_SIGN_UPDATE:-sign_update}"
 require_tool "$sign_update_tool"
@@ -13,7 +14,7 @@ require_tool "$sign_update_tool"
 zip_path="$(release_zip_path)"
 zip_url="$(release_zip_url)"
 version="$(version)"
-build_version="$(build_setting CURRENT_PROJECT_VERSION)"
+build_version="$(build_setting CURRENT_PROJECT_VERSION "$GITHUB_SCHEME_NAME")"
 tag="$(release_tag)"
 release_notes_url="https://github.com/pascalpp/FreeRuler/releases/tag/$tag"
 

@@ -15,7 +15,6 @@ ARCHIVE_PATH="$RELEASE_DIR/$APP_NAME.xcarchive"
 EXPORT_DIR="$RELEASE_DIR/export"
 EXPORT_OPTIONS_PLIST="$ROOT_DIR/scripts/release/ExportOptions.github.plist"
 APPCAST_PATH="$RELEASE_DIR/appcast.xml"
-SPARKLE_FEED_URL="https://github.com/pascalpp/FreeRuler/releases/latest/download/appcast.xml"
 
 load_release_env() {
   [[ -f "$RELEASE_ENV_FILE" ]] || return 0
@@ -55,6 +54,8 @@ load_release_env() {
 }
 
 load_release_env
+
+SPARKLE_FEED_URL="${SPARKLE_FEED_URL:-https://github.com/pascalpp/FreeRuler/releases/latest/download/appcast.xml}"
 
 version() {
   node -p "require('./package.json').version"
@@ -104,8 +105,9 @@ ensure_clean_worktree() {
 
 build_setting() {
   local setting="$1"
+  local scheme="${2:-$SCHEME_NAME}"
   xcodebuild -project "$PROJECT_PATH" \
-    -scheme "$SCHEME_NAME" \
+    -scheme "$scheme" \
     -configuration "$CONFIGURATION" \
     -showBuildSettings 2>/dev/null \
     | awk -F ' = ' -v key="$setting" '$1 ~ key "$" { print $2; exit }'
