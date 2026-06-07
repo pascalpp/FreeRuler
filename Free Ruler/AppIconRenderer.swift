@@ -104,8 +104,12 @@ enum AppIconRenderer {
 
         bitmap.size = NSSize(width: pixels, height: pixels)
 
+        guard let context = NSGraphicsContext(bitmapImageRep: bitmap) else {
+            throw AppIconRendererError.couldNotCreateGraphicsContext(pixels)
+        }
+
         NSGraphicsContext.saveGraphicsState()
-        NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: bitmap)
+        NSGraphicsContext.current = context
         image(size: AppIconLayout.canvasSize).draw(
             in: NSRect(x: 0, y: 0, width: pixels, height: pixels),
             from: NSRect(x: 0, y: 0, width: AppIconLayout.canvasSize, height: AppIconLayout.canvasSize),
@@ -350,9 +354,21 @@ enum AppIconRenderer {
     }
 }
 
-enum AppIconRendererError: Error {
+enum AppIconRendererError: LocalizedError {
     case couldNotCreateBitmap(Int)
+    case couldNotCreateGraphicsContext(Int)
     case couldNotEncodePNG(Int)
+
+    var errorDescription: String? {
+        switch self {
+        case let .couldNotCreateBitmap(pixels):
+            return "Could not create a \(pixels)x\(pixels) bitmap for app icon generation."
+        case let .couldNotCreateGraphicsContext(pixels):
+            return "Could not create a graphics context for the \(pixels)x\(pixels) app icon bitmap."
+        case let .couldNotEncodePNG(pixels):
+            return "Could not encode the \(pixels)x\(pixels) app icon as PNG."
+        }
+    }
 }
 
 #if DEBUG

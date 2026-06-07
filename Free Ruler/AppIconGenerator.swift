@@ -14,7 +14,7 @@ enum AppIconGeneratorCLI {
         do {
             try AppIconRenderer.exportAppIconSet(to: outputDirectory)
         } catch {
-            printError("Could not generate app icons: \(error)")
+            printError("Could not generate app icons: \(error.localizedDescription)")
             exit(1)
         }
     }
