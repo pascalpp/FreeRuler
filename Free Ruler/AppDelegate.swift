@@ -1,5 +1,8 @@
 import Cocoa
 import Carbon.HIToolbox
+#if DEBUG
+import Darwin
+#endif
 #if SPARKLE
 import Sparkle
 #endif
@@ -87,6 +90,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
 
+#if DEBUG
+        if let outputDirectory = appStoreScreenshotOutputDirectory() {
+            generateAppStoreScreenshots(to: outputDirectory)
+            return
+        }
+#endif
+
         if UI_TESTS {
             resetStateForUITests()
         }
@@ -100,6 +110,32 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         showRulers()
 
     }
+
+#if DEBUG
+    private func appStoreScreenshotOutputDirectory() -> URL? {
+        let arguments = CommandLine.arguments
+        guard let flagIndex = arguments.firstIndex(of: "--generate-app-store-screenshots"),
+              arguments.indices.contains(flagIndex + 1) else {
+            return nil
+        }
+
+        return URL(fileURLWithPath: arguments[flagIndex + 1])
+    }
+
+    private func generateAppStoreScreenshots(to outputDirectory: URL) {
+        do {
+            try AppStoreScreenshotRenderer.exportAll(to: outputDirectory)
+            NSApp.terminate(nil)
+        } catch {
+            printError("Could not generate App Store screenshots: \(error.localizedDescription)")
+            exit(1)
+        }
+    }
+
+    private func printError(_ message: String) {
+        FileHandle.standardError.write(Data((message + "\n").utf8))
+    }
+#endif
 
 #if SPARKLE
     private func configureUpdater() {

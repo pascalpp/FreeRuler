@@ -74,6 +74,89 @@ private enum AppStoreScreenshotScreen {
             return "Screen 3 - Preferences"
         }
     }
+
+    var outputFilename: String {
+        switch self {
+        case .screen1:
+            return "01-measure-anything.png"
+        case .screen2:
+            return "02-switch-units.png"
+        case .screen3:
+            return "03-customize-rulers.png"
+        }
+    }
+}
+
+enum AppStoreScreenshotRenderer {
+    static func exportAll(to outputDirectory: URL) throws {
+        try FileManager.default.createDirectory(
+            at: outputDirectory,
+            withIntermediateDirectories: true
+        )
+
+        for screen in screens {
+            let image = render(screen: screen)
+            let outputURL = outputDirectory.appendingPathComponent(screen.outputFilename)
+            try writePNG(image, to: outputURL)
+            print("Generated \(outputURL.path)")
+        }
+    }
+
+    private static let screens: [AppStoreScreenshotScreen] = [
+        .screen1,
+        .screen2,
+        .screen3,
+    ]
+
+    private static func render(screen: AppStoreScreenshotScreen) -> NSImage {
+        let view = AppStoreScreenshotScenarioNSView(screen: screen)
+        view.frame = NSRect(origin: .zero, size: AppStoreScreenshotLayout.canvasSize)
+        view.layoutSubtreeIfNeeded()
+        view.needsDisplay = true
+        view.displayIfNeeded()
+
+        guard let representation = NSBitmapImageRep(
+            bitmapDataPlanes: nil,
+            pixelsWide: Int(AppStoreScreenshotLayout.canvasWidth),
+            pixelsHigh: Int(AppStoreScreenshotLayout.canvasHeight),
+            bitsPerSample: 8,
+            samplesPerPixel: 4,
+            hasAlpha: true,
+            isPlanar: false,
+            colorSpaceName: .deviceRGB,
+            bytesPerRow: 0,
+            bitsPerPixel: 0
+        ) else {
+            return NSImage(size: AppStoreScreenshotLayout.canvasSize)
+        }
+        representation.size = AppStoreScreenshotLayout.canvasSize
+        view.cacheDisplay(in: view.bounds, to: representation)
+
+        let image = NSImage(size: AppStoreScreenshotLayout.canvasSize)
+        image.addRepresentation(representation)
+        return image
+    }
+
+    private static func writePNG(_ image: NSImage, to outputURL: URL) throws {
+        guard let tiffData = image.tiffRepresentation,
+              let bitmap = NSBitmapImageRep(data: tiffData),
+              let pngData = bitmap.representation(using: .png, properties: [:]) else {
+            throw AppStoreScreenshotRendererError.couldNotEncodePNG
+        }
+
+        try pngData.write(to: outputURL, options: .atomic)
+    }
+}
+
+enum AppStoreScreenshotRendererError: LocalizedError {
+    case couldNotEncodePNG
+
+    var errorDescription: String? {
+        switch self {
+        case .couldNotEncodePNG:
+            return "Could not encode an App Store screenshot as PNG."
+        }
+    }
 }
 
 private enum AppStoreScreenshotLayout {
@@ -306,15 +389,37 @@ private struct AppStoreScreenshotScenarioView: NSViewRepresentable {
 private struct AppStoreRulerPlacement {
     let container: NSView
     let view: RuleView
+    let borderView: AppStoreRulerBorderView
     let frame: NSRect
     let boundsSize: NSSize
 
     init(view: RuleView, frame: NSRect, boundsSize: NSSize) {
         self.container = NSView(frame: NSRect(origin: .zero, size: boundsSize))
         self.view = view
+        self.borderView = AppStoreRulerBorderView(frame: NSRect(origin: .zero, size: boundsSize))
         self.frame = frame
         self.boundsSize = boundsSize
         self.container.addSubview(view)
+        self.container.addSubview(borderView)
+    }
+}
+
+private final class AppStoreRulerBorderView: NSView {
+    var borderColor: NSColor = .clear
+    var borderWidth: CGFloat = 0
+
+    override var isFlipped: Bool {
+        true
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
+        guard borderWidth > 0 else { return }
+
+        borderColor.setStroke()
+        let path = NSBezierPath(rect: bounds.insetBy(dx: borderWidth / 2, dy: borderWidth / 2))
+        path.lineWidth = borderWidth
+        path.stroke()
     }
 }
 
@@ -369,7 +474,7 @@ private final class AppStoreHorizontalRule: HorizontalRule {
         defer {
             prefs.unit = originalUnit
         }
-        super.draw(dirtyRect)
+        super.draw(bounds)
     }
 }
 
@@ -391,7 +496,7 @@ private final class AppStoreVerticalRule: VerticalRule {
         defer {
             prefs.unit = originalUnit
         }
-        super.draw(dirtyRect)
+        super.draw(bounds)
     }
 }
 
@@ -726,6 +831,10 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         rulerPlacement.view.frame = NSRect(origin: .zero, size: rulerPlacement.boundsSize)
         rulerPlacement.view.setBoundsSize(rulerPlacement.boundsSize)
         rulerPlacement.view.needsDisplay = true
+        rulerPlacement.borderView.frame = NSRect(origin: .zero, size: rulerPlacement.boundsSize)
+        rulerPlacement.borderView.borderColor = palette.rulerBorder
+        rulerPlacement.borderView.borderWidth = AppStoreScreenshotLayout.rulerBorderWidth
+        rulerPlacement.borderView.needsDisplay = true
     }
 
     private func layoutView(
@@ -784,9 +893,6 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
     private func configureRuler(_ view: RuleView) {
         view.showMouseTick = false
         view.alphaValue = screen == .screen3 ? AppStoreScreenshotLayout.screen3RulerOpacity : 1
-        view.wantsLayer = true
-        view.layer?.borderColor = palette.rulerBorder.cgColor
-        view.layer?.borderWidth = AppStoreScreenshotLayout.rulerBorderWidth
     }
 
     private func drawSampleWindow(_ rect: NSRect) {
@@ -806,7 +912,7 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
             rect,
             radius: AppStoreScreenshotLayout.sampleWindowCornerRadius,
             fill: palette.sampleWindowFill,
-            stroke: palette.sampleWindowBorder
+            stroke: nil
         )
         rounded(
             titlebarRect,
@@ -821,12 +927,18 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
             width: titlebarRect.width,
             height: AppStoreScreenshotLayout.titlebarHeight / 2
         ).fill()
-        stroke(
-            titlebarRect,
-            color: palette.sampleWindowTitlebarBorder,
-            width: AppStoreScreenshotLayout.sampleWindowBorderWidth
-        )
+        drawTitlebarDivider(in: titlebarRect)
         drawTrafficLights(at: sampleWindowTrafficLightOrigin(for: rect))
+    }
+
+    private func drawTitlebarDivider(in titlebarRect: NSRect) {
+        palette.sampleWindowTitlebarBorder.setFill()
+        NSRect(
+            x: titlebarRect.minX,
+            y: titlebarRect.maxY - AppStoreScreenshotLayout.sampleWindowBorderWidth,
+            width: titlebarRect.width,
+            height: AppStoreScreenshotLayout.sampleWindowBorderWidth
+        ).fill()
     }
 
     private func sampleWindowTitlebarRect(for rect: NSRect) -> NSRect {
