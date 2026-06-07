@@ -95,7 +95,7 @@ enum AppStoreScreenshotRenderer {
         )
 
         for screen in screens {
-            let image = render(screen: screen)
+            let image = try render(screen: screen)
             let outputURL = outputDirectory.appendingPathComponent(screen.outputFilename)
             try writePNG(image, to: outputURL)
             print("Generated \(outputURL.path)")
@@ -108,7 +108,7 @@ enum AppStoreScreenshotRenderer {
         .screen3,
     ]
 
-    private static func render(screen: AppStoreScreenshotScreen) -> NSImage {
+    private static func render(screen: AppStoreScreenshotScreen) throws -> NSImage {
         let view = AppStoreScreenshotScenarioNSView(screen: screen)
         view.frame = NSRect(origin: .zero, size: AppStoreScreenshotLayout.canvasSize)
         view.layoutSubtreeIfNeeded()
@@ -127,7 +127,7 @@ enum AppStoreScreenshotRenderer {
             bytesPerRow: 0,
             bitsPerPixel: 0
         ) else {
-            return NSImage(size: AppStoreScreenshotLayout.canvasSize)
+            throw AppStoreScreenshotRendererError.couldNotCreateBitmap
         }
         representation.size = AppStoreScreenshotLayout.canvasSize
         view.cacheDisplay(in: view.bounds, to: representation)
@@ -149,10 +149,13 @@ enum AppStoreScreenshotRenderer {
 }
 
 enum AppStoreScreenshotRendererError: LocalizedError {
+    case couldNotCreateBitmap
     case couldNotEncodePNG
 
     var errorDescription: String? {
         switch self {
+        case .couldNotCreateBitmap:
+            return "Could not create an App Store screenshot bitmap."
         case .couldNotEncodePNG:
             return "Could not encode an App Store screenshot as PNG."
         }
@@ -502,10 +505,14 @@ private final class AppStoreActiveSnapshotWindow: NSWindow {
 }
 
 private final class AppStoreHorizontalRule: HorizontalRule {
-    private let unit: Unit
+    private let screenshotUnit: Unit
+
+    override var unit: Unit {
+        screenshotUnit
+    }
 
     init(unit: Unit, frame: NSRect) {
-        self.unit = unit
+        self.screenshotUnit = unit
         super.init(frame: frame)
     }
 
@@ -514,20 +521,19 @@ private final class AppStoreHorizontalRule: HorizontalRule {
     }
 
     override func draw(_ dirtyRect: NSRect) {
-        let originalUnit = prefs.unit
-        prefs.unit = unit
-        defer {
-            prefs.unit = originalUnit
-        }
         super.draw(bounds)
     }
 }
 
 private final class AppStoreVerticalRule: VerticalRule {
-    private let unit: Unit
+    private let screenshotUnit: Unit
+
+    override var unit: Unit {
+        screenshotUnit
+    }
 
     init(unit: Unit, frame: NSRect) {
-        self.unit = unit
+        self.screenshotUnit = unit
         super.init(frame: frame)
     }
 
@@ -536,11 +542,6 @@ private final class AppStoreVerticalRule: VerticalRule {
     }
 
     override func draw(_ dirtyRect: NSRect) {
-        let originalUnit = prefs.unit
-        prefs.unit = unit
-        defer {
-            prefs.unit = originalUnit
-        }
         super.draw(bounds)
     }
 }

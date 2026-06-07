@@ -23,7 +23,7 @@ class HorizontalRule: RuleView {
 
         let width = dirtyRect.width
         let path = NSBezierPath()
-        let tickLayout = RulerTickLayout(unit: prefs.unit, screen: screen)
+        let tickLayout = RulerTickLayout(unit: unit, screen: screen)
 
         let labelWidth: CGFloat = 50
         let labelHeight: CGFloat = 20
