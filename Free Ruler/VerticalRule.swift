@@ -19,47 +19,12 @@ class VerticalRule: RuleView {
         color.fill.setFill()
         dirtyRect.fill()
 
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.alignment = .right
-        let attrs: [NSAttributedString.Key: Any] = [
-            .font: NSFont(name: "HelveticaNeue", size: 10)!,
-            .paragraphStyle: paragraphStyle,
-            .foregroundColor: color.numbers
-       ]
+        let attrs = labelAttributes(alignment: .right, foregroundColor: color.numbers)
 
         let width = dirtyRect.width
         let height = dirtyRect.height
         let path = NSBezierPath()
-        let tickScale: CGFloat
-        let textScale: Int
-        let largeTicks: Int
-        let mediumTicks: Int
-        let smallTicks: Int
-        let tinyTicks: Int?
-        
-        switch prefs.unit {
-        case .millimeters:
-            tickScale = screen?.dpmm.width ?? NSScreen.defaultDpmm
-            textScale = 1
-            largeTicks = 10
-            mediumTicks = 5
-            smallTicks = 1
-            tinyTicks = nil
-        case .inches:
-            tickScale = (screen?.dpi.width ?? NSScreen.defaultDpi) / 16
-            textScale = 16
-            largeTicks = 16
-            mediumTicks = 8
-            smallTicks = 4
-            tinyTicks = 1
-        default:
-            tickScale = 1
-            textScale = 1
-            largeTicks = 50
-            mediumTicks = 10
-            smallTicks = 2
-            tinyTicks = nil
-        }
+        let tickLayout = RulerTickLayout(unit: prefs.unit, screen: screen)
 
         let labelWidth: CGFloat = 50
         let labelHeight: CGFloat = 20
@@ -69,13 +34,13 @@ class VerticalRule: RuleView {
 
         // substract two so ticks don't overlap with border
         // substract from this range so we can use the height var for position calculations
-        for i in 1...Int((height - 2) / tickScale) {
-            let pos = CGFloat(i) * tickScale
-            if i.isMultiple(of: largeTicks) {
+        for i in 1...Int((height - 2) / tickLayout.tickScale) {
+            let pos = CGFloat(i) * tickLayout.tickScale
+            if i.isMultiple(of: tickLayout.largeTicks) {
                 path.move(to: CGPoint(x: width - 1, y: height - pos))
                 path.line(to: CGPoint(x: width - 10, y: height - pos))
 
-                let label = String(i / textScale)
+                let label = String(i / tickLayout.textScale)
                 let labelX = width - labelWidth - labelOffset
                 let labelY = height - pos - (textHeight / 2)
                 let labelRect = CGRect(x: labelX, y: labelY, width: labelWidth, height: labelHeight)
@@ -87,15 +52,15 @@ class VerticalRule: RuleView {
                 )
 
             }
-            else if i.isMultiple(of: mediumTicks) {
+            else if i.isMultiple(of: tickLayout.mediumTicks) {
                 path.move(to: CGPoint(x: width - 1, y: height - pos))
                 path.line(to: CGPoint(x: width - 8, y: height - pos))
             }
-            else if i.isMultiple(of: smallTicks) {
+            else if i.isMultiple(of: tickLayout.smallTicks) {
                 path.move(to: CGPoint(x: width - 1, y: height - pos))
                 path.line(to: CGPoint(x: width - 5, y: height - pos))
             }
-            else if let tinyTicks = tinyTicks, i.isMultiple(of: tinyTicks) {
+            else if let tinyTicks = tickLayout.tinyTicks, i.isMultiple(of: tinyTicks) {
                 path.move(to: CGPoint(x: width - 1, y: height - pos))
                 path.line(to: CGPoint(x: width - 3, y: height - pos))
             }
@@ -142,14 +107,7 @@ class VerticalRule: RuleView {
         let number = height - mouseTickY
         let labelOffset: CGFloat = 2
 
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.alignment = .left
-
-        let attributes = [
-            NSAttributedString.Key.font: NSFont(name: "HelveticaNeue", size: 10)!,
-            NSAttributedString.Key.paragraphStyle: paragraphStyle,
-            NSAttributedString.Key.foregroundColor: color.mouseNumber,
-        ]
+        let attributes = labelAttributes(alignment: .left, foregroundColor: color.mouseNumber)
 
         let mouseNumber = self.getMouseNumberLabel(number)
         let label = NSAttributedString(string: mouseNumber, attributes: attributes)
@@ -173,14 +131,7 @@ class VerticalRule: RuleView {
     }
 
     func drawUnitLabel() {
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.alignment = .left
-
-        let attributes = [
-            NSAttributedString.Key.font: NSFont(name: "HelveticaNeue", size: 10)!,
-            NSAttributedString.Key.paragraphStyle: paragraphStyle,
-            NSAttributedString.Key.foregroundColor: color.ticks,
-        ]
+        let attributes = labelAttributes(alignment: .left, foregroundColor: color.ticks)
 
         let unitlabel = self.getUnitLabel()
         let label = NSAttributedString(string: unitlabel, attributes: attributes)
