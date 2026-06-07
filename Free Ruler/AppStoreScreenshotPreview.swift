@@ -133,10 +133,10 @@ private enum AppStoreScreenshotLayout {
     static let screen3RulerScale: CGFloat = 6
     static let screen3RulerOpacity: CGFloat = 0.75
     static let screen3VerticalRulerX: CGFloat = 250
-    static let screen3VerticalRulerY: CGFloat = 150
+    static let screen3VerticalRulerY: CGFloat = 170
     static let screen3VerticalRulerLength: CGFloat = 2050
     static let screen3HorizontalRulerX: CGFloat = 50
-    static let screen3HorizontalRulerY: CGFloat = 1080
+    static let screen3HorizontalRulerY: CGFloat = 1100
     static let screen3HorizontalRulerLength: CGFloat = 3000
     static let screen3PreferencesWindowX: CGFloat = 620
     static let screen3PreferencesWindowY: CGFloat = 560
@@ -632,7 +632,7 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         let knobX = trackStartX + trackWidth * fraction
         let trackHeight: CGFloat = 4
         let tickHeight: CGFloat = 10
-        let knobSize = NSSize(width: 18, height: 28)
+        let knobSize = NSSize(width: 14, height: 28)
 
         image.lockFocus()
         defer {
