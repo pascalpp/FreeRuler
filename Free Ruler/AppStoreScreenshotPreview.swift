@@ -3,7 +3,8 @@ import Cocoa
 import SwiftUI
 
 private struct AppStoreScreenshotPalette {
-    let background = #colorLiteral(red: 0.4796547203, green: 0.5864364802, blue: 0.8, alpha: 1)
+    let screen1Background = #colorLiteral(red: 0.4796547203, green: 0.5864364802, blue: 0.8, alpha: 1)
+    let screen2Background = #colorLiteral(red: 0.3084420562, green: 0.521068275, blue: 0.509829402, alpha: 1)
     let text = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
     let secondaryText = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0.78)
 
@@ -24,14 +25,52 @@ private enum AppStoreScreenshotFontFamily {
     case helveticaNeue
 }
 
+private enum AppStoreScreenshotScreen {
+    case screen1
+    case screen2
+
+    func background(in palette: AppStoreScreenshotPalette) -> NSColor {
+        switch self {
+        case .screen1:
+            return palette.screen1Background
+        case .screen2:
+            return palette.screen2Background
+        }
+    }
+
+    var headline: String {
+        switch self {
+        case .screen1:
+            return "A ruler for your Mac"
+        case .screen2:
+            return "Switch units instantly"
+        }
+    }
+
+    var description: String {
+        switch self {
+        case .screen1:
+            return "Measure anything on your screen."
+        case .screen2:
+            return "Use pixels, millimeters, or inches."
+        }
+    }
+
+    var previewName: String {
+        switch self {
+        case .screen1:
+            return "Screen 1 - Measure anything"
+        case .screen2:
+            return "Screen 2 - Units"
+        }
+    }
+}
+
 private enum AppStoreScreenshotLayout {
     static let canvasWidth: CGFloat = 2880
     static let canvasHeight: CGFloat = 1800
     static let previewWidth: CGFloat = 960
     static let previewHeight: CGFloat = 600
-
-    static let headline = "A ruler for your Mac"
-    static let description = "Measure anything on your screen."
 
     static let iconX: CGFloat = 640
     static let iconY: CGFloat = 80
@@ -73,6 +112,13 @@ private enum AppStoreScreenshotLayout {
     static let trafficLightSpacing: CGFloat = 80
     static let trafficLightXPadding: CGFloat = 56
     static let trafficLightYPadding: CGFloat = 52
+
+    static let screen2RulerScale: CGFloat = 6
+    static let screen2RulerX: CGFloat = 550
+    static let screen2RulerXOffset: CGFloat = -200
+    static let screen2FirstRulerY: CGFloat = 620
+    static let screen2RulerVerticalSpacing: CGFloat = 350
+    static let screen2RulerLength: CGFloat = 2200
 
     static var canvasSize: NSSize {
         NSSize(width: canvasWidth, height: canvasHeight)
@@ -136,42 +182,112 @@ private enum AppStoreScreenshotLayout {
             y: sampleWindowRect.minY + trafficLightYPadding
         )
     }
+
+    static var screen2ScaledRulerThickness: CGFloat {
+        Ruler.thickness * screen2RulerScale
+    }
+
+    static func screen2RulerRect(index: Int) -> NSRect {
+        NSRect(
+            x: screen2RulerX + CGFloat(index) * screen2RulerXOffset,
+            y: screen2FirstRulerY + CGFloat(index) * screen2RulerVerticalSpacing,
+            width: screen2RulerLength,
+            height: screen2ScaledRulerThickness
+        )
+    }
+
 }
 
 struct AppStoreScreenshotPreview: PreviewProvider {
     static var previews: some View {
-        AppStoreScreenshotScenarioView()
-            .aspectRatio(16.0 / 10.0, contentMode: .fit)
-            .frame(width: AppStoreScreenshotLayout.previewWidth, height: AppStoreScreenshotLayout.previewHeight)
-            .previewLayout(.fixed(
-                width: AppStoreScreenshotLayout.previewWidth,
-                height: AppStoreScreenshotLayout.previewHeight
-            ))
+        Group {
+            AppStoreScreenshotScenarioView(screen: .screen1)
+                .previewDisplayName(AppStoreScreenshotScreen.screen1.previewName)
+            AppStoreScreenshotScenarioView(screen: .screen2)
+                .previewDisplayName(AppStoreScreenshotScreen.screen2.previewName)
+        }
+        .aspectRatio(16.0 / 10.0, contentMode: .fit)
+        .frame(width: AppStoreScreenshotLayout.previewWidth, height: AppStoreScreenshotLayout.previewHeight)
+        .previewLayout(.fixed(
+            width: AppStoreScreenshotLayout.previewWidth,
+            height: AppStoreScreenshotLayout.previewHeight
+        ))
     }
 }
 
 private struct AppStoreScreenshotScenarioView: NSViewRepresentable {
+    let screen: AppStoreScreenshotScreen
+
     func makeNSView(context: Context) -> AppStoreScreenshotScenarioNSView {
-        AppStoreScreenshotScenarioNSView()
+        AppStoreScreenshotScenarioNSView(screen: screen)
     }
 
     func updateNSView(_ nsView: AppStoreScreenshotScenarioNSView, context: Context) {}
 }
 
+private struct AppStoreRulerPlacement {
+    let container: NSView
+    let view: RuleView
+    let frame: NSRect
+    let boundsSize: NSSize
+
+    init(view: RuleView, frame: NSRect, boundsSize: NSSize) {
+        self.container = NSView(frame: NSRect(origin: .zero, size: boundsSize))
+        self.view = view
+        self.frame = frame
+        self.boundsSize = boundsSize
+        self.container.addSubview(view)
+    }
+}
+
+private final class AppStoreHorizontalRule: HorizontalRule {
+    private let unit: Unit
+
+    init(unit: Unit, frame: NSRect) {
+        self.unit = unit
+        super.init(frame: frame)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+        let originalUnit = prefs.unit
+        prefs.unit = unit
+        defer {
+            prefs.unit = originalUnit
+        }
+        super.draw(dirtyRect)
+    }
+}
+
+private final class AppStoreVerticalRule: VerticalRule {
+    private let unit: Unit
+
+    init(unit: Unit, frame: NSRect) {
+        self.unit = unit
+        super.init(frame: frame)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+        let originalUnit = prefs.unit
+        prefs.unit = unit
+        defer {
+            prefs.unit = originalUnit
+        }
+        super.draw(dirtyRect)
+    }
+}
+
 private final class AppStoreScreenshotScenarioNSView: NSView {
+    private let screen: AppStoreScreenshotScreen
     private let palette = AppStoreScreenshotPalette()
-    private let horizontalRuler = getRulerView(ruler: Ruler(.horizontal, frame: NSRect(
-        x: 0,
-        y: 0,
-        width: AppStoreScreenshotLayout.horizontalRulerLength / AppStoreScreenshotLayout.rulerScale,
-        height: Ruler.thickness
-    )))
-    private let verticalRuler = getRulerView(ruler: Ruler(.vertical, frame: NSRect(
-        x: 0,
-        y: 0,
-        width: Ruler.thickness,
-        height: AppStoreScreenshotLayout.verticalRulerLength / AppStoreScreenshotLayout.rulerScale
-    )))
+    private let rulerPlacements: [AppStoreRulerPlacement]
 
     override var isFlipped: Bool {
         true
@@ -181,12 +297,14 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         NSSize(width: 960, height: 600)
     }
 
-    override init(frame frameRect: NSRect) {
+    init(screen: AppStoreScreenshotScreen) {
+        self.screen = screen
+        self.rulerPlacements = Self.makeRulerPlacements(for: screen)
         super.init(frame: NSRect(origin: .zero, size: AppStoreScreenshotLayout.canvasSize))
-        configureRuler(horizontalRuler)
-        configureRuler(verticalRuler)
-        addSubview(horizontalRuler)
-        addSubview(verticalRuler)
+        for rulerPlacement in rulerPlacements {
+            configureRuler(rulerPlacement.view)
+            addSubview(rulerPlacement.container)
+        }
     }
 
     required init?(coder: NSCoder) {
@@ -224,24 +342,51 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
     override func layout() {
         super.layout()
         let transform = previewTransform()
-        layoutRuler(
-            horizontalRuler,
-            frame: AppStoreScreenshotLayout.horizontalRulerRect,
-            boundsSize: NSSize(
+        for rulerPlacement in rulerPlacements {
+            layoutRuler(
+                rulerPlacement,
+                frame: rulerPlacement.frame,
+                transform: transform
+            )
+        }
+    }
+
+    private static func makeRulerPlacements(for screen: AppStoreScreenshotScreen) -> [AppStoreRulerPlacement] {
+        switch screen {
+        case .screen1:
+            let horizontalBoundsSize = NSSize(
                 width: AppStoreScreenshotLayout.horizontalRulerLength / AppStoreScreenshotLayout.rulerScale,
                 height: Ruler.thickness
-            ),
-            transform: transform
-        )
-        layoutRuler(
-            verticalRuler,
-            frame: AppStoreScreenshotLayout.verticalRulerRect,
-            boundsSize: NSSize(
+            )
+            let verticalBoundsSize = NSSize(
                 width: Ruler.thickness,
                 height: AppStoreScreenshotLayout.verticalRulerLength / AppStoreScreenshotLayout.rulerScale
-            ),
-            transform: transform
-        )
+            )
+            return [
+                AppStoreRulerPlacement(
+                    view: AppStoreHorizontalRule(unit: .pixels, frame: NSRect(origin: .zero, size: horizontalBoundsSize)),
+                    frame: AppStoreScreenshotLayout.horizontalRulerRect,
+                    boundsSize: horizontalBoundsSize
+                ),
+                AppStoreRulerPlacement(
+                    view: AppStoreVerticalRule(unit: .pixels, frame: NSRect(origin: .zero, size: verticalBoundsSize)),
+                    frame: AppStoreScreenshotLayout.verticalRulerRect,
+                    boundsSize: verticalBoundsSize
+                ),
+            ]
+        case .screen2:
+            let rulerBoundsSize = NSSize(
+                width: AppStoreScreenshotLayout.screen2RulerLength / AppStoreScreenshotLayout.screen2RulerScale,
+                height: Ruler.thickness
+            )
+            return [Unit.pixels, .millimeters, .inches].enumerated().map { index, unit in
+                AppStoreRulerPlacement(
+                    view: AppStoreHorizontalRule(unit: unit, frame: NSRect(origin: .zero, size: rulerBoundsSize)),
+                    frame: AppStoreScreenshotLayout.screen2RulerRect(index: index),
+                    boundsSize: rulerBoundsSize
+                )
+            }
+        }
     }
 
     private func previewTransform() -> (origin: CGPoint, scale: CGFloat) {
@@ -261,27 +406,33 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
     }
 
     private func layoutRuler(
-        _ view: RuleView,
+        _ rulerPlacement: AppStoreRulerPlacement,
         frame: NSRect,
-        boundsSize: NSSize,
         transform: (origin: CGPoint, scale: CGFloat)
     ) {
-        view.frame = NSRect(
+        rulerPlacement.container.frame = NSRect(
             x: transform.origin.x + frame.minX * transform.scale,
             y: transform.origin.y + frame.minY * transform.scale,
             width: frame.width * transform.scale,
             height: frame.height * transform.scale
         )
-        view.setBoundsSize(boundsSize)
-        view.needsDisplay = true
+        rulerPlacement.container.setBoundsSize(rulerPlacement.boundsSize)
+        rulerPlacement.view.frame = NSRect(origin: .zero, size: rulerPlacement.boundsSize)
+        rulerPlacement.view.setBoundsSize(rulerPlacement.boundsSize)
+        rulerPlacement.view.needsDisplay = true
     }
 
     private func drawScenario() {
-        palette.background.setFill()
+        screen.background(in: palette).setFill()
         NSRect(origin: .zero, size: AppStoreScreenshotLayout.canvasSize).fill()
 
         drawCopy()
-        drawSampleWindow(AppStoreScreenshotLayout.sampleWindowRect)
+        switch screen {
+        case .screen1:
+            drawSampleWindow(AppStoreScreenshotLayout.sampleWindowRect)
+        case .screen2:
+            break
+        }
     }
 
     private func drawCopy() {
@@ -289,14 +440,14 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         icon.draw(in: AppStoreScreenshotLayout.iconRect)
 
         drawText(
-            AppStoreScreenshotLayout.headline,
+            screen.headline,
             in: AppStoreScreenshotLayout.headlineRect,
             size: AppStoreScreenshotLayout.headlineFontSize,
             color: palette.text,
             weight: AppStoreScreenshotLayout.headlineFontWeight
         )
         drawText(
-            AppStoreScreenshotLayout.description,
+            screen.description,
             in: AppStoreScreenshotLayout.descriptionRect,
             size: AppStoreScreenshotLayout.descriptionFontSize,
             color: palette.secondaryText
@@ -304,12 +455,6 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
     }
 
     private func configureRuler(_ view: RuleView) {
-        let originalUnit = prefs.unit
-        prefs.unit = .pixels
-        defer {
-            prefs.unit = originalUnit
-        }
-
         view.showMouseTick = false
         view.wantsLayer = true
         view.layer?.borderColor = palette.rulerBorder.cgColor
@@ -320,7 +465,7 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         drawShadow(
             rect,
             radius: AppStoreScreenshotLayout.sampleWindowCornerRadius,
-            fill: palette.background,
+            fill: screen.background(in: palette),
             blur: AppStoreScreenshotLayout.sampleWindowShadowBlur,
             offset: NSSize(
                 width: AppStoreScreenshotLayout.sampleWindowShadowXOffset,
