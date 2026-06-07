@@ -29,6 +29,32 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertEqual(getMaxSize(ruler: vertical), NSSize(width: 40, height: 4000))
     }
 
+    func testRulerTickLayoutMatchesUnitScales() {
+        let pixels = RulerTickLayout(unit: .pixels, dpi: 144, dpmm: 4)
+        XCTAssertEqual(pixels.tickScale, 1)
+        XCTAssertEqual(pixels.textScale, 1)
+        XCTAssertEqual(pixels.largeTicks, 50)
+        XCTAssertEqual(pixels.mediumTicks, 10)
+        XCTAssertEqual(pixels.smallTicks, 2)
+        XCTAssertNil(pixels.tinyTicks)
+
+        let millimeters = RulerTickLayout(unit: .millimeters, dpi: 144, dpmm: 4)
+        XCTAssertEqual(millimeters.tickScale, 4)
+        XCTAssertEqual(millimeters.textScale, 1)
+        XCTAssertEqual(millimeters.largeTicks, 10)
+        XCTAssertEqual(millimeters.mediumTicks, 5)
+        XCTAssertEqual(millimeters.smallTicks, 1)
+        XCTAssertNil(millimeters.tinyTicks)
+
+        let inches = RulerTickLayout(unit: .inches, dpi: 144, dpmm: 4)
+        XCTAssertEqual(inches.tickScale, 9)
+        XCTAssertEqual(inches.textScale, 16)
+        XCTAssertEqual(inches.largeTicks, 16)
+        XCTAssertEqual(inches.mediumTicks, 8)
+        XCTAssertEqual(inches.smallTicks, 4)
+        XCTAssertEqual(inches.tinyTicks, 1)
+    }
+
     func testDefaultRulerRectsUseExpectedShapeAndOffsets() {
         let screen = NSScreen.main?.frame
         let screenWidth = screen?.width ?? 1000

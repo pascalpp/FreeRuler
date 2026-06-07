@@ -75,6 +75,20 @@ class RuleView: NSView {
         }
     }
 
+    func labelAttributes(
+        alignment: NSTextAlignment,
+        foregroundColor: NSColor
+    ) -> [NSAttributedString.Key: Any] {
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = alignment
+
+        return [
+            .font: NSFont(name: "HelveticaNeue", size: 10)!,
+            .paragraphStyle: paragraphStyle,
+            .foregroundColor: foregroundColor,
+        ]
+    }
+
     override func accessibilityValue() -> Any? {
         return getUnitLabel()
     }
