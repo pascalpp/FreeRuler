@@ -1,6 +1,6 @@
 {
   "name": "freeruler",
-  "version": "2.0.9",
+  "version": "2.0.10",
   "description": "A free ruler for macOS",
   "main": "none",
   "scripts": {
