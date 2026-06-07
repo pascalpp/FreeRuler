@@ -76,7 +76,8 @@ enum AppIconRenderer {
     static func exportAppIconSet(to outputDirectory: URL) throws {
         try FileManager.default.createDirectory(
             at: outputDirectory,
-            withIntermediateDirectories: true
+            withIntermediateDirectories: true,
+            attributes: nil
         )
 
         for icon in appIconSetSizes {
