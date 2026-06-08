@@ -521,6 +521,7 @@ private final class AppStoreHorizontalRule: HorizontalRule {
     }
 
     override func draw(_ dirtyRect: NSRect) {
+        // Force full bounds drawing because HorizontalRule uses dirtyRect to compute tick layout.
         super.draw(bounds)
     }
 }
@@ -542,6 +543,7 @@ private final class AppStoreVerticalRule: VerticalRule {
     }
 
     override func draw(_ dirtyRect: NSRect) {
+        // Force full bounds drawing because VerticalRule uses dirtyRect to compute tick layout.
         super.draw(bounds)
     }
 }
