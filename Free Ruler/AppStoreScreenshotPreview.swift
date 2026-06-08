@@ -1,5 +1,5 @@
-import Cocoa
 #if DEBUG
+import Cocoa
 import SwiftUI
 
 private struct AppStoreScreenshotPalette {

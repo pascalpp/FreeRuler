@@ -12,6 +12,7 @@ xcodebuild \
   -scheme "Free Ruler" \
   -configuration Debug \
   -derivedDataPath "$derived_data" \
+  CODE_SIGNING_ALLOWED=NO \
   CODE_SIGN_ENTITLEMENTS="" \
   build
 
