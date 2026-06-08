@@ -124,7 +124,7 @@ enum AppStoreScreenshotRenderer {
             samplesPerPixel: 4,
             hasAlpha: true,
             isPlanar: false,
-            colorSpaceName: .calibratedRGB,
+            colorSpaceName: .deviceRGB,
             bytesPerRow: 0,
             bitsPerPixel: 0
         ) else {
