@@ -684,15 +684,6 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
     }
 
     private static func makePreferencesController() -> PreferencesController {
-        let originalForegroundOpacity = prefs.foregroundOpacity
-        let originalBackgroundOpacity = prefs.backgroundOpacity
-        prefs.foregroundOpacity = AppStoreScreenshotLayout.screen3ForegroundOpacityPercent
-        prefs.backgroundOpacity = AppStoreScreenshotLayout.screen3BackgroundOpacityPercent
-        defer {
-            prefs.foregroundOpacity = originalForegroundOpacity
-            prefs.backgroundOpacity = originalBackgroundOpacity
-        }
-
         let controller = PreferencesController()
         controller.loadWindow()
         controller.updateView()
@@ -708,6 +699,17 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
               let preferencesView = preferencesController?.window?.contentView else {
             return []
         }
+        let originalForegroundOpacity = prefs.foregroundOpacity
+        let originalBackgroundOpacity = prefs.backgroundOpacity
+        prefs.foregroundOpacity = AppStoreScreenshotLayout.screen3ForegroundOpacityPercent
+        prefs.backgroundOpacity = AppStoreScreenshotLayout.screen3BackgroundOpacityPercent
+        preferencesController?.updateView()
+        preferencesController?.window?.contentView?.layoutSubtreeIfNeeded()
+        defer {
+            prefs.foregroundOpacity = originalForegroundOpacity
+            prefs.backgroundOpacity = originalBackgroundOpacity
+        }
+
         let imageView = NSImageView(frame: NSRect(origin: .zero, size: AppStoreScreenshotLayout.screen3PreferencesContentSize))
         imageView.image = snapshot(preferencesView, preferencesController: preferencesController)
         imageView.imageScaling = .scaleAxesIndependently
