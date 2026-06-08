@@ -558,7 +558,10 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
     }
 
     override var intrinsicContentSize: NSSize {
-        NSSize(width: 960, height: 600)
+        NSSize(
+            width: AppStoreScreenshotLayout.previewWidth,
+            height: AppStoreScreenshotLayout.previewHeight
+        )
     }
 
     init(screen: AppStoreScreenshotScreen) {
