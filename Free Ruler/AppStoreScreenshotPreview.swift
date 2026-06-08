@@ -3,7 +3,7 @@ import Cocoa
 import SwiftUI
 
 private struct AppStoreScreenshotPalette {
-    let screen1Background = #colorLiteral(red: 0.4796547203, green: 0.5864364802, blue: 0.8, alpha: 1)
+    let screen1Background = #colorLiteral(red: 0.385, green: 0.49, blue: 0.7, alpha: 1)
     let screen2Background = #colorLiteral(red: 0.3084420562, green: 0.521068275, blue: 0.509829402, alpha: 1)
     let screen3Background = #colorLiteral(red: 0.5181607008, green: 0.4312165375, blue: 0.6487324834, alpha: 1)
     let text = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
