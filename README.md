@@ -2,7 +2,7 @@
 
 A ruler application for macOS
 
-<img width="512" height="512" alt="icon_512x512" src="https://github.com/user-attachments/assets/667c66bb-40f0-4616-8601-db75fa074477" />
+<img width="512" height="512" alt="icon_512x512" src="https://github.com/user-attachments/assets/ca725456-7811-49e9-b069-106dcc08c8b0" />
 
 ### Features
 
