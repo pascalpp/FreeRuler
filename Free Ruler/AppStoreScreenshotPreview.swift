@@ -123,7 +123,7 @@ enum AppStoreScreenshotRenderer {
             samplesPerPixel: 4,
             hasAlpha: true,
             isPlanar: false,
-            colorSpaceName: .deviceRGB,
+            colorSpaceName: .calibratedRGB,
             bytesPerRow: 0,
             bitsPerPixel: 0
         ) else {
@@ -492,14 +492,6 @@ private final class AppStoreActiveSnapshotWindow: NSWindow {
     }
 
     override var canBecomeMain: Bool {
-        true
-    }
-
-    override var isKeyWindow: Bool {
-        true
-    }
-
-    override var isMainWindow: Bool {
         true
     }
 }
