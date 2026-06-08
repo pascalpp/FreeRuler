@@ -16,4 +16,9 @@ xcodebuild \
   CODE_SIGN_ENTITLEMENTS="" \
   build
 
+if [[ ! -x "$app_executable" ]]; then
+  echo "Expected app executable not found: $app_executable" >&2
+  exit 1
+fi
+
 "$app_executable" --generate-app-store-screenshots "$output_dir"
