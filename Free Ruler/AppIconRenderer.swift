@@ -17,9 +17,9 @@ private enum AppIconFontFamily {
 private enum AppIconLayout {
     static let canvasSize: CGFloat = 1024
     static let iconInset: CGFloat = 84
-    static let cornerRadius: CGFloat = 200
+    static let cornerRadius: CGFloat = 225
     static let rulerStartTick: CGFloat = 2
-    static let rulerEndTick: CGFloat = 69
+    static let rulerEndTick: CGFloat = 68.5
 
     static let tickWidth: CGFloat = 20
     static let largeTickLength: CGFloat = 200
