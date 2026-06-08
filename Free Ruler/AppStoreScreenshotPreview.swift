@@ -111,6 +111,7 @@ enum AppStoreScreenshotRenderer {
     private static func render(screen: AppStoreScreenshotScreen) throws -> NSImage {
         let view = AppStoreScreenshotScenarioNSView(screen: screen)
         view.frame = NSRect(origin: .zero, size: AppStoreScreenshotLayout.canvasSize)
+        view.needsLayout = true
         view.layoutSubtreeIfNeeded()
         view.needsDisplay = true
         view.displayIfNeeded()
