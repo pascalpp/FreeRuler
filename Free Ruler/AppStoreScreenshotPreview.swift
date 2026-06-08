@@ -741,6 +741,8 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         snapshotWindow.makeKeyAndOrderFront(nil)
         defer {
             snapshotWindow.orderOut(nil)
+            snapshotWindow.contentView = nil
+            snapshotWindow.close()
         }
 
         view.frame = NSRect(origin: .zero, size: snapshotWindow.contentRect(forFrameRect: snapshotWindow.frame).size)
