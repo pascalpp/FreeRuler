@@ -64,8 +64,12 @@ class RuleView: NSView {
         return NSScreen.screens.first { $0.frame.intersects(window.convertToScreen(frame)) }
     }
 
+    var unit: Unit {
+        prefs.unit
+    }
+
     func getUnitLabel() -> String {
-        switch prefs.unit {
+        switch unit {
         case .pixels:
             return "px"
         case .millimeters:
@@ -95,7 +99,7 @@ class RuleView: NSView {
     }
 
     func getMouseNumberLabel(_ number: CGFloat) -> String {
-        switch prefs.unit {
+        switch unit {
         case .pixels:
             return String(format: "%d", Int(number))
         case .millimeters:
