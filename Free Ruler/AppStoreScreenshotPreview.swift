@@ -245,6 +245,9 @@ private enum AppStoreScreenshotLayout {
     }
 
     static let screen3BackgroundOpacityPercent = 50
+    static let screen3FloatRulers = true
+    static let screen3GroupRulers = true
+    static let screen3RulerShadow = false
 
     static var canvasSize: NSSize {
         NSSize(width: canvasWidth, height: canvasHeight)
@@ -699,13 +702,22 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         }
         let originalForegroundOpacity = prefs.foregroundOpacity
         let originalBackgroundOpacity = prefs.backgroundOpacity
+        let originalFloatRulers = prefs.floatRulers
+        let originalGroupRulers = prefs.groupRulers
+        let originalRulerShadow = prefs.rulerShadow
         prefs.foregroundOpacity = AppStoreScreenshotLayout.screen3ForegroundOpacityPercent
         prefs.backgroundOpacity = AppStoreScreenshotLayout.screen3BackgroundOpacityPercent
+        prefs.floatRulers = AppStoreScreenshotLayout.screen3FloatRulers
+        prefs.groupRulers = AppStoreScreenshotLayout.screen3GroupRulers
+        prefs.rulerShadow = AppStoreScreenshotLayout.screen3RulerShadow
         preferencesController?.updateView()
         preferencesController?.window?.contentView?.layoutSubtreeIfNeeded()
         defer {
             prefs.foregroundOpacity = originalForegroundOpacity
             prefs.backgroundOpacity = originalBackgroundOpacity
+            prefs.floatRulers = originalFloatRulers
+            prefs.groupRulers = originalGroupRulers
+            prefs.rulerShadow = originalRulerShadow
         }
 
         let imageView = NSImageView(frame: NSRect(origin: .zero, size: AppStoreScreenshotLayout.screen3PreferencesContentSize))
