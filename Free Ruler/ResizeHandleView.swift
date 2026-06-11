@@ -277,38 +277,58 @@ func windowResizeCursor(for orientation: Orientation) -> NSCursor {
 
 private enum ResizeHandleCursor {
     struct Parameters {
-        var arrowHeight: CGFloat = 13
-        var arrowWidth: CGFloat = 5
-        var arrowStroke: CGFloat = 2
-        var shaftHeight: CGFloat = 4
+        var arrowHeight: CGFloat = 7
+        var arrowWidth: CGFloat = 3.5
+        var arrowStroke: CGFloat = 1
+        var shaftHeight: CGFloat = 2
         var shaftWidth: CGFloat = 7
-        var arrowOffset: CGFloat = 0
+        var arrowOffset: CGFloat = -0.5
+        var miterLimit: CGFloat = 10
+        var shadowAlpha: CGFloat = 0.45
+        var shadowBlur: CGFloat = 2
+        var shadowOffsetX: CGFloat = 0
+        var shadowOffsetY: CGFloat = -1.5
+        var shadowPadding: CGFloat = 3
     }
 
     static let horizontal = NSCursor(
         image: image(for: .horizontal, parameters: parameters),
-        hotSpot: hotSpot(for: parameters)
+        hotSpot: hotSpot(for: .horizontal, parameters: parameters)
     )
     static let vertical = NSCursor(
         image: image(for: .vertical, parameters: parameters),
-        hotSpot: hotSpot(for: parameters)
+        hotSpot: hotSpot(for: .vertical, parameters: parameters)
     )
 
     private static let parameters = Parameters()
 
     static func image(for orientation: Orientation, parameters: Parameters) -> NSImage {
-        let image = NSImage(size: imageSize(for: parameters))
+        let image = NSImage(size: imageSize(for: orientation, parameters: parameters))
 
         image.lockFocus()
         NSColor.clear.setFill()
         NSRect(origin: .zero, size: image.size).fill()
 
         let outlinePath = cursorBodyPath(for: orientation, parameters: parameters)
-        NSColor.white.setFill()
-        NSColor.white.setStroke()
         outlinePath.lineWidth = parameters.arrowStroke * 2
         outlinePath.lineJoinStyle = .miter
+        outlinePath.miterLimit = parameters.miterLimit
         outlinePath.lineCapStyle = .square
+
+        NSGraphicsContext.saveGraphicsState()
+        let shadow = NSShadow()
+        shadow.shadowColor = NSColor.black.withAlphaComponent(parameters.shadowAlpha)
+        shadow.shadowBlurRadius = parameters.shadowBlur
+        shadow.shadowOffset = NSSize(width: parameters.shadowOffsetX, height: parameters.shadowOffsetY)
+        shadow.set()
+        NSColor.white.setFill()
+        NSColor.white.setStroke()
+        outlinePath.stroke()
+        outlinePath.fill()
+        NSGraphicsContext.restoreGraphicsState()
+
+        NSColor.white.setFill()
+        NSColor.white.setStroke()
         outlinePath.stroke()
         outlinePath.fill()
 
@@ -322,22 +342,28 @@ private enum ResizeHandleCursor {
         return image
     }
 
-    static func imageSize(for parameters: Parameters) -> NSSize {
+    static func imageSize(for orientation: Orientation, parameters: Parameters) -> NSSize {
         let arrowExtent = parameters.arrowWidth + parameters.arrowOffset
-        let width = (arrowExtent * 2) + parameters.shaftWidth + (parameters.arrowStroke * 2)
-        let height = max(parameters.arrowHeight, parameters.shaftHeight) + (parameters.arrowStroke * 2)
+        let shadowInset = parameters.shadowPadding * 2
+        let length = (arrowExtent * 2) + parameters.shaftWidth + (parameters.arrowStroke * 2) + shadowInset
+        let thickness = max(parameters.arrowHeight, parameters.shaftHeight) + (parameters.arrowStroke * 2) + shadowInset
 
-        return NSSize(width: ceil(width), height: ceil(height))
+        switch orientation {
+        case .horizontal:
+            return NSSize(width: ceil(length), height: ceil(thickness))
+        case .vertical:
+            return NSSize(width: ceil(thickness), height: ceil(length))
+        }
     }
 
-    static func hotSpot(for parameters: Parameters) -> NSPoint {
-        let size = imageSize(for: parameters)
+    static func hotSpot(for orientation: Orientation, parameters: Parameters) -> NSPoint {
+        let size = imageSize(for: orientation, parameters: parameters)
 
         return NSPoint(x: floor(size.width / 2), y: floor(size.height / 2))
     }
 
     private static func cursorBodyPath(for orientation: Orientation, parameters: Parameters) -> NSBezierPath {
-        let size = imageSize(for: parameters)
+        let size = imageSize(for: orientation, parameters: parameters)
         let center = CGPoint(x: size.width / 2, y: size.height / 2)
         let arrowExtent = parameters.arrowWidth + parameters.arrowOffset
         let shaftHalfWidth = parameters.shaftWidth / 2
@@ -398,12 +424,18 @@ private func resizeHandleAccessibilityIdentifier(for orientation: Orientation) -
 
 #if DEBUG
 private struct ResizeHandleCursorPreview: View {
-    @State private var arrowHeight = 13.0
-    @State private var arrowWidth = 5.0
-    @State private var arrowStroke = 2.0
-    @State private var shaftHeight = 4.0
+    @State private var arrowHeight = 7.5
+    @State private var arrowWidth = 3.5
+    @State private var arrowStroke = 1.0
+    @State private var shaftHeight = 2.0
     @State private var shaftWidth = 7.0
-    @State private var arrowOffset = 0.0
+    @State private var arrowOffset = -0.5
+    @State private var miterLimit = 10.0
+    @State private var shadowAlpha = 0.45
+    @State private var shadowBlur = 2.0
+    @State private var shadowOffsetX = 0.0
+    @State private var shadowOffsetY = -1.5
+    @State private var shadowPadding = 3.0
 
     private var parameters: ResizeHandleCursor.Parameters {
         ResizeHandleCursor.Parameters(
@@ -412,13 +444,19 @@ private struct ResizeHandleCursorPreview: View {
             arrowStroke: CGFloat(arrowStroke),
             shaftHeight: CGFloat(shaftHeight),
             shaftWidth: CGFloat(shaftWidth),
-            arrowOffset: CGFloat(arrowOffset)
+            arrowOffset: CGFloat(arrowOffset),
+            miterLimit: CGFloat(miterLimit),
+            shadowAlpha: CGFloat(shadowAlpha),
+            shadowBlur: CGFloat(shadowBlur),
+            shadowOffsetX: CGFloat(shadowOffsetX),
+            shadowOffsetY: CGFloat(shadowOffsetY),
+            shadowPadding: CGFloat(shadowPadding)
         )
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            HStack(alignment: .top, spacing: 24) {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top, spacing: 18) {
                 previewImage(
                     image: ResizeHandleCursor.image(for: .horizontal, parameters: parameters),
                     title: "Custom Horizontal"
@@ -429,22 +467,33 @@ private struct ResizeHandleCursorPreview: View {
                 )
             }
 
-            HStack(alignment: .top, spacing: 24) {
+            HStack(alignment: .top, spacing: 18) {
                 privateCursorPreview(for: .horizontal)
                 privateCursorPreview(for: .vertical)
             }
 
-            VStack(spacing: 10) {
-                slider("arrowHeight", value: $arrowHeight, range: 6...18)
-                slider("arrowWidth", value: $arrowWidth, range: 2...10)
-                slider("arrowStroke", value: $arrowStroke, range: 0.5...4)
-                slider("shaftHeight", value: $shaftHeight, range: 1...8)
-                slider("shaftWidth", value: $shaftWidth, range: 2...14)
-                slider("arrowOffset", value: $arrowOffset, range: -2...4)
+            HStack(alignment: .top, spacing: 14) {
+                VStack(spacing: 8) {
+                    slider("arrowHeight", value: $arrowHeight, range: 6...18)
+                    slider("arrowWidth", value: $arrowWidth, range: 2...10)
+                    slider("arrowStroke", value: $arrowStroke, range: 0.5...4)
+                    slider("shaftHeight", value: $shaftHeight, range: 1...8)
+                    slider("shaftWidth", value: $shaftWidth, range: 2...14)
+                    slider("arrowOffset", value: $arrowOffset, range: -2...4)
+                }
+
+                VStack(spacing: 8) {
+                    slider("miterLimit", value: $miterLimit, range: 1...20)
+                    slider("shadowAlpha", value: $shadowAlpha, range: 0...1)
+                    slider("shadowBlur", value: $shadowBlur, range: 0...6)
+                    slider("shadowOffsetX", value: $shadowOffsetX, range: -4...4)
+                    slider("shadowOffsetY", value: $shadowOffsetY, range: -4...4)
+                    slider("shadowPadding", value: $shadowPadding, range: 0...8)
+                }
             }
         }
-        .padding()
-        .frame(width: 720)
+        .padding(12)
+        .frame(width: 560)
     }
 
     private func previewImage(image: NSImage, title: String) -> some View {
@@ -452,8 +501,8 @@ private struct ResizeHandleCursorPreview: View {
             Image(nsImage: image)
                 .interpolation(.none)
                 .resizable()
-                .frame(width: image.size.width * 8, height: image.size.height * 8)
-                .padding(20)
+                .frame(width: image.size.width * 6, height: image.size.height * 6)
+                .padding(12)
                 .background(Color(red: 0.25, green: 0.49, blue: 0.46))
 
             Text(title)
@@ -470,7 +519,7 @@ private struct ResizeHandleCursorPreview: View {
                 title: previewTitle(for: orientation, prefix: "Private")
             )
         } else {
-            VStack(spacing: 8) {
+            VStack(spacing: 0) {
                 Text("Unavailable")
                     .font(.caption.monospaced())
                     .frame(width: 130, height: 80)
@@ -484,15 +533,15 @@ private struct ResizeHandleCursorPreview: View {
     }
 
     private func slider(_ title: String, value: Binding<Double>, range: ClosedRange<Double>) -> some View {
-        HStack {
+        HStack(spacing: 6) {
             Text(title)
                 .font(.caption.monospaced())
-                .frame(width: 120, alignment: .leading)
-            Slider(value: value, in: range, step: 0.5)
-                .frame(minWidth: 420)
+                .frame(width: 104, alignment: .leading)
+            Slider(value: value, in: range, step: 0.1)
+                .frame(width: 110)
             Text(String(format: "%.1f", value.wrappedValue))
                 .font(.caption.monospacedDigit())
-                .frame(width: 48, alignment: .trailing)
+                .frame(width: 38, alignment: .trailing)
         }
     }
 
@@ -527,8 +576,7 @@ private func privateWindowResizeCursor(for orientation: Orientation) -> NSCursor
 struct ResizeHandleCursor_Previews: PreviewProvider {
     static var previews: some View {
         ResizeHandleCursorPreview()
-            .previewLayout(.sizeThatFits)
-            .previewDisplayName("Resize Handle Cursor")
+            .previewLayout(.fixed(width: 560, height: 600))
     }
 }
 #endif
