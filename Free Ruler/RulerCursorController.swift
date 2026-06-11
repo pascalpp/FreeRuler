@@ -7,6 +7,19 @@ final class RulerCursorController {
         case openHand
         case closedHand
 
+        var accessibilityValue: String {
+            switch self {
+            case .arrow:
+                return "arrow"
+            case .crosshair:
+                return "crosshair"
+            case .openHand:
+                return "open-hand"
+            case .closedHand:
+                return "closed-hand"
+            }
+        }
+
         var nsCursor: NSCursor {
             switch self {
             case .arrow:
@@ -83,5 +96,12 @@ final class RulerCursorController {
 
         currentCursor = cursor
         applyCursor(cursor)
+        cursor.writeUITestStateIfNeeded()
+    }
+}
+
+private extension RulerCursorController.CursorStyle {
+    func writeUITestStateIfNeeded() {
+        writeUITestCursorState(accessibilityValue)
     }
 }

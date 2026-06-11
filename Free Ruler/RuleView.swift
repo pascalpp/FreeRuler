@@ -34,6 +34,30 @@ class RuleView: NSView {
         addTrackingArea(trackingArea!)
     }
 
+    override func mouseEntered(with event: NSEvent) {
+        nextResponder?.mouseEntered(with: event)
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        nextResponder?.mouseExited(with: event)
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        nextResponder?.mouseDown(with: event)
+    }
+
+    override func mouseUp(with event: NSEvent) {
+        nextResponder?.mouseUp(with: event)
+    }
+
+    override func mouseMoved(with event: NSEvent) {
+        nextResponder?.mouseMoved(with: event)
+    }
+
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
+        return true
+    }
+
     func drawMouseTick(at mouseLoc: NSPoint) {
         // required override
         // TODO: is there a better way to do this, maybe via a protocol?
