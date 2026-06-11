@@ -251,4 +251,31 @@ final class RulerCoreTests: XCTestCase {
 
         XCTAssertEqual(policy.desiredInterval, 1 / 60)
     }
+
+    func testRulerControllerKeepsMouseTicksHiddenWhileDragging() {
+        let ruler = Ruler(.horizontal, frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
+        let controller = RulerController(ruler: ruler)
+        let event = NSEvent.mouseEvent(
+            with: .leftMouseDown,
+            location: NSPoint(x: 10, y: 10),
+            modifierFlags: [],
+            timestamp: 0,
+            windowNumber: controller.rulerWindow.windowNumber,
+            context: nil,
+            eventNumber: 0,
+            clickCount: 1,
+            pressure: 1
+        )!
+
+        controller.mouseDown(with: event)
+        controller.windowDidMove(Notification(name: NSWindow.didMoveNotification, object: controller.rulerWindow))
+        RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+
+        XCTAssertFalse(controller.rulerWindow.rule.showMouseTick)
+
+        controller.mouseUp(with: event)
+        RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+
+        XCTAssertTrue(controller.rulerWindow.rule.showMouseTick)
+    }
 }
