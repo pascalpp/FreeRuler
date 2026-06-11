@@ -4,6 +4,11 @@ final class ResizeHandleView: NSView {
 
     private let color: RulerColors
     private let orientation: Orientation
+    private var trackingArea: NSTrackingArea?
+    private var dragInitialMouseLocation: NSPoint?
+    private var dragInitialWindowFrame: NSRect?
+    private var wasMovableByWindowBackgroundBeforeDrag: Bool?
+    private var childWindowFramesBeforeDrag: [(window: NSWindow, frame: NSRect)] = []
 
     private let length: CGFloat = 12
     private let lineCount = 4
@@ -19,6 +24,9 @@ final class ResizeHandleView: NSView {
         self.orientation = orientation
         self.color = color
         super.init(frame: .zero)
+
+        setAccessibilityElement(true)
+        setAccessibilityIdentifier(resizeHandleAccessibilityIdentifier(for: orientation))
     }
 
     required init?(coder: NSCoder) {
@@ -30,6 +38,103 @@ final class ResizeHandleView: NSView {
 
         drawBackground()
         drawGripLines()
+    }
+
+    override func updateTrackingAreas() {
+        if let trackingArea = trackingArea {
+            removeTrackingArea(trackingArea)
+        }
+
+        trackingArea = NSTrackingArea(
+            rect: bounds,
+            options: [
+                .activeAlways,
+                .cursorUpdate,
+                .inVisibleRect,
+                .mouseEnteredAndExited,
+            ],
+            owner: self,
+            userInfo: nil
+        )
+
+        addTrackingArea(trackingArea!)
+    }
+
+    override func resetCursorRects() {
+        addCursorRect(bounds, cursor: windowResizeCursor(for: orientation))
+    }
+
+    override func cursorUpdate(with event: NSEvent) {
+        windowResizeCursor(for: orientation).set()
+    }
+
+    override func mouseEntered(with event: NSEvent) {
+        windowResizeCursor(for: orientation).set()
+    }
+
+    override var mouseDownCanMoveWindow: Bool {
+        return false
+    }
+
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
+        return true
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        guard let window = window else { return }
+
+        dragInitialMouseLocation = screenLocation(for: event, in: window)
+        dragInitialWindowFrame = window.frame
+        wasMovableByWindowBackgroundBeforeDrag = window.isMovableByWindowBackground
+
+        window.isMovableByWindowBackground = false
+        window.makeKey()
+
+        childWindowFramesBeforeDrag = window.childWindows?.map { ($0, $0.frame) } ?? []
+        for childWindow in childWindowFramesBeforeDrag.map(\.window) {
+            window.removeChildWindow(childWindow)
+        }
+    }
+
+    override func mouseDragged(with event: NSEvent) {
+        guard let window = window,
+              let dragInitialMouseLocation = dragInitialMouseLocation,
+              let dragInitialWindowFrame = dragInitialWindowFrame else { return }
+
+        let mouseLocation = screenLocation(for: event, in: window)
+        let delta = NSSize(
+            width: mouseLocation.x - dragInitialMouseLocation.x,
+            height: mouseLocation.y - dragInitialMouseLocation.y
+        )
+        let nextFrame = resizedRulerFrame(
+            orientation: orientation,
+            initialFrame: dragInitialWindowFrame,
+            delta: delta,
+            minSize: window.minSize,
+            maxSize: window.maxSize
+        )
+
+        window.setFrame(nextFrame, display: true)
+        for (childWindow, childFrame) in childWindowFramesBeforeDrag {
+            childWindow.setFrame(childFrame, display: false)
+        }
+    }
+
+    override func mouseUp(with event: NSEvent) {
+        guard let window = window else {
+            resetDragState()
+            return
+        }
+
+        if let wasMovableByWindowBackgroundBeforeDrag = wasMovableByWindowBackgroundBeforeDrag {
+            window.isMovableByWindowBackground = wasMovableByWindowBackgroundBeforeDrag
+        }
+        for (childWindow, childFrame) in childWindowFramesBeforeDrag {
+            childWindow.setFrame(childFrame, display: false)
+            window.addChildWindow(childWindow, ordered: .below)
+        }
+
+        resetDragState()
     }
 
     func frame(in bounds: NSRect) -> NSRect {
@@ -116,4 +221,67 @@ final class ResizeHandleView: NSView {
         path.stroke()
     }
 
+    private func resetDragState() {
+        dragInitialMouseLocation = nil
+        dragInitialWindowFrame = nil
+        wasMovableByWindowBackgroundBeforeDrag = nil
+        childWindowFramesBeforeDrag = []
+    }
+
+}
+
+private func screenLocation(for event: NSEvent, in window: NSWindow) -> NSPoint {
+    return window.convertPoint(toScreen: event.locationInWindow)
+}
+
+func resizedRulerFrame(
+    orientation: Orientation,
+    initialFrame: NSRect,
+    delta: NSSize,
+    minSize: NSSize,
+    maxSize: NSSize
+) -> NSRect {
+    switch orientation {
+    case .horizontal:
+        let width = clamp(initialFrame.width + delta.width, minSize.width, maxSize.width)
+        return NSRect(
+            x: initialFrame.minX,
+            y: initialFrame.minY,
+            width: width,
+            height: initialFrame.height
+        )
+    case .vertical:
+        let height = clamp(initialFrame.height - delta.height, minSize.height, maxSize.height)
+        return NSRect(
+            x: initialFrame.minX,
+            y: initialFrame.maxY - height,
+            width: initialFrame.width,
+            height: height
+        )
+    }
+}
+
+private func clamp(_ value: CGFloat, _ minValue: CGFloat, _ maxValue: CGFloat) -> CGFloat {
+    return min(max(value, minValue), maxValue)
+}
+
+private func windowResizeCursor(for orientation: Orientation) -> NSCursor {
+    // Public AppKit cursors keep App Store review safe. The private two-arrow
+    // variants to revisit for non-App-Store builds are `_windowResizeEastWestCursor`
+    // and `_windowResizeNorthSouthCursor`.
+    switch orientation {
+    case .horizontal:
+        return .resizeLeftRight
+    case .vertical:
+        return .resizeUpDown
+    }
+}
+
+private func resizeHandleAccessibilityIdentifier(for orientation: Orientation) -> String {
+    switch orientation {
+    case .horizontal:
+        return "horizontal-resize-handle"
+    case .vertical:
+        return "vertical-resize-handle"
+    }
 }
