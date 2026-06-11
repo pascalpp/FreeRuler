@@ -147,8 +147,10 @@ class HorizontalRule: RuleView {
             )
         }
 
-        let enoughRoomToTheRight = rightPosition + labelSize.width <= maxLabelRight
-        let labelX = enoughRoomToTheRight ? rightPosition : leftPosition
+        let pinnedRightPosition = maxLabelRight - labelSize.width
+        let rightLabelX = min(rightPosition, pinnedRightPosition)
+        let leftLabelX = min(leftPosition, pinnedRightPosition)
+        let labelX = number < rightLabelX ? rightLabelX : leftLabelX
 
         return CGRect(
             x: labelX,
