@@ -138,13 +138,17 @@ class HorizontalRule: RuleView {
 
         let rightPosition = number + labelOffset
         let leftPosition = number - labelOffset - labelSize.width
-        let enoughRoomToTheRight = rightPosition + labelSize.width < rulerSize.width - labelOffset
-        var labelX = enoughRoomToTheRight ? rightPosition : leftPosition
+        var maxLabelRight = rulerSize.width - labelOffset
 
         if let resizeHandleExclusionFrame = resizeHandleExclusionFrame {
-            let maxLabelRight = resizeHandleExclusionFrame.minX - mouseTickLabelResizeHandleSpacing
-            labelX = min(labelX, maxLabelRight - labelSize.width)
+            maxLabelRight = min(
+                maxLabelRight,
+                resizeHandleExclusionFrame.minX - mouseTickLabelResizeHandleSpacing
+            )
         }
+
+        let enoughRoomToTheRight = rightPosition + labelSize.width <= maxLabelRight
+        let labelX = enoughRoomToTheRight ? rightPosition : leftPosition
 
         return CGRect(
             x: labelX,

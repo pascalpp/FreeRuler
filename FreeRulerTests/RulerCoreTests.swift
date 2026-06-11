@@ -325,16 +325,33 @@ final class RulerCoreTests: XCTestCase {
         }
 
         let labelRect = rule.mouseNumberLabelRect(
+            number: 240,
+            labelSize: CGSize(width: 30, height: 10),
+            rulerSize: CGSize(width: 300, height: Ruler.thickness)
+        )
+
+        XCTAssertGreaterThan(labelRect.minX, 240)
+        XCTAssertEqual(
+            labelRect.minX,
+            245,
+            accuracy: 0.0001
+        )
+        XCTAssertLessThanOrEqual(
+            labelRect.maxX,
+            resizeHandleFrame.minX - rule.mouseTickLabelResizeHandleSpacing
+        )
+    }
+
+    func testHorizontalMouseTickLabelFlipsBeforeCollidingWithMouseTick() {
+        let rule = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
+
+        let labelRect = rule.mouseNumberLabelRect(
             number: 245,
             labelSize: CGSize(width: 30, height: 10),
             rulerSize: CGSize(width: 300, height: Ruler.thickness)
         )
 
-        XCTAssertEqual(
-            labelRect.maxX,
-            resizeHandleFrame.minX - rule.mouseTickLabelResizeHandleSpacing,
-            accuracy: 0.0001
-        )
+        XCTAssertEqual(labelRect.maxX, 240, accuracy: 0.0001)
     }
 
     func testVerticalMouseTickLabelStopsBeforeResizeHandle() {
