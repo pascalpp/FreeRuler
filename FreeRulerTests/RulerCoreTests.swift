@@ -310,10 +310,10 @@ final class RulerCoreTests: XCTestCase {
         let horizontalCursor = windowResizeCursor(for: .horizontal)
         let verticalCursor = windowResizeCursor(for: .vertical)
 
-        XCTAssertEqual(horizontalCursor.image.size, NSSize(width: 21, height: 17))
-        XCTAssertEqual(verticalCursor.image.size, NSSize(width: 21, height: 17))
-        XCTAssertEqual(horizontalCursor.hotSpot, NSPoint(x: 10, y: 8))
-        XCTAssertEqual(verticalCursor.hotSpot, NSPoint(x: 10, y: 8))
+        XCTAssertEqual(horizontalCursor.image.size, NSSize(width: 21, height: 15))
+        XCTAssertEqual(verticalCursor.image.size, NSSize(width: 15, height: 21))
+        XCTAssertEqual(horizontalCursor.hotSpot, NSPoint(x: 10, y: 7))
+        XCTAssertEqual(verticalCursor.hotSpot, NSPoint(x: 7, y: 10))
         XCTAssertFalse(horizontalCursor.image.isTemplate)
         XCTAssertFalse(verticalCursor.image.isTemplate)
     }
