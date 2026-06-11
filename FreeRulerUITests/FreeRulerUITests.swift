@@ -1,14 +1,28 @@
 import XCTest
+import Darwin
 
 final class FreeRulerUITests: XCTestCase {
 
     private var app: XCUIApplication!
+    private var cursorStateURL: URL!
 
     override func setUpWithError() throws {
         continueAfterFailure = false
 
+        let cursorStateName = "FreeRulerUITests-\(UUID().uuidString).cursor"
+        let homeDirectory = currentUserHomeDirectory()
+        cursorStateURL = URL(fileURLWithPath: homeDirectory)
+            .appendingPathComponent("Library/Containers/com.pascal.freeruler/Data/tmp", isDirectory: true)
+            .appendingPathComponent(cursorStateName)
+        try? FileManager.default.createDirectory(
+            at: cursorStateURL.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        try? FileManager.default.removeItem(at: cursorStateURL)
+
         app = XCUIApplication()
         app.launchEnvironment["FREE_RULER_UI_TESTS"] = "1"
+        app.launchEnvironment["FREE_RULER_UI_TEST_CURSOR_STATE_NAME"] = cursorStateName
         app.launch()
         app.activate()
     }
@@ -16,6 +30,8 @@ final class FreeRulerUITests: XCTestCase {
     override func tearDownWithError() throws {
         app.terminate()
         app = nil
+        try? FileManager.default.removeItem(at: cursorStateURL)
+        cursorStateURL = nil
     }
 
     func testRulerVisibilityKeyboardCommands() {
@@ -210,6 +226,46 @@ final class FreeRulerUITests: XCTestCase {
         XCTAssertTrue(verticalRuler.waitForFrameChange(from: originalVerticalFrame, timeout: 2))
     }
 
+    func testHorizontalRulerCursorForMouseoverMousedownAndMouseoutActions() {
+        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
+        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
+
+        isolateHorizontalRulerByUngroupingWithVerticalToggle()
+
+        assertCursorSequence(on: horizontalRuler, label: "ungrouped horizontal ruler")
+    }
+
+    func testVerticalRulerCursorForMouseoverMousedownAndMouseoutActions() {
+        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
+        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
+
+        isolateHorizontalRulerByUngroupingWithVerticalToggle()
+
+        app.typeKey("h", modifierFlags: [])
+        XCTAssertTrue(horizontalRuler.waitForNonExistence(timeout: 2))
+        app.typeKey("v", modifierFlags: [])
+        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 2))
+
+        assertCursorSequence(on: verticalRuler, label: "ungrouped vertical ruler")
+    }
+
+    func testGroupedRulerCursorsForKeyAndChildWindows() {
+        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
+        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
+
+        setGroupRulers(true)
+        XCTAssertTrue(groupRulersEnabledInPreferences())
+        closePreferences()
+
+        horizontalRuler.click()
+        assertCursorSequence(on: horizontalRulerView, label: "grouped key horizontal ruler")
+        assertCursorSequence(on: verticalRulerView, label: "grouped child vertical ruler")
+
+        verticalRuler.click()
+        assertCursorSequence(on: verticalRulerView, label: "grouped key vertical ruler")
+        assertCursorSequence(on: horizontalRulerView, label: "grouped child horizontal ruler")
+    }
+
     private var horizontalRuler: XCUIElement {
         app.dialogs["horizontal-ruler-window"]
     }
@@ -220,6 +276,10 @@ final class FreeRulerUITests: XCTestCase {
 
     private var horizontalRulerView: XCUIElement {
         app.otherElements["horizontal-ruler-view"]
+    }
+
+    private var verticalRulerView: XCUIElement {
+        app.otherElements["vertical-ruler-view"]
     }
 
     private var preferencesWindow: XCUIElement {
@@ -284,6 +344,36 @@ final class FreeRulerUITests: XCTestCase {
         return rulerShadowCheckbox.isChecked
     }
 
+    private func isolateHorizontalRulerByUngroupingWithVerticalToggle() {
+        horizontalRuler.click()
+        app.typeKey("v", modifierFlags: [])
+
+        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 2))
+        XCTAssertTrue(verticalRuler.waitForNonExistence(timeout: 2))
+        XCTAssertFalse(groupRulersEnabledInPreferences())
+        closePreferences()
+    }
+
+    private func assertCursorSequence(on ruler: XCUIElement, label: String) {
+        hover(over: ruler)
+        assertCursor("open-hand", after: "mouseover \(label)")
+
+        pressAndRelease(in: ruler, assertingCursorDuringPress: "closed-hand")
+        assertCursor("open-hand", after: "mousedown and mouseup inside \(label)")
+
+        hover(over: pointOutside(ruler))
+        assertCursor("crosshair", after: "mouseout \(label)")
+
+        hover(over: ruler)
+        assertCursor("open-hand", after: "mouseover \(label) again")
+
+        pressAndRelease(in: ruler, assertingCursorDuringPress: "closed-hand")
+        assertCursor("open-hand", after: "mousedown and mouseup inside \(label) again")
+
+        hover(over: pointOutside(ruler))
+        assertCursor("crosshair", after: "mouseout \(label) again")
+    }
+
     private func waitForHotkeyBezel(_ expectedLabel: String, timeout: TimeInterval = 2) -> Bool {
         let deadline = Date().addingTimeInterval(timeout)
 
@@ -301,6 +391,100 @@ final class FreeRulerUITests: XCTestCase {
 
         return (hotkeyBezel.exists && hotkeyBezel.value as? String == expectedLabel)
             || (hotkeyBezelLabel.exists && hotkeyBezelLabel.label == expectedLabel)
+    }
+
+    private func hover(over element: XCUIElement) {
+        hover(over: interactionPoint(in: element))
+    }
+
+    private func hover(over coordinate: XCUICoordinate) {
+        coordinate.hover()
+        RunLoop.current.run(until: Date().addingTimeInterval(0.1))
+    }
+
+    private func pressAndRelease(in element: XCUIElement, assertingCursorDuringPress expectedCursor: String) {
+        let expectation = expectationForCursor(expectedCursor, after: "mousedown inside \(element.identifier)")
+        let coordinate = interactionPoint(in: element)
+        coordinate.press(forDuration: 0.4)
+        wait(for: [expectation], timeout: 1)
+        RunLoop.current.run(until: Date().addingTimeInterval(0.1))
+    }
+
+    private func pointOutside(_ element: XCUIElement) -> XCUICoordinate {
+        let yOffset = isVerticalRulerElement(element) ? 0.75 : 1.5
+        return element.coordinate(withNormalizedOffset: CGVector(dx: 1.5, dy: yOffset))
+    }
+
+    private func interactionPoint(in element: XCUIElement) -> XCUICoordinate {
+        let yOffset = isVerticalRulerElement(element) ? 0.75 : 0.5
+        return element.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: yOffset))
+    }
+
+    private func isVerticalRulerElement(_ element: XCUIElement) -> Bool {
+        return element.identifier.contains("vertical-ruler")
+    }
+
+    private func expectationForCursor(_ expectedCursor: String, after action: String) -> XCTestExpectation {
+        let expectation = expectation(description: "Expected cursor \(expectedCursor) after \(action)")
+
+        DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.15) { [cursorStateURL] in
+            guard let cursorStateURL = cursorStateURL else { return }
+
+            let deadline = Date().addingTimeInterval(1.5)
+
+            while Date() < deadline {
+                let cursor = try? String(contentsOf: cursorStateURL, encoding: .utf8)
+
+                if cursor == expectedCursor {
+                    expectation.fulfill()
+                    return
+                }
+
+                Thread.sleep(forTimeInterval: 0.025)
+            }
+        }
+
+        return expectation
+    }
+
+    private func assertCursor(
+        _ expectedCursor: String,
+        after action: String,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        XCTAssertTrue(
+            waitForCursor(expectedCursor, timeout: 2),
+            "Expected cursor \(expectedCursor) after \(action); actual cursor was \(readCursorState() ?? "nil")",
+            file: file,
+            line: line
+        )
+    }
+
+    private func waitForCursor(_ expectedCursor: String, timeout: TimeInterval) -> Bool {
+        let deadline = Date().addingTimeInterval(timeout)
+
+        while Date() < deadline {
+            if readCursorState() == expectedCursor {
+                return true
+            }
+
+            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
+        }
+
+        return readCursorState() == expectedCursor
+    }
+
+    private func readCursorState() -> String? {
+        return try? String(contentsOf: cursorStateURL, encoding: .utf8)
+    }
+
+    private func currentUserHomeDirectory() -> String {
+        guard let passwd = getpwuid(getuid()) else {
+            return NSHomeDirectory()
+        }
+
+        return String(cString: passwd.pointee.pw_dir)
     }
 }
 

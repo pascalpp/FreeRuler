@@ -57,6 +57,16 @@ class RulerWindow: NSPanel {
         set {}
     }
 
+    override func mouseDown(with event: NSEvent) {
+        nextResponder?.mouseDown(with: event)
+        super.mouseDown(with: event)
+    }
+
+    override func mouseUp(with event: NSEvent) {
+        nextResponder?.mouseUp(with: event)
+        super.mouseUp(with: event)
+    }
+
 }
 
 private func getTitle(for orientation: Orientation) -> String {

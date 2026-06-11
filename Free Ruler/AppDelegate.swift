@@ -9,6 +9,23 @@ import Sparkle
 
 let env = ProcessInfo.processInfo.environment
 let UI_TESTS = env["FREE_RULER_UI_TESTS"] != nil
+let UI_TEST_CURSOR_STATE_NAME: String? = {
+    guard UI_TESTS,
+          let name = env["FREE_RULER_UI_TEST_CURSOR_STATE_NAME"] else { return nil }
+
+    let lastPathComponent = URL(fileURLWithPath: name).lastPathComponent
+    guard !lastPathComponent.isEmpty, lastPathComponent == name else { return nil }
+
+    return name
+}()
+
+func writeUITestCursorState(_ value: String) {
+    guard let name = UI_TEST_CURSOR_STATE_NAME else { return }
+
+    let url = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+        .appendingPathComponent(name)
+    try? value.write(to: url, atomically: true, encoding: .utf8)
+}
 
 private enum HotkeyBezelLocalizationKey: String {
     case rulersFloated = "HotkeyBezel.RulersFloated"
@@ -99,6 +116,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         if UI_TESTS {
             resetStateForUITests()
+            writeUITestCursorState("none")
         }
 
         subscribeToPrefs()
