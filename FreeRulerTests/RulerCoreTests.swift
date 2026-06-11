@@ -318,6 +318,44 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertFalse(verticalCursor.image.isTemplate)
     }
 
+    func testHorizontalMouseTickLabelStopsBeforeResizeHandle() {
+        let rule = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
+        guard let resizeHandleFrame = rule.resizeHandleExclusionFrame else {
+            return XCTFail("Expected horizontal ruler to install a resize handle")
+        }
+
+        let labelRect = rule.mouseNumberLabelRect(
+            number: 245,
+            labelSize: CGSize(width: 30, height: 10),
+            rulerSize: CGSize(width: 300, height: Ruler.thickness)
+        )
+
+        XCTAssertEqual(
+            labelRect.maxX,
+            resizeHandleFrame.minX - rule.mouseTickLabelResizeHandleSpacing,
+            accuracy: 0.0001
+        )
+    }
+
+    func testVerticalMouseTickLabelStopsBeforeResizeHandle() {
+        let rule = VerticalRule(frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
+        guard let resizeHandleFrame = rule.resizeHandleExclusionFrame else {
+            return XCTFail("Expected vertical ruler to install a resize handle")
+        }
+
+        let labelRect = rule.mouseNumberLabelRect(
+            number: 290,
+            labelSize: CGSize(width: 22, height: 10),
+            rulerHeight: 300
+        )
+
+        XCTAssertEqual(
+            labelRect.minY,
+            resizeHandleFrame.maxY + rule.mouseTickLabelResizeHandleSpacing,
+            accuracy: 0.0001
+        )
+    }
+
     func testResizeHandleDisablesWindowBackgroundDraggingDuringResizeDrag() {
         let ruler = Ruler(.horizontal, frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
         let window = RulerWindow(ruler)

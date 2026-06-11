@@ -114,7 +114,6 @@ class HorizontalRule: RuleView {
         let number = mouseTickX
         let width = self.frame.width
         let height = self.frame.height
-        let labelOffset: CGFloat = 5
 
         let attributes = labelAttributes(alignment: .center, foregroundColor: color.mouseNumber)
 
@@ -122,16 +121,36 @@ class HorizontalRule: RuleView {
         let label = NSAttributedString(string: mouseNumber, attributes: attributes)
         let labelSize = label.size()
 
-        let rightPosition = number + labelOffset;
-        let leftPosition = number - labelOffset - labelSize.width
-        let enoughRoomToTheRight = rightPosition + labelSize.width < width - labelOffset
-        let labelX = enoughRoomToTheRight ? rightPosition : leftPosition
-
-        let labelRect = CGRect(x: labelX, y: height - labelSize.height, width: labelSize.width, height: labelSize.height)
+        let labelRect = mouseNumberLabelRect(
+            number: number,
+            labelSize: labelSize,
+            rulerSize: CGSize(width: width, height: height)
+        )
 
         label.draw(
             with: labelRect,
             context: nil
+        )
+    }
+
+    func mouseNumberLabelRect(number: CGFloat, labelSize: CGSize, rulerSize: CGSize) -> CGRect {
+        let labelOffset: CGFloat = 5
+
+        let rightPosition = number + labelOffset
+        let leftPosition = number - labelOffset - labelSize.width
+        let enoughRoomToTheRight = rightPosition + labelSize.width < rulerSize.width - labelOffset
+        var labelX = enoughRoomToTheRight ? rightPosition : leftPosition
+
+        if let resizeHandleExclusionFrame = resizeHandleExclusionFrame {
+            let maxLabelRight = resizeHandleExclusionFrame.minX - mouseTickLabelResizeHandleSpacing
+            labelX = min(labelX, maxLabelRight - labelSize.width)
+        }
+
+        return CGRect(
+            x: labelX,
+            y: rulerSize.height - labelSize.height,
+            width: labelSize.width,
+            height: labelSize.height
         )
     }
 

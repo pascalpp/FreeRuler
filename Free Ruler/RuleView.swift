@@ -17,6 +17,7 @@ struct RulerColors {
 class RuleView: NSView {
 
     let color = RulerColors()
+    let mouseTickLabelResizeHandleSpacing: CGFloat = 8
     private var resizeHandleView: ResizeHandleView?
 
     var trackingArea: NSTrackingArea?
@@ -109,6 +110,10 @@ class RuleView: NSView {
 
     var unit: Unit {
         prefs.unit
+    }
+
+    var resizeHandleExclusionFrame: NSRect? {
+        return resizeHandleView?.frame
     }
 
     func getUnitLabel() -> String {
