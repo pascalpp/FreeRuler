@@ -1,5 +1,8 @@
 import Cocoa
+
+#if DEBUG
 import SwiftUI
+#endif
 
 final class ResizeHandleView: NSView {
 
