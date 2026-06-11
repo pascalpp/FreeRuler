@@ -7,7 +7,7 @@ final class RulerCursorController {
         case openHand
         case closedHand
 
-        var accessibilityValue: String {
+        var uiTestStateValue: String {
             switch self {
             case .arrow:
                 return "arrow"
@@ -102,6 +102,6 @@ final class RulerCursorController {
 
 private extension RulerCursorController.CursorStyle {
     func writeUITestStateIfNeeded() {
-        writeUITestCursorState(accessibilityValue)
+        writeUITestCursorState(uiTestStateValue)
     }
 }

@@ -428,10 +428,12 @@ final class FreeRulerUITests: XCTestCase {
         let expectation = expectation(description: "Expected cursor \(expectedCursor) after \(action)")
 
         DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.15) { [cursorStateURL] in
+            guard let cursorStateURL = cursorStateURL else { return }
+
             let deadline = Date().addingTimeInterval(1.5)
 
             while Date() < deadline {
-                let cursor = try? String(contentsOf: cursorStateURL!, encoding: .utf8)
+                let cursor = try? String(contentsOf: cursorStateURL, encoding: .utf8)
 
                 if cursor == expectedCursor {
                     expectation.fulfill()

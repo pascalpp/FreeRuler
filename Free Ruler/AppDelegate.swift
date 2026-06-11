@@ -9,7 +9,15 @@ import Sparkle
 
 let env = ProcessInfo.processInfo.environment
 let UI_TESTS = env["FREE_RULER_UI_TESTS"] != nil
-let UI_TEST_CURSOR_STATE_NAME = env["FREE_RULER_UI_TEST_CURSOR_STATE_NAME"]
+let UI_TEST_CURSOR_STATE_NAME: String? = {
+    guard UI_TESTS,
+          let name = env["FREE_RULER_UI_TEST_CURSOR_STATE_NAME"] else { return nil }
+
+    let lastPathComponent = URL(fileURLWithPath: name).lastPathComponent
+    guard !lastPathComponent.isEmpty, lastPathComponent == name else { return nil }
+
+    return name
+}()
 
 func writeUITestCursorState(_ value: String) {
     guard let name = UI_TEST_CURSOR_STATE_NAME else { return }
