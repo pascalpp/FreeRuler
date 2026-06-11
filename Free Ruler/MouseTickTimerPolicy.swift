@@ -45,4 +45,10 @@ final class MouseTickTimerPolicy {
     func resume(owner: AnyObject) {
         suspendedOwners.remove(owner)
     }
+
+    func resume(owners: [AnyObject]) {
+        for owner in owners {
+            resume(owner: owner)
+        }
+    }
 }

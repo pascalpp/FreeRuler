@@ -131,6 +131,19 @@ final class RulerCoreTests: XCTestCase {
         ])
     }
 
+    func testRulerCursorControllerReappliesHandOnMouseMovement() {
+        var appliedCursors: [RulerCursorController.CursorStyle] = []
+        let controller = RulerCursorController { appliedCursors.append($0) }
+
+        controller.applicationDidBecomeActive()
+        controller.mouseEnteredRuler()
+        appliedCursors.removeAll()
+
+        controller.mouseMovedInRuler()
+
+        XCTAssertEqual(appliedCursors, [.openHand])
+    }
+
     func testMouseTickTimerPolicyRunsOnlyWhenRulersAreVisible() {
         let policy = MouseTickTimerPolicy(foregroundInterval: 1 / 60, backgroundInterval: 1 / 30)
 
@@ -195,6 +208,21 @@ final class RulerCoreTests: XCTestCase {
             policy.suspend(owner: owner)
             XCTAssertNil(policy.desiredInterval)
         }
+
+        XCTAssertEqual(policy.desiredInterval, 1 / 60)
+    }
+
+    func testMouseTickTimerPolicyResumesMultipleOwnersTogether() {
+        let policy = MouseTickTimerPolicy(foregroundInterval: 1 / 60, backgroundInterval: 1 / 30)
+        let firstOwner = NSObject()
+        let secondOwner = NSObject()
+
+        policy.applicationDidBecomeActive()
+        policy.updateVisibleRulers(true)
+        policy.suspend(owner: firstOwner)
+        policy.suspend(owner: secondOwner)
+
+        policy.resume(owners: [firstOwner, secondOwner])
 
         XCTAssertEqual(policy.desiredInterval, 1 / 60)
     }
