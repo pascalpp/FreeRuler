@@ -265,25 +265,15 @@ private func clamp(_ value: CGFloat, _ minValue: CGFloat, _ maxValue: CGFloat) -
 }
 
 private func windowResizeCursor(for orientation: Orientation) -> NSCursor {
-    let selectorName: String
-    let fallback: NSCursor
-
+    // Public AppKit cursors keep App Store review safe. The private two-arrow
+    // variants to revisit for non-App-Store builds are `_windowResizeEastWestCursor`
+    // and `_windowResizeNorthSouthCursor`.
     switch orientation {
     case .horizontal:
-        selectorName = "_windowResizeEastWestCursor"
-        fallback = .resizeLeftRight
+        return .resizeLeftRight
     case .vertical:
-        selectorName = "_windowResizeNorthSouthCursor"
-        fallback = .resizeUpDown
+        return .resizeUpDown
     }
-
-    let selector = NSSelectorFromString(selectorName)
-    guard NSCursor.responds(to: selector),
-          let cursor = NSCursor.perform(selector)?.takeUnretainedValue() as? NSCursor else {
-        return fallback
-    }
-
-    return cursor
 }
 
 private func resizeHandleAccessibilityIdentifier(for orientation: Orientation) -> String {
