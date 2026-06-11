@@ -15,6 +15,7 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     var keyListener: Any?
     private var mouseTickResumeTimer: Timer?
     private let mouseTickResumeDelay: TimeInterval = 0.15
+    private var mouseIsDraggingRuler = false
 
     var preferencesWindowOpen = false {
         didSet {
@@ -88,6 +89,7 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
 
     func windowDidMove(_ notification: Notification) {
         rulerWindow.invalidateShadow()
+        guard !mouseIsDraggingRuler else { return }
         scheduleMouseTickResume()
     }
 
@@ -110,14 +112,19 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     }
 
     override func mouseDown(with event: NSEvent) {
+        mouseIsDraggingRuler = true
+        disableMouseTicks()
         rulerCursorController?.mouseDownInRuler()
     }
 
     override func mouseUp(with event: NSEvent) {
+        mouseIsDraggingRuler = false
+        scheduleMouseTickResume()
         rulerCursorController?.mouseUpInRuler(mouseIsInsideRuler: isMouseInsideRuler(with: event))
     }
 
     override func mouseMoved(with event: NSEvent) {
+        guard !mouseIsDraggingRuler else { return }
         enableMouseTicks()
     }
 
