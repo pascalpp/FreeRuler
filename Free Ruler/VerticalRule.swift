@@ -4,6 +4,16 @@ class VerticalRule: RuleView {
 
     let transformer = AffineTransform(translationByX: 0, byY: -0.5)
 
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        installResizeHandle(for: .vertical)
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        installResizeHandle(for: .vertical)
+    }
+
     var mouseTickY: CGFloat = 0 {
         didSet {
             if mouseTickY != oldValue {

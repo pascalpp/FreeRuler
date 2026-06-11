@@ -4,6 +4,16 @@ class HorizontalRule: RuleView {
 
     let transformer = AffineTransform(translationByX: 0.5, byY: 0)
 
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        installResizeHandle(for: .horizontal)
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        installResizeHandle(for: .horizontal)
+    }
+
     var mouseTickX: CGFloat = 0 {
         didSet {
             if mouseTickX != oldValue {
