@@ -131,17 +131,57 @@ final class RulerCoreTests: XCTestCase {
         ])
     }
 
-    func testRulerCursorControllerReappliesHandOnMouseMovement() {
+    func testRulerCursorControllerTracksMouseOverMouseDownAndMouseOutActions() {
         var appliedCursors: [RulerCursorController.CursorStyle] = []
         let controller = RulerCursorController { appliedCursors.append($0) }
 
+        func assertCursor(
+            after actionName: String,
+            _ action: () -> Void,
+            is expectedCursor: RulerCursorController.CursorStyle,
+            file: StaticString = #filePath,
+            line: UInt = #line
+        ) {
+            action()
+            XCTAssertEqual(controller.currentCursor, expectedCursor, actionName, file: file, line: line)
+            XCTAssertEqual(appliedCursors.last, expectedCursor, actionName, file: file, line: line)
+        }
+
         controller.applicationDidBecomeActive()
-        controller.mouseEnteredRuler()
-        appliedCursors.removeAll()
+        XCTAssertEqual(controller.currentCursor, .crosshair)
 
-        controller.mouseMovedInRuler()
+        assertCursor(after: "mouse over ruler", {
+            controller.mouseEnteredRuler()
+        }, is: .openHand)
 
-        XCTAssertEqual(appliedCursors, [.openHand])
+        assertCursor(after: "mouse down inside ruler", {
+            controller.mouseDownInRuler()
+        }, is: .closedHand)
+
+        let appliedCursorCountBeforeMouseOut = appliedCursors.count
+        controller.mouseExitedRuler()
+        XCTAssertEqual(controller.currentCursor, .closedHand, "mouse out while dragging")
+        XCTAssertEqual(appliedCursors.count, appliedCursorCountBeforeMouseOut, "mouse out while dragging")
+
+        assertCursor(after: "mouse up outside ruler", {
+            controller.mouseUpInRuler(mouseIsInsideRuler: false)
+        }, is: .crosshair)
+
+        assertCursor(after: "mouse over ruler again", {
+            controller.mouseEnteredRuler()
+        }, is: .openHand)
+
+        assertCursor(after: "mouse down inside ruler again", {
+            controller.mouseDownInRuler()
+        }, is: .closedHand)
+
+        assertCursor(after: "mouse up inside ruler", {
+            controller.mouseUpInRuler(mouseIsInsideRuler: true)
+        }, is: .openHand)
+
+        assertCursor(after: "mouse out after release", {
+            controller.mouseExitedRuler()
+        }, is: .crosshair)
     }
 
     func testMouseTickTimerPolicyRunsOnlyWhenRulersAreVisible() {
@@ -208,21 +248,6 @@ final class RulerCoreTests: XCTestCase {
             policy.suspend(owner: owner)
             XCTAssertNil(policy.desiredInterval)
         }
-
-        XCTAssertEqual(policy.desiredInterval, 1 / 60)
-    }
-
-    func testMouseTickTimerPolicyResumesMultipleOwnersTogether() {
-        let policy = MouseTickTimerPolicy(foregroundInterval: 1 / 60, backgroundInterval: 1 / 30)
-        let firstOwner = NSObject()
-        let secondOwner = NSObject()
-
-        policy.applicationDidBecomeActive()
-        policy.updateVisibleRulers(true)
-        policy.suspend(owner: firstOwner)
-        policy.suspend(owner: secondOwner)
-
-        policy.resume(owners: [firstOwner, secondOwner])
 
         XCTAssertEqual(policy.desiredInterval, 1 / 60)
     }

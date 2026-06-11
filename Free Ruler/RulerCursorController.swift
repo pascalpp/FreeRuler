@@ -49,11 +49,6 @@ final class RulerCursorController {
         updateCursor()
     }
 
-    func mouseMovedInRuler() {
-        mouseIsOverRuler = true
-        updateCursor(force: true)
-    }
-
     func mouseExitedRuler() {
         mouseIsOverRuler = false
         updateCursor()
@@ -71,20 +66,20 @@ final class RulerCursorController {
         updateCursor()
     }
 
-    private func updateCursor(force: Bool = false) {
+    private func updateCursor() {
         guard appIsActive else { return }
 
         if mouseIsDraggingRuler {
-            setCursor(.closedHand, force: force)
+            setCursor(.closedHand)
         } else if mouseIsOverRuler {
-            setCursor(.openHand, force: force)
+            setCursor(.openHand)
         } else {
-            setCursor(.crosshair, force: force)
+            setCursor(.crosshair)
         }
     }
 
-    private func setCursor(_ cursor: CursorStyle, force: Bool = false) {
-        guard force || cursor != currentCursor else { return }
+    private func setCursor(_ cursor: CursorStyle) {
+        guard cursor != currentCursor else { return }
 
         currentCursor = cursor
         applyCursor(cursor)
