@@ -345,6 +345,38 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertTrue(window.isMovableByWindowBackground)
     }
 
+    func testResizeHandleDetachesChildWindowsAttachedWhileBecomingKey() {
+        let childWindow = RulerWindow(
+            Ruler(.vertical, frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
+        )
+        let window = ChildAttachingRulerWindow(
+            ruler: Ruler(.horizontal, frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness)),
+            childWindow: childWindow
+        )
+        guard let resizeHandle = window.rule.subviews.first(where: { $0 is ResizeHandleView }) as? ResizeHandleView else {
+            return XCTFail("Expected horizontal ruler to install a resize handle")
+        }
+        let location = resizeHandle.convert(NSPoint(x: 1, y: 1), to: nil)
+
+        resizeHandle.mouseDown(with: mouseEvent(
+            type: .leftMouseDown,
+            location: location,
+            windowNumber: window.windowNumber,
+            timestamp: 0
+        ))
+
+        XCTAssertFalse(window.childWindows?.contains(childWindow) ?? false)
+
+        resizeHandle.mouseUp(with: mouseEvent(
+            type: .leftMouseUp,
+            location: location,
+            windowNumber: window.windowNumber,
+            timestamp: 0.1
+        ))
+
+        XCTAssertTrue(window.childWindows?.contains(childWindow) ?? false)
+    }
+
     func testHorizontalResizeHandleDragKeepsLeftAndTopEdgesFixed() {
         let initialFrame = NSRect(x: 100, y: 200, width: 300, height: Ruler.thickness)
         let ruler = Ruler(.horizontal, frame: initialFrame)
@@ -514,5 +546,19 @@ final class RulerCoreTests: XCTestCase {
             clickCount: 1,
             pressure: type == .leftMouseUp ? 0 : 1
         )!
+    }
+}
+
+private final class ChildAttachingRulerWindow: RulerWindow {
+    private let childWindowToAttach: NSWindow
+
+    init(ruler: Ruler, childWindow: NSWindow) {
+        self.childWindowToAttach = childWindow
+        super.init(ruler: ruler)
+    }
+
+    override func makeKey() {
+        super.makeKey()
+        addChildWindow(childWindowToAttach, ordered: .below)
     }
 }

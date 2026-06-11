@@ -86,13 +86,14 @@ final class ResizeHandleView: NSView {
         dragInitialMouseLocation = screenLocation(for: event, in: window)
         dragInitialWindowFrame = window.frame
         wasMovableByWindowBackgroundBeforeDrag = window.isMovableByWindowBackground
-        childWindowFramesBeforeDrag = window.childWindows?.map { ($0, $0.frame) } ?? []
 
         window.isMovableByWindowBackground = false
+        window.makeKey()
+
+        childWindowFramesBeforeDrag = window.childWindows?.map { ($0, $0.frame) } ?? []
         for childWindow in childWindowFramesBeforeDrag.map(\.window) {
             window.removeChildWindow(childWindow)
         }
-        window.makeKey()
     }
 
     override func mouseDragged(with event: NSEvent) {
