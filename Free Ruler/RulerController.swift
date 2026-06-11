@@ -118,6 +118,12 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     }
 
     override func mouseUp(with event: NSEvent) {
+        finishMouseDrag(with: event)
+    }
+
+    func finishMouseDrag(with event: NSEvent) {
+        guard mouseIsDraggingRuler else { return }
+
         mouseIsDraggingRuler = false
         scheduleMouseTickResume()
         rulerCursorController?.mouseUpInRuler(mouseIsInsideRuler: isMouseInsideRuler(with: event))
