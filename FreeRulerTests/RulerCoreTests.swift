@@ -306,6 +306,18 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertEqual(frame.maxY, initialFrame.maxY)
     }
 
+    func testResizeHandleCursorsUseCustomCenteredImages() {
+        let horizontalCursor = windowResizeCursor(for: .horizontal)
+        let verticalCursor = windowResizeCursor(for: .vertical)
+
+        XCTAssertEqual(horizontalCursor.image.size, NSSize(width: 21, height: 17))
+        XCTAssertEqual(verticalCursor.image.size, NSSize(width: 21, height: 17))
+        XCTAssertEqual(horizontalCursor.hotSpot, NSPoint(x: 10, y: 8))
+        XCTAssertEqual(verticalCursor.hotSpot, NSPoint(x: 10, y: 8))
+        XCTAssertFalse(horizontalCursor.image.isTemplate)
+        XCTAssertFalse(verticalCursor.image.isTemplate)
+    }
+
     func testResizeHandleDisablesWindowBackgroundDraggingDuringResizeDrag() {
         let ruler = Ruler(.horizontal, frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
         let window = RulerWindow(ruler)

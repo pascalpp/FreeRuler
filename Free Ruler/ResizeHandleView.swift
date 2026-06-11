@@ -1,4 +1,5 @@
 import Cocoa
+import SwiftUI
 
 final class ResizeHandleView: NSView {
 
@@ -265,15 +266,124 @@ private func clamp(_ value: CGFloat, _ minValue: CGFloat, _ maxValue: CGFloat) -
     return min(max(value, minValue), maxValue)
 }
 
-private func windowResizeCursor(for orientation: Orientation) -> NSCursor {
-    // Public AppKit cursors keep App Store review safe. The private two-arrow
-    // variants to revisit for non-App-Store builds are `_windowResizeEastWestCursor`
-    // and `_windowResizeNorthSouthCursor`.
+func windowResizeCursor(for orientation: Orientation) -> NSCursor {
     switch orientation {
     case .horizontal:
-        return .resizeLeftRight
+        return ResizeHandleCursor.horizontal
     case .vertical:
-        return .resizeUpDown
+        return ResizeHandleCursor.vertical
+    }
+}
+
+private enum ResizeHandleCursor {
+    struct Parameters {
+        var arrowHeight: CGFloat = 13
+        var arrowWidth: CGFloat = 5
+        var arrowStroke: CGFloat = 2
+        var shaftHeight: CGFloat = 4
+        var shaftWidth: CGFloat = 7
+        var arrowOffset: CGFloat = 0
+    }
+
+    static let horizontal = NSCursor(
+        image: image(for: .horizontal, parameters: parameters),
+        hotSpot: hotSpot(for: parameters)
+    )
+    static let vertical = NSCursor(
+        image: image(for: .vertical, parameters: parameters),
+        hotSpot: hotSpot(for: parameters)
+    )
+
+    private static let parameters = Parameters()
+
+    static func image(for orientation: Orientation, parameters: Parameters) -> NSImage {
+        let image = NSImage(size: imageSize(for: parameters))
+
+        image.lockFocus()
+        NSColor.clear.setFill()
+        NSRect(origin: .zero, size: image.size).fill()
+
+        let outlinePath = cursorBodyPath(for: orientation, parameters: parameters)
+        NSColor.white.setFill()
+        NSColor.white.setStroke()
+        outlinePath.lineWidth = parameters.arrowStroke * 2
+        outlinePath.lineJoinStyle = .miter
+        outlinePath.lineCapStyle = .square
+        outlinePath.stroke()
+        outlinePath.fill()
+
+        let bodyPath = cursorBodyPath(for: orientation, parameters: parameters)
+        NSColor.black.setFill()
+        bodyPath.fill()
+
+        image.unlockFocus()
+        image.isTemplate = false
+
+        return image
+    }
+
+    static func imageSize(for parameters: Parameters) -> NSSize {
+        let arrowExtent = parameters.arrowWidth + parameters.arrowOffset
+        let width = (arrowExtent * 2) + parameters.shaftWidth + (parameters.arrowStroke * 2)
+        let height = max(parameters.arrowHeight, parameters.shaftHeight) + (parameters.arrowStroke * 2)
+
+        return NSSize(width: ceil(width), height: ceil(height))
+    }
+
+    static func hotSpot(for parameters: Parameters) -> NSPoint {
+        let size = imageSize(for: parameters)
+
+        return NSPoint(x: floor(size.width / 2), y: floor(size.height / 2))
+    }
+
+    private static func cursorBodyPath(for orientation: Orientation, parameters: Parameters) -> NSBezierPath {
+        let size = imageSize(for: parameters)
+        let center = CGPoint(x: size.width / 2, y: size.height / 2)
+        let arrowExtent = parameters.arrowWidth + parameters.arrowOffset
+        let shaftHalfWidth = parameters.shaftWidth / 2
+        let arrowHalfHeight = parameters.arrowHeight / 2
+        let shaftHalfHeight = parameters.shaftHeight / 2
+
+        switch orientation {
+        case .horizontal:
+            return closedPath([
+                CGPoint(x: center.x - shaftHalfWidth - arrowExtent, y: center.y),
+                CGPoint(x: center.x - shaftHalfWidth - parameters.arrowOffset, y: center.y - arrowHalfHeight),
+                CGPoint(x: center.x - shaftHalfWidth - parameters.arrowOffset, y: center.y - shaftHalfHeight),
+                CGPoint(x: center.x + shaftHalfWidth + parameters.arrowOffset, y: center.y - shaftHalfHeight),
+                CGPoint(x: center.x + shaftHalfWidth + parameters.arrowOffset, y: center.y - arrowHalfHeight),
+                CGPoint(x: center.x + shaftHalfWidth + arrowExtent, y: center.y),
+                CGPoint(x: center.x + shaftHalfWidth + parameters.arrowOffset, y: center.y + arrowHalfHeight),
+                CGPoint(x: center.x + shaftHalfWidth + parameters.arrowOffset, y: center.y + shaftHalfHeight),
+                CGPoint(x: center.x - shaftHalfWidth - parameters.arrowOffset, y: center.y + shaftHalfHeight),
+                CGPoint(x: center.x - shaftHalfWidth - parameters.arrowOffset, y: center.y + arrowHalfHeight),
+            ])
+        case .vertical:
+            return closedPath([
+                CGPoint(x: center.x, y: center.y - shaftHalfWidth - arrowExtent),
+                CGPoint(x: center.x + arrowHalfHeight, y: center.y - shaftHalfWidth - parameters.arrowOffset),
+                CGPoint(x: center.x + shaftHalfHeight, y: center.y - shaftHalfWidth - parameters.arrowOffset),
+                CGPoint(x: center.x + shaftHalfHeight, y: center.y + shaftHalfWidth + parameters.arrowOffset),
+                CGPoint(x: center.x + arrowHalfHeight, y: center.y + shaftHalfWidth + parameters.arrowOffset),
+                CGPoint(x: center.x, y: center.y + shaftHalfWidth + arrowExtent),
+                CGPoint(x: center.x - arrowHalfHeight, y: center.y + shaftHalfWidth + parameters.arrowOffset),
+                CGPoint(x: center.x - shaftHalfHeight, y: center.y + shaftHalfWidth + parameters.arrowOffset),
+                CGPoint(x: center.x - shaftHalfHeight, y: center.y - shaftHalfWidth - parameters.arrowOffset),
+                CGPoint(x: center.x - arrowHalfHeight, y: center.y - shaftHalfWidth - parameters.arrowOffset),
+            ])
+        }
+    }
+
+    private static func closedPath(_ points: [CGPoint]) -> NSBezierPath {
+        let path = NSBezierPath()
+        guard let firstPoint = points.first else { return path }
+
+        path.move(to: firstPoint)
+        for point in points.dropFirst() {
+            path.line(to: point)
+        }
+        path.close()
+        return path
     }
 }
 
@@ -285,3 +395,140 @@ private func resizeHandleAccessibilityIdentifier(for orientation: Orientation) -
         return "vertical-resize-handle"
     }
 }
+
+#if DEBUG
+private struct ResizeHandleCursorPreview: View {
+    @State private var arrowHeight = 13.0
+    @State private var arrowWidth = 5.0
+    @State private var arrowStroke = 2.0
+    @State private var shaftHeight = 4.0
+    @State private var shaftWidth = 7.0
+    @State private var arrowOffset = 0.0
+
+    private var parameters: ResizeHandleCursor.Parameters {
+        ResizeHandleCursor.Parameters(
+            arrowHeight: CGFloat(arrowHeight),
+            arrowWidth: CGFloat(arrowWidth),
+            arrowStroke: CGFloat(arrowStroke),
+            shaftHeight: CGFloat(shaftHeight),
+            shaftWidth: CGFloat(shaftWidth),
+            arrowOffset: CGFloat(arrowOffset)
+        )
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            HStack(alignment: .top, spacing: 24) {
+                previewImage(
+                    image: ResizeHandleCursor.image(for: .horizontal, parameters: parameters),
+                    title: "Custom Horizontal"
+                )
+                previewImage(
+                    image: ResizeHandleCursor.image(for: .vertical, parameters: parameters),
+                    title: "Custom Vertical"
+                )
+            }
+
+            HStack(alignment: .top, spacing: 24) {
+                privateCursorPreview(for: .horizontal)
+                privateCursorPreview(for: .vertical)
+            }
+
+            VStack(spacing: 10) {
+                slider("arrowHeight", value: $arrowHeight, range: 6...18)
+                slider("arrowWidth", value: $arrowWidth, range: 2...10)
+                slider("arrowStroke", value: $arrowStroke, range: 0.5...4)
+                slider("shaftHeight", value: $shaftHeight, range: 1...8)
+                slider("shaftWidth", value: $shaftWidth, range: 2...14)
+                slider("arrowOffset", value: $arrowOffset, range: -2...4)
+            }
+        }
+        .padding()
+        .frame(width: 720)
+    }
+
+    private func previewImage(image: NSImage, title: String) -> some View {
+        VStack(spacing: 8) {
+            Image(nsImage: image)
+                .interpolation(.none)
+                .resizable()
+                .frame(width: image.size.width * 8, height: image.size.height * 8)
+                .padding(20)
+                .background(Color(red: 0.25, green: 0.49, blue: 0.46))
+
+            Text(title)
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+    }
+
+    @ViewBuilder
+    private func privateCursorPreview(for orientation: Orientation) -> some View {
+        if let cursor = privateWindowResizeCursor(for: orientation) {
+            previewImage(
+                image: cursor.image,
+                title: previewTitle(for: orientation, prefix: "Private")
+            )
+        } else {
+            VStack(spacing: 8) {
+                Text("Unavailable")
+                    .font(.caption.monospaced())
+                    .frame(width: 130, height: 80)
+                    .background(Color(red: 0.25, green: 0.49, blue: 0.46))
+
+                Text(previewTitle(for: orientation, prefix: "Private"))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+
+    private func slider(_ title: String, value: Binding<Double>, range: ClosedRange<Double>) -> some View {
+        HStack {
+            Text(title)
+                .font(.caption.monospaced())
+                .frame(width: 120, alignment: .leading)
+            Slider(value: value, in: range, step: 0.5)
+                .frame(minWidth: 420)
+            Text(String(format: "%.1f", value.wrappedValue))
+                .font(.caption.monospacedDigit())
+                .frame(width: 48, alignment: .trailing)
+        }
+    }
+
+    private func previewTitle(for orientation: Orientation, prefix: String) -> String {
+        switch orientation {
+        case .horizontal:
+            return "\(prefix) Horizontal"
+        case .vertical:
+            return "\(prefix) Vertical"
+        }
+    }
+}
+
+private func privateWindowResizeCursor(for orientation: Orientation) -> NSCursor? {
+    let selectorName: String
+    switch orientation {
+    case .horizontal:
+        selectorName = "_windowResizeEastWestCursor"
+    case .vertical:
+        selectorName = "_windowResizeNorthSouthCursor"
+    }
+
+    let selector = NSSelectorFromString(selectorName)
+    guard NSCursor.responds(to: selector),
+          let unmanagedCursor = NSCursor.perform(selector) else {
+        return nil
+    }
+
+    return unmanagedCursor.takeUnretainedValue() as? NSCursor
+}
+
+struct ResizeHandleCursor_Previews: PreviewProvider {
+    static var previews: some View {
+        ResizeHandleCursorPreview()
+            .previewLayout(.sizeThatFits)
+            .previewDisplayName("Resize Handle Cursor")
+    }
+}
+#endif
