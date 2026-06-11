@@ -16,6 +16,9 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     private var mouseTickResumeTimer: Timer?
     private let mouseTickResumeDelay: TimeInterval = 0.15
     private var mouseIsDraggingRuler = false
+    var isLeftMouseButtonPressed = {
+        return NSEvent.pressedMouseButtons & 1 == 1
+    }
 
     var preferencesWindowOpen = false {
         didSet {
@@ -89,7 +92,7 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
 
     func windowDidMove(_ notification: Notification) {
         rulerWindow.invalidateShadow()
-        guard !mouseIsDraggingRuler else { return }
+        guard !mouseIsDraggingRuler && !isLeftMouseButtonPressed() else { return }
         scheduleMouseTickResume()
     }
 
@@ -143,8 +146,6 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     }
 
     func enableMouseTicks() {
-        guard !rulerWindow.rule.showMouseTick || otherWindow?.rule.showMouseTick == false else { return }
-
         rulerWindow.rule.showMouseTick = true
         otherWindow?.rule.showMouseTick = true
         appDelegate?.resumeMouseTickUpdates(owner: self)
