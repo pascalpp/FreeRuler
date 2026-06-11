@@ -289,4 +289,67 @@ final class RulerCoreTests: XCTestCase {
 
         XCTAssertTrue(controller.rulerWindow.rule.showMouseTick)
     }
+
+    func testRulerControllerResumesMouseTicksWhenWindowDragLoopEnds() {
+        let ruler = Ruler(.horizontal, frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
+        let controller = RulerController(ruler: ruler)
+        let otherWindow = RulerWindow(Ruler(.vertical, frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300)))
+        controller.otherWindow = otherWindow
+        let mouseDownEvent = NSEvent.mouseEvent(
+            with: .leftMouseDown,
+            location: NSPoint(x: 10, y: 10),
+            modifierFlags: [],
+            timestamp: 0,
+            windowNumber: controller.rulerWindow.windowNumber,
+            context: nil,
+            eventNumber: 0,
+            clickCount: 1,
+            pressure: 1
+        )!
+
+        controller.mouseDown(with: mouseDownEvent)
+        controller.windowDidMove(Notification(name: NSWindow.didMoveNotification, object: controller.rulerWindow))
+        RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+
+        XCTAssertFalse(controller.rulerWindow.rule.showMouseTick)
+        XCTAssertFalse(otherWindow.rule.showMouseTick)
+
+        controller.finishMouseDrag(with: mouseDownEvent)
+        RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+
+        XCTAssertTrue(controller.rulerWindow.rule.showMouseTick)
+        XCTAssertTrue(otherWindow.rule.showMouseTick)
+    }
+
+    func testGroupedChildMoveDoesNotResumeMouseTicksDuringDrag() {
+        let draggedController = RulerController(
+            ruler: Ruler(.horizontal, frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
+        )
+        let groupedChildController = RulerController(
+            ruler: Ruler(.vertical, frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
+        )
+        draggedController.otherWindow = groupedChildController.rulerWindow
+        groupedChildController.otherWindow = draggedController.rulerWindow
+        groupedChildController.isLeftMouseButtonPressed = { true }
+        let mouseDownEvent = NSEvent.mouseEvent(
+            with: .leftMouseDown,
+            location: NSPoint(x: 10, y: 10),
+            modifierFlags: [],
+            timestamp: 0,
+            windowNumber: draggedController.rulerWindow.windowNumber,
+            context: nil,
+            eventNumber: 0,
+            clickCount: 1,
+            pressure: 1
+        )!
+
+        draggedController.mouseDown(with: mouseDownEvent)
+        groupedChildController.windowDidMove(
+            Notification(name: NSWindow.didMoveNotification, object: groupedChildController.rulerWindow)
+        )
+        RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+
+        XCTAssertFalse(draggedController.rulerWindow.rule.showMouseTick)
+        XCTAssertFalse(groupedChildController.rulerWindow.rule.showMouseTick)
+    }
 }

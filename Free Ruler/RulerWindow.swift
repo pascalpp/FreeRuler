@@ -60,11 +60,19 @@ class RulerWindow: NSPanel {
     override func mouseDown(with event: NSEvent) {
         nextResponder?.mouseDown(with: event)
         super.mouseDown(with: event)
+
+        if !leftMouseButtonIsPressed {
+            (nextResponder as? RulerController)?.finishMouseDrag(with: event)
+        }
     }
 
     override func mouseUp(with event: NSEvent) {
         nextResponder?.mouseUp(with: event)
         super.mouseUp(with: event)
+    }
+
+    private var leftMouseButtonIsPressed: Bool {
+        return NSEvent.pressedMouseButtons & 1 == 1
     }
 
 }
