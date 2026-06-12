@@ -58,7 +58,7 @@ when clarification or context is needed, and prefix agent replies with the agent
 name in brackets, for example `[codex]`. Once all currently actionable comments
 are resolved, at-mention Copilot on the PR to request a fresh review.
 
-Set a poller to check the PR for new unresolved comments after 8 minutes. If new
+Set a poller to check the PR for new unresolved comments after 6 minutes. If new
 comments are found, repeat the full comment-resolution loop: inspect, fix, test,
 commit, push, resolve, request another Copilot review, and start a new poller.
 If the poller finds no new comments, check again up to 3 total no-comment tries;
