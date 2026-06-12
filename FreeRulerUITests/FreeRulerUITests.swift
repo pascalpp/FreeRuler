@@ -365,11 +365,13 @@ final class FreeRulerUITests: XCTestCase {
     private func openRulerColorPanel() {
         openPreferences()
 
-        rulerColorWell.click()
-        if !colorPanel.waitForExistence(timeout: 1) {
-            rulerColorWell.click()
+        if colorPanel.exists {
+            colorPanel.click()
+            app.typeKey("w", modifierFlags: .command)
+            XCTAssertTrue(colorPanel.waitForNonExistence(timeout: 2))
         }
 
+        rulerColorWell.click()
         XCTAssertTrue(colorPanel.waitForExistence(timeout: 3))
     }
 
