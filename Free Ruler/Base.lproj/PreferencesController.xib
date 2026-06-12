@@ -128,7 +128,6 @@
                         <rect key="frame" x="234" y="291" width="66" height="28"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="60" id="G7i-q1-eDr"/>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="60" id="sHT-Qb-QbW"/>
                             <constraint firstAttribute="height" constant="24" id="sIs-pi-nKw"/>
                         </constraints>
                         <color key="color" name="systemYellowColor" catalog="System" colorSpace="catalog"/>
