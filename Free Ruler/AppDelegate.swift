@@ -106,6 +106,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Lifecycle
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
+        configureOpaqueColorPicking()
 
 #if DEBUG
         if let outputDirectory = appStoreScreenshotOutputDirectory() {
