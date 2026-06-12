@@ -10,19 +10,19 @@ struct RulerColors {
     }
 
     var numbers: NSColor {
-        return contrastingColor(mixedBy: 0.45)
+        return contrastingColor(mixedBy: 0.55)
     }
 
     var ticks: NSColor {
-        return contrastingColor(mixedBy: 0.4)
+        return contrastingColor(mixedBy: 0.5)
     }
 
     var mouseTick: NSColor {
-        return contrastingColor(mixedBy: 0.7).withAlphaComponent(0.75)
+        return contrastingColor(mixedBy: 0.8).withAlphaComponent(0.75)
     }
 
     var mouseNumber: NSColor {
-        return contrastingColor(mixedBy: 0.7)
+        return contrastingColor(mixedBy: 0.8)
     }
 
     var resizeHandleLight: NSColor {
@@ -37,7 +37,7 @@ struct RulerColors {
         return fill.mixed(
             with: fill.isLightColor ? .black : .white,
             fraction: fraction
-        )
+        ).withBoostedSaturation(multiplier: 3)
     }
 }
 
@@ -219,6 +219,23 @@ extension NSColor {
             green: (baseColor.greenComponent * baseFraction) + (mixColor.greenComponent * clampedFraction),
             blue: (baseColor.blueComponent * baseFraction) + (mixColor.blueComponent * clampedFraction),
             alpha: baseColor.alphaComponent
+        )
+    }
+
+    fileprivate func withBoostedSaturation(multiplier: CGFloat) -> NSColor {
+        let color = usingColorSpace(.deviceRGB) ?? self
+        var hue: CGFloat = 0
+        var saturation: CGFloat = 0
+        var brightness: CGFloat = 0
+        var alpha: CGFloat = 0
+
+        color.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
+
+        return NSColor(
+            calibratedHue: hue,
+            saturation: min(saturation * multiplier, 1),
+            brightness: brightness,
+            alpha: alpha
         )
     }
 }
