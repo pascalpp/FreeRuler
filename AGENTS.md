@@ -45,17 +45,38 @@ zips or other generated artifacts.
   AppKit patterns, explicit `NS*` types, and straightforward helpers rather than
   heavy abstraction.
 
+## PR Review Comment Resolution
+
+When asked to address PR review comments, inspect the pull request associated
+with the current branch and find any unresolved review comments or threads.
+Address actionable comments with code changes, keeping each change scoped to
+the feedback. After making fixes, run the relevant core/unit tests, commit the
+changes, and push them to the remote PR branch.
+
+After pushing fixes, resolve the addressed review comments. Leave replies only
+when clarification or context is needed, and prefix agent replies with the agent
+name in brackets, for example `[codex]`. Once all currently actionable comments
+are resolved, at-mention Copilot on the PR to request a fresh review.
+
+Set a poller to check the PR for new unresolved comments after 8 minutes. If new
+comments are found, repeat the full comment-resolution loop: inspect, fix, test,
+commit, push, resolve, request another Copilot review, and start a new poller.
+If the poller finds no new comments, check again up to 3 total no-comment tries;
+after the third no-comment poll, stop polling and consider the review-comment
+resolution process complete.
+
 ## Build And Test
 
 Use Xcode's command-line tools from the repository root:
 
 ```sh
 xcodebuild -project "Free Ruler.xcodeproj" -scheme "Free Ruler" build
-xcodebuild -project "Free Ruler.xcodeproj" -scheme "Free Ruler" test
+xcodebuild -project "Free Ruler.xcodeproj" -scheme "Free Ruler" test -only-testing:FreeRulerTests
 ```
 
 For focused test work, prefer the smallest relevant Xcode test invocation first,
-then run the full scheme if the change affects shared behavior.
+then run the core/unit tests if the change affects shared behavior. Do not run
+the UI tests unless the user explicitly asks for them.
 
 The `package.json` scripts are for versioning and release automation, not the
 normal test suite. `npm test` is intentionally not wired to the Xcode tests.
