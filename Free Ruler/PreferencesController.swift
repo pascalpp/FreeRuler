@@ -11,6 +11,7 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
     @IBOutlet weak var backgroundOpacityLabel: NSTextField!
 
     @IBOutlet weak var rulerColorWell: NSColorWell!
+    @IBOutlet weak var resetRulerColorButton: NSButton!
 
     @IBOutlet weak var floatRulersCheckbox: NSButton!
     @IBOutlet weak var groupRulersCheckbox: NSButton!
@@ -35,6 +36,8 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
         rulerColorWell.isContinuous = true
         rulerColorWell.identifier = NSUserInterfaceItemIdentifier("ruler-color-well")
         rulerColorWell.setAccessibilityIdentifier("ruler-color-well")
+        window?.initialFirstResponder = rulerColorWell
+        configureResetRulerColorButton()
 
         subscribeToPrefs()
         updateView()
@@ -46,6 +49,7 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
         post(.preferencesWindowOpened)
 
         window?.makeKeyAndOrderFront(sender)
+        window?.makeFirstResponder(rulerColorWell)
         window?.center()
     }
 
@@ -95,6 +99,9 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
     @IBAction func setRulerColor(_ sender: Any) {
         prefs.rulerColor = rulerColorWell.color
     }
+    @IBAction func resetRulerColor(_ sender: Any) {
+        prefs.rulerColor = Prefs.defaultRulerFillColor
+    }
 
     func updateView() {
         updateForegroundSlider()
@@ -117,6 +124,7 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
 
     func updateRulerColorWell() {
         rulerColorWell.color = prefs.rulerColor
+        resetRulerColorButton.isHidden = colorsMatch(prefs.rulerColor, Prefs.defaultRulerFillColor)
     }
 
     func updateFloatRulersCheckbox() {
@@ -129,6 +137,42 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
 
     func updateRulerShadowCheckbox() {
         rulerShadowCheckbox.state = prefs.rulerShadow ? .on : .off
+    }
+
+    private func configureResetRulerColorButton() {
+        let resetRulerColorLabel = NSLocalizedString(
+            "Reset ruler color",
+            comment: "Tooltip and accessibility label for the button that restores the default ruler color"
+        )
+        let symbol = NSImage(
+            systemSymbolName: "arrow.counterclockwise",
+            accessibilityDescription: resetRulerColorLabel
+        )?.withSymbolConfiguration(
+            NSImage.SymbolConfiguration(pointSize: 14, weight: .regular)
+        ) ?? NSImage()
+        symbol.isTemplate = true
+
+        resetRulerColorButton.image = symbol
+        resetRulerColorButton.isBordered = false
+        resetRulerColorButton.imagePosition = .imageOnly
+        resetRulerColorButton.imageScaling = .scaleProportionallyDown
+        resetRulerColorButton.contentTintColor = .secondaryLabelColor
+        resetRulerColorButton.toolTip = resetRulerColorLabel
+        resetRulerColorButton.identifier = NSUserInterfaceItemIdentifier("reset-ruler-color-button")
+        resetRulerColorButton.setAccessibilityIdentifier("reset-ruler-color-button")
+        resetRulerColorButton.setAccessibilityLabel(resetRulerColorLabel)
+    }
+
+    private func colorsMatch(_ firstColor: NSColor, _ secondColor: NSColor) -> Bool {
+        guard let first = firstColor.usingColorSpace(.deviceRGB),
+              let second = secondColor.usingColorSpace(.deviceRGB) else {
+            return firstColor == secondColor
+        }
+
+        return abs(first.redComponent - second.redComponent) < 0.0001
+            && abs(first.greenComponent - second.greenComponent) < 0.0001
+            && abs(first.blueComponent - second.blueComponent) < 0.0001
+            && abs(first.alphaComponent - second.alphaComponent) < 0.0001
     }
 
 }
