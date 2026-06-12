@@ -257,14 +257,15 @@ private enum AppStoreScreenshotLayout {
     static let screen2RulerVerticalSpacing: CGFloat = 350
     static let screen2RulerLength: CGFloat = 2200
 
-    static let screen3RulerScale: CGFloat = 5.35
-    static let screen3RulerOpacity: CGFloat = 0.94
+  static let screen3RulerScale: CGFloat = 10.28
+    static let screen3RulerOpacity: CGFloat = 1
     static let screen3RulerCount = 7
-    static let screen3RulerX: CGFloat = 360
-    static let screen3RulerY: CGFloat = 545
-    static let screen3RulerXOffset: CGFloat = 185
-    static let screen3RulerYOffset: CGFloat = 135
-    static let screen3RulerLength: CGFloat = 2180
+    static let screen3FirstRulerX: CGFloat = 0
+    static let screen3RulerGap: CGFloat = 0
+    static let screen3RulerArcTop: CGFloat = 450
+    static let screen3RulerArcBottom: CGFloat = 1000
+    static let screen3RulerCurvature: CGFloat = 1.5
+    static let screen3RulerOffscreenBottom: CGFloat = 2230
     static let screen3RulerBorderWidth: CGFloat = 2
     static let screen3RulerShadowBlur: CGFloat = 0
     static let screen3RulerShadowXOffset: CGFloat = 0
@@ -424,12 +425,22 @@ private enum AppStoreScreenshotLayout {
     }
 
     static func screen3RulerRect(index: Int) -> NSRect {
-        NSRect(
-            x: screen3RulerX + CGFloat(index) * screen3RulerXOffset,
-            y: screen3RulerY + CGFloat(index) * screen3RulerYOffset,
-            width: screen3RulerLength,
-            height: screen3ScaledRulerThickness
+        let top = screen3RulerTopY(index: index)
+        return NSRect(
+            x: screen3FirstRulerX + CGFloat(index) * (screen3ScaledRulerThickness + screen3RulerGap),
+            y: top,
+            width: screen3ScaledRulerThickness,
+            height: screen3RulerOffscreenBottom - top
         )
+    }
+
+    static func screen3RulerTopY(index: Int) -> CGFloat {
+        guard screen3RulerCount > 1 else { return screen3RulerArcTop }
+
+        let midpoint = CGFloat(screen3RulerCount - 1) / 2
+        let distanceFromCenter = abs(CGFloat(index) - midpoint) / midpoint
+        let curvedDistance = pow(distanceFromCenter, screen3RulerCurvature)
+        return screen3RulerArcTop + (screen3RulerArcBottom - screen3RulerArcTop) * curvedDistance
     }
 
     static var screen4ScaledRulerThickness: CGFloat {
@@ -745,14 +756,15 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
                 )
             }
         case .screen3:
-            let rulerBoundsSize = NSSize(
-                width: AppStoreScreenshotLayout.screen3RulerLength / AppStoreScreenshotLayout.screen3RulerScale,
-                height: Ruler.thickness
-            )
             return (0..<AppStoreScreenshotLayout.screen3RulerCount).map { index in
                 let fillColor = AppStoreScreenshotLayout.screen3RulerColors[
                     index % AppStoreScreenshotLayout.screen3RulerColors.count
                 ]
+                let frame = AppStoreScreenshotLayout.screen3RulerRect(index: index)
+                let rulerBoundsSize = NSSize(
+                    width: Ruler.thickness,
+                    height: frame.height / AppStoreScreenshotLayout.screen3RulerScale
+                )
                 let style = AppStoreRulerStyle(
                     fillColor: fillColor,
                     opacity: AppStoreScreenshotLayout.screen3RulerOpacity,
@@ -766,8 +778,8 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
                     shadowOpacity: AppStoreScreenshotLayout.screen3RulerShadowOpacity
                 )
                 return AppStoreRulerPlacement(
-                    view: AppStoreHorizontalRule(unit: .pixels, frame: NSRect(origin: .zero, size: rulerBoundsSize)),
-                    frame: AppStoreScreenshotLayout.screen3RulerRect(index: index),
+                    view: AppStoreVerticalRule(unit: .pixels, frame: NSRect(origin: .zero, size: rulerBoundsSize)),
+                    frame: frame,
                     boundsSize: rulerBoundsSize,
                     style: style
                 )
