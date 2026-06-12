@@ -360,6 +360,7 @@ final class RulerCoreTests: XCTestCase {
         )
 
         XCTAssertGreaterThan(mouseTickInsideResizeHandle, resizeHandleFrame.minX)
+        XCTAssertLessThan(labelRect.maxX, mouseTickInsideResizeHandle)
         XCTAssertEqual(
             labelRect.maxX,
             expectedMaxLabelRight,
