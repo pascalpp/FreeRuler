@@ -5,7 +5,7 @@ import SwiftUI
 private struct AppStoreScreenshotPalette {
     let screen1Background = #colorLiteral(red: 0.385, green: 0.49, blue: 0.7, alpha: 1)
     let screen2Background = #colorLiteral(red: 0.3084420562, green: 0.521068275, blue: 0.509829402, alpha: 1)
-    let screen3Background = #colorLiteral(red: 0.91, green: 0.92, blue: 0.94, alpha: 1)
+    let screen3Background = AppStoreScreenshotLayout.screen3BackgroundColor
     let screen4Background = #colorLiteral(red: 0.5181607008, green: 0.4312165375, blue: 0.6487324834, alpha: 1)
     let text = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
     let secondaryText = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0.78)
@@ -55,9 +55,9 @@ private enum AppStoreScreenshotScreen {
         case .screen2:
             return "Switch units instantly"
         case .screen3:
-            return "Choose your color"
+            return "Color your world"
         case .screen4:
-            return "Make it yours"
+            return "Pick your preferences"
         }
     }
 
@@ -68,9 +68,9 @@ private enum AppStoreScreenshotScreen {
         case .screen2:
             return "Use pixels, millimeters, or inches."
         case .screen3:
-            return "Match your workspace at a glance."
+            return "Follow your heart. Be hue you want to be."
         case .screen4:
-            return "Tune opacity, grouping, and shadows."
+            return "Change color, opacity, and more."
         }
     }
 
@@ -257,6 +257,7 @@ private enum AppStoreScreenshotLayout {
     static let screen2RulerVerticalSpacing: CGFloat = 350
     static let screen2RulerLength: CGFloat = 2200
 
+    static let screen3BackgroundColor = #colorLiteral(red: 0.875857736, green: 0.8972384907, blue: 0.94, alpha: 1)
   static let screen3RulerScale: CGFloat = 10.28
     static let screen3RulerOpacity: CGFloat = 1
     static let screen3RulerCount = 7
@@ -287,13 +288,13 @@ private enum AppStoreScreenshotLayout {
     static let screen4VerticalRulerY: CGFloat = 170
     static let screen4VerticalRulerLength: CGFloat = 2050
     static let screen4HorizontalRulerX: CGFloat = 50
-    static let screen4HorizontalRulerY: CGFloat = 1100
+    static let screen4HorizontalRulerY: CGFloat = 1180
     static let screen4HorizontalRulerLength: CGFloat = 3000
-    static let screen4PreferencesWindowX: CGFloat = 620
-    static let screen4PreferencesWindowY: CGFloat = 560
-    static let screen4PreferencesWindowScale: CGFloat = 4.5
-    static let screen4PreferencesContentWidth: CGFloat = 400
-    static let screen4PreferencesContentHeight: CGFloat = 295
+    static let screen4PreferencesWindowX: CGFloat = 680
+    static let screen4PreferencesWindowY: CGFloat = 540
+    static let screen4PreferencesWindowScale: CGFloat = 4
+    static let screen4PreferencesContentWidth: CGFloat = 350
+    static let screen4PreferencesContentHeight: CGFloat = 333
     static let screen4PreferencesWindowShadowOpacity: CGFloat = 0.28
     static let screen4PreferencesWindowShadowYOffset: CGFloat = -5
 
