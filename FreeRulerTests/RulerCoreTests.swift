@@ -55,6 +55,30 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertEqual(inches.tinyTicks, 1)
     }
 
+    func testRulerColorsDefaultToOriginalFillColor() {
+        let previousColor = prefs.rulerColor
+        defer { prefs.rulerColor = previousColor }
+
+        prefs.rulerColor = Prefs.defaultRulerFillColor
+
+        assertColor(RulerColors().fill, equals: Prefs.defaultRulerFillColor)
+    }
+
+    func testRulerColorsDeriveContrastingForegroundColors() {
+        let previousColor = prefs.rulerColor
+        defer { prefs.rulerColor = previousColor }
+
+        prefs.rulerColor = NSColor(calibratedWhite: 0.9, alpha: 1)
+        let colorsOnLightFill = RulerColors()
+        XCTAssertLessThan(relativeLuminance(colorsOnLightFill.ticks), relativeLuminance(colorsOnLightFill.fill))
+        XCTAssertLessThan(relativeLuminance(colorsOnLightFill.numbers), relativeLuminance(colorsOnLightFill.fill))
+
+        prefs.rulerColor = NSColor(calibratedWhite: 0.1, alpha: 1)
+        let colorsOnDarkFill = RulerColors()
+        XCTAssertGreaterThan(relativeLuminance(colorsOnDarkFill.ticks), relativeLuminance(colorsOnDarkFill.fill))
+        XCTAssertGreaterThan(relativeLuminance(colorsOnDarkFill.numbers), relativeLuminance(colorsOnDarkFill.fill))
+    }
+
     func testDefaultRulerRectsUseExpectedShapeAndOffsets() {
         let screen = NSScreen.main?.frame
         let screenWidth = screen?.width ?? 1000
@@ -642,4 +666,26 @@ private final class ChildAttachingRulerWindow: RulerWindow {
         super.makeKey()
         addChildWindow(childWindowToAttach, ordered: .below)
     }
+}
+
+private func assertColor(
+    _ actualColor: NSColor,
+    equals expectedColor: NSColor,
+    file: StaticString = #filePath,
+    line: UInt = #line
+) {
+    let actual = actualColor.usingColorSpace(.deviceRGB)!
+    let expected = expectedColor.usingColorSpace(.deviceRGB)!
+
+    XCTAssertEqual(actual.redComponent, expected.redComponent, accuracy: 0.0001, file: file, line: line)
+    XCTAssertEqual(actual.greenComponent, expected.greenComponent, accuracy: 0.0001, file: file, line: line)
+    XCTAssertEqual(actual.blueComponent, expected.blueComponent, accuracy: 0.0001, file: file, line: line)
+    XCTAssertEqual(actual.alphaComponent, expected.alphaComponent, accuracy: 0.0001, file: file, line: line)
+}
+
+private func relativeLuminance(_ color: NSColor) -> CGFloat {
+    let color = color.usingColorSpace(.deviceRGB)!
+    return (0.299 * color.redComponent)
+        + (0.587 * color.greenComponent)
+        + (0.114 * color.blueComponent)
 }

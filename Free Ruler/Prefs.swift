@@ -1,4 +1,4 @@
-import Foundation
+import Cocoa
 
 // Prefs
 // a KVO bridge for UserDefaults
@@ -30,6 +30,7 @@ class Prefs: NSObject {
     @objc dynamic var rulerShadow       : Bool
     @objc dynamic var foregroundOpacity : Int
     @objc dynamic var backgroundOpacity : Int
+    @objc dynamic var rulerColor        : NSColor
     @objc dynamic var unit              : Unit
 
     // MARK: - public save method
@@ -40,6 +41,7 @@ class Prefs: NSObject {
     // MARK: - private implementation
 
     private let defaults = UserDefaults.standard
+    private static let defaultRulerColor = #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1)
 
     private var defaultValues: [String: Any] = [
         "groupRulers":       true,
@@ -47,6 +49,7 @@ class Prefs: NSObject {
         "rulerShadow":       false,
         "foregroundOpacity": 90,
         "backgroundOpacity": 50,
+        "rulerColor":        Prefs.archivedColorData(defaultRulerColor),
         "unit":              Unit.pixels.rawValue
     ]
 
@@ -58,6 +61,7 @@ class Prefs: NSObject {
         rulerShadow       = defaults.bool(forKey: "rulerShadow")
         foregroundOpacity = defaults.integer(forKey: "foregroundOpacity")
         backgroundOpacity = defaults.integer(forKey: "backgroundOpacity")
+        rulerColor        = Prefs.unarchiveColor(defaults.data(forKey: "rulerColor")) ?? Prefs.defaultRulerColor
         unit              = Unit(rawValue: defaults.integer(forKey: "unit")) ?? .pixels
 
         super.init()
@@ -84,10 +88,36 @@ class Prefs: NSObject {
             observe(\Prefs.backgroundOpacity, options: .new) { prefs, changed in
                 self.defaults.set(changed.newValue, forKey: "backgroundOpacity")
             },
+            observe(\Prefs.rulerColor, options: .new) { prefs, changed in
+                guard let color = changed.newValue else { return }
+                self.defaults.set(Prefs.archivedColorData(color), forKey: "rulerColor")
+            },
             observe(\Prefs.unit, options: .new) { prefs, changed in
                 self.defaults.set(prefs.unit.rawValue, forKey: "unit")
             },
         ]
     }
 
+}
+
+extension Prefs {
+    static var defaultRulerFillColor: NSColor {
+        return defaultRulerColor
+    }
+
+    private static func archivedColorData(_ color: NSColor) -> Data? {
+        return try? NSKeyedArchiver.archivedData(
+            withRootObject: color,
+            requiringSecureCoding: true
+        )
+    }
+
+    private static func unarchiveColor(_ data: Data?) -> NSColor? {
+        guard let data = data else { return nil }
+
+        return try? NSKeyedUnarchiver.unarchivedObject(
+            ofClass: NSColor.self,
+            from: data
+        )
+    }
 }

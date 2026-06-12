@@ -5,13 +5,40 @@ import SwiftUI
 #endif
 
 struct RulerColors {
-    let fill = #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1)
-    let numbers = #colorLiteral(red: 0.6829560399, green: 0.4503545761, blue: 0.09706548601, alpha: 1)
-    let ticks = #colorLiteral(red: 0.7254902124, green: 0.4784313738, blue: 0.09803921729, alpha: 1)
-    let mouseTick = #colorLiteral(red: 0.3098039329, green: 0.2039215714, blue: 0.03921568766, alpha: 0.75)
-    let mouseNumber = #colorLiteral(red: 0.3098039329, green: 0.2039215714, blue: 0.03921568766, alpha: 1)
-    let resizeHandleLight = NSColor.white.withAlphaComponent(0.25)
-    let resizeHandleShadow = NSColor.black.withAlphaComponent(0.15)
+    var fill: NSColor {
+        return prefs.rulerColor
+    }
+
+    var numbers: NSColor {
+        return contrastingColor(mixedBy: 0.45)
+    }
+
+    var ticks: NSColor {
+        return contrastingColor(mixedBy: 0.4)
+    }
+
+    var mouseTick: NSColor {
+        return contrastingColor(mixedBy: 0.7).withAlphaComponent(0.75)
+    }
+
+    var mouseNumber: NSColor {
+        return contrastingColor(mixedBy: 0.7)
+    }
+
+    var resizeHandleLight: NSColor {
+        return fill.isLightColor ? NSColor.white.withAlphaComponent(0.25) : NSColor.white.withAlphaComponent(0.45)
+    }
+
+    var resizeHandleShadow: NSColor {
+        return fill.isLightColor ? NSColor.black.withAlphaComponent(0.15) : NSColor.black.withAlphaComponent(0.35)
+    }
+
+    private func contrastingColor(mixedBy fraction: CGFloat) -> NSColor {
+        return fill.mixed(
+            with: fill.isLightColor ? .black : .white,
+            fraction: fraction
+        )
+    }
 }
 
 class RuleView: NSView {
@@ -83,6 +110,11 @@ class RuleView: NSView {
         // TODO: is there a better way to do this, maybe via a protocol?
         // AppDelegate needs to be able to infer that any RulerView has this method
         fatalError("RuleView subclass must override drawMouseTick method.")
+    }
+
+    func redrawForPreferenceChange() {
+        needsDisplay = true
+        resizeHandleView?.needsDisplay = true
     }
 
     var windowWidth: CGFloat {
@@ -163,6 +195,32 @@ class RuleView: NSView {
         resizeHandleView.frame = resizeHandleView.frame(in: bounds)
     }
 
+}
+
+extension NSColor {
+    fileprivate var isLightColor: Bool {
+        let color = usingColorSpace(.deviceRGB) ?? self
+        return (0.299 * color.redComponent)
+            + (0.587 * color.greenComponent)
+            + (0.114 * color.blueComponent) > 0.5
+    }
+
+    fileprivate func mixed(with color: NSColor, fraction: CGFloat) -> NSColor {
+        guard let baseColor = usingColorSpace(.deviceRGB),
+              let mixColor = color.usingColorSpace(.deviceRGB) else {
+            return self
+        }
+
+        let clampedFraction = min(max(fraction, 0), 1)
+        let baseFraction = 1 - clampedFraction
+
+        return NSColor(
+            calibratedRed: (baseColor.redComponent * baseFraction) + (mixColor.redComponent * clampedFraction),
+            green: (baseColor.greenComponent * baseFraction) + (mixColor.greenComponent * clampedFraction),
+            blue: (baseColor.blueComponent * baseFraction) + (mixColor.blueComponent * clampedFraction),
+            alpha: baseColor.alphaComponent
+        )
+    }
 }
 
 #if DEBUG

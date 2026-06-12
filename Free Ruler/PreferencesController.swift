@@ -10,6 +10,8 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
     @IBOutlet weak var foregroundOpacityLabel: NSTextField!
     @IBOutlet weak var backgroundOpacityLabel: NSTextField!
 
+    @IBOutlet weak var rulerColorWell: NSColorWell!
+
     @IBOutlet weak var floatRulersCheckbox: NSButton!
     @IBOutlet weak var groupRulersCheckbox: NSButton!
     @IBOutlet weak var rulerShadowCheckbox: NSButton!
@@ -30,6 +32,9 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
         groupRulersCheckbox.setAccessibilityIdentifier("group-rulers-checkbox")
         rulerShadowCheckbox.identifier = NSUserInterfaceItemIdentifier("ruler-shadow-checkbox")
         rulerShadowCheckbox.setAccessibilityIdentifier("ruler-shadow-checkbox")
+        rulerColorWell.isContinuous = true
+        rulerColorWell.identifier = NSUserInterfaceItemIdentifier("ruler-color-well")
+        rulerColorWell.setAccessibilityIdentifier("ruler-color-well")
 
         subscribeToPrefs()
         updateView()
@@ -66,6 +71,9 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
             prefs.observe(\Prefs.rulerShadow, options: .new) { prefs, changed in
                 self.updateRulerShadowCheckbox()
             },
+            prefs.observe(\Prefs.rulerColor, options: .new) { prefs, changed in
+                self.updateRulerColorWell()
+            },
         ]
     }
 
@@ -84,10 +92,14 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
     @IBAction func setRulerShadow(_ sender: Any) {
         prefs.rulerShadow = rulerShadowCheckbox.state == .on
     }
+    @IBAction func setRulerColor(_ sender: Any) {
+        prefs.rulerColor = rulerColorWell.color
+    }
 
     func updateView() {
         updateForegroundSlider()
         updateBackgroundSlider()
+        updateRulerColorWell()
         updateFloatRulersCheckbox()
         updateGroupRulersCheckbox()
         updateRulerShadowCheckbox()
@@ -101,6 +113,10 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
     func updateBackgroundSlider() {
         backgroundOpacitySlider.integerValue = prefs.backgroundOpacity
         backgroundOpacityLabel.stringValue = "\(prefs.backgroundOpacity)%"
+    }
+
+    func updateRulerColorWell() {
+        rulerColorWell.color = prefs.rulerColor
     }
 
     func updateFloatRulersCheckbox() {
