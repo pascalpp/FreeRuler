@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24506" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24506"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -13,30 +14,32 @@
                 <outlet property="foregroundOpacityLabel" destination="Fs7-sZ-5IE" id="qfm-M7-boB"/>
                 <outlet property="foregroundOpacitySlider" destination="ZzT-WS-Ex9" id="rug-vL-keS"/>
                 <outlet property="groupRulersCheckbox" destination="GrR-RZ-ofD" id="2Nc-Pt-4iJ"/>
+                <outlet property="resetRulerColorButton" destination="rXy-v5-rst" id="trd-Fi-zY2"/>
+                <outlet property="rulerColorWell" destination="3cj-Zq-t2I" id="HZA-4N-mAw"/>
                 <outlet property="rulerShadowCheckbox" destination="wce-fE-92o" id="Nm0-Wx-NCz"/>
                 <outlet property="window" destination="F0z-JX-Cv5" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window title="Free Ruler Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" frameAutosaveName="preferencesWindow" animationBehavior="default" id="F0z-JX-Cv5">
+        <window title="Free Ruler Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" frameAutosaveName="preferencesWindow" animationBehavior="default" id="F0z-JX-Cv5">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
-            <rect key="contentRect" x="602" y="400" width="350" height="336"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <rect key="contentRect" x="602" y="400" width="315" height="332"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1512" height="944"/>
             <view key="contentView" id="se5-gp-TjO">
-                <rect key="frame" x="0.0" y="0.0" width="350" height="295"/>
+                <rect key="frame" x="0.0" y="0.0" width="315" height="332"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fKJ-pW-Idj">
-                        <rect key="frame" x="18" y="253" width="125" height="17"/>
+                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fKJ-pW-Idj">
+                        <rect key="frame" x="18" y="255" width="125" height="16"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="Foreground Opacity" id="BgV-9N-IVn">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Fs7-sZ-5IE">
-                        <rect key="frame" x="295" y="253" width="37" height="17"/>
+                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Fs7-sZ-5IE">
+                        <rect key="frame" x="260" y="255" width="37" height="16"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Label" id="Vqd-CI-vmd">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -44,22 +47,22 @@
                         </textFieldCell>
                     </textField>
                     <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZzT-WS-Ex9">
-                        <rect key="frame" x="18" y="223" width="314" height="24"/>
+                        <rect key="frame" x="18" y="221" width="279" height="28"/>
                         <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="5" maxValue="100" doubleValue="50" tickMarkPosition="below" numberOfTickMarks="20" allowsTickMarkValuesOnly="YES" sliderType="linear" id="cBe-kv-k4O"/>
                         <connections>
                             <action selector="setForegroundOpacity:" target="-2" id="1eU-1v-QVs"/>
                         </connections>
                     </slider>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8tT-pC-4Sb">
-                        <rect key="frame" x="18" y="187" width="127" height="17"/>
+                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8tT-pC-4Sb">
+                        <rect key="frame" x="18" y="191" width="127" height="16"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="Background Opacity" id="cRb-8z-VZj">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="L9c-EP-R2u">
-                        <rect key="frame" x="295" y="187" width="37" height="17"/>
+                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="L9c-EP-R2u">
+                        <rect key="frame" x="260" y="191" width="37" height="16"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Label" id="VXi-Ch-Jf5">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -67,14 +70,14 @@
                         </textFieldCell>
                     </textField>
                     <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vDG-0i-7UH">
-                        <rect key="frame" x="18" y="157" width="314" height="24"/>
+                        <rect key="frame" x="18" y="157" width="279" height="28"/>
                         <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="5" maxValue="100" doubleValue="50" tickMarkPosition="below" numberOfTickMarks="20" allowsTickMarkValuesOnly="YES" sliderType="linear" id="isR-aS-fmz"/>
                         <connections>
                             <action selector="setBackgroundOpacity:" target="-2" id="KAY-mT-HC0"/>
                         </connections>
                     </slider>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MHD-HA-XYA">
-                        <rect key="frame" x="18" y="122" width="243" height="18"/>
+                        <rect key="frame" x="18" y="126" width="247" height="18"/>
                         <buttonCell key="cell" type="check" title="Float rulers above other applications" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="yPM-Cw-Qsi">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
@@ -84,7 +87,7 @@
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GrR-RZ-ofD">
-                        <rect key="frame" x="18" y="93" width="98" height="18"/>
+                        <rect key="frame" x="18" y="95" width="102" height="18"/>
                         <buttonCell key="cell" type="check" title="Group rulers" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="N2Y-8B-L9c">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
@@ -94,7 +97,7 @@
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Dlw-cH-IYI">
-                        <rect key="frame" x="14" y="18" width="168" height="32"/>
+                        <rect key="frame" x="13" y="18" width="162" height="32"/>
                         <buttonCell key="cell" type="push" title="Reset Ruler Positions" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="10f-9L-qca">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -104,7 +107,7 @@
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wce-fE-92o">
-                        <rect key="frame" x="18" y="64" width="137" height="18"/>
+                        <rect key="frame" x="18" y="64" width="141" height="18"/>
                         <buttonCell key="cell" type="check" title="Show ruler shadow" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="l53-85-hoA">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
@@ -113,16 +116,50 @@
                             <action selector="setRulerShadow:" target="-2" id="Tbm-gn-rr5"/>
                         </connections>
                     </button>
+                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eOK-GV-sMs">
+                        <rect key="frame" x="18" y="297" width="72" height="16"/>
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="Ruler Color" id="ydA-TR-Gwu">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <colorWell translatesAutoresizingMaskIntoConstraints="NO" id="3cj-Zq-t2I" customClass="RulerColorWell" customModule="Free_Ruler" customModuleProvider="target">
+                        <rect key="frame" x="234" y="291" width="66" height="28"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="60" id="G7i-q1-eDr"/>
+                            <constraint firstAttribute="height" constant="24" id="sIs-pi-nKw"/>
+                        </constraints>
+                        <color key="color" name="systemYellowColor" catalog="System" colorSpace="catalog"/>
+                        <connections>
+                            <action selector="setRulerColor:" target="-2" id="WXz-pT-Afi"/>
+                        </connections>
+                    </colorWell>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="rXy-v5-rst">
+                        <rect key="frame" x="196" y="291" width="28" height="28"/>
+                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" id="PRt-eJ-rst">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <color key="bezelColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <connections>
+                            <action selector="resetRulerColor:" target="-2" id="y6f-Cj-rst"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <constraints>
                     <constraint firstItem="fKJ-pW-Idj" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="1Kz-4t-Izh"/>
-                    <constraint firstItem="fKJ-pW-Idj" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" constant="25" id="6j2-A9-RfT"/>
                     <constraint firstItem="MHD-HA-XYA" firstAttribute="top" secondItem="vDG-0i-7UH" secondAttribute="bottom" constant="20" id="8aK-CY-f0B"/>
+                    <constraint firstItem="eOK-GV-sMs" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="8qL-pA-2PX"/>
                     <constraint firstItem="ZzT-WS-Ex9" firstAttribute="top" secondItem="fKJ-pW-Idj" secondAttribute="bottom" constant="8" id="95Z-Nm-R3G"/>
+                    <constraint firstItem="rXy-v5-rst" firstAttribute="width" constant="28" id="9av-oy-rst"/>
                     <constraint firstAttribute="bottom" secondItem="Dlw-cH-IYI" secondAttribute="bottom" constant="25" id="Amf-On-TbF"/>
                     <constraint firstItem="wce-fE-92o" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="BmS-kj-FR4"/>
+                    <constraint firstItem="3cj-Zq-t2I" firstAttribute="centerY" secondItem="eOK-GV-sMs" secondAttribute="centerY" id="BpZ-SU-tsT"/>
+                    <constraint firstItem="rXy-v5-rst" firstAttribute="centerY" secondItem="3cj-Zq-t2I" secondAttribute="centerY" id="D6T-VN-qcA"/>
                     <constraint firstItem="GrR-RZ-ofD" firstAttribute="top" secondItem="MHD-HA-XYA" secondAttribute="bottom" constant="15" id="DMF-Jv-qNT"/>
                     <constraint firstItem="GrR-RZ-ofD" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="HOJ-20-15i"/>
+                    <constraint firstItem="rXy-v5-rst" firstAttribute="height" constant="28" id="JQs-fw-rst"/>
                     <constraint firstItem="vDG-0i-7UH" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="JiU-zb-OYE"/>
                     <constraint firstItem="8tT-pC-4Sb" firstAttribute="top" secondItem="ZzT-WS-Ex9" secondAttribute="bottom" constant="20" id="Os8-lr-m1I"/>
                     <constraint firstItem="vDG-0i-7UH" firstAttribute="top" secondItem="8tT-pC-4Sb" secondAttribute="bottom" constant="8" id="QpH-M6-Hbl"/>
@@ -132,18 +169,21 @@
                     <constraint firstItem="ZzT-WS-Ex9" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="cS0-cB-7df"/>
                     <constraint firstItem="L9c-EP-R2u" firstAttribute="firstBaseline" secondItem="8tT-pC-4Sb" secondAttribute="firstBaseline" id="drC-8c-dJ8"/>
                     <constraint firstItem="Dlw-cH-IYI" firstAttribute="top" secondItem="wce-fE-92o" secondAttribute="bottom" constant="20" id="ecF-6L-G7y"/>
+                    <constraint firstItem="fKJ-pW-Idj" firstAttribute="top" secondItem="3cj-Zq-t2I" secondAttribute="bottom" constant="22" id="h19-vU-dTi"/>
                     <constraint firstItem="Fs7-sZ-5IE" firstAttribute="firstBaseline" secondItem="fKJ-pW-Idj" secondAttribute="firstBaseline" id="iVj-L9-5lc"/>
+                    <constraint firstItem="3cj-Zq-t2I" firstAttribute="leading" secondItem="rXy-v5-rst" secondAttribute="trailing" constant="10" id="lWe-Eq-diC"/>
                     <constraint firstAttribute="trailing" secondItem="L9c-EP-R2u" secondAttribute="trailing" constant="20" id="myW-gj-dmX"/>
                     <constraint firstItem="MHD-HA-XYA" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="nEe-NO-kRx"/>
                     <constraint firstAttribute="trailing" secondItem="Fs7-sZ-5IE" secondAttribute="trailing" constant="20" id="o3I-uM-LMk"/>
                     <constraint firstItem="wce-fE-92o" firstAttribute="top" secondItem="GrR-RZ-ofD" secondAttribute="bottom" constant="15" id="p8g-qX-OTd"/>
                     <constraint firstItem="8tT-pC-4Sb" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="vFk-iR-SJY"/>
+                    <constraint firstAttribute="trailing" secondItem="3cj-Zq-t2I" secondAttribute="trailing" constant="18" id="wdI-wU-qYh"/>
                 </constraints>
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
             </connections>
-            <point key="canvasLocation" x="139" y="213"/>
+            <point key="canvasLocation" x="121.5" y="231"/>
         </window>
     </objects>
 </document>

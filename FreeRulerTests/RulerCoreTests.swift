@@ -55,6 +55,56 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertEqual(inches.tinyTicks, 1)
     }
 
+    func testRulerColorsDefaultToOriginalFillColor() {
+        withRestoredRulerColorPreference {
+            prefs.rulerColor = Prefs.defaultRulerFillColor
+
+            assertColor(RulerColors().fill, equals: Prefs.defaultRulerFillColor)
+        }
+    }
+
+    func testRulerColorsDeriveContrastingForegroundColors() {
+        withRestoredRulerColorPreference {
+            prefs.rulerColor = NSColor(calibratedWhite: 0.9, alpha: 1)
+            let colorsOnLightFill = RulerColors()
+            XCTAssertLessThan(relativeLuminance(colorsOnLightFill.ticks), relativeLuminance(colorsOnLightFill.fill))
+            XCTAssertLessThan(relativeLuminance(colorsOnLightFill.numbers), relativeLuminance(colorsOnLightFill.fill))
+
+            prefs.rulerColor = NSColor(calibratedWhite: 0.1, alpha: 1)
+            let colorsOnDarkFill = RulerColors()
+            XCTAssertGreaterThan(relativeLuminance(colorsOnDarkFill.ticks), relativeLuminance(colorsOnDarkFill.fill))
+            XCTAssertGreaterThan(relativeLuminance(colorsOnDarkFill.numbers), relativeLuminance(colorsOnDarkFill.fill))
+        }
+    }
+
+    func testRulerColorNormalizesUnconvertibleColorsInMemory() {
+        withRestoredRulerColorPreference {
+            prefs.rulerColor = NSColor(patternImage: NSImage(size: NSSize(width: 1, height: 1)))
+
+            assertColor(prefs.rulerColor, equals: Prefs.defaultRulerFillColor)
+        }
+    }
+
+    func testRulerColorNormalizesAlphaInMemory() {
+        withRestoredRulerColorPreference {
+            prefs.rulerColor = NSColor(deviceRed: 0.2, green: 0.4, blue: 0.6, alpha: 0.35)
+
+            assertColor(prefs.rulerColor, equals: NSColor(deviceRed: 0.2, green: 0.4, blue: 0.6, alpha: 1))
+        }
+    }
+
+    func testArchivedRulerColorNormalizesAlphaOnLoad() throws {
+        let archivedColor = NSColor(deviceRed: 0.2, green: 0.4, blue: 0.6, alpha: 0.35)
+        let data = try NSKeyedArchiver.archivedData(
+            withRootObject: archivedColor,
+            requiringSecureCoding: true
+        )
+
+        let loadedColor = Prefs.rulerFillColor(fromArchivedData: data)
+
+        assertColor(loadedColor, equals: NSColor(deviceRed: 0.2, green: 0.4, blue: 0.6, alpha: 1))
+    }
+
     func testDefaultRulerRectsUseExpectedShapeAndOffsets() {
         let screen = NSScreen.main?.frame
         let screenWidth = screen?.width ?? 1000
@@ -628,6 +678,34 @@ final class RulerCoreTests: XCTestCase {
             pressure: type == .leftMouseUp ? 0 : 1
         )!
     }
+
+    private func withRestoredRulerColorPreference(_ test: () throws -> Void) rethrows {
+        let defaults = UserDefaults.standard
+        let previousColor = prefs.rulerColor
+        let domainName = Bundle.main.bundleIdentifier
+        let previousDomainValue = domainName
+            .flatMap { defaults.persistentDomain(forName: $0)?["rulerColor"] }
+
+        defer {
+            prefs.rulerColor = previousColor
+
+            if let domainName = domainName {
+                var domain = defaults.persistentDomain(forName: domainName) ?? [:]
+                if let previousDomainValue = previousDomainValue {
+                    domain["rulerColor"] = previousDomainValue
+                } else {
+                    domain.removeValue(forKey: "rulerColor")
+                }
+                defaults.setPersistentDomain(domain, forName: domainName)
+            } else {
+                if previousDomainValue == nil {
+                    defaults.removeObject(forKey: "rulerColor")
+                }
+            }
+        }
+
+        try test()
+    }
 }
 
 private final class ChildAttachingRulerWindow: RulerWindow {
@@ -642,4 +720,41 @@ private final class ChildAttachingRulerWindow: RulerWindow {
         super.makeKey()
         addChildWindow(childWindowToAttach, ordered: .below)
     }
+}
+
+private func assertColor(
+    _ actualColor: NSColor,
+    equals expectedColor: NSColor,
+    file: StaticString = #filePath,
+    line: UInt = #line
+) {
+    guard let actual = actualColor.usingColorSpace(.deviceRGB) else {
+        XCTFail("Could not convert actual color to device RGB", file: file, line: line)
+        return
+    }
+
+    guard let expected = expectedColor.usingColorSpace(.deviceRGB) else {
+        XCTFail("Could not convert expected color to device RGB", file: file, line: line)
+        return
+    }
+
+    XCTAssertEqual(actual.redComponent, expected.redComponent, accuracy: 0.0001, file: file, line: line)
+    XCTAssertEqual(actual.greenComponent, expected.greenComponent, accuracy: 0.0001, file: file, line: line)
+    XCTAssertEqual(actual.blueComponent, expected.blueComponent, accuracy: 0.0001, file: file, line: line)
+    XCTAssertEqual(actual.alphaComponent, expected.alphaComponent, accuracy: 0.0001, file: file, line: line)
+}
+
+private func relativeLuminance(
+    _ color: NSColor,
+    file: StaticString = #filePath,
+    line: UInt = #line
+) -> CGFloat {
+    guard let color = color.usingColorSpace(.deviceRGB) else {
+        XCTFail("Could not convert color to device RGB", file: file, line: line)
+        return .nan
+    }
+
+    return (0.299 * color.redComponent)
+        + (0.587 * color.greenComponent)
+        + (0.114 * color.blueComponent)
 }

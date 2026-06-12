@@ -106,6 +106,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Lifecycle
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
+        configureOpaqueColorPicking()
 
 #if DEBUG
         if let outputDirectory = appStoreScreenshotOutputDirectory() {
@@ -214,6 +215,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             prefs.observe(\Prefs.rulerShadow, options: .new) { prefs, changed in
                 self.updateRulerShadowMenuItem()
             },
+            prefs.observe(\Prefs.rulerColor, options: .new) { prefs, changed in
+                self.redrawRulers()
+            },
         ]
     }
 
@@ -232,7 +236,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func redrawRulers() {
         for ruler in rulers {
-            ruler.rulerWindow.rule.setNeedsDisplay(ruler.rulerWindow.rule.visibleRect)
+            ruler.rulerWindow.rule.redrawForPreferenceChange()
         }
     }
 
@@ -256,6 +260,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             "rulerShadow",
             "foregroundOpacity",
             "backgroundOpacity",
+            "rulerColor",
             "unit",
             "NSWindow Frame horizontal-ruler",
             "NSWindow Frame vertical-ruler",
@@ -267,6 +272,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         prefs.rulerShadow = false
         prefs.foregroundOpacity = 90
         prefs.backgroundOpacity = 50
+        prefs.rulerColor = Prefs.defaultRulerFillColor
         prefs.unit = .pixels
     }
 

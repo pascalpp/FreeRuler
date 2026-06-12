@@ -20,6 +20,9 @@
 /* Class = "NSTextFieldCell"; title = "Background Opacity"; ObjectID = "cRb-8z-VZj"; */
 "cRb-8z-VZj.title" = "Peittävyys taustalla";
 
+/* Class = "NSTextFieldCell"; title = "Ruler Color"; ObjectID = "ydA-TR-Gwu"; */
+"ydA-TR-Gwu.title" = "Viivaimen väri";
+
 /* Class = "NSButtonCell"; title = "Show ruler shadow"; ObjectID = "l53-85-hoA"; */
 "l53-85-hoA.title" = "Näytä viivainten varjot";
 

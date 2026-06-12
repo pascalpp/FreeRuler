@@ -20,6 +20,9 @@
 /* Class = "NSTextFieldCell"; title = "Background Opacity"; ObjectID = "cRb-8z-VZj"; */
 "cRb-8z-VZj.title" = "背景の不透明度";
 
+/* Class = "NSTextFieldCell"; title = "Ruler Color"; ObjectID = "ydA-TR-Gwu"; */
+"ydA-TR-Gwu.title" = "定規の色";
+
 /* Class = "NSButtonCell"; title = "Show ruler shadow"; ObjectID = "l53-85-hoA"; */
 "l53-85-hoA.title" = "定規の影を表示";
 

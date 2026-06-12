@@ -5,9 +5,12 @@ import SwiftUI
 private struct AppStoreScreenshotPalette {
     let screen1Background = #colorLiteral(red: 0.385, green: 0.49, blue: 0.7, alpha: 1)
     let screen2Background = #colorLiteral(red: 0.3084420562, green: 0.521068275, blue: 0.509829402, alpha: 1)
-    let screen3Background = #colorLiteral(red: 0.5181607008, green: 0.4312165375, blue: 0.6487324834, alpha: 1)
+    let screen3Background = AppStoreScreenshotLayout.screen3BackgroundColor
+    let screen4Background = #colorLiteral(red: 0.5181607008, green: 0.4312165375, blue: 0.6487324834, alpha: 1)
     let text = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
     let secondaryText = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0.78)
+    let darkText = #colorLiteral(red: 0.13, green: 0.14, blue: 0.17, alpha: 1)
+    let darkSecondaryText = #colorLiteral(red: 0.13, green: 0.14, blue: 0.17, alpha: 0.68)
 
     let sampleWindowFill = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
     let sampleWindowBorder = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.35)
@@ -30,6 +33,7 @@ private enum AppStoreScreenshotScreen {
     case screen1
     case screen2
     case screen3
+    case screen4
 
     func background(in palette: AppStoreScreenshotPalette) -> NSColor {
         switch self {
@@ -39,6 +43,8 @@ private enum AppStoreScreenshotScreen {
             return palette.screen2Background
         case .screen3:
             return palette.screen3Background
+        case .screen4:
+            return palette.screen4Background
         }
     }
 
@@ -49,7 +55,9 @@ private enum AppStoreScreenshotScreen {
         case .screen2:
             return "Switch units instantly"
         case .screen3:
-            return "Make it yours"
+            return "Color your world"
+        case .screen4:
+            return "Pick your preferences"
         }
     }
 
@@ -60,7 +68,9 @@ private enum AppStoreScreenshotScreen {
         case .screen2:
             return "Use pixels, millimeters, or inches."
         case .screen3:
-            return "Tune opacity, grouping, and shadows."
+            return "Follow your heart. Be hue you want to be."
+        case .screen4:
+            return "Change color, opacity, and more."
         }
     }
 
@@ -71,7 +81,9 @@ private enum AppStoreScreenshotScreen {
         case .screen2:
             return "Screen 2 - Units"
         case .screen3:
-            return "Screen 3 - Preferences"
+            return "Screen 3 - Colors"
+        case .screen4:
+            return "Screen 4 - Preferences"
         }
     }
 
@@ -80,9 +92,29 @@ private enum AppStoreScreenshotScreen {
         case .screen1:
             return "01-measure-anything.png"
         case .screen2:
-            return "02-switch-units.png"
+            return "03-switch-units.png"
         case .screen3:
-            return "03-customize-rulers.png"
+            return "02-custom-colors.png"
+        case .screen4:
+            return "04-customize-rulers.png"
+        }
+    }
+
+    func headlineColor(in palette: AppStoreScreenshotPalette) -> NSColor {
+        switch self {
+        case .screen3:
+            return palette.darkText
+        case .screen1, .screen2, .screen4:
+            return palette.text
+        }
+    }
+
+    func descriptionColor(in palette: AppStoreScreenshotPalette) -> NSColor {
+        switch self {
+        case .screen3:
+            return palette.darkSecondaryText
+        case .screen1, .screen2, .screen4:
+            return palette.secondaryText
         }
     }
 }
@@ -104,8 +136,9 @@ enum AppStoreScreenshotRenderer {
 
     private static let screens: [AppStoreScreenshotScreen] = [
         .screen1,
-        .screen2,
         .screen3,
+        .screen2,
+        .screen4,
     ]
 
     private static func render(screen: AppStoreScreenshotScreen) throws -> NSImage {
@@ -224,30 +257,55 @@ private enum AppStoreScreenshotLayout {
     static let screen2RulerVerticalSpacing: CGFloat = 350
     static let screen2RulerLength: CGFloat = 2200
 
-    static let screen3RulerScale: CGFloat = 6
-    static let screen3RulerOpacity: CGFloat = 0.75
-    static let screen3VerticalRulerX: CGFloat = 250
-    static let screen3VerticalRulerY: CGFloat = 170
-    static let screen3VerticalRulerLength: CGFloat = 2050
-    static let screen3HorizontalRulerX: CGFloat = 50
-    static let screen3HorizontalRulerY: CGFloat = 1100
-    static let screen3HorizontalRulerLength: CGFloat = 3000
-    static let screen3PreferencesWindowX: CGFloat = 620
-    static let screen3PreferencesWindowY: CGFloat = 560
-    static let screen3PreferencesWindowScale: CGFloat = 4.5
-    static let screen3PreferencesContentWidth: CGFloat = 400
-    static let screen3PreferencesContentHeight: CGFloat = 295
-    static let screen3PreferencesWindowShadowOpacity: CGFloat = 0.28
-    static let screen3PreferencesWindowShadowYOffset: CGFloat = -5
+    static let screen3BackgroundColor = #colorLiteral(red: 0.875857736, green: 0.8972384907, blue: 0.94, alpha: 1)
+    static let screen3RulerScale: CGFloat = 10.28
+    static let screen3RulerOpacity: CGFloat = 1
+    static let screen3RulerCount = 7
+    static let screen3FirstRulerX: CGFloat = 0
+    static let screen3RulerGap: CGFloat = 0
+    static let screen3RulerArcTop: CGFloat = 450
+    static let screen3RulerArcBottom: CGFloat = 1000
+    static let screen3RulerCurvature: CGFloat = 1.5
+    static let screen3RulerOffscreenBottom: CGFloat = 2230
+    static let screen3RulerBorderWidth: CGFloat = 2
+    static let screen3RulerShadowBlur: CGFloat = 0
+    static let screen3RulerShadowXOffset: CGFloat = 0
+    static let screen3RulerShadowYOffset: CGFloat = 0
+    static let screen3RulerShadowOpacity: CGFloat = 0
+    static let screen3RulerColors = [
+        #colorLiteral(red: 0.961, green: 0.294, blue: 0.333, alpha: 1),
+        #colorLiteral(red: 0.984, green: 0.545, blue: 0.224, alpha: 1),
+        #colorLiteral(red: 0.957, green: 0.796, blue: 0.247, alpha: 1),
+        #colorLiteral(red: 0.322, green: 0.686, blue: 0.416, alpha: 1),
+        #colorLiteral(red: 0.227, green: 0.62, blue: 0.804, alpha: 1),
+        #colorLiteral(red: 0.357, green: 0.408, blue: 0.827, alpha: 1),
+        #colorLiteral(red: 0.667, green: 0.404, blue: 0.753, alpha: 1),
+    ]
 
-    static var screen3ForegroundOpacityPercent: Int {
-        Int((screen3RulerOpacity * 100).rounded())
+    static let screen4RulerScale: CGFloat = 6
+    static let screen4RulerOpacity: CGFloat = 0.75
+    static let screen4VerticalRulerX: CGFloat = 250
+    static let screen4VerticalRulerY: CGFloat = 170
+    static let screen4VerticalRulerLength: CGFloat = 2050
+    static let screen4HorizontalRulerX: CGFloat = 50
+    static let screen4HorizontalRulerY: CGFloat = 1180
+    static let screen4HorizontalRulerLength: CGFloat = 3000
+    static let screen4PreferencesWindowX: CGFloat = 680
+    static let screen4PreferencesWindowY: CGFloat = 540
+    static let screen4PreferencesWindowScale: CGFloat = 4
+    static let screen4PreferencesContentWidth: CGFloat = 350
+    static let screen4PreferencesContentHeight: CGFloat = 333
+    static let screen4PreferencesWindowShadowOpacity: CGFloat = 0.28
+    static let screen4PreferencesWindowShadowYOffset: CGFloat = -5
+
+    static var screen4ForegroundOpacityPercent: Int {
+        Int((screen4RulerOpacity * 100).rounded())
     }
 
-    static let screen3BackgroundOpacityPercent = 50
-    static let screen3FloatRulers = true
-    static let screen3GroupRulers = true
-    static let screen3RulerShadow = false
+    static let screen4BackgroundOpacityPercent = 50
+    static let screen4FloatRulers = true
+    static let screen4GroupRulers = true
+    static let screen4RulerShadow = false
 
     static var canvasSize: NSSize {
         NSSize(width: canvasWidth, height: canvasHeight)
@@ -367,43 +425,66 @@ private enum AppStoreScreenshotLayout {
         Ruler.thickness * screen3RulerScale
     }
 
-    static var screen3VerticalRulerRect: NSRect {
-        NSRect(
-            x: screen3VerticalRulerX,
-            y: screen3VerticalRulerY,
+    static func screen3RulerRect(index: Int) -> NSRect {
+        let top = screen3RulerTopY(index: index)
+        return NSRect(
+            x: screen3FirstRulerX + CGFloat(index) * (screen3ScaledRulerThickness + screen3RulerGap),
+            y: top,
             width: screen3ScaledRulerThickness,
-            height: screen3VerticalRulerLength
+            height: screen3RulerOffscreenBottom - top
         )
     }
 
-    static var screen3HorizontalRulerRect: NSRect {
+    static func screen3RulerTopY(index: Int) -> CGFloat {
+        guard screen3RulerCount > 1 else { return screen3RulerArcTop }
+
+        let midpoint = CGFloat(screen3RulerCount - 1) / 2
+        let distanceFromCenter = abs(CGFloat(index) - midpoint) / midpoint
+        let curvedDistance = pow(distanceFromCenter, screen3RulerCurvature)
+        return screen3RulerArcTop + (screen3RulerArcBottom - screen3RulerArcTop) * curvedDistance
+    }
+
+    static var screen4ScaledRulerThickness: CGFloat {
+        Ruler.thickness * screen4RulerScale
+    }
+
+    static var screen4VerticalRulerRect: NSRect {
         NSRect(
-            x: screen3HorizontalRulerX,
-            y: screen3HorizontalRulerY,
-            width: screen3HorizontalRulerLength,
-            height: screen3ScaledRulerThickness
+            x: screen4VerticalRulerX,
+            y: screen4VerticalRulerY,
+            width: screen4ScaledRulerThickness,
+            height: screen4VerticalRulerLength
         )
     }
 
-    static var screen3PreferencesContentSize: NSSize {
-        NSSize(width: screen3PreferencesContentWidth, height: screen3PreferencesContentHeight)
-    }
-
-    static var screen3PreferencesWindowRect: NSRect {
+    static var screen4HorizontalRulerRect: NSRect {
         NSRect(
-            x: screen3PreferencesWindowX,
-            y: screen3PreferencesWindowY,
-            width: screen3PreferencesContentWidth * screen3PreferencesWindowScale,
-            height: titlebarHeight + screen3PreferencesContentHeight * screen3PreferencesWindowScale
+            x: screen4HorizontalRulerX,
+            y: screen4HorizontalRulerY,
+            width: screen4HorizontalRulerLength,
+            height: screen4ScaledRulerThickness
         )
     }
 
-    static var screen3PreferencesContentRect: NSRect {
+    static var screen4PreferencesContentSize: NSSize {
+        NSSize(width: screen4PreferencesContentWidth, height: screen4PreferencesContentHeight)
+    }
+
+    static var screen4PreferencesWindowRect: NSRect {
         NSRect(
-            x: screen3PreferencesWindowX,
-            y: screen3PreferencesWindowY + titlebarHeight,
-            width: screen3PreferencesContentWidth * screen3PreferencesWindowScale,
-            height: screen3PreferencesContentHeight * screen3PreferencesWindowScale
+            x: screen4PreferencesWindowX,
+            y: screen4PreferencesWindowY,
+            width: screen4PreferencesContentWidth * screen4PreferencesWindowScale,
+            height: titlebarHeight + screen4PreferencesContentHeight * screen4PreferencesWindowScale
+        )
+    }
+
+    static var screen4PreferencesContentRect: NSRect {
+        NSRect(
+            x: screen4PreferencesWindowX,
+            y: screen4PreferencesWindowY + titlebarHeight,
+            width: screen4PreferencesContentWidth * screen4PreferencesWindowScale,
+            height: screen4PreferencesContentHeight * screen4PreferencesWindowScale
         )
     }
 
@@ -414,10 +495,12 @@ struct AppStoreScreenshotPreview: PreviewProvider {
         Group {
             AppStoreScreenshotScenarioView(screen: .screen1)
                 .previewDisplayName(AppStoreScreenshotScreen.screen1.previewName)
-            AppStoreScreenshotScenarioView(screen: .screen2)
-                .previewDisplayName(AppStoreScreenshotScreen.screen2.previewName)
             AppStoreScreenshotScenarioView(screen: .screen3)
                 .previewDisplayName(AppStoreScreenshotScreen.screen3.previewName)
+            AppStoreScreenshotScenarioView(screen: .screen2)
+                .previewDisplayName(AppStoreScreenshotScreen.screen2.previewName)
+            AppStoreScreenshotScenarioView(screen: .screen4)
+                .previewDisplayName(AppStoreScreenshotScreen.screen4.previewName)
         }
         .aspectRatio(16.0 / 10.0, contentMode: .fit)
         .frame(width: AppStoreScreenshotLayout.previewWidth, height: AppStoreScreenshotLayout.previewHeight)
@@ -444,16 +527,29 @@ private struct AppStoreRulerPlacement {
     let borderView: AppStoreRulerBorderView
     let frame: NSRect
     let boundsSize: NSSize
+    let style: AppStoreRulerStyle
 
-    init(view: RuleView, frame: NSRect, boundsSize: NSSize) {
+    init(view: RuleView, frame: NSRect, boundsSize: NSSize, style: AppStoreRulerStyle = AppStoreRulerStyle()) {
         self.container = NSView(frame: NSRect(origin: .zero, size: boundsSize))
         self.view = view
         self.borderView = AppStoreRulerBorderView(frame: NSRect(origin: .zero, size: boundsSize))
         self.frame = frame
         self.boundsSize = boundsSize
+        self.style = style
+        self.view.color = RulerColors(customFill: style.fillColor)
         self.container.addSubview(view)
         self.container.addSubview(borderView)
     }
+}
+
+private struct AppStoreRulerStyle {
+    var fillColor: NSColor = Prefs.defaultRulerFillColor
+    var opacity: CGFloat = 1
+    var borderColor: NSColor?
+    var borderWidth: CGFloat?
+    var shadowBlur: CGFloat = 0
+    var shadowOffset: NSSize = .zero
+    var shadowOpacity: CGFloat = 0
 }
 
 private final class AppStoreRulerBorderView: NSView {
@@ -565,7 +661,7 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
     init(screen: AppStoreScreenshotScreen) {
         self.screen = screen
         self.rulerPlacements = Self.makeRulerPlacements(for: screen)
-        let preferencesController = screen == .screen3 ? Self.makePreferencesController() : nil
+        let preferencesController = screen == .screen4 ? Self.makePreferencesController() : nil
         self.preferencesController = preferencesController
         self.viewPlacements = Self.makeViewPlacements(for: screen, preferencesController: preferencesController)
         super.init(frame: NSRect(origin: .zero, size: AppStoreScreenshotLayout.canvasSize))
@@ -661,24 +757,55 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
                 )
             }
         case .screen3:
+            return (0..<AppStoreScreenshotLayout.screen3RulerCount).map { index in
+                let fillColor = AppStoreScreenshotLayout.screen3RulerColors[
+                    index % AppStoreScreenshotLayout.screen3RulerColors.count
+                ]
+                let frame = AppStoreScreenshotLayout.screen3RulerRect(index: index)
+                let rulerBoundsSize = NSSize(
+                    width: Ruler.thickness,
+                    height: frame.height / AppStoreScreenshotLayout.screen3RulerScale
+                )
+                let style = AppStoreRulerStyle(
+                    fillColor: fillColor,
+                    opacity: AppStoreScreenshotLayout.screen3RulerOpacity,
+                    borderColor: fillColor.shadow(withLevel: 0.25),
+                    borderWidth: AppStoreScreenshotLayout.screen3RulerBorderWidth,
+                    shadowBlur: AppStoreScreenshotLayout.screen3RulerShadowBlur,
+                    shadowOffset: NSSize(
+                        width: AppStoreScreenshotLayout.screen3RulerShadowXOffset,
+                        height: AppStoreScreenshotLayout.screen3RulerShadowYOffset
+                    ),
+                    shadowOpacity: AppStoreScreenshotLayout.screen3RulerShadowOpacity
+                )
+                return AppStoreRulerPlacement(
+                    view: AppStoreVerticalRule(unit: .pixels, frame: NSRect(origin: .zero, size: rulerBoundsSize)),
+                    frame: frame,
+                    boundsSize: rulerBoundsSize,
+                    style: style
+                )
+            }
+        case .screen4:
             let horizontalBoundsSize = NSSize(
-                width: AppStoreScreenshotLayout.screen3HorizontalRulerLength / AppStoreScreenshotLayout.screen3RulerScale,
+                width: AppStoreScreenshotLayout.screen4HorizontalRulerLength / AppStoreScreenshotLayout.screen4RulerScale,
                 height: Ruler.thickness
             )
             let verticalBoundsSize = NSSize(
                 width: Ruler.thickness,
-                height: AppStoreScreenshotLayout.screen3VerticalRulerLength / AppStoreScreenshotLayout.screen3RulerScale
+                height: AppStoreScreenshotLayout.screen4VerticalRulerLength / AppStoreScreenshotLayout.screen4RulerScale
             )
             return [
                 AppStoreRulerPlacement(
                     view: AppStoreVerticalRule(unit: .pixels, frame: NSRect(origin: .zero, size: verticalBoundsSize)),
-                    frame: AppStoreScreenshotLayout.screen3VerticalRulerRect,
-                    boundsSize: verticalBoundsSize
+                    frame: AppStoreScreenshotLayout.screen4VerticalRulerRect,
+                    boundsSize: verticalBoundsSize,
+                    style: AppStoreRulerStyle(opacity: AppStoreScreenshotLayout.screen4RulerOpacity)
                 ),
                 AppStoreRulerPlacement(
                     view: AppStoreHorizontalRule(unit: .pixels, frame: NSRect(origin: .zero, size: horizontalBoundsSize)),
-                    frame: AppStoreScreenshotLayout.screen3HorizontalRulerRect,
-                    boundsSize: horizontalBoundsSize
+                    frame: AppStoreScreenshotLayout.screen4HorizontalRulerRect,
+                    boundsSize: horizontalBoundsSize,
+                    style: AppStoreRulerStyle(opacity: AppStoreScreenshotLayout.screen4RulerOpacity)
                 ),
             ]
         }
@@ -696,7 +823,7 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         for screen: AppStoreScreenshotScreen,
         preferencesController: PreferencesController?
     ) -> [AppStoreViewPlacement] {
-        guard screen == .screen3,
+        guard screen == .screen4,
               let preferencesView = preferencesController?.window?.contentView else {
             return []
         }
@@ -705,11 +832,11 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         let originalFloatRulers = prefs.floatRulers
         let originalGroupRulers = prefs.groupRulers
         let originalRulerShadow = prefs.rulerShadow
-        prefs.foregroundOpacity = AppStoreScreenshotLayout.screen3ForegroundOpacityPercent
-        prefs.backgroundOpacity = AppStoreScreenshotLayout.screen3BackgroundOpacityPercent
-        prefs.floatRulers = AppStoreScreenshotLayout.screen3FloatRulers
-        prefs.groupRulers = AppStoreScreenshotLayout.screen3GroupRulers
-        prefs.rulerShadow = AppStoreScreenshotLayout.screen3RulerShadow
+        prefs.foregroundOpacity = AppStoreScreenshotLayout.screen4ForegroundOpacityPercent
+        prefs.backgroundOpacity = AppStoreScreenshotLayout.screen4BackgroundOpacityPercent
+        prefs.floatRulers = AppStoreScreenshotLayout.screen4FloatRulers
+        prefs.groupRulers = AppStoreScreenshotLayout.screen4GroupRulers
+        prefs.rulerShadow = AppStoreScreenshotLayout.screen4RulerShadow
         preferencesController?.updateView()
         preferencesController?.window?.contentView?.layoutSubtreeIfNeeded()
         defer {
@@ -720,22 +847,22 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
             prefs.rulerShadow = originalRulerShadow
         }
 
-        let imageView = NSImageView(frame: NSRect(origin: .zero, size: AppStoreScreenshotLayout.screen3PreferencesContentSize))
+        let imageView = NSImageView(frame: NSRect(origin: .zero, size: AppStoreScreenshotLayout.screen4PreferencesContentSize))
         imageView.image = snapshot(preferencesView, preferencesController: preferencesController)
         imageView.imageScaling = .scaleAxesIndependently
 
         return [
             AppStoreViewPlacement(
                 view: imageView,
-                frame: AppStoreScreenshotLayout.screen3PreferencesContentRect,
-                boundsSize: AppStoreScreenshotLayout.screen3PreferencesContentSize
+                frame: AppStoreScreenshotLayout.screen4PreferencesContentRect,
+                boundsSize: AppStoreScreenshotLayout.screen4PreferencesContentSize
             ),
         ]
     }
 
     private static func snapshot(_ view: NSView, preferencesController: PreferencesController?) -> NSImage {
         let snapshotWindow = AppStoreActiveSnapshotWindow(
-            contentRect: NSRect(origin: .zero, size: AppStoreScreenshotLayout.screen3PreferencesContentSize),
+            contentRect: NSRect(origin: .zero, size: AppStoreScreenshotLayout.screen4PreferencesContentSize),
             styleMask: [.titled, .closable, .miniaturizable],
             backing: .buffered,
             defer: true
@@ -770,12 +897,12 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
             drawActiveSliderOverlay(
                 for: preferencesController.foregroundOpacitySlider,
                 in: image,
-                value: CGFloat(AppStoreScreenshotLayout.screen3ForegroundOpacityPercent)
+                value: CGFloat(AppStoreScreenshotLayout.screen4ForegroundOpacityPercent)
             )
             drawActiveSliderOverlay(
                 for: preferencesController.backgroundOpacitySlider,
                 in: image,
-                value: CGFloat(AppStoreScreenshotLayout.screen3BackgroundOpacityPercent)
+                value: CGFloat(AppStoreScreenshotLayout.screen4BackgroundOpacityPercent)
             )
         }
         return image
@@ -887,13 +1014,30 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
             width: frame.width * transform.scale,
             height: frame.height * transform.scale
         )
+        rulerPlacement.container.wantsLayer = true
+        if let layer = rulerPlacement.container.layer {
+            layer.backgroundColor = NSColor.clear.cgColor
+            layer.shadowColor = NSColor.black.cgColor
+            layer.shadowRadius = rulerPlacement.style.shadowBlur * transform.scale
+            layer.shadowOffset = CGSize(
+                width: rulerPlacement.style.shadowOffset.width * transform.scale,
+                height: rulerPlacement.style.shadowOffset.height * transform.scale
+            )
+            layer.shadowOpacity = Float(rulerPlacement.style.shadowOpacity)
+            layer.shadowPath = CGPath(
+                rect: CGRect(origin: .zero, size: rulerPlacement.container.frame.size),
+                transform: nil
+            )
+        }
         rulerPlacement.container.setBoundsSize(rulerPlacement.boundsSize)
         rulerPlacement.view.frame = NSRect(origin: .zero, size: rulerPlacement.boundsSize)
         rulerPlacement.view.setBoundsSize(rulerPlacement.boundsSize)
+        rulerPlacement.view.alphaValue = rulerPlacement.style.opacity
         rulerPlacement.view.needsDisplay = true
         rulerPlacement.borderView.frame = NSRect(origin: .zero, size: rulerPlacement.boundsSize)
-        rulerPlacement.borderView.borderColor = palette.rulerBorder
-        rulerPlacement.borderView.borderWidth = AppStoreScreenshotLayout.rulerBorderWidth
+        rulerPlacement.borderView.alphaValue = rulerPlacement.style.opacity
+        rulerPlacement.borderView.borderColor = rulerPlacement.style.borderColor ?? palette.rulerBorder
+        rulerPlacement.borderView.borderWidth = rulerPlacement.style.borderWidth ?? AppStoreScreenshotLayout.rulerBorderWidth
         rulerPlacement.borderView.needsDisplay = true
     }
 
@@ -928,7 +1072,9 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         case .screen2:
             break
         case .screen3:
-            drawSampleWindow(AppStoreScreenshotLayout.screen3PreferencesWindowRect)
+            break
+        case .screen4:
+            drawSampleWindow(AppStoreScreenshotLayout.screen4PreferencesWindowRect)
         }
     }
 
@@ -940,20 +1086,19 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
             screen.headline,
             in: AppStoreScreenshotLayout.headlineRect,
             size: AppStoreScreenshotLayout.headlineFontSize,
-            color: palette.text,
+            color: screen.headlineColor(in: palette),
             weight: AppStoreScreenshotLayout.headlineFontWeight
         )
         drawText(
             screen.description,
             in: AppStoreScreenshotLayout.descriptionRect,
             size: AppStoreScreenshotLayout.descriptionFontSize,
-            color: palette.secondaryText
+            color: screen.descriptionColor(in: palette)
         )
     }
 
     private func configureRuler(_ view: RuleView) {
         view.showMouseTick = false
-        view.alphaValue = screen == .screen3 ? AppStoreScreenshotLayout.screen3RulerOpacity : 1
     }
 
     private func drawSampleWindow(_ rect: NSRect) {
@@ -1035,19 +1180,19 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
 
     private var sampleWindowShadowOpacity: CGFloat {
         switch screen {
-        case .screen1, .screen2:
+        case .screen1, .screen2, .screen3:
             return AppStoreScreenshotLayout.sampleWindowShadowOpacity
-        case .screen3:
-            return AppStoreScreenshotLayout.screen3PreferencesWindowShadowOpacity
+        case .screen4:
+            return AppStoreScreenshotLayout.screen4PreferencesWindowShadowOpacity
         }
     }
 
     private var sampleWindowShadowYOffset: CGFloat {
         switch screen {
-        case .screen1, .screen2:
+        case .screen1, .screen2, .screen3:
             return AppStoreScreenshotLayout.sampleWindowShadowYOffset
-        case .screen3:
-            return AppStoreScreenshotLayout.screen3PreferencesWindowShadowYOffset
+        case .screen4:
+            return AppStoreScreenshotLayout.screen4PreferencesWindowShadowYOffset
         }
     }
 

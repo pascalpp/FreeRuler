@@ -1,4 +1,4 @@
-import Foundation
+import Cocoa
 
 // Prefs
 // a KVO bridge for UserDefaults
@@ -30,6 +30,7 @@ class Prefs: NSObject {
     @objc dynamic var rulerShadow       : Bool
     @objc dynamic var foregroundOpacity : Int
     @objc dynamic var backgroundOpacity : Int
+    @objc dynamic var rulerColor        : NSColor
     @objc dynamic var unit              : Unit
 
     // MARK: - public save method
@@ -40,24 +41,42 @@ class Prefs: NSObject {
     // MARK: - private implementation
 
     private let defaults = UserDefaults.standard
+    private static let defaultRulerColor = #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1)
+    private static let defaultRulerColorData: Data? = {
+        guard let data = archivedColorData(defaultRulerColor) else {
+            assertionFailure("Unable to archive default ruler color")
+            return nil
+        }
 
-    private var defaultValues: [String: Any] = [
-        "groupRulers":       true,
-        "floatRulers":       true,
-        "rulerShadow":       false,
-        "foregroundOpacity": 90,
-        "backgroundOpacity": 50,
-        "unit":              Unit.pixels.rawValue
-    ]
+        return data
+    }()
+
+    private static var defaultValues: [String: Any] {
+        var values: [String: Any] = [
+            "groupRulers":       true,
+            "floatRulers":       true,
+            "rulerShadow":       false,
+            "foregroundOpacity": 90,
+            "backgroundOpacity": 50,
+            "unit":              Unit.pixels.rawValue
+        ]
+
+        if let defaultRulerColorData = Prefs.defaultRulerColorData {
+            values["rulerColor"] = defaultRulerColorData
+        }
+
+        return values
+    }
 
     private override init() {
-        defaults.register(defaults: defaultValues)
+        defaults.register(defaults: Prefs.defaultValues)
 
         floatRulers       = defaults.bool(forKey: "floatRulers")
         groupRulers       = defaults.bool(forKey: "groupRulers")
         rulerShadow       = defaults.bool(forKey: "rulerShadow")
         foregroundOpacity = defaults.integer(forKey: "foregroundOpacity")
         backgroundOpacity = defaults.integer(forKey: "backgroundOpacity")
+        rulerColor        = Prefs.rulerFillColor(fromArchivedData: defaults.data(forKey: "rulerColor"))
         unit              = Unit(rawValue: defaults.integer(forKey: "unit")) ?? .pixels
 
         super.init()
@@ -84,10 +103,72 @@ class Prefs: NSObject {
             observe(\Prefs.backgroundOpacity, options: .new) { prefs, changed in
                 self.defaults.set(changed.newValue, forKey: "backgroundOpacity")
             },
+            observe(\Prefs.rulerColor, options: .new) { prefs, changed in
+                guard let color = changed.newValue else { return }
+                let normalizedColor = Prefs.normalizedRulerColor(color)
+                guard Prefs.colorsMatch(color, normalizedColor) else {
+                    prefs.rulerColor = normalizedColor
+                    return
+                }
+
+                guard let data = Prefs.archivedColorData(normalizedColor) else { return }
+                self.defaults.set(data, forKey: "rulerColor")
+            },
             observe(\Prefs.unit, options: .new) { prefs, changed in
                 self.defaults.set(prefs.unit.rawValue, forKey: "unit")
             },
         ]
     }
 
+}
+
+extension Prefs {
+    static var defaultRulerFillColor: NSColor {
+        return defaultRulerColor
+    }
+
+    static func rulerFillColor(fromArchivedData data: Data?) -> NSColor {
+        return normalizedRulerColor(unarchiveColor(data) ?? defaultRulerColor)
+    }
+
+    private static func archivedColorData(_ color: NSColor) -> Data? {
+        return try? NSKeyedArchiver.archivedData(
+            withRootObject: color,
+            requiringSecureCoding: true
+        )
+    }
+
+    private static func normalizedRulerColor(_ color: NSColor) -> NSColor {
+        guard let color = color.usingColorSpace(.deviceRGB) else {
+            return defaultRulerColor
+        }
+
+        return NSColor(
+            deviceRed: color.redComponent,
+            green: color.greenComponent,
+            blue: color.blueComponent,
+            alpha: 1
+        )
+    }
+
+    static func colorsMatch(_ firstColor: NSColor, _ secondColor: NSColor) -> Bool {
+        guard let first = firstColor.usingColorSpace(.deviceRGB),
+              let second = secondColor.usingColorSpace(.deviceRGB) else {
+            return firstColor == secondColor
+        }
+
+        return abs(first.redComponent - second.redComponent) < 0.0001
+            && abs(first.greenComponent - second.greenComponent) < 0.0001
+            && abs(first.blueComponent - second.blueComponent) < 0.0001
+            && abs(first.alphaComponent - second.alphaComponent) < 0.0001
+    }
+
+    private static func unarchiveColor(_ data: Data?) -> NSColor? {
+        guard let data = data else { return nil }
+
+        return try? NSKeyedUnarchiver.unarchivedObject(
+            ofClass: NSColor.self,
+            from: data
+        )
+    }
 }

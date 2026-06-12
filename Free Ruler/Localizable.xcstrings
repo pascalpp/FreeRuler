@@ -463,6 +463,48 @@
         }
       }
     },
+    "Reset ruler color" : {
+      "comment" : "Tooltip and accessibility label for the button that restores the default ruler color",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Linealfarbe zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset ruler color"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer color de la regla"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nollaa viivaimen väri"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定規の色を元に戻す"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重置尺子颜色"
+          }
+        }
+      }
+    },
     "Show All Rulers" : {
       "comment" : "Menu item title to show all ruler windows",
       "extractionState" : "manual",

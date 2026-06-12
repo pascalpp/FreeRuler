@@ -5,18 +5,54 @@ import SwiftUI
 #endif
 
 struct RulerColors {
-    let fill = #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1)
-    let numbers = #colorLiteral(red: 0.6829560399, green: 0.4503545761, blue: 0.09706548601, alpha: 1)
-    let ticks = #colorLiteral(red: 0.7254902124, green: 0.4784313738, blue: 0.09803921729, alpha: 1)
-    let mouseTick = #colorLiteral(red: 0.3098039329, green: 0.2039215714, blue: 0.03921568766, alpha: 0.75)
-    let mouseNumber = #colorLiteral(red: 0.3098039329, green: 0.2039215714, blue: 0.03921568766, alpha: 1)
-    let resizeHandleLight = NSColor.white.withAlphaComponent(0.25)
-    let resizeHandleShadow = NSColor.black.withAlphaComponent(0.15)
+    var customFill: NSColor? = nil
+
+    var fill: NSColor {
+        return customFill ?? prefs.rulerColor
+    }
+
+    var numbers: NSColor {
+        return contrastingColor(mixedBy: 0.55)
+    }
+
+    var ticks: NSColor {
+        return contrastingColor(mixedBy: 0.5)
+    }
+
+    var mouseTick: NSColor {
+        return contrastingColor(mixedBy: 0.8).withAlphaComponent(0.75)
+    }
+
+    var mouseNumber: NSColor {
+        return contrastingColor(mixedBy: 0.8)
+    }
+
+    var resizeHandleLight: NSColor {
+        return fill.isLightColor ? NSColor.white.withAlphaComponent(0.25) : NSColor.white.withAlphaComponent(0.45)
+    }
+
+    var resizeHandleShadow: NSColor {
+        return fill.isLightColor ? NSColor.black.withAlphaComponent(0.15) : NSColor.black.withAlphaComponent(0.35)
+    }
+
+    private func contrastingColor(mixedBy fraction: CGFloat) -> NSColor {
+        let color = fill.mixed(
+            with: fill.isLightColor ? .black : .white,
+            fraction: fraction
+        )
+
+        return fill.isLightColor ? color.withBoostedSaturation(multiplier: 3) : color
+    }
 }
 
 class RuleView: NSView {
 
-    let color = RulerColors()
+    var color = RulerColors() {
+        didSet {
+            resizeHandleView?.color = color
+            resizeHandleView?.needsDisplay = true
+        }
+    }
     let mouseTickLabelResizeHandleSpacing: CGFloat = 8
     private var resizeHandleView: ResizeHandleView?
 
@@ -83,6 +119,11 @@ class RuleView: NSView {
         // TODO: is there a better way to do this, maybe via a protocol?
         // AppDelegate needs to be able to infer that any RulerView has this method
         fatalError("RuleView subclass must override drawMouseTick method.")
+    }
+
+    func redrawForPreferenceChange() {
+        setNeedsDisplay(visibleRect)
+        resizeHandleView?.needsDisplay = true
     }
 
     var windowWidth: CGFloat {
@@ -163,6 +204,66 @@ class RuleView: NSView {
         resizeHandleView.frame = resizeHandleView.frame(in: bounds)
     }
 
+}
+
+extension NSColor {
+    private var deviceRGBComponents: (red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat)? {
+        guard let color = usingColorSpace(.deviceRGB) else { return nil }
+
+        return (color.redComponent, color.greenComponent, color.blueComponent, color.alphaComponent)
+    }
+
+    fileprivate var isLightColor: Bool {
+        guard let components = deviceRGBComponents else { return false }
+        return (0.299 * components.red)
+            + (0.587 * components.green)
+            + (0.114 * components.blue) > 0.5
+    }
+
+    fileprivate func mixed(with color: NSColor, fraction: CGFloat) -> NSColor {
+        guard let baseColor = usingColorSpace(.deviceRGB),
+              let mixColor = color.usingColorSpace(.deviceRGB) else {
+            return self
+        }
+
+        let clampedFraction = min(max(fraction, 0), 1)
+        let baseFraction = 1 - clampedFraction
+
+        return NSColor(
+            deviceRed: (baseColor.redComponent * baseFraction) + (mixColor.redComponent * clampedFraction),
+            green: (baseColor.greenComponent * baseFraction) + (mixColor.greenComponent * clampedFraction),
+            blue: (baseColor.blueComponent * baseFraction) + (mixColor.blueComponent * clampedFraction),
+            alpha: baseColor.alphaComponent
+        )
+    }
+
+    fileprivate func withBoostedSaturation(multiplier: CGFloat) -> NSColor {
+        guard let components = deviceRGBComponents else { return self }
+
+        let maxValue = max(components.red, components.green, components.blue)
+        let minValue = min(components.red, components.green, components.blue)
+        let delta = maxValue - minValue
+        let brightness = maxValue
+        let saturation = maxValue == 0 ? 0 : delta / maxValue
+        let hue: CGFloat
+
+        if delta == 0 {
+            hue = 0
+        } else if maxValue == components.red {
+            hue = ((components.green - components.blue) / delta / 6).truncatingRemainder(dividingBy: 1)
+        } else if maxValue == components.green {
+            hue = ((components.blue - components.red) / delta + 2) / 6
+        } else {
+            hue = ((components.red - components.green) / delta + 4) / 6
+        }
+
+        return NSColor(
+            calibratedHue: hue < 0 ? hue + 1 : hue,
+            saturation: min(saturation * multiplier, 1),
+            brightness: brightness,
+            alpha: components.alpha
+        )
+    }
 }
 
 #if DEBUG

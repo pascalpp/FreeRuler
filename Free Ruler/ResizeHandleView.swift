@@ -6,7 +6,7 @@ import SwiftUI
 
 final class ResizeHandleView: NSView {
 
-    private let color: RulerColors
+    var color: RulerColors
     private let orientation: Orientation
     private var trackingArea: NSTrackingArea?
     private var dragInitialMouseLocation: NSPoint?
