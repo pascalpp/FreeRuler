@@ -5,8 +5,10 @@ import SwiftUI
 #endif
 
 struct RulerColors {
+    var customFill: NSColor? = nil
+
     var fill: NSColor {
-        return prefs.rulerColor
+        return customFill ?? prefs.rulerColor
     }
 
     var numbers: NSColor {
@@ -45,7 +47,12 @@ struct RulerColors {
 
 class RuleView: NSView {
 
-    let color = RulerColors()
+    var color = RulerColors() {
+        didSet {
+            resizeHandleView?.color = color
+            resizeHandleView?.needsDisplay = true
+        }
+    }
     let mouseTickLabelResizeHandleSpacing: CGFloat = 8
     private var resizeHandleView: ResizeHandleView?
 
