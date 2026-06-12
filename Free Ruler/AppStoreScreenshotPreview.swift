@@ -258,11 +258,11 @@ private enum AppStoreScreenshotLayout {
     static let screen2RulerLength: CGFloat = 2200
 
     static let screen3BackgroundColor = #colorLiteral(red: 0.875857736, green: 0.8972384907, blue: 0.94, alpha: 1)
-    static let screen3RulerScale: CGFloat = 10.28
     static let screen3RulerOpacity: CGFloat = 1
     static let screen3RulerCount = 7
-    static let screen3FirstRulerX: CGFloat = 0
-    static let screen3RulerGap: CGFloat = 0
+    static let screen3RulerGap: CGFloat = 30
+    static let screen3FirstRulerStart: CGFloat = screen3RulerGap
+    static let screen3LastRulerEnd: CGFloat = canvasWidth - screen3RulerGap
     static let screen3RulerArcTop: CGFloat = 450
     static let screen3RulerArcBottom: CGFloat = 1000
     static let screen3RulerCurvature: CGFloat = 1.5
@@ -421,14 +421,22 @@ private enum AppStoreScreenshotLayout {
         )
     }
 
+    static var screen3RulerScale: CGFloat {
+        screen3ScaledRulerThickness / Ruler.thickness
+    }
+
+    private static var screen3AvailableRulerWidth: CGFloat {
+        screen3LastRulerEnd - screen3FirstRulerStart - (CGFloat(screen3RulerCount - 1) * screen3RulerGap)
+    }
+
     static var screen3ScaledRulerThickness: CGFloat {
-        Ruler.thickness * screen3RulerScale
+        screen3AvailableRulerWidth / CGFloat(screen3RulerCount)
     }
 
     static func screen3RulerRect(index: Int) -> NSRect {
         let top = screen3RulerTopY(index: index)
         return NSRect(
-            x: screen3FirstRulerX + CGFloat(index) * (screen3ScaledRulerThickness + screen3RulerGap),
+            x: screen3FirstRulerStart + CGFloat(index) * (screen3ScaledRulerThickness + screen3RulerGap),
             y: top,
             width: screen3ScaledRulerThickness,
             height: screen3RulerOffscreenBottom - top
@@ -873,6 +881,7 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         snapshotWindow.contentView = view
         snapshotWindow.orderFrontRegardless()
         snapshotWindow.makeKeyAndOrderFront(nil)
+        snapshotWindow.makeFirstResponder(nil)
         defer {
             snapshotWindow.orderOut(nil)
             snapshotWindow.contentView = nil

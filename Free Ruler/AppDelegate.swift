@@ -559,7 +559,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - Application Quit
 
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        closeRulerColorPanel()
+        return .terminateNow
+    }
+
     func applicationWillTerminate(_ aNotification: Notification) {
+        closeRulerColorPanel()
         prefs.save()
     }
 

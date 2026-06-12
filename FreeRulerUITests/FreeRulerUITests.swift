@@ -3,6 +3,8 @@ import Darwin
 
 final class FreeRulerUITests: XCTestCase {
 
+    private let opaqueColorPanelValue = "ruler-color-panel-alpha-hidden"
+
     private var app: XCUIApplication!
     private var cursorStateURL: URL!
 
@@ -101,6 +103,45 @@ final class FreeRulerUITests: XCTestCase {
 
         app.typeKey("w", modifierFlags: .command)
         XCTAssertTrue(preferences.waitForNonExistence(timeout: 2))
+    }
+
+    func testRulerColorPanelHidesOpacityControl() {
+        openRulerColorPanel()
+        XCTAssertTrue(
+            colorPanel.waitForVisibleFrame(timeout: 1),
+            "The ruler color panel should be visible."
+        )
+        XCTAssertEqual(
+            colorPanel.value as? String,
+            opaqueColorPanelValue,
+            "The ruler color panel should be configured for opaque color picking."
+        )
+        XCTAssertEqual(
+            visibleSliderCount(in: colorPanel),
+            1,
+            "The ruler color panel should show the color slider, but not an opacity slider."
+        )
+    }
+
+    func testClosingPreferencesClosesRulerColorPanel() {
+        openRulerColorPanel()
+
+        preferencesWindow.click()
+        app.typeKey("w", modifierFlags: .command)
+
+        XCTAssertTrue(preferencesWindow.waitForNonExistence(timeout: 2))
+        XCTAssertTrue(colorPanel.waitForNonExistence(timeout: 2))
+    }
+
+    func testRulerColorPanelDoesNotReopenAfterRelaunch() {
+        openRulerColorPanel()
+
+        app.terminate()
+        app.launch()
+        app.activate()
+
+        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
+        XCTAssertTrue(colorPanel.waitForNonExistence(timeout: 2))
     }
 
     func testRulerCloseWithCommandW() {
@@ -298,6 +339,14 @@ final class FreeRulerUITests: XCTestCase {
         app.checkBoxes["ruler-shadow-checkbox"]
     }
 
+    private var rulerColorWell: XCUIElement {
+        app.colorWells["ruler-color-well"]
+    }
+
+    private var colorPanel: XCUIElement {
+        app.windows["ruler-color-panel"]
+    }
+
     private var hotkeyBezelLabel: XCUIElement {
         app.staticTexts["hotkey-bezel-label"]
     }
@@ -319,6 +368,19 @@ final class FreeRulerUITests: XCTestCase {
             app.typeKey("w", modifierFlags: .command)
             XCTAssertTrue(preferencesWindow.waitForNonExistence(timeout: 2))
         }
+    }
+
+    private func openRulerColorPanel() {
+        openPreferences()
+
+        if colorPanel.exists {
+            colorPanel.click()
+            app.typeKey("w", modifierFlags: .command)
+            XCTAssertTrue(colorPanel.waitForNonExistence(timeout: 2))
+        }
+
+        rulerColorWell.click()
+        XCTAssertTrue(colorPanel.waitForExistence(timeout: 3))
     }
 
     private func setGroupRulers(_ enabled: Bool) {
@@ -486,6 +548,10 @@ final class FreeRulerUITests: XCTestCase {
 
         return String(cString: passwd.pointee.pw_dir)
     }
+
+    private func visibleSliderCount(in element: XCUIElement) -> Int {
+        return element.sliders.allElementsBoundByIndex.filter(\.hasVisibleFrame).count
+    }
 }
 
 private extension XCUIElement {
@@ -493,6 +559,38 @@ private extension XCUIElement {
         let predicate = NSPredicate(format: "exists == false")
         let expectation = XCTNSPredicateExpectation(predicate: predicate, object: self)
         return XCTWaiter.wait(for: [expectation], timeout: timeout) == .completed
+    }
+
+    func waitForNoVisibleFrame(timeout: TimeInterval) -> Bool {
+        let deadline = Date().addingTimeInterval(timeout)
+
+        while Date() < deadline {
+            if !hasVisibleFrame {
+                return true
+            }
+
+            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
+        }
+
+        return !hasVisibleFrame
+    }
+
+    func waitForVisibleFrame(timeout: TimeInterval) -> Bool {
+        let deadline = Date().addingTimeInterval(timeout)
+
+        while Date() < deadline {
+            if hasVisibleFrame {
+                return true
+            }
+
+            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
+        }
+
+        return hasVisibleFrame
+    }
+
+    var hasVisibleFrame: Bool {
+        return exists && !frame.isEmpty && !frame.isNull
     }
 
     func waitForFrameChange(from originalFrame: CGRect, timeout: TimeInterval) -> Bool {

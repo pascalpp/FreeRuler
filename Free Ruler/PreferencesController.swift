@@ -1,22 +1,38 @@
 import Cocoa
-import ObjectiveC.runtime
+
+private let colorPanelOpaqueConfigurationRetryDelays: [TimeInterval] = [0.1, 0.3]
+private let rulerColorPanelIdentifier = NSUserInterfaceItemIdentifier("ruler-color-panel")
+private let rulerColorPanelOpaqueAccessibilityValue = "ruler-color-panel-alpha-hidden"
 
 func configureOpaqueColorPicking() {
+    let colorPanel = NSColorPanel.shared
+    colorPanel.identifier = rulerColorPanelIdentifier
+    colorPanel.setAccessibilityIdentifier(rulerColorPanelIdentifier.rawValue)
+    if UI_TESTS {
+        colorPanel.setAccessibilityValue(rulerColorPanelOpaqueAccessibilityValue)
+    }
     setColorPickingIgnoresAlpha(true)
-    NSColorPanel.shared.showsAlpha = false
-    NSColorPanel.shared.isContinuous = true
-    NSColorPanel.shared.animationBehavior = .none
+    colorPanel.showsAlpha = false
+    colorPanel.isContinuous = true
+    colorPanel.animationBehavior = .none
+    colorPanel.isRestorable = false
+}
+
+private func configureOpaqueColorPickingAfterPanelUpdates() {
+    configureOpaqueColorPicking()
+
+    // The shared color panel can rebuild picker controls shortly after opening; reapply during
+    // that churn so alpha controls stay hidden without doing work for every color change.
+    for delay in colorPanelOpaqueConfigurationRetryDelays {
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            configureOpaqueColorPicking()
+        }
+    }
 }
 
 private func setColorPickingIgnoresAlpha(_ ignoresAlpha: Bool) {
-    typealias Setter = @convention(c) (AnyClass, Selector, Bool) -> Void
-    let selector = Selector(("setIgnoresAlpha:"))
-
-    guard let method = class_getClassMethod(NSColor.self, selector) else { return }
-
     // AppKit still consults this deprecated global switch when deciding whether color wells support alpha.
-    let setter = unsafeBitCast(method_getImplementation(method), to: Setter.self)
-    setter(NSColor.self, selector, ignoresAlpha)
+    NSColor.ignoresAlpha = ignoresAlpha
 }
 
 class RulerColorWell: NSColorWell {
@@ -45,8 +61,9 @@ class RulerColorWell: NSColorWell {
         colorPanel.color = color
         colorPanel.setTarget(self)
         colorPanel.setAction(#selector(takeColorFrom(_:)))
-        NSApp.orderFrontColorPanel(self)
+        colorPanel.orderFront(self)
         configureForOpaqueColors()
+        configureOpaqueColorPickingAfterPanelUpdates()
     }
 
     override func draw(_ dirtyRect: NSRect) {
@@ -136,6 +153,7 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
     }
 
     func windowWillClose(_ notification: Notification) {
+        rulerColorWell.deactivate()
         closeRulerColorPanel()
 
         // send closed notification
@@ -263,16 +281,15 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
               let colorPanel = notification.object as? NSColorPanel,
               colorPanel.isVisible else { return }
 
-        configureOpaqueColorPicking()
         prefs.rulerColor = colorPanel.color
     }
 
 }
 
-private func closeRulerColorPanel() {
+func closeRulerColorPanel() {
     let colorPanel = NSColorPanel.shared
     colorPanel.animationBehavior = .none
     colorPanel.setTarget(nil)
     colorPanel.setAction(nil)
-    colorPanel.orderOut(nil)
+    colorPanel.close()
 }
