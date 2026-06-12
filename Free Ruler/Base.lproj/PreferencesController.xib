@@ -135,8 +135,8 @@
                             <action selector="setRulerColor:" target="-2" id="WXz-pT-Afi"/>
                         </connections>
                     </colorWell>
-                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="rXy-v5-rst">
-                        <rect key="frame" x="197" y="291" width="28" height="28"/>
+                    <button verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rXy-v5-rst">
+                        <rect key="frame" x="199" y="289" width="28" height="28"/>
                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" imagePosition="only" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" id="PRt-eJ-rst">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -171,7 +171,7 @@
                     <constraint firstItem="Dlw-cH-IYI" firstAttribute="top" secondItem="wce-fE-92o" secondAttribute="bottom" constant="20" id="ecF-6L-G7y"/>
                     <constraint firstItem="fKJ-pW-Idj" firstAttribute="top" secondItem="3cj-Zq-t2I" secondAttribute="bottom" constant="22" id="h19-vU-dTi"/>
                     <constraint firstItem="Fs7-sZ-5IE" firstAttribute="firstBaseline" secondItem="fKJ-pW-Idj" secondAttribute="firstBaseline" id="iVj-L9-5lc"/>
-                    <constraint firstItem="3cj-Zq-t2I" firstAttribute="leading" secondItem="rXy-v5-rst" secondAttribute="trailing" constant="12" id="lWe-Eq-diC"/>
+                    <constraint firstItem="3cj-Zq-t2I" firstAttribute="leading" secondItem="rXy-v5-rst" secondAttribute="trailing" constant="10" id="lWe-Eq-diC"/>
                     <constraint firstAttribute="trailing" secondItem="L9c-EP-R2u" secondAttribute="trailing" constant="20" id="myW-gj-dmX"/>
                     <constraint firstItem="MHD-HA-XYA" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="nEe-NO-kRx"/>
                     <constraint firstAttribute="trailing" secondItem="Fs7-sZ-5IE" secondAttribute="trailing" constant="20" id="o3I-uM-LMk"/>

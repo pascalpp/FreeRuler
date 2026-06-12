@@ -34,10 +34,12 @@ struct RulerColors {
     }
 
     private func contrastingColor(mixedBy fraction: CGFloat) -> NSColor {
-        return fill.mixed(
+        let color = fill.mixed(
             with: fill.isLightColor ? .black : .white,
             fraction: fraction
-        ).withBoostedSaturation(multiplier: 3)
+        )
+
+        return fill.isLightColor ? color.withBoostedSaturation(multiplier: 3) : color
     }
 }
 
