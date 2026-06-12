@@ -9,16 +9,13 @@ func configureOpaqueColorPicking() {
     colorPanel.isRestorable = false
 }
 
-func configureOpaqueColorPickingAfterPanelUpdates() {
+private func configureOpaqueColorPickingAfterPanelUpdates() {
     configureOpaqueColorPicking()
-    DispatchQueue.main.async {
-        configureOpaqueColorPicking()
-    }
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-        configureOpaqueColorPicking()
-    }
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-        configureOpaqueColorPicking()
+
+    for delay in [0.0, 0.1, 0.3] {
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            configureOpaqueColorPicking()
+        }
     }
 }
 
