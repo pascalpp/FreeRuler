@@ -76,7 +76,7 @@ class Prefs: NSObject {
         rulerShadow       = defaults.bool(forKey: "rulerShadow")
         foregroundOpacity = defaults.integer(forKey: "foregroundOpacity")
         backgroundOpacity = defaults.integer(forKey: "backgroundOpacity")
-        rulerColor        = Prefs.unarchiveColor(defaults.data(forKey: "rulerColor")) ?? Prefs.defaultRulerColor
+        rulerColor        = Prefs.rulerFillColor(fromArchivedData: defaults.data(forKey: "rulerColor"))
         unit              = Unit(rawValue: defaults.integer(forKey: "unit")) ?? .pixels
 
         super.init()
@@ -125,6 +125,10 @@ class Prefs: NSObject {
 extension Prefs {
     static var defaultRulerFillColor: NSColor {
         return defaultRulerColor
+    }
+
+    static func rulerFillColor(fromArchivedData data: Data?) -> NSColor {
+        return normalizedRulerColor(unarchiveColor(data) ?? defaultRulerColor)
     }
 
     private static func archivedColorData(_ color: NSColor) -> Data? {
