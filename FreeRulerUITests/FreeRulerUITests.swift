@@ -103,6 +103,37 @@ final class FreeRulerUITests: XCTestCase {
         XCTAssertTrue(preferences.waitForNonExistence(timeout: 2))
     }
 
+    func testRulerColorPanelHidesOpacityControl() {
+        openRulerColorPanel()
+        XCTAssertTrue(
+            colorPanel.buttons["Color Palettes"].waitForVisibleExistence(timeout: 1),
+            "The color panel should expose its picker controls."
+        )
+        XCTAssertTrue(
+            colorPanel.staticTexts["Opacity"].waitForNonVisibility(timeout: 1),
+            "The ruler color panel should not expose alpha controls."
+        )
+    }
+
+    func testClosingPreferencesClosesRulerColorPanel() {
+        openRulerColorPanel()
+
+        app.typeKey("w", modifierFlags: .command)
+
+        XCTAssertTrue(preferencesWindow.waitForNonExistence(timeout: 2))
+        XCTAssertTrue(colorPanel.waitForNonExistence(timeout: 2))
+    }
+
+    func testRulerColorPanelDoesNotReopenAfterRelaunch() {
+        openRulerColorPanel()
+
+        app.terminate()
+        app.launch()
+        app.activate()
+
+        XCTAssertTrue(colorPanel.waitForNonExistence(timeout: 2))
+    }
+
     func testRulerCloseWithCommandW() {
         XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
         XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
@@ -298,6 +329,14 @@ final class FreeRulerUITests: XCTestCase {
         app.checkBoxes["ruler-shadow-checkbox"]
     }
 
+    private var rulerColorWell: XCUIElement {
+        app.colorWells["ruler-color-well"]
+    }
+
+    private var colorPanel: XCUIElement {
+        app.windows["Colors"]
+    }
+
     private var hotkeyBezelLabel: XCUIElement {
         app.staticTexts["hotkey-bezel-label"]
     }
@@ -319,6 +358,17 @@ final class FreeRulerUITests: XCTestCase {
             app.typeKey("w", modifierFlags: .command)
             XCTAssertTrue(preferencesWindow.waitForNonExistence(timeout: 2))
         }
+    }
+
+    private func openRulerColorPanel() {
+        openPreferences()
+
+        rulerColorWell.click()
+        if !colorPanel.waitForExistence(timeout: 1) {
+            rulerColorWell.click()
+        }
+
+        XCTAssertTrue(colorPanel.waitForExistence(timeout: 3))
     }
 
     private func setGroupRulers(_ enabled: Bool) {
@@ -493,6 +543,34 @@ private extension XCUIElement {
         let predicate = NSPredicate(format: "exists == false")
         let expectation = XCTNSPredicateExpectation(predicate: predicate, object: self)
         return XCTWaiter.wait(for: [expectation], timeout: timeout) == .completed
+    }
+
+    func waitForNonVisibility(timeout: TimeInterval) -> Bool {
+        let deadline = Date().addingTimeInterval(timeout)
+
+        while Date() < deadline {
+            if !exists || !isHittable {
+                return true
+            }
+
+            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
+        }
+
+        return !exists || !isHittable
+    }
+
+    func waitForVisibleExistence(timeout: TimeInterval) -> Bool {
+        let deadline = Date().addingTimeInterval(timeout)
+
+        while Date() < deadline {
+            if exists && isHittable {
+                return true
+            }
+
+            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
+        }
+
+        return exists && isHittable
     }
 
     func waitForFrameChange(from originalFrame: CGRect, timeout: TimeInterval) -> Bool {
