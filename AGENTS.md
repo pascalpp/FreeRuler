@@ -56,7 +56,8 @@ changes, and push them to the remote PR branch.
 After pushing fixes, resolve the addressed review comments. Leave replies only
 when clarification or context is needed, and prefix agent replies with the agent
 name in brackets, for example `[codex]`. Once all currently actionable comments
-are resolved, at-mention Copilot on the PR to request a fresh review.
+are resolved, at-mention Copilot on the PR to request a fresh review. Tell
+Copilot not to make code changes.
 
 Set a poller to check the PR for new unresolved comments after 6 minutes. If new
 comments are found, repeat the full comment-resolution loop: inspect, fix, test,
