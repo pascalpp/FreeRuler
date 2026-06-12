@@ -79,9 +79,9 @@ private enum AppStoreScreenshotScreen {
         case .screen1:
             return "Screen 1 - Measure anything"
         case .screen2:
-            return "Screen 3 - Units"
+            return "Screen 2 - Units"
         case .screen3:
-            return "Screen 2 - Colors"
+            return "Screen 3 - Colors"
         case .screen4:
             return "Screen 4 - Preferences"
         }
