@@ -258,7 +258,7 @@ private enum AppStoreScreenshotLayout {
     static let screen2RulerLength: CGFloat = 2200
 
     static let screen3BackgroundColor = #colorLiteral(red: 0.875857736, green: 0.8972384907, blue: 0.94, alpha: 1)
-  static let screen3RulerScale: CGFloat = 10.28
+    static let screen3RulerScale: CGFloat = 10.28
     static let screen3RulerOpacity: CGFloat = 1
     static let screen3RulerCount = 7
     static let screen3FirstRulerX: CGFloat = 0
@@ -543,7 +543,7 @@ private struct AppStoreRulerPlacement {
 }
 
 private struct AppStoreRulerStyle {
-    var fillColor: NSColor?
+    var fillColor: NSColor = Prefs.defaultRulerFillColor
     var opacity: CGFloat = 1
     var borderColor: NSColor?
     var borderWidth: CGFloat?
