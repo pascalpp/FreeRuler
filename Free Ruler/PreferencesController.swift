@@ -12,7 +12,7 @@ func configureOpaqueColorPicking() {
 private func configureOpaqueColorPickingAfterPanelUpdates() {
     configureOpaqueColorPicking()
 
-    for delay in [0.0, 0.1, 0.3] {
+    for delay in [0.1, 0.3] {
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             configureOpaqueColorPicking()
         }
@@ -270,9 +270,7 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
               let colorPanel = notification.object as? NSColorPanel,
               colorPanel.isVisible else { return }
 
-        configureOpaqueColorPicking()
         prefs.rulerColor = colorPanel.color
-        configureOpaqueColorPickingAfterPanelUpdates()
     }
 
 }

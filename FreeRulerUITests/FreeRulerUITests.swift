@@ -106,11 +106,11 @@ final class FreeRulerUITests: XCTestCase {
     func testRulerColorPanelHidesOpacityControl() {
         openRulerColorPanel()
         XCTAssertTrue(
-            colorPanel.buttons["Color Palettes"].waitForVisibleExistence(timeout: 1),
+            colorPanel.buttons["Color Palettes"].waitForVisibleFrame(timeout: 1),
             "The color panel should expose its picker controls."
         )
         XCTAssertTrue(
-            colorPanel.staticTexts["Opacity"].waitForNonVisibility(timeout: 1),
+            colorPanel.staticTexts["Opacity"].waitForNoVisibleFrame(timeout: 1),
             "The ruler color panel should not expose alpha controls."
         )
     }
@@ -545,32 +545,36 @@ private extension XCUIElement {
         return XCTWaiter.wait(for: [expectation], timeout: timeout) == .completed
     }
 
-    func waitForNonVisibility(timeout: TimeInterval) -> Bool {
+    func waitForNoVisibleFrame(timeout: TimeInterval) -> Bool {
         let deadline = Date().addingTimeInterval(timeout)
 
         while Date() < deadline {
-            if !exists || !isHittable {
+            if !hasVisibleFrame {
                 return true
             }
 
             RunLoop.current.run(until: Date().addingTimeInterval(0.05))
         }
 
-        return !exists || !isHittable
+        return !hasVisibleFrame
     }
 
-    func waitForVisibleExistence(timeout: TimeInterval) -> Bool {
+    func waitForVisibleFrame(timeout: TimeInterval) -> Bool {
         let deadline = Date().addingTimeInterval(timeout)
 
         while Date() < deadline {
-            if exists && isHittable {
+            if hasVisibleFrame {
                 return true
             }
 
             RunLoop.current.run(until: Date().addingTimeInterval(0.05))
         }
 
-        return exists && isHittable
+        return hasVisibleFrame
+    }
+
+    private var hasVisibleFrame: Bool {
+        return exists && !frame.isEmpty && !frame.isNull
     }
 
     func waitForFrameChange(from originalFrame: CGRect, timeout: TimeInterval) -> Bool {
