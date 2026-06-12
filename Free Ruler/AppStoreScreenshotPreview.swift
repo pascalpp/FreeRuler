@@ -79,9 +79,9 @@ private enum AppStoreScreenshotScreen {
         case .screen1:
             return "Screen 1 - Measure anything"
         case .screen2:
-            return "Screen 2 - Units"
+            return "Screen 3 - Units"
         case .screen3:
-            return "Screen 3 - Colors"
+            return "Screen 2 - Colors"
         case .screen4:
             return "Screen 4 - Preferences"
         }
@@ -92,9 +92,9 @@ private enum AppStoreScreenshotScreen {
         case .screen1:
             return "01-measure-anything.png"
         case .screen2:
-            return "02-switch-units.png"
+            return "03-switch-units.png"
         case .screen3:
-            return "03-custom-colors.png"
+            return "02-custom-colors.png"
         case .screen4:
             return "04-customize-rulers.png"
         }
@@ -136,8 +136,8 @@ enum AppStoreScreenshotRenderer {
 
     private static let screens: [AppStoreScreenshotScreen] = [
         .screen1,
-        .screen2,
         .screen3,
+        .screen2,
         .screen4,
     ]
 
@@ -495,10 +495,10 @@ struct AppStoreScreenshotPreview: PreviewProvider {
         Group {
             AppStoreScreenshotScenarioView(screen: .screen1)
                 .previewDisplayName(AppStoreScreenshotScreen.screen1.previewName)
-            AppStoreScreenshotScenarioView(screen: .screen2)
-                .previewDisplayName(AppStoreScreenshotScreen.screen2.previewName)
             AppStoreScreenshotScenarioView(screen: .screen3)
                 .previewDisplayName(AppStoreScreenshotScreen.screen3.previewName)
+            AppStoreScreenshotScenarioView(screen: .screen2)
+                .previewDisplayName(AppStoreScreenshotScreen.screen2.previewName)
             AppStoreScreenshotScenarioView(screen: .screen4)
                 .previewDisplayName(AppStoreScreenshotScreen.screen4.previewName)
         }
