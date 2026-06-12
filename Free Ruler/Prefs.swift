@@ -105,8 +105,13 @@ class Prefs: NSObject {
             },
             observe(\Prefs.rulerColor, options: .new) { prefs, changed in
                 guard let color = changed.newValue else { return }
-                let colorToArchive = Prefs.normalizedRulerColor(color)
-                guard let data = Prefs.archivedColorData(colorToArchive) else { return }
+                let normalizedColor = Prefs.normalizedRulerColor(color)
+                guard Prefs.colorsMatch(color, normalizedColor) else {
+                    prefs.rulerColor = normalizedColor
+                    return
+                }
+
+                guard let data = Prefs.archivedColorData(normalizedColor) else { return }
                 self.defaults.set(data, forKey: "rulerColor")
             },
             observe(\Prefs.unit, options: .new) { prefs, changed in
@@ -131,6 +136,18 @@ extension Prefs {
 
     private static func normalizedRulerColor(_ color: NSColor) -> NSColor {
         return color.usingColorSpace(.deviceRGB) ?? defaultRulerColor
+    }
+
+    private static func colorsMatch(_ firstColor: NSColor, _ secondColor: NSColor) -> Bool {
+        guard let first = firstColor.usingColorSpace(.deviceRGB),
+              let second = secondColor.usingColorSpace(.deviceRGB) else {
+            return firstColor == secondColor
+        }
+
+        return abs(first.redComponent - second.redComponent) < 0.0001
+            && abs(first.greenComponent - second.greenComponent) < 0.0001
+            && abs(first.blueComponent - second.blueComponent) < 0.0001
+            && abs(first.alphaComponent - second.alphaComponent) < 0.0001
     }
 
     private static func unarchiveColor(_ data: Data?) -> NSColor? {

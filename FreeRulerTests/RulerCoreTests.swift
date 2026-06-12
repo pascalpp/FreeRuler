@@ -79,6 +79,15 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertGreaterThan(relativeLuminance(colorsOnDarkFill.numbers), relativeLuminance(colorsOnDarkFill.fill))
     }
 
+    func testRulerColorNormalizesUnconvertibleColorsInMemory() {
+        let previousColor = prefs.rulerColor
+        defer { prefs.rulerColor = previousColor }
+
+        prefs.rulerColor = NSColor(patternImage: NSImage(size: NSSize(width: 1, height: 1)))
+
+        assertColor(prefs.rulerColor, equals: Prefs.defaultRulerFillColor)
+    }
+
     func testDefaultRulerRectsUseExpectedShapeAndOffsets() {
         let screen = NSScreen.main?.frame
         let screenWidth = screen?.width ?? 1000
@@ -674,8 +683,15 @@ private func assertColor(
     file: StaticString = #filePath,
     line: UInt = #line
 ) {
-    let actual = actualColor.usingColorSpace(.deviceRGB)!
-    let expected = expectedColor.usingColorSpace(.deviceRGB)!
+    guard let actual = actualColor.usingColorSpace(.deviceRGB) else {
+        XCTFail("Could not convert actual color to device RGB", file: file, line: line)
+        return
+    }
+
+    guard let expected = expectedColor.usingColorSpace(.deviceRGB) else {
+        XCTFail("Could not convert expected color to device RGB", file: file, line: line)
+        return
+    }
 
     XCTAssertEqual(actual.redComponent, expected.redComponent, accuracy: 0.0001, file: file, line: line)
     XCTAssertEqual(actual.greenComponent, expected.greenComponent, accuracy: 0.0001, file: file, line: line)
@@ -683,8 +699,16 @@ private func assertColor(
     XCTAssertEqual(actual.alphaComponent, expected.alphaComponent, accuracy: 0.0001, file: file, line: line)
 }
 
-private func relativeLuminance(_ color: NSColor) -> CGFloat {
-    let color = color.usingColorSpace(.deviceRGB)!
+private func relativeLuminance(
+    _ color: NSColor,
+    file: StaticString = #filePath,
+    line: UInt = #line
+) -> CGFloat {
+    guard let color = color.usingColorSpace(.deviceRGB) else {
+        XCTFail("Could not convert color to device RGB", file: file, line: line)
+        return .nan
+    }
+
     return (0.299 * color.redComponent)
         + (0.587 * color.greenComponent)
         + (0.114 * color.blueComponent)
