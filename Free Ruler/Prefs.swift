@@ -42,6 +42,13 @@ class Prefs: NSObject {
 
     private let defaults = UserDefaults.standard
     private static let defaultRulerColor = #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1)
+    private static let defaultRulerColorData: Data = {
+        guard let data = archivedColorData(defaultRulerColor) else {
+            preconditionFailure("Unable to archive default ruler color")
+        }
+
+        return data
+    }()
 
     private var defaultValues: [String: Any] = [
         "groupRulers":       true,
@@ -49,7 +56,7 @@ class Prefs: NSObject {
         "rulerShadow":       false,
         "foregroundOpacity": 90,
         "backgroundOpacity": 50,
-        "rulerColor":        Prefs.archivedColorData(defaultRulerColor),
+        "rulerColor":        Prefs.defaultRulerColorData,
         "unit":              Unit.pixels.rawValue
     ]
 
@@ -90,7 +97,8 @@ class Prefs: NSObject {
             },
             observe(\Prefs.rulerColor, options: .new) { prefs, changed in
                 guard let color = changed.newValue else { return }
-                self.defaults.set(Prefs.archivedColorData(color), forKey: "rulerColor")
+                guard let data = Prefs.archivedColorData(color) else { return }
+                self.defaults.set(data, forKey: "rulerColor")
             },
             observe(\Prefs.unit, options: .new) { prefs, changed in
                 self.defaults.set(prefs.unit.rawValue, forKey: "unit")

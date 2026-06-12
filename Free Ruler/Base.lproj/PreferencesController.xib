@@ -135,8 +135,8 @@
                             <action selector="setRulerColor:" target="-2" id="WXz-pT-Afi"/>
                         </connections>
                     </colorWell>
-                    <button verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rXy-v5-rst">
-                        <rect key="frame" x="199" y="289" width="28" height="28"/>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="rXy-v5-rst">
+                        <rect key="frame" x="196" y="291" width="28" height="28"/>
                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" imagePosition="only" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" id="PRt-eJ-rst">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>

@@ -200,11 +200,17 @@ class RuleView: NSView {
 }
 
 extension NSColor {
+    private var deviceRGBComponents: (red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat)? {
+        guard let color = usingColorSpace(.deviceRGB) else { return nil }
+
+        return (color.redComponent, color.greenComponent, color.blueComponent, color.alphaComponent)
+    }
+
     fileprivate var isLightColor: Bool {
-        let color = usingColorSpace(.deviceRGB) ?? self
-        return (0.299 * color.redComponent)
-            + (0.587 * color.greenComponent)
-            + (0.114 * color.blueComponent) > 0.5
+        guard let components = deviceRGBComponents else { return false }
+        return (0.299 * components.red)
+            + (0.587 * components.green)
+            + (0.114 * components.blue) > 0.5
     }
 
     fileprivate func mixed(with color: NSColor, fraction: CGFloat) -> NSColor {
@@ -225,19 +231,30 @@ extension NSColor {
     }
 
     fileprivate func withBoostedSaturation(multiplier: CGFloat) -> NSColor {
-        let color = usingColorSpace(.deviceRGB) ?? self
-        var hue: CGFloat = 0
-        var saturation: CGFloat = 0
-        var brightness: CGFloat = 0
-        var alpha: CGFloat = 0
+        guard let components = deviceRGBComponents else { return self }
 
-        color.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
+        let maxValue = max(components.red, components.green, components.blue)
+        let minValue = min(components.red, components.green, components.blue)
+        let delta = maxValue - minValue
+        let brightness = maxValue
+        let saturation = maxValue == 0 ? 0 : delta / maxValue
+        let hue: CGFloat
+
+        if delta == 0 {
+            hue = 0
+        } else if maxValue == components.red {
+            hue = ((components.green - components.blue) / delta / 6).truncatingRemainder(dividingBy: 1)
+        } else if maxValue == components.green {
+            hue = ((components.blue - components.red) / delta + 2) / 6
+        } else {
+            hue = ((components.red - components.green) / delta + 4) / 6
+        }
 
         return NSColor(
-            calibratedHue: hue,
+            calibratedHue: hue < 0 ? hue + 1 : hue,
             saturation: min(saturation * multiplier, 1),
             brightness: brightness,
-            alpha: alpha
+            alpha: components.alpha
         )
     }
 }
