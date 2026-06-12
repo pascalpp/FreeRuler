@@ -114,7 +114,6 @@ class HorizontalRule: RuleView {
         let number = mouseTickX
         let width = self.frame.width
         let height = self.frame.height
-        let labelOffset: CGFloat = 5
 
         let attributes = labelAttributes(alignment: .center, foregroundColor: color.mouseNumber)
 
@@ -122,16 +121,42 @@ class HorizontalRule: RuleView {
         let label = NSAttributedString(string: mouseNumber, attributes: attributes)
         let labelSize = label.size()
 
-        let rightPosition = number + labelOffset;
-        let leftPosition = number - labelOffset - labelSize.width
-        let enoughRoomToTheRight = rightPosition + labelSize.width < width - labelOffset
-        let labelX = enoughRoomToTheRight ? rightPosition : leftPosition
-
-        let labelRect = CGRect(x: labelX, y: height - labelSize.height, width: labelSize.width, height: labelSize.height)
+        let labelRect = mouseNumberLabelRect(
+            number: number,
+            labelSize: labelSize,
+            rulerSize: CGSize(width: width, height: height)
+        )
 
         label.draw(
             with: labelRect,
             context: nil
+        )
+    }
+
+    func mouseNumberLabelRect(number: CGFloat, labelSize: CGSize, rulerSize: CGSize) -> CGRect {
+        let labelOffset: CGFloat = 5
+
+        let rightPosition = number + labelOffset
+        let leftPosition = number - labelOffset - labelSize.width
+        var maxLabelRight = rulerSize.width - labelOffset
+
+        if let resizeHandleExclusionFrame = resizeHandleExclusionFrame {
+            maxLabelRight = min(
+                maxLabelRight,
+                resizeHandleExclusionFrame.minX - mouseTickLabelResizeHandleSpacing
+            )
+        }
+
+        let pinnedRightPosition = maxLabelRight - labelSize.width
+        let rightLabelX = min(rightPosition, pinnedRightPosition)
+        let leftLabelX = min(leftPosition, pinnedRightPosition)
+        let labelX = number < rightLabelX ? rightLabelX : leftLabelX
+
+        return CGRect(
+            x: labelX,
+            y: rulerSize.height - labelSize.height,
+            width: labelSize.width,
+            height: labelSize.height
         )
     }
 

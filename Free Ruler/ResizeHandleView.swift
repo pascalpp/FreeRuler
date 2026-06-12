@@ -523,7 +523,7 @@ private struct ResizeHandleCursorPreview: View {
             )
         } else {
             VStack(spacing: 0) {
-                Text("Unavailable")
+                Text(verbatim: "Unavailable")
                     .font(.caption.monospaced())
                     .frame(width: 130, height: 80)
                     .background(Color(red: 0.25, green: 0.49, blue: 0.46))
