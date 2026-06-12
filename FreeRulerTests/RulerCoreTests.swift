@@ -56,45 +56,41 @@ final class RulerCoreTests: XCTestCase {
     }
 
     func testRulerColorsDefaultToOriginalFillColor() {
-        let previousColor = prefs.rulerColor
-        defer { prefs.rulerColor = previousColor }
+        withRestoredRulerColorPreference {
+            prefs.rulerColor = Prefs.defaultRulerFillColor
 
-        prefs.rulerColor = Prefs.defaultRulerFillColor
-
-        assertColor(RulerColors().fill, equals: Prefs.defaultRulerFillColor)
+            assertColor(RulerColors().fill, equals: Prefs.defaultRulerFillColor)
+        }
     }
 
     func testRulerColorsDeriveContrastingForegroundColors() {
-        let previousColor = prefs.rulerColor
-        defer { prefs.rulerColor = previousColor }
+        withRestoredRulerColorPreference {
+            prefs.rulerColor = NSColor(calibratedWhite: 0.9, alpha: 1)
+            let colorsOnLightFill = RulerColors()
+            XCTAssertLessThan(relativeLuminance(colorsOnLightFill.ticks), relativeLuminance(colorsOnLightFill.fill))
+            XCTAssertLessThan(relativeLuminance(colorsOnLightFill.numbers), relativeLuminance(colorsOnLightFill.fill))
 
-        prefs.rulerColor = NSColor(calibratedWhite: 0.9, alpha: 1)
-        let colorsOnLightFill = RulerColors()
-        XCTAssertLessThan(relativeLuminance(colorsOnLightFill.ticks), relativeLuminance(colorsOnLightFill.fill))
-        XCTAssertLessThan(relativeLuminance(colorsOnLightFill.numbers), relativeLuminance(colorsOnLightFill.fill))
-
-        prefs.rulerColor = NSColor(calibratedWhite: 0.1, alpha: 1)
-        let colorsOnDarkFill = RulerColors()
-        XCTAssertGreaterThan(relativeLuminance(colorsOnDarkFill.ticks), relativeLuminance(colorsOnDarkFill.fill))
-        XCTAssertGreaterThan(relativeLuminance(colorsOnDarkFill.numbers), relativeLuminance(colorsOnDarkFill.fill))
+            prefs.rulerColor = NSColor(calibratedWhite: 0.1, alpha: 1)
+            let colorsOnDarkFill = RulerColors()
+            XCTAssertGreaterThan(relativeLuminance(colorsOnDarkFill.ticks), relativeLuminance(colorsOnDarkFill.fill))
+            XCTAssertGreaterThan(relativeLuminance(colorsOnDarkFill.numbers), relativeLuminance(colorsOnDarkFill.fill))
+        }
     }
 
     func testRulerColorNormalizesUnconvertibleColorsInMemory() {
-        let previousColor = prefs.rulerColor
-        defer { prefs.rulerColor = previousColor }
+        withRestoredRulerColorPreference {
+            prefs.rulerColor = NSColor(patternImage: NSImage(size: NSSize(width: 1, height: 1)))
 
-        prefs.rulerColor = NSColor(patternImage: NSImage(size: NSSize(width: 1, height: 1)))
-
-        assertColor(prefs.rulerColor, equals: Prefs.defaultRulerFillColor)
+            assertColor(prefs.rulerColor, equals: Prefs.defaultRulerFillColor)
+        }
     }
 
     func testRulerColorNormalizesAlphaInMemory() {
-        let previousColor = prefs.rulerColor
-        defer { prefs.rulerColor = previousColor }
+        withRestoredRulerColorPreference {
+            prefs.rulerColor = NSColor(deviceRed: 0.2, green: 0.4, blue: 0.6, alpha: 0.35)
 
-        prefs.rulerColor = NSColor(deviceRed: 0.2, green: 0.4, blue: 0.6, alpha: 0.35)
-
-        assertColor(prefs.rulerColor, equals: NSColor(deviceRed: 0.2, green: 0.4, blue: 0.6, alpha: 1))
+            assertColor(prefs.rulerColor, equals: NSColor(deviceRed: 0.2, green: 0.4, blue: 0.6, alpha: 1))
+        }
     }
 
     func testArchivedRulerColorNormalizesAlphaOnLoad() throws {
@@ -681,6 +677,34 @@ final class RulerCoreTests: XCTestCase {
             clickCount: 1,
             pressure: type == .leftMouseUp ? 0 : 1
         )!
+    }
+
+    private func withRestoredRulerColorPreference(_ test: () throws -> Void) rethrows {
+        let defaults = UserDefaults.standard
+        let previousColor = prefs.rulerColor
+        let domainName = Bundle.main.bundleIdentifier
+        let previousDomainValue = domainName
+            .flatMap { defaults.persistentDomain(forName: $0)?["rulerColor"] }
+
+        defer {
+            prefs.rulerColor = previousColor
+
+            if let domainName = domainName {
+                var domain = defaults.persistentDomain(forName: domainName) ?? [:]
+                if let previousDomainValue = previousDomainValue {
+                    domain["rulerColor"] = previousDomainValue
+                } else {
+                    domain.removeValue(forKey: "rulerColor")
+                }
+                defaults.setPersistentDomain(domain, forName: domainName)
+            } else {
+                if previousDomainValue == nil {
+                    defaults.removeObject(forKey: "rulerColor")
+                }
+            }
+        }
+
+        try test()
     }
 }
 
