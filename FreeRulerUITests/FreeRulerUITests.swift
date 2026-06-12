@@ -3,6 +3,8 @@ import Darwin
 
 final class FreeRulerUITests: XCTestCase {
 
+    private let opaqueColorPanelValue = "ruler-color-panel-alpha-hidden"
+
     private var app: XCUIApplication!
     private var cursorStateURL: URL!
 
@@ -109,9 +111,15 @@ final class FreeRulerUITests: XCTestCase {
             colorPanel.waitForVisibleFrame(timeout: 1),
             "The ruler color panel should be visible."
         )
-        XCTAssertTrue(
-            colorPanel.sliders.element(boundBy: 1).waitForNoVisibleFrame(timeout: 1),
-            "The ruler color panel should not expose alpha controls."
+        XCTAssertEqual(
+            colorPanel.value as? String,
+            opaqueColorPanelValue,
+            "The ruler color panel should be configured for opaque color picking."
+        )
+        XCTAssertEqual(
+            visibleSliderCount(in: colorPanel),
+            1,
+            "The ruler color panel should show the color slider, but not an opacity slider."
         )
     }
 
@@ -540,6 +548,10 @@ final class FreeRulerUITests: XCTestCase {
 
         return String(cString: passwd.pointee.pw_dir)
     }
+
+    private func visibleSliderCount(in element: XCUIElement) -> Int {
+        return element.sliders.allElementsBoundByIndex.filter(\.hasVisibleFrame).count
+    }
 }
 
 private extension XCUIElement {
@@ -577,7 +589,7 @@ private extension XCUIElement {
         return hasVisibleFrame
     }
 
-    private var hasVisibleFrame: Bool {
+    var hasVisibleFrame: Bool {
         return exists && !frame.isEmpty && !frame.isNull
     }
 
