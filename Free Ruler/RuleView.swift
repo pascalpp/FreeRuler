@@ -1,16 +1,24 @@
 import Cocoa
 
+#if DEBUG
+import SwiftUI
+#endif
+
 struct RulerColors {
     let fill = #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1)
     let numbers = #colorLiteral(red: 0.6829560399, green: 0.4503545761, blue: 0.09706548601, alpha: 1)
     let ticks = #colorLiteral(red: 0.7254902124, green: 0.4784313738, blue: 0.09803921729, alpha: 1)
     let mouseTick = #colorLiteral(red: 0.3098039329, green: 0.2039215714, blue: 0.03921568766, alpha: 0.75)
     let mouseNumber = #colorLiteral(red: 0.3098039329, green: 0.2039215714, blue: 0.03921568766, alpha: 1)
+    let resizeHandleLight = NSColor.white.withAlphaComponent(0.25)
+    let resizeHandleShadow = NSColor.black.withAlphaComponent(0.15)
 }
 
 class RuleView: NSView {
 
     let color = RulerColors()
+    let mouseTickLabelResizeHandleSpacing: CGFloat = 8
+    private var resizeHandleView: ResizeHandleView?
 
     var trackingArea: NSTrackingArea?
     let trackingAreaOptions: NSTrackingArea.Options = [
@@ -58,6 +66,18 @@ class RuleView: NSView {
         return true
     }
 
+    override func layout() {
+        super.layout()
+        updateResizeHandleFrame()
+    }
+
+    func installResizeHandle(for orientation: Orientation) {
+        let view = ResizeHandleView(orientation: orientation, color: color)
+        addSubview(view)
+        resizeHandleView = view
+        updateResizeHandleFrame()
+    }
+
     func drawMouseTick(at mouseLoc: NSPoint) {
         // required override
         // TODO: is there a better way to do this, maybe via a protocol?
@@ -90,6 +110,10 @@ class RuleView: NSView {
 
     var unit: Unit {
         prefs.unit
+    }
+
+    var resizeHandleExclusionFrame: NSRect? {
+        return resizeHandleView?.frame
     }
 
     func getUnitLabel() -> String {
@@ -133,7 +157,55 @@ class RuleView: NSView {
         }
     }
 
+    private func updateResizeHandleFrame() {
+        guard let resizeHandleView = resizeHandleView else { return }
+
+        resizeHandleView.frame = resizeHandleView.frame(in: bounds)
+    }
+
 }
+
+#if DEBUG
+private struct RuleViewPreview: NSViewRepresentable {
+    let orientation: Orientation
+
+    func makeNSView(context: Context) -> RuleView {
+        let view: RuleView
+        switch orientation {
+        case .horizontal:
+            view = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 320, height: Ruler.thickness))
+        case .vertical:
+            view = VerticalRule(frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 320))
+        }
+
+        view.showMouseTick = false
+        view.wantsLayer = true
+        view.layer?.borderColor = CGColor(gray: 0, alpha: 0.5)
+        view.layer?.borderWidth = 1
+        return view
+    }
+
+    func updateNSView(_ view: RuleView, context: Context) {
+        view.showMouseTick = false
+        view.needsDisplay = true
+    }
+}
+
+struct RuleView_Previews: PreviewProvider {
+    static var previews: some View {
+        HStack(alignment: .top, spacing: 24) {
+            RuleViewPreview(orientation: .horizontal)
+                .frame(width: 320, height: Ruler.thickness)
+
+            RuleViewPreview(orientation: .vertical)
+                .frame(width: Ruler.thickness, height: 320)
+        }
+        .padding()
+        .previewLayout(.sizeThatFits)
+        .previewDisplayName("Rulers")
+    }
+}
+#endif
 
 fileprivate let mmPerIn: CGFloat = 25.4
 

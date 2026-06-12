@@ -4,6 +4,16 @@ class VerticalRule: RuleView {
 
     let transformer = AffineTransform(translationByX: 0, byY: -0.5)
 
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        installResizeHandle(for: .vertical)
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        installResizeHandle(for: .vertical)
+    }
+
     var mouseTickY: CGFloat = 0 {
         didSet {
             if mouseTickY != oldValue {
@@ -105,7 +115,6 @@ class VerticalRule: RuleView {
     func drawMouseNumber(_ mouseTickY: CGFloat) {
         let height = self.frame.height
         let number = height - mouseTickY
-        let labelOffset: CGFloat = 2
 
         let attributes = labelAttributes(alignment: .left, foregroundColor: color.mouseNumber)
 
@@ -113,13 +122,7 @@ class VerticalRule: RuleView {
         let label = NSAttributedString(string: mouseNumber, attributes: attributes)
         let labelSize = label.size()
 
-        // manually offsetting bottom position til i can figure out how to center text vertically in the label rect
-        let bottomPosition = number + 7;
-        let topPosition = number - labelOffset - labelSize.height
-        let enoughRoomToTheBottom = bottomPosition + labelSize.height < height - labelOffset
-        let labelY = enoughRoomToTheBottom ? bottomPosition : topPosition
-
-        let labelRect = CGRect(x: 7, y: height - (labelY + labelSize.height), width: 22, height: 15)
+        let labelRect = mouseNumberLabelRect(number: number, labelSize: labelSize, rulerHeight: height)
         color.fill.setFill()
         labelRect.fill()
 
@@ -128,6 +131,24 @@ class VerticalRule: RuleView {
             options: .usesLineFragmentOrigin,
             context: nil
         )
+    }
+
+    func mouseNumberLabelRect(number: CGFloat, labelSize: CGSize, rulerHeight: CGFloat) -> CGRect {
+        let labelOffset: CGFloat = 2
+
+        // Offset the bottom position until text can be centered vertically in the label rect.
+        let bottomPosition = number + 7
+        let topPosition = number - labelOffset - labelSize.height
+        let enoughRoomToTheBottom = bottomPosition + labelSize.height < rulerHeight - labelOffset
+        let labelY = enoughRoomToTheBottom ? bottomPosition : topPosition
+        var labelRect = CGRect(x: 7, y: rulerHeight - (labelY + labelSize.height), width: 22, height: 15)
+
+        if let resizeHandleExclusionFrame = resizeHandleExclusionFrame {
+            let minLabelBottom = resizeHandleExclusionFrame.maxY + mouseTickLabelResizeHandleSpacing
+            labelRect.origin.y = max(labelRect.origin.y, minLabelBottom)
+        }
+
+        return labelRect
     }
 
     func drawUnitLabel() {
