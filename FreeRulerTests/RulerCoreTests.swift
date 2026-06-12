@@ -323,17 +323,22 @@ final class RulerCoreTests: XCTestCase {
         guard let resizeHandleFrame = rule.resizeHandleExclusionFrame else {
             return XCTFail("Expected horizontal ruler to install a resize handle")
         }
+        let labelSize = CGSize(width: 30, height: 10)
+        let rulerSize = rule.bounds.size
+        let expectedMaxLabelRight = resizeHandleFrame.minX - rule.mouseTickLabelResizeHandleSpacing
+        let pinnedLabelX = expectedMaxLabelRight - labelSize.width
+        let mouseTickBeforePinnedLabel = pinnedLabelX - 2
 
         let labelRect = rule.mouseNumberLabelRect(
-            number: 243,
-            labelSize: CGSize(width: 30, height: 10),
-            rulerSize: CGSize(width: 300, height: Ruler.thickness)
+            number: mouseTickBeforePinnedLabel,
+            labelSize: labelSize,
+            rulerSize: rulerSize
         )
 
-        XCTAssertGreaterThan(labelRect.minX, 243)
+        XCTAssertGreaterThan(labelRect.minX, mouseTickBeforePinnedLabel)
         XCTAssertEqual(
             labelRect.maxX,
-            resizeHandleFrame.minX - rule.mouseTickLabelResizeHandleSpacing,
+            expectedMaxLabelRight,
             accuracy: 0.0001
         )
     }
@@ -343,17 +348,21 @@ final class RulerCoreTests: XCTestCase {
         guard let resizeHandleFrame = rule.resizeHandleExclusionFrame else {
             return XCTFail("Expected horizontal ruler to install a resize handle")
         }
+        let labelSize = CGSize(width: 30, height: 10)
+        let rulerSize = rule.bounds.size
+        let expectedMaxLabelRight = resizeHandleFrame.minX - rule.mouseTickLabelResizeHandleSpacing
+        let mouseTickInsideResizeHandle = resizeHandleFrame.minX + 1
 
         let labelRect = rule.mouseNumberLabelRect(
-            number: 290,
-            labelSize: CGSize(width: 30, height: 10),
-            rulerSize: CGSize(width: 300, height: Ruler.thickness)
+            number: mouseTickInsideResizeHandle,
+            labelSize: labelSize,
+            rulerSize: rulerSize
         )
 
-        XCTAssertGreaterThan(290, resizeHandleFrame.minX)
+        XCTAssertGreaterThan(mouseTickInsideResizeHandle, resizeHandleFrame.minX)
         XCTAssertEqual(
             labelRect.maxX,
-            resizeHandleFrame.minX - rule.mouseTickLabelResizeHandleSpacing,
+            expectedMaxLabelRight,
             accuracy: 0.0001
         )
     }

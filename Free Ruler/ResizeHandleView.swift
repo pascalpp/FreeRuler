@@ -523,7 +523,10 @@ private struct ResizeHandleCursorPreview: View {
             )
         } else {
             VStack(spacing: 0) {
-                Text("Unavailable")
+                Text(NSLocalizedString(
+                    "Unavailable",
+                    comment: "A placeholder text indicating that a cursor image is unavailable."
+                ))
                     .font(.caption.monospaced())
                     .frame(width: 130, height: 80)
                     .background(Color(red: 0.25, green: 0.49, blue: 0.46))
