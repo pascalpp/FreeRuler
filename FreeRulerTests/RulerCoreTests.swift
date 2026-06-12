@@ -88,6 +88,15 @@ final class RulerCoreTests: XCTestCase {
         assertColor(prefs.rulerColor, equals: Prefs.defaultRulerFillColor)
     }
 
+    func testRulerColorNormalizesAlphaInMemory() {
+        let previousColor = prefs.rulerColor
+        defer { prefs.rulerColor = previousColor }
+
+        prefs.rulerColor = NSColor(deviceRed: 0.2, green: 0.4, blue: 0.6, alpha: 0.35)
+
+        assertColor(prefs.rulerColor, equals: NSColor(deviceRed: 0.2, green: 0.4, blue: 0.6, alpha: 1))
+    }
+
     func testDefaultRulerRectsUseExpectedShapeAndOffsets() {
         let screen = NSScreen.main?.frame
         let screenWidth = screen?.width ?? 1000

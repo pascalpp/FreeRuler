@@ -135,10 +135,19 @@ extension Prefs {
     }
 
     private static func normalizedRulerColor(_ color: NSColor) -> NSColor {
-        return color.usingColorSpace(.deviceRGB) ?? defaultRulerColor
+        guard let color = color.usingColorSpace(.deviceRGB) else {
+            return defaultRulerColor
+        }
+
+        return NSColor(
+            deviceRed: color.redComponent,
+            green: color.greenComponent,
+            blue: color.blueComponent,
+            alpha: 1
+        )
     }
 
-    private static func colorsMatch(_ firstColor: NSColor, _ secondColor: NSColor) -> Bool {
+    static func colorsMatch(_ firstColor: NSColor, _ secondColor: NSColor) -> Bool {
         guard let first = firstColor.usingColorSpace(.deviceRGB),
               let second = secondColor.usingColorSpace(.deviceRGB) else {
             return firstColor == secondColor

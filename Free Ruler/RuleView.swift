@@ -223,7 +223,7 @@ extension NSColor {
         let baseFraction = 1 - clampedFraction
 
         return NSColor(
-            calibratedRed: (baseColor.redComponent * baseFraction) + (mixColor.redComponent * clampedFraction),
+            deviceRed: (baseColor.redComponent * baseFraction) + (mixColor.redComponent * clampedFraction),
             green: (baseColor.greenComponent * baseFraction) + (mixColor.greenComponent * clampedFraction),
             blue: (baseColor.blueComponent * baseFraction) + (mixColor.blueComponent * clampedFraction),
             alpha: baseColor.alphaComponent

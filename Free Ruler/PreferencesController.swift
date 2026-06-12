@@ -125,7 +125,7 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
 
     func updateRulerColorWell() {
         rulerColorWell.color = prefs.rulerColor
-        resetRulerColorButton.isHidden = colorsMatch(prefs.rulerColor, Prefs.defaultRulerFillColor)
+        resetRulerColorButton.isHidden = Prefs.colorsMatch(prefs.rulerColor, Prefs.defaultRulerFillColor)
     }
 
     func updateFloatRulersCheckbox() {
@@ -162,18 +162,6 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
         resetRulerColorButton.identifier = NSUserInterfaceItemIdentifier("reset-ruler-color-button")
         resetRulerColorButton.setAccessibilityIdentifier("reset-ruler-color-button")
         resetRulerColorButton.setAccessibilityLabel(resetRulerColorLabel)
-    }
-
-    private func colorsMatch(_ firstColor: NSColor, _ secondColor: NSColor) -> Bool {
-        guard let first = firstColor.usingColorSpace(.deviceRGB),
-              let second = secondColor.usingColorSpace(.deviceRGB) else {
-            return firstColor == secondColor
-        }
-
-        return abs(first.redComponent - second.redComponent) < 0.0001
-            && abs(first.greenComponent - second.greenComponent) < 0.0001
-            && abs(first.blueComponent - second.blueComponent) < 0.0001
-            && abs(first.alphaComponent - second.alphaComponent) < 0.0001
     }
 
 }
