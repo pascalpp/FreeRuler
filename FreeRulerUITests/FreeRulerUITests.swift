@@ -118,6 +118,7 @@ final class FreeRulerUITests: XCTestCase {
     func testClosingPreferencesClosesRulerColorPanel() {
         openRulerColorPanel()
 
+        preferencesWindow.click()
         app.typeKey("w", modifierFlags: .command)
 
         XCTAssertTrue(preferencesWindow.waitForNonExistence(timeout: 2))
@@ -131,6 +132,7 @@ final class FreeRulerUITests: XCTestCase {
         app.launch()
         app.activate()
 
+        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
         XCTAssertTrue(colorPanel.waitForNonExistence(timeout: 2))
     }
 
