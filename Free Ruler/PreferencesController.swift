@@ -1,4 +1,5 @@
 import Cocoa
+import ObjectiveC.runtime
 
 func configureOpaqueColorPicking() {
     setColorPickingIgnoresAlpha(true)
