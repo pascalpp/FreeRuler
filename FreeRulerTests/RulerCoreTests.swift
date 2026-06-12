@@ -97,6 +97,18 @@ final class RulerCoreTests: XCTestCase {
         assertColor(prefs.rulerColor, equals: NSColor(deviceRed: 0.2, green: 0.4, blue: 0.6, alpha: 1))
     }
 
+    func testArchivedRulerColorNormalizesAlphaOnLoad() throws {
+        let archivedColor = NSColor(deviceRed: 0.2, green: 0.4, blue: 0.6, alpha: 0.35)
+        let data = try NSKeyedArchiver.archivedData(
+            withRootObject: archivedColor,
+            requiringSecureCoding: true
+        )
+
+        let loadedColor = Prefs.rulerFillColor(fromArchivedData: data)
+
+        assertColor(loadedColor, equals: NSColor(deviceRed: 0.2, green: 0.4, blue: 0.6, alpha: 1))
+    }
+
     func testDefaultRulerRectsUseExpectedShapeAndOffsets() {
         let screen = NSScreen.main?.frame
         let screenWidth = screen?.width ?? 1000
