@@ -1,5 +1,7 @@
 import Cocoa
 
+private let colorPanelOpaqueConfigurationRetryDelays: [TimeInterval] = [0.1, 0.3]
+
 func configureOpaqueColorPicking() {
     let colorPanel = NSColorPanel.shared
     setColorPickingIgnoresAlpha(true)
@@ -12,7 +14,9 @@ func configureOpaqueColorPicking() {
 private func configureOpaqueColorPickingAfterPanelUpdates() {
     configureOpaqueColorPicking()
 
-    for delay in [0.1, 0.3] {
+    // The shared color panel can rebuild picker controls shortly after opening; reapply once after
+    // that churn settles so alpha controls stay hidden without doing work for every color change.
+    for delay in colorPanelOpaqueConfigurationRetryDelays {
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             configureOpaqueColorPicking()
         }
