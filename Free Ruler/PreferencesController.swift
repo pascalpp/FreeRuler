@@ -34,6 +34,7 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
         rulerShadowCheckbox.identifier = NSUserInterfaceItemIdentifier("ruler-shadow-checkbox")
         rulerShadowCheckbox.setAccessibilityIdentifier("ruler-shadow-checkbox")
         rulerColorWell.isContinuous = true
+        rulerColorWell.supportsAlpha = false
         rulerColorWell.identifier = NSUserInterfaceItemIdentifier("ruler-color-well")
         rulerColorWell.setAccessibilityIdentifier("ruler-color-well")
         window?.initialFirstResponder = rulerColorWell
