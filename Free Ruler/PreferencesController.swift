@@ -1,9 +1,12 @@
 import Cocoa
 
 private let colorPanelOpaqueConfigurationRetryDelays: [TimeInterval] = [0.1, 0.3]
+private let rulerColorPanelIdentifier = NSUserInterfaceItemIdentifier("ruler-color-panel")
 
 func configureOpaqueColorPicking() {
     let colorPanel = NSColorPanel.shared
+    colorPanel.identifier = rulerColorPanelIdentifier
+    colorPanel.setAccessibilityIdentifier(rulerColorPanelIdentifier.rawValue)
     setColorPickingIgnoresAlpha(true)
     colorPanel.showsAlpha = false
     colorPanel.isContinuous = true

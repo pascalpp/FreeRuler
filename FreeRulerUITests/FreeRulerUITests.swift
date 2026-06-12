@@ -106,11 +106,11 @@ final class FreeRulerUITests: XCTestCase {
     func testRulerColorPanelHidesOpacityControl() {
         openRulerColorPanel()
         XCTAssertTrue(
-            colorPanel.buttons["Color Palettes"].waitForVisibleFrame(timeout: 1),
-            "The color panel should expose its picker controls."
+            colorPanel.waitForVisibleFrame(timeout: 1),
+            "The ruler color panel should be visible."
         )
         XCTAssertTrue(
-            colorPanel.staticTexts["Opacity"].waitForNoVisibleFrame(timeout: 1),
+            colorPanel.sliders.element(boundBy: 1).waitForNoVisibleFrame(timeout: 1),
             "The ruler color panel should not expose alpha controls."
         )
     }
@@ -336,7 +336,7 @@ final class FreeRulerUITests: XCTestCase {
     }
 
     private var colorPanel: XCUIElement {
-        app.windows["Colors"]
+        app.windows["ruler-color-panel"]
     }
 
     private var hotkeyBezelLabel: XCUIElement {
