@@ -42,26 +42,34 @@ class Prefs: NSObject {
 
     private let defaults = UserDefaults.standard
     private static let defaultRulerColor = #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1)
-    private static let defaultRulerColorData: Data = {
+    private static let defaultRulerColorData: Data? = {
         guard let data = archivedColorData(defaultRulerColor) else {
-            preconditionFailure("Unable to archive default ruler color")
+            assertionFailure("Unable to archive default ruler color")
+            return nil
         }
 
         return data
     }()
 
-    private var defaultValues: [String: Any] = [
-        "groupRulers":       true,
-        "floatRulers":       true,
-        "rulerShadow":       false,
-        "foregroundOpacity": 90,
-        "backgroundOpacity": 50,
-        "rulerColor":        Prefs.defaultRulerColorData,
-        "unit":              Unit.pixels.rawValue
-    ]
+    private static var defaultValues: [String: Any] {
+        var values: [String: Any] = [
+            "groupRulers":       true,
+            "floatRulers":       true,
+            "rulerShadow":       false,
+            "foregroundOpacity": 90,
+            "backgroundOpacity": 50,
+            "unit":              Unit.pixels.rawValue
+        ]
+
+        if let defaultRulerColorData = Prefs.defaultRulerColorData {
+            values["rulerColor"] = defaultRulerColorData
+        }
+
+        return values
+    }
 
     private override init() {
-        defaults.register(defaults: defaultValues)
+        defaults.register(defaults: Prefs.defaultValues)
 
         floatRulers       = defaults.bool(forKey: "floatRulers")
         groupRulers       = defaults.bool(forKey: "groupRulers")
@@ -97,7 +105,8 @@ class Prefs: NSObject {
             },
             observe(\Prefs.rulerColor, options: .new) { prefs, changed in
                 guard let color = changed.newValue else { return }
-                guard let data = Prefs.archivedColorData(color) else { return }
+                let colorToArchive = Prefs.normalizedRulerColor(color)
+                guard let data = Prefs.archivedColorData(colorToArchive) else { return }
                 self.defaults.set(data, forKey: "rulerColor")
             },
             observe(\Prefs.unit, options: .new) { prefs, changed in
@@ -118,6 +127,10 @@ extension Prefs {
             withRootObject: color,
             requiringSecureCoding: true
         )
+    }
+
+    private static func normalizedRulerColor(_ color: NSColor) -> NSColor {
+        return color.usingColorSpace(.deviceRGB) ?? defaultRulerColor
     }
 
     private static func unarchiveColor(_ data: Data?) -> NSColor? {
