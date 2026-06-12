@@ -136,7 +136,7 @@ class VerticalRule: RuleView {
     func mouseNumberLabelRect(number: CGFloat, labelSize: CGSize, rulerHeight: CGFloat) -> CGRect {
         let labelOffset: CGFloat = 2
 
-        // manually offsetting bottom position til i can figure out how to center text vertically in the label rect
+        // Offset the bottom position until text can be centered vertically in the label rect.
         let bottomPosition = number + 7
         let topPosition = number - labelOffset - labelSize.height
         let enoughRoomToTheBottom = bottomPosition + labelSize.height < rulerHeight - labelOffset

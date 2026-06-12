@@ -76,6 +76,12 @@ final class ResizeHandleView: NSView {
         windowResizeCursor(for: orientation).set()
     }
 
+    override func mouseExited(with event: NSEvent) {
+        guard dragInitialMouseLocation == nil else { return }
+
+        restoreRulerCursor(with: event)
+    }
+
     override var mouseDownCanMoveWindow: Bool {
         return false
     }
@@ -139,6 +145,7 @@ final class ResizeHandleView: NSView {
         }
 
         resetDragState()
+        restoreRulerCursor(with: event)
     }
 
     func frame(in bounds: NSRect) -> NSRect {
@@ -230,6 +237,17 @@ final class ResizeHandleView: NSView {
         dragInitialWindowFrame = nil
         wasMovableByWindowBackgroundBeforeDrag = nil
         childWindowFramesBeforeDrag = []
+    }
+
+    private func restoreRulerCursor(with event: NSEvent) {
+        guard let superview = superview else { return }
+
+        let locationInSuperview = superview.convert(event.locationInWindow, from: nil)
+        if superview.bounds.contains(locationInSuperview) {
+            nextResponder?.mouseEntered(with: event)
+        } else {
+            nextResponder?.mouseExited(with: event)
+        }
     }
 
 }
