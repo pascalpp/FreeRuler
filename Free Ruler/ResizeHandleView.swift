@@ -145,7 +145,11 @@ final class ResizeHandleView: NSView {
         }
 
         resetDragState()
-        restoreRulerCursor(with: event)
+        if contains(event) {
+            windowResizeCursor(for: orientation).set()
+        } else {
+            restoreRulerCursor(with: event)
+        }
     }
 
     func frame(in bounds: NSRect) -> NSRect {
@@ -248,6 +252,11 @@ final class ResizeHandleView: NSView {
         } else {
             nextResponder?.mouseExited(with: event)
         }
+    }
+
+    private func contains(_ event: NSEvent) -> Bool {
+        let locationInView = convert(event.locationInWindow, from: nil)
+        return bounds.contains(locationInView)
     }
 
 }
