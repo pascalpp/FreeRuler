@@ -1122,7 +1122,7 @@ final class RulerCoreTests: XCTestCase {
 
             prefs.zeroCorner = .topLeft
             prefs.groupRulers = true
-            let appDelegate = AppDelegate()
+            let appDelegate = TestableFlipAppDelegate()
             let horizontalController = RulerController(
                 ruler: Ruler(.horizontal, frame: NSRect(x: 100, y: 299, width: 120, height: Ruler.thickness))
             )
@@ -1146,7 +1146,7 @@ final class RulerCoreTests: XCTestCase {
 
             prefs.zeroCorner = .topLeft
             prefs.groupRulers = true
-            let appDelegate = AppDelegate()
+            let appDelegate = TestableFlipAppDelegate()
             let horizontalController = RulerController(
                 ruler: Ruler(.horizontal, frame: NSRect(x: 100, y: 299, width: 120, height: Ruler.thickness))
             )
@@ -1178,6 +1178,8 @@ final class RulerCoreTests: XCTestCase {
                 ruler: Ruler(.vertical, frame: NSRect(x: 61, y: 140, width: Ruler.thickness, height: 160))
             )
             appDelegate.rulers = [verticalController, horizontalController]
+            let horizontalFrame = horizontalController.rulerWindow.frame
+            let verticalFrame = verticalController.rulerWindow.frame
 
             XCTAssertFalse(horizontalController.rulerWindow.isVisible)
             XCTAssertFalse(verticalController.rulerWindow.isVisible)
@@ -1186,6 +1188,8 @@ final class RulerCoreTests: XCTestCase {
 
             XCTAssertFalse(horizontalController.rulerWindow.isVisible)
             XCTAssertFalse(verticalController.rulerWindow.isVisible)
+            XCTAssertEqual(horizontalController.rulerWindow.frame, horizontalFrame)
+            XCTAssertEqual(verticalController.rulerWindow.frame, verticalFrame)
         }
     }
 
@@ -1279,6 +1283,12 @@ private final class ChildAttachingRulerWindow: RulerWindow {
     override func makeKey() {
         super.makeKey()
         addChildWindow(childWindowToAttach, ordered: .below)
+    }
+}
+
+private final class TestableFlipAppDelegate: AppDelegate {
+    override func isRulerWindowShown(_ window: RulerWindow) -> Bool {
+        return true
     }
 }
 

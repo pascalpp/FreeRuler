@@ -191,11 +191,17 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Flip" id="mEK-Pg-ijY">
                                     <items>
-                                        <menuItem title="Flip Horizontal" keyEquivalent="h" id="GZl-Zd-Ad4">
+                                        <menuItem title="Flip Horizontal" keyEquivalent="H" id="GZl-Zd-Ad4">
                                             <modifierMask key="keyEquivalentModifierMask" shift="YES"/>
+                                            <connections>
+                                                <action selector="flipHorizontalRuler:" target="Voe-Tx-rLC" id="eZk-Kw-SvQ"/>
+                                            </connections>
                                         </menuItem>
-                                        <menuItem title="Flip Vertical" keyEquivalent="v" id="IQD-xF-keq">
+                                        <menuItem title="Flip Vertical" keyEquivalent="V" id="IQD-xF-keq">
                                             <modifierMask key="keyEquivalentModifierMask" shift="YES"/>
+                                            <connections>
+                                                <action selector="flipVerticalRuler:" target="Voe-Tx-rLC" id="oGm-x8-0bo"/>
+                                            </connections>
                                         </menuItem>
                                     </items>
                                 </menu>
