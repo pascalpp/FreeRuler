@@ -56,9 +56,9 @@ final class UnitLabelView: NSView {
         let placement = ZeroCornerGeometry(zeroCorner: zeroCorner)
             .unitLabelPlacement(for: orientation)
         let topInset: CGFloat = 2
-        let bottomInset: CGFloat = 10
-        let leftInset: CGFloat = 7
-        let rightInset: CGFloat = 7
+        let bottomInset: CGFloat = 9
+        let leftInset: CGFloat = 8
+        let rightInset: CGFloat = 8
         let x: CGFloat
         let y: CGFloat
 
