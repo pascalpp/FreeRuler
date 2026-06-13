@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24506" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24506"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -187,6 +187,19 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Options" id="HyV-fh-RgO">
                         <items>
+                            <menuItem title="Flip" id="TkR-03-X6l">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Flip" id="mEK-Pg-ijY">
+                                    <items>
+                                        <menuItem title="Horizontal" keyEquivalent="H" id="GZl-Zd-Ad4">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        </menuItem>
+                                        <menuItem title="Vertical" keyEquivalent="V" id="IQD-xF-keq">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
                             <menuItem title="Float Rulers" keyEquivalent="f" id="GDK-AC-uC8">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
