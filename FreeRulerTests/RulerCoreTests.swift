@@ -295,7 +295,7 @@ final class RulerCoreTests: XCTestCase {
             )
             XCTAssertEqual(
                 rule.unitLabelRect(labelSize: NSSize(width: 12, height: 10), rulerSize: NSSize(width: 300, height: 40)),
-                CGRect(x: 278, y: 8, width: 12, height: 10)
+                CGRect(x: 280, y: 9, width: 12, height: 10)
             )
         }
     }
@@ -339,7 +339,7 @@ final class RulerCoreTests: XCTestCase {
             XCTAssertEqual(rule.mouseNumber(forTickY: 40, rulerHeight: 300), 40)
             XCTAssertEqual(
                 rule.unitLabelRect(labelSize: NSSize(width: 12, height: 10), rulerSize: NSSize(width: 40, height: 300)),
-                CGRect(x: 20, y: 8, width: 12, height: 10)
+                CGRect(x: 20, y: 9, width: 12, height: 10)
             )
         }
     }
@@ -357,10 +357,10 @@ final class RulerCoreTests: XCTestCase {
                     verticalUnitRect: CGRect
                 )
             ] = [
-                (.topLeft, CGRect(x: 10, y: 30, width: 12, height: 10), CGRect(x: 8, y: 288, width: 12, height: 10)),
-                (.topRight, CGRect(x: 278, y: 30, width: 12, height: 10), CGRect(x: 20, y: 288, width: 12, height: 10)),
-                (.bottomLeft, CGRect(x: 10, y: 8, width: 12, height: 10), CGRect(x: 8, y: 8, width: 12, height: 10)),
-                (.bottomRight, CGRect(x: 278, y: 8, width: 12, height: 10), CGRect(x: 20, y: 8, width: 12, height: 10)),
+                (.topLeft, CGRect(x: 8, y: 28, width: 12, height: 10), CGRect(x: 8, y: 288, width: 12, height: 10)),
+                (.topRight, CGRect(x: 280, y: 28, width: 12, height: 10), CGRect(x: 20, y: 288, width: 12, height: 10)),
+                (.bottomLeft, CGRect(x: 8, y: 9, width: 12, height: 10), CGRect(x: 8, y: 9, width: 12, height: 10)),
+                (.bottomRight, CGRect(x: 280, y: 9, width: 12, height: 10), CGRect(x: 20, y: 9, width: 12, height: 10)),
             ]
 
             for testCase in cases {
