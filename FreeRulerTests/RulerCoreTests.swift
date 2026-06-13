@@ -1,4 +1,5 @@
 import AppKit
+import Carbon.HIToolbox
 import XCTest
 @testable import Free_Ruler
 
@@ -339,6 +340,51 @@ final class RulerCoreTests: XCTestCase {
             XCTAssertEqual(
                 rule.unitLabelRect(labelSize: NSSize(width: 12, height: 10), rulerSize: NSSize(width: 40, height: 300)),
                 CGRect(x: 20, y: 2, width: 12, height: 10)
+            )
+        }
+    }
+
+    func testMouseNumberLabelsRespectUnitsAfterZeroCornerFlip() {
+        withRestoredZeroCornerPreference {
+            let previousUnit = prefs.unit
+            defer { prefs.unit = previousUnit }
+
+            prefs.zeroCorner = .bottomRight
+            let horizontalRule = HorizontalRule(
+                frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness)
+            )
+            let verticalRule = VerticalRule(
+                frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300)
+            )
+            let horizontalNumber = horizontalRule.mouseNumber(forTickX: 260, rulerWidth: 300)
+            let verticalNumber = verticalRule.mouseNumber(forTickY: 40, rulerHeight: 300)
+            let horizontalDpmm = horizontalRule.screen?.dpmm.width ?? NSScreen.defaultDpmm
+            let verticalDpmm = verticalRule.screen?.dpmm.width ?? NSScreen.defaultDpmm
+            let horizontalDpi = horizontalRule.screen?.dpi.width ?? NSScreen.defaultDpi
+            let verticalDpi = verticalRule.screen?.dpi.width ?? NSScreen.defaultDpi
+
+            prefs.unit = .pixels
+            XCTAssertEqual(horizontalRule.getMouseNumberLabel(horizontalNumber), "40")
+            XCTAssertEqual(verticalRule.getMouseNumberLabel(verticalNumber), "40")
+
+            prefs.unit = .millimeters
+            XCTAssertEqual(
+                horizontalRule.getMouseNumberLabel(horizontalNumber),
+                String(format: "%.1f", horizontalNumber / horizontalDpmm)
+            )
+            XCTAssertEqual(
+                verticalRule.getMouseNumberLabel(verticalNumber),
+                String(format: "%.1f", verticalNumber / verticalDpmm)
+            )
+
+            prefs.unit = .inches
+            XCTAssertEqual(
+                horizontalRule.getMouseNumberLabel(horizontalNumber),
+                String(format: "%.3f", horizontalNumber / horizontalDpi)
+            )
+            XCTAssertEqual(
+                verticalRule.getMouseNumberLabel(verticalNumber),
+                String(format: "%.3f", verticalNumber / verticalDpi)
             )
         }
     }
@@ -1190,6 +1236,124 @@ final class RulerCoreTests: XCTestCase {
             XCTAssertFalse(verticalController.rulerWindow.isVisible)
             XCTAssertEqual(horizontalController.rulerWindow.frame, horizontalFrame)
             XCTAssertEqual(verticalController.rulerWindow.frame, verticalFrame)
+        }
+    }
+
+    func testShiftHotkeysFlipRulerOrigins() {
+        withRestoredZeroCornerPreference {
+            let previousGroupRulers = prefs.groupRulers
+            defer { prefs.groupRulers = previousGroupRulers }
+
+            prefs.zeroCorner = .topLeft
+            prefs.groupRulers = false
+            let appDelegate = AppDelegate()
+            let horizontalController = RulerController(
+                ruler: Ruler(.horizontal, frame: NSRect(x: 100, y: 299, width: 120, height: Ruler.thickness))
+            )
+            let verticalController = RulerController(
+                ruler: Ruler(.vertical, frame: NSRect(x: 61, y: 140, width: Ruler.thickness, height: 160))
+            )
+            appDelegate.rulers = [verticalController, horizontalController]
+
+            XCTAssertTrue(
+                appDelegate.performRulerHotkey(
+                    keyCode: kVK_ANSI_H,
+                    modifierFlags: .shift,
+                    sender: horizontalController
+                )
+            )
+            XCTAssertEqual(prefs.zeroCorner, .topRight)
+
+            XCTAssertTrue(
+                appDelegate.performRulerHotkey(
+                    keyCode: kVK_ANSI_V,
+                    modifierFlags: .shift,
+                    sender: verticalController
+                )
+            )
+            XCTAssertEqual(prefs.zeroCorner, .bottomRight)
+        }
+    }
+
+    func testShiftHotkeysIgnoreCapsLock() {
+        withRestoredZeroCornerPreference {
+            let previousGroupRulers = prefs.groupRulers
+            defer { prefs.groupRulers = previousGroupRulers }
+
+            prefs.zeroCorner = .topLeft
+            prefs.groupRulers = false
+            let appDelegate = AppDelegate()
+            let horizontalController = RulerController(
+                ruler: Ruler(.horizontal, frame: NSRect(x: 100, y: 299, width: 120, height: Ruler.thickness))
+            )
+            appDelegate.rulers = [horizontalController]
+
+            XCTAssertTrue(
+                appDelegate.performRulerHotkey(
+                    keyCode: kVK_ANSI_H,
+                    modifierFlags: [.shift, .capsLock],
+                    sender: horizontalController
+                )
+            )
+            XCTAssertEqual(prefs.zeroCorner, .topRight)
+        }
+    }
+
+    func testNonShiftModifiedRulerHotkeysAreIgnored() {
+        let appDelegate = AppDelegate()
+
+        XCTAssertFalse(
+            appDelegate.performRulerHotkey(
+                keyCode: kVK_ANSI_H,
+                modifierFlags: .option,
+                sender: self
+            )
+        )
+    }
+
+    func testResetPositionUsesCurrentZeroCorner() {
+        withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .bottomRight
+            let horizontalController = RulerController(
+                ruler: Ruler(.horizontal, frame: NSRect(x: 10, y: 20, width: 300, height: Ruler.thickness))
+            )
+            let verticalController = RulerController(
+                ruler: Ruler(.vertical, frame: NSRect(x: 10, y: 20, width: Ruler.thickness, height: 300))
+            )
+
+            horizontalController.resetPosition()
+            verticalController.resetPosition()
+
+            XCTAssertEqual(
+                horizontalController.rulerWindow.frame,
+                getDefaultContentRect(orientation: .horizontal, zeroCorner: .bottomRight)
+            )
+            XCTAssertEqual(
+                verticalController.rulerWindow.frame,
+                getDefaultContentRect(orientation: .vertical, zeroCorner: .bottomRight)
+            )
+            XCTAssertEqual(prefs.zeroCorner, .bottomRight)
+        }
+    }
+
+    func testResetPositionKeepsFlippedDefaultRulersOnSharedZeroPoint() {
+        withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .topRight
+            let horizontalController = RulerController(
+                ruler: Ruler(.horizontal, frame: NSRect(x: 10, y: 20, width: 300, height: Ruler.thickness))
+            )
+            let verticalController = RulerController(
+                ruler: Ruler(.vertical, frame: NSRect(x: 10, y: 20, width: Ruler.thickness, height: 300))
+            )
+
+            horizontalController.resetPosition()
+            verticalController.resetPosition()
+
+            let geometry = ZeroCornerGeometry(zeroCorner: .topRight)
+            XCTAssertEqual(
+                geometry.zeroPoint(in: horizontalController.rulerWindow.frame, for: .horizontal),
+                geometry.zeroPoint(in: verticalController.rulerWindow.frame, for: .vertical)
+            )
         }
     }
 

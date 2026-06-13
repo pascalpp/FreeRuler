@@ -286,10 +286,13 @@ extension RulerController {
         let shift = event.modifierFlags.contains(.shift)
         let keyboardModifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
 
-        if keyboardModifiers.isEmpty,
-           rulerWindow.isKeyWindow,
+        if rulerWindow.isKeyWindow,
            let appDelegate = NSApp.delegate as? AppDelegate,
-           appDelegate.performRulerHotkey(keyCode: Int(event.keyCode), sender: self) {
+           appDelegate.performRulerHotkey(
+               keyCode: Int(event.keyCode),
+               modifierFlags: keyboardModifiers,
+               sender: self
+           ) {
             return nil
         }
 

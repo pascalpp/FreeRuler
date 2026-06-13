@@ -34,6 +34,12 @@ private enum HotkeyBezelLocalizationKey: String {
     case rulersUngrouped = "HotkeyBezel.RulersUngrouped"
     case shadowEnabled = "HotkeyBezel.ShadowEnabled"
     case shadowDisabled = "HotkeyBezel.ShadowDisabled"
+    case horizontalOriginFormat = "HotkeyBezel.HorizontalOriginFormat"
+    case verticalOriginFormat = "HotkeyBezel.VerticalOriginFormat"
+    case originLeft = "HotkeyBezel.OriginLeft"
+    case originRight = "HotkeyBezel.OriginRight"
+    case originTop = "HotkeyBezel.OriginTop"
+    case originBottom = "HotkeyBezel.OriginBottom"
     case unitsFormat = "HotkeyBezel.UnitsFormat"
     case pixelsUnit = "Unit.Pixels.Abbreviation"
     case millimetersUnit = "Unit.Millimeters.Abbreviation"
@@ -57,6 +63,18 @@ private enum HotkeyBezelLocalizationKey: String {
             return "Hotkey status bezel text indicating ruler shadow is enabled"
         case .shadowDisabled:
             return "Hotkey status bezel text indicating ruler shadow is disabled"
+        case .horizontalOriginFormat:
+            return "Hotkey status bezel format for the horizontal ruler origin side"
+        case .verticalOriginFormat:
+            return "Hotkey status bezel format for the vertical ruler origin side"
+        case .originLeft:
+            return "Hotkey status bezel value for a ruler origin on the left"
+        case .originRight:
+            return "Hotkey status bezel value for a ruler origin on the right"
+        case .originTop:
+            return "Hotkey status bezel value for a ruler origin at the top"
+        case .originBottom:
+            return "Hotkey status bezel value for a ruler origin at the bottom"
         case .unitsFormat:
             return "Hotkey status bezel format for the selected measurement unit"
         case .pixelsUnit:
@@ -512,10 +530,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @IBAction func flipHorizontalRuler(_ sender: Any) {
         flipRulers(along: .horizontal)
+        showHorizontalOriginHotkeyBezel(on: bezelScreen(for: sender))
     }
 
     @IBAction func flipVerticalRuler(_ sender: Any) {
         flipRulers(along: .vertical)
+        showVerticalOriginHotkeyBezel(on: bezelScreen(for: sender))
     }
 
     func flipRulers(along orientation: Orientation) {
@@ -586,7 +606,30 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         )
     }
 
-    func performRulerHotkey(keyCode: Int, sender: Any) -> Bool {
+    func performRulerHotkey(
+        keyCode: Int,
+        modifierFlags: NSEvent.ModifierFlags,
+        sender: Any
+    ) -> Bool {
+        let keyboardModifiers = modifierFlags
+            .intersection(.deviceIndependentFlagsMask)
+            .subtracting(.capsLock)
+
+        if keyboardModifiers == .shift {
+            switch keyCode {
+            case kVK_ANSI_H:
+                flipHorizontalRuler(sender)
+            case kVK_ANSI_V:
+                flipVerticalRuler(sender)
+            default:
+                return false
+            }
+
+            return true
+        }
+
+        guard keyboardModifiers.isEmpty else { return false }
+
         switch keyCode {
         case kVK_ANSI_H:
             toggleHorizontalRuler(sender)
@@ -619,6 +662,40 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func showGroupRulersHotkeyBezel(on screen: NSScreen?) {
         showHotkeyBezel(prefs.groupRulers ? .rulersGrouped : .rulersUngrouped, on: screen)
+    }
+
+    private func showHorizontalOriginHotkeyBezel(on screen: NSScreen?) {
+        switch prefs.zeroCorner {
+        case .topLeft, .bottomLeft:
+            showHotkeyBezel(
+                format: .horizontalOriginFormat,
+                HotkeyBezelLocalizationKey.originLeft.localizedString,
+                on: screen
+            )
+        case .topRight, .bottomRight:
+            showHotkeyBezel(
+                format: .horizontalOriginFormat,
+                HotkeyBezelLocalizationKey.originRight.localizedString,
+                on: screen
+            )
+        }
+    }
+
+    private func showVerticalOriginHotkeyBezel(on screen: NSScreen?) {
+        switch prefs.zeroCorner {
+        case .topLeft, .topRight:
+            showHotkeyBezel(
+                format: .verticalOriginFormat,
+                HotkeyBezelLocalizationKey.originTop.localizedString,
+                on: screen
+            )
+        case .bottomLeft, .bottomRight:
+            showHotkeyBezel(
+                format: .verticalOriginFormat,
+                HotkeyBezelLocalizationKey.originBottom.localizedString,
+                on: screen
+            )
+        }
     }
 
     private func bezelScreen(for sender: Any) -> NSScreen? {
