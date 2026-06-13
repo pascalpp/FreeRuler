@@ -231,6 +231,106 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertEqual(inches.tinyTicks, 1)
     }
 
+    func testHorizontalRuleDrawingHelpersFollowZeroCornerGeometry() {
+        let rule = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
+
+        XCTAssertEqual(
+            rule.tickX(forOffset: 50, rulerWidth: 300, growthDirection: .positive),
+            50
+        )
+        XCTAssertEqual(
+            rule.tickX(forOffset: 50, rulerWidth: 300, growthDirection: .negative),
+            250
+        )
+
+        let bottomTick = rule.tickLine(forX: 50, length: 10, rulerHeight: 40, tickSide: .bottom)
+        XCTAssertEqual(bottomTick.start, CGPoint(x: 50, y: 1))
+        XCTAssertEqual(bottomTick.end, CGPoint(x: 50, y: 10))
+
+        let topTick = rule.tickLine(forX: 250, length: 10, rulerHeight: 40, tickSide: .top)
+        XCTAssertEqual(topTick.start, CGPoint(x: 250, y: 39))
+        XCTAssertEqual(topTick.end, CGPoint(x: 250, y: 30))
+
+        XCTAssertEqual(
+            rule.tickLabelRect(
+                forX: 250,
+                labelSize: NSSize(width: 50, height: 20),
+                rulerHeight: 40,
+                tickSide: .top
+            ),
+            CGRect(x: 225.5, y: 7, width: 50, height: 20)
+        )
+    }
+
+    func testHorizontalRuleMouseAndUnitLabelsMirrorForRightZeroCorner() {
+        withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .bottomRight
+            let rule = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
+            guard let resizeHandleFrame = rule.resizeHandleExclusionFrame else {
+                return XCTFail("Expected horizontal ruler to install a resize handle")
+            }
+
+            XCTAssertEqual(rule.mouseNumber(forTickX: 260, rulerWidth: 300), 40)
+            XCTAssertEqual(
+                rule.mouseNumberLabelRect(
+                    number: resizeHandleFrame.maxX - 1,
+                    labelSize: NSSize(width: 30, height: 10),
+                    rulerSize: rule.bounds.size
+                ).minX,
+                resizeHandleFrame.maxX + rule.mouseTickLabelResizeHandleSpacing,
+                accuracy: 0.0001
+            )
+            XCTAssertEqual(
+                rule.unitLabelRect(labelSize: NSSize(width: 12, height: 10), rulerSize: NSSize(width: 300, height: 40)),
+                CGRect(x: 278, y: 0, width: 12, height: 10)
+            )
+        }
+    }
+
+    func testVerticalRuleDrawingHelpersFollowZeroCornerGeometry() {
+        let rule = VerticalRule(frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
+
+        XCTAssertEqual(
+            rule.tickY(forOffset: 50, rulerHeight: 300, growthDirection: .negative),
+            250
+        )
+        XCTAssertEqual(
+            rule.tickY(forOffset: 50, rulerHeight: 300, growthDirection: .positive),
+            50
+        )
+
+        let rightTick = rule.tickLine(forY: 250, length: 10, rulerWidth: 40, tickSide: .right)
+        XCTAssertEqual(rightTick.start, CGPoint(x: 39, y: 250))
+        XCTAssertEqual(rightTick.end, CGPoint(x: 30, y: 250))
+
+        let leftTick = rule.tickLine(forY: 50, length: 10, rulerWidth: 40, tickSide: .left)
+        XCTAssertEqual(leftTick.start, CGPoint(x: 1, y: 50))
+        XCTAssertEqual(leftTick.end, CGPoint(x: 10, y: 50))
+
+        XCTAssertEqual(
+            rule.tickLabelRect(
+                forY: 50,
+                labelSize: NSSize(width: 50, height: 20),
+                rulerWidth: 40,
+                tickSide: .left
+            ),
+            CGRect(x: 13, y: 46, width: 50, height: 20)
+        )
+    }
+
+    func testVerticalRuleMouseAndUnitLabelsMirrorForBottomZeroCorner() {
+        withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .bottomRight
+            let rule = VerticalRule(frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
+
+            XCTAssertEqual(rule.mouseNumber(forTickY: 40, rulerHeight: 300), 40)
+            XCTAssertEqual(
+                rule.unitLabelRect(labelSize: NSSize(width: 12, height: 10), rulerSize: NSSize(width: 40, height: 300)),
+                CGRect(x: 20, y: 2, width: 12, height: 10)
+            )
+        }
+    }
+
     func testRulerColorsDefaultToOriginalFillColor() {
         withRestoredRulerColorPreference {
             prefs.rulerColor = Prefs.defaultRulerFillColor

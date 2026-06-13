@@ -29,31 +29,43 @@ class VerticalRule: RuleView {
         color.fill.setFill()
         dirtyRect.fill()
 
-        let attrs = labelAttributes(alignment: .right, foregroundColor: color.numbers)
-
         let width = dirtyRect.width
         let height = dirtyRect.height
         let path = NSBezierPath()
         let tickLayout = RulerTickLayout(unit: unit, screen: screen)
+        let geometry = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner)
+        let tickSide = geometry.tickSide(for: .vertical)
+        let growthDirection = geometry.growthDirection(for: .vertical)
+        let attrs = labelAttributes(
+            alignment: tickSide == .right ? .right : .left,
+            foregroundColor: color.numbers
+        )
 
         let labelWidth: CGFloat = 50
         let labelHeight: CGFloat = 20
-        let labelOffset: CGFloat = 13 // offset of label from right edge of ruler
-        let textHeight: CGFloat = 8   // height of text, used to center the label next to the tick
         // TODO: refactor this to use label.size() logic (see func drawUnitLabel)
 
         // substract two so ticks don't overlap with border
         // substract from this range so we can use the height var for position calculations
         for i in 1...Int((height - 2) / tickLayout.tickScale) {
-            let pos = CGFloat(i) * tickLayout.tickScale
+            let offset = CGFloat(i) * tickLayout.tickScale
+            let pos = tickY(
+                forOffset: offset,
+                rulerHeight: height,
+                growthDirection: growthDirection
+            )
             if i.isMultiple(of: tickLayout.largeTicks) {
-                path.move(to: CGPoint(x: width - 1, y: height - pos))
-                path.line(to: CGPoint(x: width - 10, y: height - pos))
+                let tickLine = tickLine(forY: pos, length: 10, rulerWidth: width, tickSide: tickSide)
+                path.move(to: tickLine.start)
+                path.line(to: tickLine.end)
 
                 let label = String(i / tickLayout.textScale)
-                let labelX = width - labelWidth - labelOffset
-                let labelY = height - pos - (textHeight / 2)
-                let labelRect = CGRect(x: labelX, y: labelY, width: labelWidth, height: labelHeight)
+                let labelRect = tickLabelRect(
+                    forY: pos,
+                    labelSize: NSSize(width: labelWidth, height: labelHeight),
+                    rulerWidth: width,
+                    tickSide: tickSide
+                )
 
                 label.draw(
                     with: labelRect,
@@ -63,16 +75,19 @@ class VerticalRule: RuleView {
 
             }
             else if i.isMultiple(of: tickLayout.mediumTicks) {
-                path.move(to: CGPoint(x: width - 1, y: height - pos))
-                path.line(to: CGPoint(x: width - 8, y: height - pos))
+                let tickLine = tickLine(forY: pos, length: 8, rulerWidth: width, tickSide: tickSide)
+                path.move(to: tickLine.start)
+                path.line(to: tickLine.end)
             }
             else if i.isMultiple(of: tickLayout.smallTicks) {
-                path.move(to: CGPoint(x: width - 1, y: height - pos))
-                path.line(to: CGPoint(x: width - 5, y: height - pos))
+                let tickLine = tickLine(forY: pos, length: 5, rulerWidth: width, tickSide: tickSide)
+                path.move(to: tickLine.start)
+                path.line(to: tickLine.end)
             }
             else if let tinyTicks = tickLayout.tinyTicks, i.isMultiple(of: tinyTicks) {
-                path.move(to: CGPoint(x: width - 1, y: height - pos))
-                path.line(to: CGPoint(x: width - 3, y: height - pos))
+                let tickLine = tickLine(forY: pos, length: 3, rulerWidth: width, tickSide: tickSide)
+                path.move(to: tickLine.start)
+                path.line(to: tickLine.end)
             }
         }
 
@@ -114,7 +129,7 @@ class VerticalRule: RuleView {
 
     func drawMouseNumber(_ mouseTickY: CGFloat) {
         let height = self.frame.height
-        let number = height - mouseTickY
+        let number = mouseNumber(forTickY: mouseTickY, rulerHeight: height)
 
         let attributes = labelAttributes(alignment: .left, foregroundColor: color.mouseNumber)
 
@@ -122,7 +137,11 @@ class VerticalRule: RuleView {
         let label = NSAttributedString(string: mouseNumber, attributes: attributes)
         let labelSize = label.size()
 
-        let labelRect = mouseNumberLabelRect(number: number, labelSize: labelSize, rulerHeight: height)
+        let labelRect = mouseNumberLabelRect(
+            number: height - mouseTickY,
+            labelSize: labelSize,
+            rulerHeight: height
+        )
         color.fill.setFill()
         labelRect.fill()
 
@@ -135,13 +154,15 @@ class VerticalRule: RuleView {
 
     func mouseNumberLabelRect(number: CGFloat, labelSize: CGSize, rulerHeight: CGFloat) -> CGRect {
         let labelOffset: CGFloat = 2
+        let tickSide = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner).tickSide(for: .vertical)
 
         // Offset the bottom position until text can be centered vertically in the label rect.
         let bottomPosition = number + 7
         let topPosition = number - labelOffset - labelSize.height
         let enoughRoomToTheBottom = bottomPosition + labelSize.height < rulerHeight - labelOffset
         let labelY = enoughRoomToTheBottom ? bottomPosition : topPosition
-        var labelRect = CGRect(x: 7, y: rulerHeight - (labelY + labelSize.height), width: 22, height: 15)
+        let labelX: CGFloat = tickSide == .right ? 7 : 11
+        var labelRect = CGRect(x: labelX, y: rulerHeight - (labelY + labelSize.height), width: 22, height: 15)
 
         if let resizeHandleExclusionFrame = resizeHandleExclusionFrame {
             let minLabelBottom = resizeHandleExclusionFrame.maxY + mouseTickLabelResizeHandleSpacing
@@ -156,14 +177,109 @@ class VerticalRule: RuleView {
 
         let unitlabel = self.getUnitLabel()
         let label = NSAttributedString(string: unitlabel, attributes: attributes)
-        let height = self.frame.height
         let labelSize = label.size()
-        let labelRect = CGRect(x: 8, y: height - labelSize.height - 2, width: labelSize.width, height: labelSize.height)
+        let labelRect = unitLabelRect(labelSize: labelSize, rulerSize: bounds.size)
 
         label.draw(
             with: labelRect,
             context: nil
         )
+    }
+
+    func tickY(
+        forOffset offset: CGFloat,
+        rulerHeight: CGFloat,
+        growthDirection: RulerGrowthDirection
+    ) -> CGFloat {
+        switch growthDirection {
+        case .positive:
+            return offset
+        case .negative:
+            return rulerHeight - offset
+        }
+    }
+
+    func tickLine(
+        forY y: CGFloat,
+        length: CGFloat,
+        rulerWidth: CGFloat,
+        tickSide: RulerSide
+    ) -> (start: CGPoint, end: CGPoint) {
+        switch tickSide {
+        case .right:
+            return (CGPoint(x: rulerWidth - 1, y: y), CGPoint(x: rulerWidth - length, y: y))
+        case .left:
+            return (CGPoint(x: 1, y: y), CGPoint(x: length, y: y))
+        case .top, .bottom:
+            assertionFailure("Vertical ruler ticks must be placed on a vertical side")
+            return (CGPoint(x: rulerWidth - 1, y: y), CGPoint(x: rulerWidth - length, y: y))
+        }
+    }
+
+    func tickLabelRect(
+        forY y: CGFloat,
+        labelSize: NSSize,
+        rulerWidth: CGFloat,
+        tickSide: RulerSide
+    ) -> CGRect {
+        let labelOffset: CGFloat = 13
+        let textHeight: CGFloat = 8
+        let labelX: CGFloat
+
+        switch tickSide {
+        case .right:
+            labelX = rulerWidth - labelSize.width - labelOffset
+        case .left:
+            labelX = labelOffset
+        case .top, .bottom:
+            assertionFailure("Vertical ruler labels must be placed on a vertical side")
+            labelX = rulerWidth - labelSize.width - labelOffset
+        }
+
+        return CGRect(
+            x: labelX,
+            y: y - (textHeight / 2),
+            width: labelSize.width,
+            height: labelSize.height
+        )
+    }
+
+    func mouseNumber(forTickY mouseTickY: CGFloat, rulerHeight: CGFloat) -> CGFloat {
+        let growthDirection = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner).growthDirection(for: .vertical)
+
+        switch growthDirection {
+        case .positive:
+            return mouseTickY
+        case .negative:
+            return rulerHeight - mouseTickY
+        }
+    }
+
+    func unitLabelRect(labelSize: NSSize, rulerSize: NSSize) -> CGRect {
+        let geometry = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner)
+        let tickSide = geometry.tickSide(for: .vertical)
+        let growthDirection = geometry.growthDirection(for: .vertical)
+        let x: CGFloat
+        let y: CGFloat
+
+        switch tickSide {
+        case .right:
+            x = 8
+        case .left:
+            x = rulerSize.width - labelSize.width - 8
+        case .top, .bottom:
+            assertionFailure("Vertical unit label must be placed on a vertical side")
+            x = 8
+        }
+
+        switch growthDirection {
+        case .positive:
+            y = 2
+        case .negative:
+            y = rulerSize.height - labelSize.height - 2
+        }
+
+        return CGRect(x: x, y: y, width: labelSize.width, height: labelSize.height)
     }
 
 
