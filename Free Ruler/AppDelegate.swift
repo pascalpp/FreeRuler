@@ -510,6 +510,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         toggleRuler(orientation: .vertical)
     }
 
+    @IBAction func flipHorizontalRuler(_ sender: Any) {
+        flipRulers(along: .horizontal)
+    }
+
+    @IBAction func flipVerticalRuler(_ sender: Any) {
+        flipRulers(along: .vertical)
+    }
+
     func flipRulers(along orientation: Orientation) {
         createRulersIfNeeded()
 
@@ -529,6 +537,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         guard prefs.groupRulers,
               let flippedWindow = flippedRuler?.rulerWindow,
               let otherWindow = otherRuler?.rulerWindow,
+              isRulerWindowShown(otherWindow),
               let zeroPointOffset = zeroPointOffset else { return }
 
         let newGeometry = ZeroCornerGeometry(zeroCorner: flippedCorner)
@@ -543,7 +552,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             size: otherWindow.frame.size
         )
 
+        detachRulerWindows()
         otherWindow.setFrame(otherFrame, display: true)
+        updateRulerGrouping()
+    }
+
+    func isRulerWindowShown(_ window: RulerWindow) -> Bool {
+        return window.isVisible || window.parent != nil || rulers.contains {
+            $0.rulerWindow.childWindows?.contains(window) == true
+        }
     }
 
     private func zeroPointOffset(
