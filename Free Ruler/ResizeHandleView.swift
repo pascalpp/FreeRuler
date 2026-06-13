@@ -154,17 +154,15 @@ final class ResizeHandleView: NSView {
     }
 
     func frame(in bounds: NSRect) -> NSRect {
-        let geometry = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner)
-        let tickSide = geometry.tickSide(for: orientation)
-        let resizeSide = geometry.resizeSide(for: orientation)
+        let placement = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner)
+            .resizeHandlePlacement(for: orientation)
 
         switch orientation {
         case .horizontal:
-            let verticalHandleSide = tickSide.opposite
             let bottomY: CGFloat
             let firstX: CGFloat
 
-            switch resizeSide {
+            switch placement.xSide {
             case .left:
                 firstX = bounds.minX + horizontalXOffset + 1
             case .right:
@@ -180,7 +178,7 @@ final class ResizeHandleView: NSView {
                     - 1
             }
 
-            switch verticalHandleSide {
+            switch placement.ySide {
             case .top:
                 bottomY = bounds.maxY - horizontalYOffset - length
             case .bottom:
@@ -197,11 +195,10 @@ final class ResizeHandleView: NSView {
                 height: length + (backgroundPadding * 2)
             )
         case .vertical:
-            let horizontalHandleSide = tickSide.opposite
             let leftX: CGFloat
             let firstY: CGFloat
 
-            switch horizontalHandleSide {
+            switch placement.xSide {
             case .left:
                 leftX = bounds.minX + verticalXOffset
             case .right:
@@ -211,7 +208,7 @@ final class ResizeHandleView: NSView {
                 leftX = bounds.minX + verticalXOffset
             }
 
-            switch resizeSide {
+            switch placement.ySide {
             case .top:
                 firstY = bounds.maxY
                     - verticalYOffset
