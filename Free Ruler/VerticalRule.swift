@@ -6,17 +6,20 @@ class VerticalRule: RuleView {
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
+        installUnitLabel(for: .vertical)
         installResizeHandle(for: .vertical)
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+        installUnitLabel(for: .vertical)
         installResizeHandle(for: .vertical)
     }
 
     var mouseTickY: CGFloat = 0 {
         didSet {
             if mouseTickY != oldValue {
+                updateUnitLabelVisibility()
                 needsDisplay = true
             }
         }
@@ -43,7 +46,7 @@ class VerticalRule: RuleView {
 
         let labelWidth: CGFloat = 50
         let labelHeight: CGFloat = 20
-        // TODO: refactor this to use label.size() logic (see func drawUnitLabel)
+        // TODO: refactor this to use measured label sizes.
 
         // substract two so ticks don't overlap with border
         // substract from this range so we can use the height var for position calculations
@@ -96,9 +99,7 @@ class VerticalRule: RuleView {
         color.ticks.setStroke()
         path.stroke()
 
-        if !showMouseTick || self.windowHeight - mouseTickY < 0 || windowHeight - mouseTickY > 18 {
-            drawUnitLabel()
-        }
+        updateUnitLabelVisibility()
 
         // Draw the MouseTick & number
         if showMouseTick && mouseTickY >= 1 && mouseTickY < windowHeight {
@@ -172,18 +173,16 @@ class VerticalRule: RuleView {
         return labelRect
     }
 
-    func drawUnitLabel() {
-        let attributes = labelAttributes(alignment: .left, foregroundColor: color.ticks)
+    override func updateUnitLabelVisibility() {
+        guard showMouseTick,
+              mouseTickY >= 1,
+              mouseTickY < windowHeight,
+              let frame = unitLabelFrame else {
+            setUnitLabelHidden(false)
+            return
+        }
 
-        let unitlabel = self.getUnitLabel()
-        let label = NSAttributedString(string: unitlabel, attributes: attributes)
-        let labelSize = label.size()
-        let labelRect = unitLabelRect(labelSize: labelSize, rulerSize: bounds.size)
-
-        label.draw(
-            with: labelRect,
-            context: nil
-        )
+        setUnitLabelHidden(frame.minY <= mouseTickY && mouseTickY <= frame.maxY)
     }
 
     func tickY(
@@ -256,33 +255,12 @@ class VerticalRule: RuleView {
     }
 
     func unitLabelRect(labelSize: NSSize, rulerSize: NSSize) -> CGRect {
-        let geometry = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner)
-        let labelXSide = geometry.tickSide(for: .vertical).opposite
-        let labelYSide = geometry.resizeSide(for: .vertical).opposite
-        let x: CGFloat
-        let y: CGFloat
-
-        switch labelXSide {
-        case .left:
-            x = 8
-        case .right:
-            x = rulerSize.width - labelSize.width - 8
-        case .top, .bottom:
-            assertionFailure("Vertical unit label must be anchored to a horizontal corner side")
-            x = 8
-        }
-
-        switch labelYSide {
-        case .bottom:
-            y = 2
-        case .top:
-            y = rulerSize.height - labelSize.height - 2
-        case .left, .right:
-            assertionFailure("Vertical unit label must be anchored to a vertical corner side")
-            y = 2
-        }
-
-        return CGRect(x: x, y: y, width: labelSize.width, height: labelSize.height)
+        return UnitLabelView.labelFrame(
+            labelSize: labelSize,
+            rulerSize: rulerSize,
+            orientation: .vertical,
+            zeroCorner: prefs.zeroCorner
+        )
     }
 
 

@@ -116,6 +116,21 @@ struct ZeroCornerGeometry {
         }
     }
 
+    func unitLabelPlacement(for orientation: Orientation) -> RulerCornerPlacement {
+        switch orientation {
+        case .horizontal:
+            return RulerCornerPlacement(
+                xSide: resizeSide(for: orientation).opposite,
+                ySide: tickSide(for: orientation).opposite
+            )
+        case .vertical:
+            return RulerCornerPlacement(
+                xSide: tickSide(for: orientation).opposite,
+                ySide: resizeSide(for: orientation).opposite
+            )
+        }
+    }
+
     func zeroPoint(in frame: NSRect, for orientation: Orientation) -> NSPoint {
         switch orientation {
         case .horizontal:
