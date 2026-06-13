@@ -45,6 +45,19 @@ enum RulerSide: Equatable {
     case right
     case bottom
     case left
+
+    var opposite: RulerSide {
+        switch self {
+        case .top:
+            return .bottom
+        case .right:
+            return .left
+        case .bottom:
+            return .top
+        case .left:
+            return .right
+        }
+    }
 }
 
 struct ZeroCornerGeometry {

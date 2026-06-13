@@ -257,26 +257,29 @@ class VerticalRule: RuleView {
 
     func unitLabelRect(labelSize: NSSize, rulerSize: NSSize) -> CGRect {
         let geometry = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner)
-        let tickSide = geometry.tickSide(for: .vertical)
-        let growthDirection = geometry.growthDirection(for: .vertical)
+        let labelXSide = geometry.tickSide(for: .vertical).opposite
+        let labelYSide = geometry.resizeSide(for: .vertical).opposite
         let x: CGFloat
         let y: CGFloat
 
-        switch tickSide {
-        case .right:
-            x = 8
+        switch labelXSide {
         case .left:
+            x = 8
+        case .right:
             x = rulerSize.width - labelSize.width - 8
         case .top, .bottom:
-            assertionFailure("Vertical unit label must be placed on a vertical side")
+            assertionFailure("Vertical unit label must be anchored to a horizontal corner side")
             x = 8
         }
 
-        switch growthDirection {
-        case .positive:
+        switch labelYSide {
+        case .bottom:
             y = 2
-        case .negative:
+        case .top:
             y = rulerSize.height - labelSize.height - 2
+        case .left, .right:
+            assertionFailure("Vertical unit label must be anchored to a vertical corner side")
+            y = 2
         }
 
         return CGRect(x: x, y: y, width: labelSize.width, height: labelSize.height)
