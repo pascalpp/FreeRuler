@@ -344,6 +344,47 @@ final class RulerCoreTests: XCTestCase {
         }
     }
 
+    func testMouseNumberLabelsRespectUnitsAfterZeroCornerFlip() {
+        withRestoredZeroCornerPreference {
+            let previousUnit = prefs.unit
+            defer { prefs.unit = previousUnit }
+
+            prefs.zeroCorner = .bottomRight
+            let horizontalRule = HorizontalRule(
+                frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness)
+            )
+            let verticalRule = VerticalRule(
+                frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300)
+            )
+            let horizontalNumber = horizontalRule.mouseNumber(forTickX: 260, rulerWidth: 300)
+            let verticalNumber = verticalRule.mouseNumber(forTickY: 40, rulerHeight: 300)
+
+            prefs.unit = .pixels
+            XCTAssertEqual(horizontalRule.getMouseNumberLabel(horizontalNumber), "40")
+            XCTAssertEqual(verticalRule.getMouseNumberLabel(verticalNumber), "40")
+
+            prefs.unit = .millimeters
+            XCTAssertEqual(
+                horizontalRule.getMouseNumberLabel(horizontalNumber),
+                String(format: "%.1f", horizontalNumber / NSScreen.defaultDpmm)
+            )
+            XCTAssertEqual(
+                verticalRule.getMouseNumberLabel(verticalNumber),
+                String(format: "%.1f", verticalNumber / NSScreen.defaultDpmm)
+            )
+
+            prefs.unit = .inches
+            XCTAssertEqual(
+                horizontalRule.getMouseNumberLabel(horizontalNumber),
+                String(format: "%.3f", horizontalNumber / NSScreen.defaultDpi)
+            )
+            XCTAssertEqual(
+                verticalRule.getMouseNumberLabel(verticalNumber),
+                String(format: "%.3f", verticalNumber / NSScreen.defaultDpi)
+            )
+        }
+    }
+
     func testRulerColorsDefaultToOriginalFillColor() {
         withRestoredRulerColorPreference {
             prefs.rulerColor = Prefs.defaultRulerFillColor
@@ -1240,6 +1281,52 @@ final class RulerCoreTests: XCTestCase {
                 sender: self
             )
         )
+    }
+
+    func testResetPositionUsesCurrentZeroCorner() {
+        withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .bottomRight
+            let horizontalController = RulerController(
+                ruler: Ruler(.horizontal, frame: NSRect(x: 10, y: 20, width: 300, height: Ruler.thickness))
+            )
+            let verticalController = RulerController(
+                ruler: Ruler(.vertical, frame: NSRect(x: 10, y: 20, width: Ruler.thickness, height: 300))
+            )
+
+            horizontalController.resetPosition()
+            verticalController.resetPosition()
+
+            XCTAssertEqual(
+                horizontalController.rulerWindow.frame,
+                getDefaultContentRect(orientation: .horizontal, zeroCorner: .bottomRight)
+            )
+            XCTAssertEqual(
+                verticalController.rulerWindow.frame,
+                getDefaultContentRect(orientation: .vertical, zeroCorner: .bottomRight)
+            )
+            XCTAssertEqual(prefs.zeroCorner, .bottomRight)
+        }
+    }
+
+    func testResetPositionKeepsFlippedDefaultRulersOnSharedZeroPoint() {
+        withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .topRight
+            let horizontalController = RulerController(
+                ruler: Ruler(.horizontal, frame: NSRect(x: 10, y: 20, width: 300, height: Ruler.thickness))
+            )
+            let verticalController = RulerController(
+                ruler: Ruler(.vertical, frame: NSRect(x: 10, y: 20, width: Ruler.thickness, height: 300))
+            )
+
+            horizontalController.resetPosition()
+            verticalController.resetPosition()
+
+            let geometry = ZeroCornerGeometry(zeroCorner: .topRight)
+            XCTAssertEqual(
+                geometry.zeroPoint(in: horizontalController.rulerWindow.frame, for: .horizontal),
+                geometry.zeroPoint(in: verticalController.rulerWindow.frame, for: .vertical)
+            )
+        }
     }
 
     private func mouseEvent(
