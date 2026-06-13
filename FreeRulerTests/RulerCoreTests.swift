@@ -114,6 +114,18 @@ final class RulerCoreTests: XCTestCase {
         }
     }
 
+    func testZeroCornerFlipsAlongSelectedAxis() {
+        XCTAssertEqual(ZeroCorner.topLeft.flipped(along: .horizontal), .topRight)
+        XCTAssertEqual(ZeroCorner.topRight.flipped(along: .horizontal), .topLeft)
+        XCTAssertEqual(ZeroCorner.bottomLeft.flipped(along: .horizontal), .bottomRight)
+        XCTAssertEqual(ZeroCorner.bottomRight.flipped(along: .horizontal), .bottomLeft)
+
+        XCTAssertEqual(ZeroCorner.topLeft.flipped(along: .vertical), .bottomLeft)
+        XCTAssertEqual(ZeroCorner.topRight.flipped(along: .vertical), .bottomRight)
+        XCTAssertEqual(ZeroCorner.bottomLeft.flipped(along: .vertical), .topLeft)
+        XCTAssertEqual(ZeroCorner.bottomRight.flipped(along: .vertical), .topRight)
+    }
+
     func testZeroCornerGeometryPlacesFramesAroundSharedZeroPoint() {
         let zeroPoint = NSPoint(x: 200, y: 300)
         let horizontalSize = NSSize(width: 120, height: Ruler.thickness)
@@ -1077,6 +1089,104 @@ final class RulerCoreTests: XCTestCase {
 
         XCTAssertFalse(draggedController.rulerWindow.rule.showMouseTick)
         XCTAssertFalse(groupedChildController.rulerWindow.rule.showMouseTick)
+    }
+
+    func testUngroupedHorizontalFlipDoesNotMoveRulerWindows() {
+        withRestoredZeroCornerPreference {
+            let previousGroupRulers = prefs.groupRulers
+            defer { prefs.groupRulers = previousGroupRulers }
+
+            prefs.zeroCorner = .topLeft
+            prefs.groupRulers = false
+            let appDelegate = AppDelegate()
+            let horizontalController = RulerController(
+                ruler: Ruler(.horizontal, frame: NSRect(x: 100, y: 299, width: 120, height: Ruler.thickness))
+            )
+            let verticalController = RulerController(
+                ruler: Ruler(.vertical, frame: NSRect(x: 51, y: 150, width: Ruler.thickness, height: 160))
+            )
+            appDelegate.rulers = [verticalController, horizontalController]
+
+            appDelegate.flipRulers(along: .horizontal)
+
+            XCTAssertEqual(prefs.zeroCorner, .topRight)
+            XCTAssertEqual(horizontalController.rulerWindow.frame, NSRect(x: 100, y: 299, width: 120, height: Ruler.thickness))
+            XCTAssertEqual(verticalController.rulerWindow.frame, NSRect(x: 51, y: 150, width: Ruler.thickness, height: 160))
+        }
+    }
+
+    func testGroupedHorizontalFlipMovesVerticalRulerToPreserveZeroPointOffset() {
+        withRestoredZeroCornerPreference {
+            let previousGroupRulers = prefs.groupRulers
+            defer { prefs.groupRulers = previousGroupRulers }
+
+            prefs.zeroCorner = .topLeft
+            prefs.groupRulers = true
+            let appDelegate = AppDelegate()
+            let horizontalController = RulerController(
+                ruler: Ruler(.horizontal, frame: NSRect(x: 100, y: 299, width: 120, height: Ruler.thickness))
+            )
+            let verticalController = RulerController(
+                ruler: Ruler(.vertical, frame: NSRect(x: 51, y: 150, width: Ruler.thickness, height: 160))
+            )
+            appDelegate.rulers = [verticalController, horizontalController]
+
+            appDelegate.flipRulers(along: .horizontal)
+
+            XCTAssertEqual(prefs.zeroCorner, .topRight)
+            XCTAssertEqual(horizontalController.rulerWindow.frame, NSRect(x: 100, y: 299, width: 120, height: Ruler.thickness))
+            XCTAssertEqual(verticalController.rulerWindow.frame, NSRect(x: 210, y: 150, width: Ruler.thickness, height: 160))
+        }
+    }
+
+    func testGroupedVerticalFlipMovesHorizontalRulerToPreserveZeroPointOffset() {
+        withRestoredZeroCornerPreference {
+            let previousGroupRulers = prefs.groupRulers
+            defer { prefs.groupRulers = previousGroupRulers }
+
+            prefs.zeroCorner = .topLeft
+            prefs.groupRulers = true
+            let appDelegate = AppDelegate()
+            let horizontalController = RulerController(
+                ruler: Ruler(.horizontal, frame: NSRect(x: 100, y: 299, width: 120, height: Ruler.thickness))
+            )
+            let verticalController = RulerController(
+                ruler: Ruler(.vertical, frame: NSRect(x: 61, y: 140, width: Ruler.thickness, height: 160))
+            )
+            appDelegate.rulers = [verticalController, horizontalController]
+
+            appDelegate.flipRulers(along: .vertical)
+
+            XCTAssertEqual(prefs.zeroCorner, .bottomLeft)
+            XCTAssertEqual(verticalController.rulerWindow.frame, NSRect(x: 61, y: 140, width: Ruler.thickness, height: 160))
+            XCTAssertEqual(horizontalController.rulerWindow.frame, NSRect(x: 100, y: 101, width: 120, height: Ruler.thickness))
+        }
+    }
+
+    func testGroupedFlipDoesNotShowHiddenRulerWindows() {
+        withRestoredZeroCornerPreference {
+            let previousGroupRulers = prefs.groupRulers
+            defer { prefs.groupRulers = previousGroupRulers }
+
+            prefs.zeroCorner = .topLeft
+            prefs.groupRulers = true
+            let appDelegate = AppDelegate()
+            let horizontalController = RulerController(
+                ruler: Ruler(.horizontal, frame: NSRect(x: 100, y: 299, width: 120, height: Ruler.thickness))
+            )
+            let verticalController = RulerController(
+                ruler: Ruler(.vertical, frame: NSRect(x: 61, y: 140, width: Ruler.thickness, height: 160))
+            )
+            appDelegate.rulers = [verticalController, horizontalController]
+
+            XCTAssertFalse(horizontalController.rulerWindow.isVisible)
+            XCTAssertFalse(verticalController.rulerWindow.isVisible)
+
+            appDelegate.flipRulers(along: .horizontal)
+
+            XCTAssertFalse(horizontalController.rulerWindow.isVisible)
+            XCTAssertFalse(verticalController.rulerWindow.isVisible)
+        }
     }
 
     private func mouseEvent(

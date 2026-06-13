@@ -12,6 +12,29 @@ enum Orientation: String {
     case bottomRight = 3
 }
 
+extension ZeroCorner {
+    func flipped(along orientation: Orientation) -> ZeroCorner {
+        switch (self, orientation) {
+        case (.topLeft, .horizontal):
+            return .topRight
+        case (.topRight, .horizontal):
+            return .topLeft
+        case (.bottomLeft, .horizontal):
+            return .bottomRight
+        case (.bottomRight, .horizontal):
+            return .bottomLeft
+        case (.topLeft, .vertical):
+            return .bottomLeft
+        case (.topRight, .vertical):
+            return .bottomRight
+        case (.bottomLeft, .vertical):
+            return .topLeft
+        case (.bottomRight, .vertical):
+            return .topRight
+        }
+    }
+}
+
 enum RulerGrowthDirection: Equatable {
     case positive
     case negative

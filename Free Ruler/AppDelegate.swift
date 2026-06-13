@@ -218,6 +218,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             prefs.observe(\Prefs.rulerColor, options: .new) { prefs, changed in
                 self.redrawRulers()
             },
+            prefs.observe(\Prefs.zeroCorner, options: .new) { prefs, changed in
+                self.redrawRulers()
+            },
         ]
     }
 
@@ -505,6 +508,65 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @IBAction func toggleVerticalRuler(_ sender: Any) {
         toggleRuler(orientation: .vertical)
+    }
+
+    func flipRulers(along orientation: Orientation) {
+        createRulersIfNeeded()
+
+        let oldGeometry = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner)
+        let flippedCorner = prefs.zeroCorner.flipped(along: orientation)
+        let flippedRuler = existingRulerController(orientation: orientation)
+        let otherOrientation: Orientation = orientation == .horizontal ? .vertical : .horizontal
+        let otherRuler = existingRulerController(orientation: otherOrientation)
+        let zeroPointOffset = zeroPointOffset(
+            from: flippedRuler?.rulerWindow,
+            to: otherRuler?.rulerWindow,
+            geometry: oldGeometry
+        )
+
+        prefs.zeroCorner = flippedCorner
+
+        guard prefs.groupRulers,
+              let flippedWindow = flippedRuler?.rulerWindow,
+              let otherWindow = otherRuler?.rulerWindow,
+              let zeroPointOffset = zeroPointOffset else { return }
+
+        let newGeometry = ZeroCornerGeometry(zeroCorner: flippedCorner)
+        let flippedZeroPoint = newGeometry.zeroPoint(in: flippedWindow.frame, for: orientation)
+        let targetOtherZeroPoint = NSPoint(
+            x: flippedZeroPoint.x + zeroPointOffset.width,
+            y: flippedZeroPoint.y + zeroPointOffset.height
+        )
+        let otherFrame = newGeometry.frame(
+            for: otherOrientation,
+            zeroPoint: targetOtherZeroPoint,
+            size: otherWindow.frame.size
+        )
+
+        otherWindow.setFrame(otherFrame, display: true)
+    }
+
+    private func zeroPointOffset(
+        from sourceWindow: RulerWindow?,
+        to targetWindow: RulerWindow?,
+        geometry: ZeroCornerGeometry
+    ) -> NSSize? {
+        guard let sourceWindow = sourceWindow,
+              let targetWindow = targetWindow else { return nil }
+
+        let sourceZeroPoint = geometry.zeroPoint(
+            in: sourceWindow.frame,
+            for: sourceWindow.ruler.orientation
+        )
+        let targetZeroPoint = geometry.zeroPoint(
+            in: targetWindow.frame,
+            for: targetWindow.ruler.orientation
+        )
+
+        return NSSize(
+            width: targetZeroPoint.x - sourceZeroPoint.x,
+            height: targetZeroPoint.y - sourceZeroPoint.y
+        )
     }
 
     func performRulerHotkey(keyCode: Int, sender: Any) -> Bool {
