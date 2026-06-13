@@ -279,20 +279,8 @@ final class RulerCoreTests: XCTestCase {
         withRestoredZeroCornerPreference {
             prefs.zeroCorner = .bottomRight
             let rule = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
-            guard let resizeHandleFrame = rule.resizeHandleExclusionFrame else {
-                return XCTFail("Expected horizontal ruler to install a resize handle")
-            }
 
             XCTAssertEqual(rule.mouseNumber(forTickX: 260, rulerWidth: 300), 40)
-            XCTAssertEqual(
-                rule.mouseNumberLabelRect(
-                    number: resizeHandleFrame.maxX - 1,
-                    labelSize: NSSize(width: 30, height: 10),
-                    rulerSize: rule.bounds.size
-                ).minX,
-                resizeHandleFrame.maxX + rule.mouseTickLabelResizeHandleSpacing,
-                accuracy: 0.0001
-            )
             XCTAssertEqual(
                 rule.unitLabelRect(labelSize: NSSize(width: 12, height: 10), rulerSize: NSSize(width: 300, height: 40)),
                 CGRect(x: 280, y: 9, width: 12, height: 10)
@@ -341,6 +329,83 @@ final class RulerCoreTests: XCTestCase {
                 rule.unitLabelRect(labelSize: NSSize(width: 12, height: 10), rulerSize: NSSize(width: 40, height: 300)),
                 CGRect(x: 20, y: 9, width: 12, height: 10)
             )
+        }
+    }
+
+    func testMouseNumberLabelFramesFollowZeroCornerPlacement() {
+        withRestoredZeroCornerPreference {
+            let horizontalRule = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
+            let verticalRule = VerticalRule(frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
+            let labelSize = NSSize(width: 20, height: 10)
+            let cases: [
+                (
+                    zeroCorner: ZeroCorner,
+                    horizontalRect: CGRect,
+                    verticalRect: CGRect
+                )
+            ] = [
+                (.topLeft, CGRect(x: 155, y: 28, width: 20, height: 10), CGRect(x: 7, y: 133, width: 20, height: 10)),
+                (.topRight, CGRect(x: 155, y: 28, width: 20, height: 10), CGRect(x: 13, y: 133, width: 20, height: 10)),
+                (.bottomLeft, CGRect(x: 155, y: 2, width: 20, height: 10), CGRect(x: 7, y: 133, width: 20, height: 10)),
+                (.bottomRight, CGRect(x: 155, y: 2, width: 20, height: 10), CGRect(x: 13, y: 133, width: 20, height: 10)),
+            ]
+
+            for testCase in cases {
+                prefs.zeroCorner = testCase.zeroCorner
+                horizontalRule.redrawForPreferenceChange()
+                verticalRule.redrawForPreferenceChange()
+
+                XCTAssertEqual(
+                    horizontalRule.mouseNumberLabelRect(
+                        tickX: 150,
+                        labelSize: labelSize,
+                        rulerSize: horizontalRule.bounds.size
+                    ),
+                    testCase.horizontalRect,
+                    "\(testCase.zeroCorner) horizontal mouse number label"
+                )
+                XCTAssertEqual(
+                    verticalRule.mouseNumberLabelRect(
+                        tickY: 150,
+                        labelSize: labelSize,
+                        rulerSize: verticalRule.bounds.size
+                    ),
+                    testCase.verticalRect,
+                    "\(testCase.zeroCorner) vertical mouse number label"
+                )
+            }
+        }
+    }
+
+    func testResizeHandlesAreVisuallyObscuredWhenMouseTickOverlaps() {
+        withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .topLeft
+            let horizontalRule = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
+            let verticalRule = VerticalRule(frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
+            guard let horizontalHandle = horizontalRule.subviews.first(where: { $0 is ResizeHandleView }) as? ResizeHandleView else {
+                return XCTFail("Expected horizontal ruler to install a resize handle")
+            }
+            guard let verticalHandle = verticalRule.subviews.first(where: { $0 is ResizeHandleView }) as? ResizeHandleView else {
+                return XCTFail("Expected vertical ruler to install a resize handle")
+            }
+
+            horizontalRule.mouseTickX = horizontalHandle.frame.midX
+            XCTAssertFalse(horizontalHandle.isHidden)
+            XCTAssertEqual(horizontalHandle.alphaValue, 0)
+
+            horizontalRule.mouseTickX = horizontalHandle.frame.minX - 1
+            XCTAssertEqual(horizontalHandle.alphaValue, 1)
+
+            verticalRule.mouseTickY = verticalHandle.frame.midY
+            XCTAssertFalse(verticalHandle.isHidden)
+            XCTAssertEqual(verticalHandle.alphaValue, 0)
+
+            verticalRule.mouseTickY = verticalHandle.frame.maxY + 1
+            XCTAssertEqual(verticalHandle.alphaValue, 1)
+
+            verticalRule.mouseTickY = verticalHandle.frame.midY
+            verticalRule.showMouseTick = false
+            XCTAssertEqual(verticalHandle.alphaValue, 1)
         }
     }
 
@@ -975,81 +1040,83 @@ final class RulerCoreTests: XCTestCase {
         }
     }
 
-    func testHorizontalMouseTickLabelStopsBeforeResizeHandle() {
+    func testHorizontalMouseTickLabelFlipsBeforeRulerEnd() {
         withRestoredZeroCornerPreference {
             prefs.zeroCorner = .topLeft
 
             let rule = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
-            guard let resizeHandleFrame = rule.resizeHandleExclusionFrame else {
-                return XCTFail("Expected horizontal ruler to install a resize handle")
-            }
             let labelSize = CGSize(width: 30, height: 10)
             let rulerSize = rule.bounds.size
-            let expectedMaxLabelRight = resizeHandleFrame.minX - rule.mouseTickLabelResizeHandleSpacing
-            let pinnedLabelX = expectedMaxLabelRight - labelSize.width
-            let mouseTickBeforePinnedLabel = pinnedLabelX - 2
+            let mouseTickNearRightEdge: CGFloat = 290
 
             let labelRect = rule.mouseNumberLabelRect(
-                number: mouseTickBeforePinnedLabel,
+                tickX: mouseTickNearRightEdge,
                 labelSize: labelSize,
                 rulerSize: rulerSize
             )
 
-            XCTAssertGreaterThan(labelRect.minX, mouseTickBeforePinnedLabel)
+            XCTAssertLessThan(labelRect.maxX, mouseTickNearRightEdge)
             XCTAssertEqual(
                 labelRect.maxX,
-                expectedMaxLabelRight,
+                285,
                 accuracy: 0.0001
             )
         }
     }
 
-    func testHorizontalMouseTickLabelFlipsBeforeCollidingWithMouseTick() {
+    func testHorizontalMouseTickLabelClampsToRulerStart() {
         withRestoredZeroCornerPreference {
             prefs.zeroCorner = .topLeft
 
             let rule = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
-            guard let resizeHandleFrame = rule.resizeHandleExclusionFrame else {
-                return XCTFail("Expected horizontal ruler to install a resize handle")
-            }
             let labelSize = CGSize(width: 30, height: 10)
             let rulerSize = rule.bounds.size
-            let expectedMaxLabelRight = resizeHandleFrame.minX - rule.mouseTickLabelResizeHandleSpacing
-            let mouseTickInsideResizeHandle = resizeHandleFrame.minX + 1
+            let mouseTickNearLeftEdge: CGFloat = -10
 
             let labelRect = rule.mouseNumberLabelRect(
-                number: mouseTickInsideResizeHandle,
+                tickX: mouseTickNearLeftEdge,
                 labelSize: labelSize,
                 rulerSize: rulerSize
             )
 
-            XCTAssertGreaterThan(mouseTickInsideResizeHandle, resizeHandleFrame.minX)
-            XCTAssertLessThan(labelRect.maxX, mouseTickInsideResizeHandle)
             XCTAssertEqual(
-                labelRect.maxX,
-                expectedMaxLabelRight,
+                labelRect.minX,
+                5,
                 accuracy: 0.0001
             )
         }
     }
 
-    func testVerticalMouseTickLabelStopsBeforeResizeHandle() {
-        let rule = VerticalRule(frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
-        guard let resizeHandleFrame = rule.resizeHandleExclusionFrame else {
-            return XCTFail("Expected vertical ruler to install a resize handle")
+    func testVerticalMouseTickLabelStaysWithinRulerEnds() {
+        withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .topLeft
+
+            let rule = VerticalRule(frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
+            let labelSize = CGSize(width: 20, height: 10)
+            let rulerSize = rule.bounds.size
+
+            let labelNearBottom = rule.mouseNumberLabelRect(
+                tickY: 1,
+                labelSize: labelSize,
+                rulerSize: rulerSize
+            )
+            XCTAssertEqual(
+                labelNearBottom.minY,
+                8,
+                accuracy: 0.0001
+            )
+
+            let labelNearTop = rule.mouseNumberLabelRect(
+                tickY: 299,
+                labelSize: labelSize,
+                rulerSize: rulerSize
+            )
+            XCTAssertEqual(
+                labelNearTop.minY,
+                282,
+                accuracy: 0.0001
+            )
         }
-
-        let labelRect = rule.mouseNumberLabelRect(
-            number: 290,
-            labelSize: CGSize(width: 22, height: 10),
-            rulerHeight: 300
-        )
-
-        XCTAssertEqual(
-            labelRect.minY,
-            resizeHandleFrame.maxY + rule.mouseTickLabelResizeHandleSpacing,
-            accuracy: 0.0001
-        )
     }
 
     func testResizeHandleDisablesWindowBackgroundDraggingDuringResizeDrag() {

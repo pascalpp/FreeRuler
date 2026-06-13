@@ -19,6 +19,7 @@ class HorizontalRule: RuleView {
     var mouseTickX: CGFloat = 0 {
         didSet {
             if mouseTickX != oldValue {
+                updateResizeHandleVisibility()
                 updateUnitLabelVisibility()
                 needsDisplay = true
             }
@@ -138,7 +139,7 @@ class HorizontalRule: RuleView {
         let labelSize = label.size()
 
         let labelRect = mouseNumberLabelRect(
-            number: mouseTickX,
+            tickX: mouseTickX,
             labelSize: labelSize,
             rulerSize: CGSize(width: width, height: height)
         )
@@ -149,39 +150,13 @@ class HorizontalRule: RuleView {
         )
     }
 
-    func mouseNumberLabelRect(number: CGFloat, labelSize: CGSize, rulerSize: CGSize) -> CGRect {
-        let labelOffset: CGFloat = 5
-        let tickSide = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner).tickSide(for: .horizontal)
-
-        let rightPosition = number + labelOffset
-        let leftPosition = number - labelOffset - labelSize.width
-        var minLabelLeft = labelOffset
-        var maxLabelRight = rulerSize.width - labelOffset
-
-        if let resizeHandleExclusionFrame = resizeHandleExclusionFrame {
-            if resizeHandleExclusionFrame.midX < rulerSize.width / 2 {
-                minLabelLeft = max(
-                    minLabelLeft,
-                    resizeHandleExclusionFrame.maxX + mouseTickLabelResizeHandleSpacing
-                )
-            } else {
-                maxLabelRight = min(
-                    maxLabelRight,
-                    resizeHandleExclusionFrame.minX - mouseTickLabelResizeHandleSpacing
-                )
-            }
-        }
-
-        let pinnedRightPosition = maxLabelRight - labelSize.width
-        let rightLabelX = max(min(rightPosition, pinnedRightPosition), minLabelLeft)
-        let leftLabelX = max(min(leftPosition, pinnedRightPosition), minLabelLeft)
-        let labelX = number < rightLabelX ? rightLabelX : leftLabelX
-
-        return CGRect(
-            x: labelX,
-            y: tickSide == .bottom ? rulerSize.height - labelSize.height : 0,
-            width: labelSize.width,
-            height: labelSize.height
+    func mouseNumberLabelRect(tickX: CGFloat, labelSize: CGSize, rulerSize: CGSize) -> CGRect {
+        return MouseTickLabelLayout.labelFrame(
+            labelSize: labelSize,
+            rulerSize: rulerSize,
+            orientation: .horizontal,
+            zeroCorner: prefs.zeroCorner,
+            tickPosition: tickX
         )
     }
 
@@ -195,6 +170,18 @@ class HorizontalRule: RuleView {
         }
 
         setUnitLabelHidden(frame.minX <= mouseTickX && mouseTickX <= frame.maxX)
+    }
+
+    override func updateResizeHandleVisibility() {
+        guard showMouseTick,
+              mouseTickX > 0,
+              mouseTickX < bounds.width,
+              let frame = resizeHandleExclusionFrame else {
+            setResizeHandleObscured(false)
+            return
+        }
+
+        setResizeHandleObscured(frame.minX <= mouseTickX && mouseTickX <= frame.maxX)
     }
 
     func tickX(

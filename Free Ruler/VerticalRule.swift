@@ -19,6 +19,7 @@ class VerticalRule: RuleView {
     var mouseTickY: CGFloat = 0 {
         didSet {
             if mouseTickY != oldValue {
+                updateResizeHandleVisibility()
                 updateUnitLabelVisibility()
                 needsDisplay = true
             }
@@ -139,9 +140,9 @@ class VerticalRule: RuleView {
         let labelSize = label.size()
 
         let labelRect = mouseNumberLabelRect(
-            number: height - mouseTickY,
+            tickY: mouseTickY,
             labelSize: labelSize,
-            rulerHeight: height
+            rulerSize: CGSize(width: self.frame.width, height: height)
         )
         color.fill.setFill()
         labelRect.fill()
@@ -153,24 +154,14 @@ class VerticalRule: RuleView {
         )
     }
 
-    func mouseNumberLabelRect(number: CGFloat, labelSize: CGSize, rulerHeight: CGFloat) -> CGRect {
-        let labelOffset: CGFloat = 2
-        let tickSide = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner).tickSide(for: .vertical)
-
-        // Offset the bottom position until text can be centered vertically in the label rect.
-        let bottomPosition = number + 7
-        let topPosition = number - labelOffset - labelSize.height
-        let enoughRoomToTheBottom = bottomPosition + labelSize.height < rulerHeight - labelOffset
-        let labelY = enoughRoomToTheBottom ? bottomPosition : topPosition
-        let labelX: CGFloat = tickSide == .right ? 7 : 11
-        var labelRect = CGRect(x: labelX, y: rulerHeight - (labelY + labelSize.height), width: 22, height: 15)
-
-        if let resizeHandleExclusionFrame = resizeHandleExclusionFrame {
-            let minLabelBottom = resizeHandleExclusionFrame.maxY + mouseTickLabelResizeHandleSpacing
-            labelRect.origin.y = max(labelRect.origin.y, minLabelBottom)
-        }
-
-        return labelRect
+    func mouseNumberLabelRect(tickY: CGFloat, labelSize: CGSize, rulerSize: CGSize) -> CGRect {
+        return MouseTickLabelLayout.labelFrame(
+            labelSize: labelSize,
+            rulerSize: rulerSize,
+            orientation: .vertical,
+            zeroCorner: prefs.zeroCorner,
+            tickPosition: tickY
+        )
     }
 
     override func updateUnitLabelVisibility() {
@@ -183,6 +174,18 @@ class VerticalRule: RuleView {
         }
 
         setUnitLabelHidden(frame.minY <= mouseTickY && mouseTickY <= frame.maxY)
+    }
+
+    override func updateResizeHandleVisibility() {
+        guard showMouseTick,
+              mouseTickY >= 1,
+              mouseTickY < bounds.height,
+              let frame = resizeHandleExclusionFrame else {
+            setResizeHandleObscured(false)
+            return
+        }
+
+        setResizeHandleObscured(frame.minY <= mouseTickY && mouseTickY <= frame.maxY)
     }
 
     func tickY(

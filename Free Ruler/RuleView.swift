@@ -45,6 +45,142 @@ struct RulerColors {
     }
 }
 
+struct MouseTickLabelLayout {
+    private struct Offsets {
+        let topInset: CGFloat
+        let bottomInset: CGFloat
+        let leftInset: CGFloat
+        let rightInset: CGFloat
+        let tickGap: CGFloat
+    }
+
+    static func labelFrame(
+        labelSize: NSSize,
+        rulerSize: NSSize,
+        orientation: Orientation,
+        zeroCorner: ZeroCorner,
+        tickPosition: CGFloat
+    ) -> NSRect {
+        let placement = ZeroCornerGeometry(zeroCorner: zeroCorner)
+            .unitLabelPlacement(for: orientation)
+        let offsets = offsets(for: orientation, placement: placement)
+        let x: CGFloat
+        let y: CGFloat
+
+        switch (orientation, placement.xSide, placement.ySide) {
+        case (.horizontal, .left, .top), (.horizontal, .right, .top):
+            x = horizontalX(
+                forTickX: tickPosition,
+                labelSize: labelSize,
+                rulerSize: rulerSize,
+                offsets: offsets
+            )
+            y = rulerSize.height - labelSize.height - offsets.topInset
+        case (.horizontal, .left, .bottom), (.horizontal, .right, .bottom):
+            x = horizontalX(
+                forTickX: tickPosition,
+                labelSize: labelSize,
+                rulerSize: rulerSize,
+                offsets: offsets
+            )
+            y = offsets.bottomInset
+        case (.vertical, .left, .top), (.vertical, .left, .bottom):
+            x = offsets.leftInset
+            y = verticalY(
+                forTickY: tickPosition,
+                labelSize: labelSize,
+                rulerSize: rulerSize,
+                offsets: offsets
+            )
+        case (.vertical, .right, .top), (.vertical, .right, .bottom):
+            x = rulerSize.width - labelSize.width - offsets.rightInset
+            y = verticalY(
+                forTickY: tickPosition,
+                labelSize: labelSize,
+                rulerSize: rulerSize,
+                offsets: offsets
+            )
+        case (_, _, _):
+            assertionFailure("Mouse tick label must be anchored to left/right and top/bottom sides")
+            x = offsets.leftInset
+            y = offsets.bottomInset
+        }
+
+        return NSRect(x: x, y: y, width: labelSize.width, height: labelSize.height)
+    }
+
+    private static func offsets(
+        for orientation: Orientation,
+        placement: RulerCornerPlacement
+    ) -> Offsets {
+        switch (orientation, placement.xSide, placement.ySide) {
+        case (.horizontal, .left, .top):
+            return Offsets(topInset: 2, bottomInset: 2, leftInset: 5, rightInset: 5, tickGap: 5)
+        case (.horizontal, .right, .top):
+            return Offsets(topInset: 2, bottomInset: 2, leftInset: 5, rightInset: 5, tickGap: 5)
+        case (.horizontal, .left, .bottom):
+            return Offsets(topInset: 2, bottomInset: 2, leftInset: 5, rightInset: 5, tickGap: 5)
+        case (.horizontal, .right, .bottom):
+            return Offsets(topInset: 2, bottomInset: 2, leftInset: 5, rightInset: 5, tickGap: 5)
+        case (.vertical, .left, .top):
+            return Offsets(topInset: 2, bottomInset: 2, leftInset: 7, rightInset: 7, tickGap: 7)
+        case (.vertical, .right, .top):
+            return Offsets(topInset: 2, bottomInset: 2, leftInset: 7, rightInset: 7, tickGap: 7)
+        case (.vertical, .left, .bottom):
+            return Offsets(topInset: 2, bottomInset: 2, leftInset: 7, rightInset: 7, tickGap: 7)
+        case (.vertical, .right, .bottom):
+            return Offsets(topInset: 2, bottomInset: 2, leftInset: 7, rightInset: 7, tickGap: 7)
+        case (_, _, _):
+            assertionFailure("Mouse tick label offsets require left/right and top/bottom placement")
+            return Offsets(topInset: 2, bottomInset: 2, leftInset: 5, rightInset: 5, tickGap: 5)
+        }
+    }
+
+    private static func horizontalX(
+        forTickX tickX: CGFloat,
+        labelSize: NSSize,
+        rulerSize: NSSize,
+        offsets: Offsets
+    ) -> CGFloat {
+        let minLabelX = offsets.leftInset
+        let maxLabelX = rulerSize.width - labelSize.width - offsets.rightInset
+
+        let rightX = tickX + offsets.tickGap
+        let leftX = tickX - offsets.tickGap - labelSize.width
+        let preferredX = rightX <= maxLabelX ? rightX : leftX
+
+        return clamp(preferredX, lowerBound: minLabelX, upperBound: maxLabelX)
+    }
+
+    private static func verticalY(
+        forTickY tickY: CGFloat,
+        labelSize: NSSize,
+        rulerSize: NSSize,
+        offsets: Offsets
+    ) -> CGFloat {
+        let minLabelY = offsets.bottomInset
+        let maxLabelY = rulerSize.height - labelSize.height - offsets.topInset
+
+        let belowTickY = tickY - offsets.tickGap - labelSize.height
+        let aboveTickY = tickY + offsets.tickGap
+        let preferredY = belowTickY >= minLabelY ? belowTickY : aboveTickY
+
+        return clamp(preferredY, lowerBound: minLabelY, upperBound: maxLabelY)
+    }
+
+    private static func clamp(
+        _ value: CGFloat,
+        lowerBound: CGFloat,
+        upperBound: CGFloat
+    ) -> CGFloat {
+        guard lowerBound <= upperBound else {
+            return lowerBound
+        }
+
+        return min(max(value, lowerBound), upperBound)
+    }
+}
+
 class RuleView: NSView {
 
     var color = RulerColors() {
@@ -54,7 +190,6 @@ class RuleView: NSView {
             updateUnitLabelFrame()
         }
     }
-    let mouseTickLabelResizeHandleSpacing: CGFloat = 8
     private var resizeHandleView: ResizeHandleView?
     private var unitLabelView: UnitLabelView?
 
@@ -108,6 +243,7 @@ class RuleView: NSView {
         super.layout()
         updateResizeHandleFrame()
         updateUnitLabelFrame()
+        updateResizeHandleVisibility()
         updateUnitLabelVisibility()
     }
 
@@ -136,6 +272,7 @@ class RuleView: NSView {
     func redrawForPreferenceChange() {
         updateResizeHandleFrame()
         updateUnitLabelFrame()
+        updateResizeHandleVisibility()
         updateUnitLabelVisibility()
         setNeedsDisplay(visibleRect)
         resizeHandleView?.needsDisplay = true
@@ -153,6 +290,7 @@ class RuleView: NSView {
     var showMouseTick: Bool = true {
         didSet {
             if showMouseTick != oldValue {
+                updateResizeHandleVisibility()
                 updateUnitLabelVisibility()
                 needsDisplay = true
             }
@@ -221,6 +359,14 @@ class RuleView: NSView {
 
     func setUnitLabelHidden(_ isHidden: Bool) {
         unitLabelView?.isHidden = isHidden
+    }
+
+    func setResizeHandleObscured(_ isObscured: Bool) {
+        resizeHandleView?.alphaValue = isObscured ? 0 : 1
+    }
+
+    func updateResizeHandleVisibility() {
+        setResizeHandleObscured(false)
     }
 
     func updateUnitLabelVisibility() {
