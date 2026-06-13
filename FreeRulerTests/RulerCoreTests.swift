@@ -1275,6 +1275,30 @@ final class RulerCoreTests: XCTestCase {
         }
     }
 
+    func testShiftHotkeysIgnoreCapsLock() {
+        withRestoredZeroCornerPreference {
+            let previousGroupRulers = prefs.groupRulers
+            defer { prefs.groupRulers = previousGroupRulers }
+
+            prefs.zeroCorner = .topLeft
+            prefs.groupRulers = false
+            let appDelegate = AppDelegate()
+            let horizontalController = RulerController(
+                ruler: Ruler(.horizontal, frame: NSRect(x: 100, y: 299, width: 120, height: Ruler.thickness))
+            )
+            appDelegate.rulers = [horizontalController]
+
+            XCTAssertTrue(
+                appDelegate.performRulerHotkey(
+                    keyCode: kVK_ANSI_H,
+                    modifierFlags: [.shift, .capsLock],
+                    sender: horizontalController
+                )
+            )
+            XCTAssertEqual(prefs.zeroCorner, .topRight)
+        }
+    }
+
     func testNonShiftModifiedRulerHotkeysAreIgnored() {
         let appDelegate = AppDelegate()
 

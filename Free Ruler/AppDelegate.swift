@@ -611,7 +611,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         modifierFlags: NSEvent.ModifierFlags,
         sender: Any
     ) -> Bool {
-        let keyboardModifiers = modifierFlags.intersection(.deviceIndependentFlagsMask)
+        let keyboardModifiers = modifierFlags
+            .intersection(.deviceIndependentFlagsMask)
+            .subtracting(.capsLock)
 
         if keyboardModifiers == .shift {
             switch keyCode {
