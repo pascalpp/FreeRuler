@@ -235,6 +235,7 @@ class HorizontalRule: RuleView {
         tickSide: RulerSide
     ) -> CGRect {
         let labelOffset: CGFloat = 13
+        let textHeight: CGFloat = 8
         let labelX: CGFloat = x - (labelSize.width / 2) + 0.5
         let labelY: CGFloat
 
@@ -242,7 +243,7 @@ class HorizontalRule: RuleView {
         case .bottom:
             labelY = labelOffset
         case .top:
-            labelY = rulerHeight - labelOffset - labelSize.height
+            labelY = rulerHeight - labelOffset - textHeight
         case .left, .right:
             assertionFailure("Horizontal ruler labels must be placed on a horizontal side")
             labelY = labelOffset
@@ -265,24 +266,28 @@ class HorizontalRule: RuleView {
     func unitLabelRect(labelSize: NSSize, rulerSize: NSSize) -> CGRect {
         let geometry = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner)
         let tickSide = geometry.tickSide(for: .horizontal)
-        let growthDirection = geometry.growthDirection(for: .horizontal)
+        let labelXSide = geometry.resizeSide(for: .horizontal).opposite
+        let labelYSide = tickSide.opposite
         let x: CGFloat
         let y: CGFloat
 
-        switch growthDirection {
-        case .positive:
+        switch labelXSide {
+        case .left:
             x = 10
-        case .negative:
+        case .right:
             x = rulerSize.width - labelSize.width - 10
+        case .top, .bottom:
+            assertionFailure("Horizontal unit label must be anchored to a horizontal corner side")
+            x = 10
         }
 
-        switch tickSide {
-        case .bottom:
-            y = rulerSize.height - labelSize.height
+        switch labelYSide {
         case .top:
+            y = rulerSize.height - labelSize.height
+        case .bottom:
             y = 0
         case .left, .right:
-            assertionFailure("Horizontal unit label must be placed on a horizontal side")
+            assertionFailure("Horizontal unit label must be anchored to a vertical corner side")
             y = rulerSize.height - labelSize.height
         }
 

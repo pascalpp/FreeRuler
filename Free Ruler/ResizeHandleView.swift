@@ -154,12 +154,14 @@ final class ResizeHandleView: NSView {
     }
 
     func frame(in bounds: NSRect) -> NSRect {
-        let resizeSide = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner).resizeSide(for: orientation)
+        let geometry = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner)
+        let tickSide = geometry.tickSide(for: orientation)
+        let resizeSide = geometry.resizeSide(for: orientation)
 
         switch orientation {
         case .horizontal:
-            let topY = bounds.maxY - horizontalYOffset
-            let bottomY = topY - length
+            let verticalHandleSide = tickSide.opposite
+            let bottomY: CGFloat
             let firstX: CGFloat
 
             switch resizeSide {
@@ -178,6 +180,16 @@ final class ResizeHandleView: NSView {
                     - 1
             }
 
+            switch verticalHandleSide {
+            case .top:
+                bottomY = bounds.maxY - horizontalYOffset - length
+            case .bottom:
+                bottomY = bounds.minY + horizontalYOffset
+            case .left, .right:
+                assertionFailure("Horizontal resize handle must be placed on a vertical side")
+                bottomY = bounds.maxY - horizontalYOffset - length
+            }
+
             return NSRect(
                 x: firstX - backgroundPadding,
                 y: bottomY - backgroundPadding,
@@ -185,9 +197,19 @@ final class ResizeHandleView: NSView {
                 height: length + (backgroundPadding * 2)
             )
         case .vertical:
-            let rightX = bounds.minX + verticalXOffset + length
-            let leftX = rightX - length
+            let horizontalHandleSide = tickSide.opposite
+            let leftX: CGFloat
             let firstY: CGFloat
+
+            switch horizontalHandleSide {
+            case .left:
+                leftX = bounds.minX + verticalXOffset
+            case .right:
+                leftX = bounds.maxX - verticalXOffset - length
+            case .top, .bottom:
+                assertionFailure("Vertical resize handle must be placed on a horizontal side")
+                leftX = bounds.minX + verticalXOffset
+            }
 
             switch resizeSide {
             case .top:
