@@ -4,6 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 output_dir="$PWD/Free Ruler/Images.xcassets/AppIcon.appiconset"
+help_icon="$PWD/Free Ruler/FreeRuler.help/Contents/Resources/shrd/freeruler.png"
 binary="${TMPDIR:-/tmp}/freeruler-generate-app-icon"
 module_cache="${TMPDIR:-/tmp}/freeruler-generate-app-icon-module-cache"
 
@@ -16,3 +17,4 @@ xcrun swiftc \
   -o "$binary"
 
 "$binary" "$output_dir"
+cp "$output_dir/icon_512x512.png" "$help_icon"
