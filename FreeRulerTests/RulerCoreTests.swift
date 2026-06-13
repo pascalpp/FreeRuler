@@ -19,6 +19,43 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertEqual(ruler.name, "test-ruler")
     }
 
+    func testZeroCornerRawValuesPreservePersistedOrder() {
+        XCTAssertEqual(ZeroCorner.topLeft.rawValue, 0)
+        XCTAssertEqual(ZeroCorner.topRight.rawValue, 1)
+        XCTAssertEqual(ZeroCorner.bottomLeft.rawValue, 2)
+        XCTAssertEqual(ZeroCorner.bottomRight.rawValue, 3)
+    }
+
+    func testZeroCornerLoadsFromRawValue() {
+        XCTAssertEqual(Prefs.zeroCorner(fromRawValue: ZeroCorner.topLeft.rawValue), .topLeft)
+        XCTAssertEqual(Prefs.zeroCorner(fromRawValue: ZeroCorner.topRight.rawValue), .topRight)
+        XCTAssertEqual(Prefs.zeroCorner(fromRawValue: ZeroCorner.bottomLeft.rawValue), .bottomLeft)
+        XCTAssertEqual(Prefs.zeroCorner(fromRawValue: ZeroCorner.bottomRight.rawValue), .bottomRight)
+    }
+
+    func testZeroCornerDefaultsToTopLeftForUnknownRawValue() {
+        XCTAssertEqual(Prefs.zeroCorner(fromRawValue: -1), .topLeft)
+        XCTAssertEqual(Prefs.zeroCorner(fromRawValue: 99), .topLeft)
+    }
+
+    func testZeroCornerPreferencePersistsToUserDefaults() {
+        withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .bottomRight
+
+            XCTAssertEqual(
+                UserDefaults.standard.integer(forKey: "zeroCorner"),
+                ZeroCorner.bottomRight.rawValue
+            )
+
+            prefs.zeroCorner = .topRight
+
+            XCTAssertEqual(
+                UserDefaults.standard.integer(forKey: "zeroCorner"),
+                ZeroCorner.topRight.rawValue
+            )
+        }
+    }
+
     func testMinAndMaxSizesMatchRulerOrientation() {
         let horizontal = Ruler(.horizontal, frame: NSRect(x: 0, y: 0, width: 300, height: 40))
         let vertical = Ruler(.vertical, frame: NSRect(x: 0, y: 0, width: 40, height: 300))
@@ -700,6 +737,34 @@ final class RulerCoreTests: XCTestCase {
             } else {
                 if previousDomainValue == nil {
                     defaults.removeObject(forKey: "rulerColor")
+                }
+            }
+        }
+
+        try test()
+    }
+
+    private func withRestoredZeroCornerPreference(_ test: () throws -> Void) rethrows {
+        let defaults = UserDefaults.standard
+        let previousZeroCorner = prefs.zeroCorner
+        let domainName = Bundle.main.bundleIdentifier
+        let previousDomainValue = domainName
+            .flatMap { defaults.persistentDomain(forName: $0)?["zeroCorner"] }
+
+        defer {
+            prefs.zeroCorner = previousZeroCorner
+
+            if let domainName = domainName {
+                var domain = defaults.persistentDomain(forName: domainName) ?? [:]
+                if let previousDomainValue = previousDomainValue {
+                    domain["zeroCorner"] = previousDomainValue
+                } else {
+                    domain.removeValue(forKey: "zeroCorner")
+                }
+                defaults.setPersistentDomain(domain, forName: domainName)
+            } else {
+                if previousDomainValue == nil {
+                    defaults.removeObject(forKey: "zeroCorner")
                 }
             }
         }

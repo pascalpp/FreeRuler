@@ -262,6 +262,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             "backgroundOpacity",
             "rulerColor",
             "unit",
+            "zeroCorner",
             "NSWindow Frame horizontal-ruler",
             "NSWindow Frame vertical-ruler",
             "NSWindow Frame preferencesWindow",
@@ -274,6 +275,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         prefs.backgroundOpacity = 50
         prefs.rulerColor = Prefs.defaultRulerFillColor
         prefs.unit = .pixels
+        prefs.zeroCorner = .topLeft
     }
 
     func createRulersIfNeeded() {

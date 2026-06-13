@@ -5,6 +5,13 @@ enum Orientation: String {
     case vertical
 }
 
+@objc enum ZeroCorner: Int {
+    case topLeft
+    case topRight
+    case bottomLeft
+    case bottomRight
+}
+
 class Ruler {
     static let thickness: CGFloat = 40
 
