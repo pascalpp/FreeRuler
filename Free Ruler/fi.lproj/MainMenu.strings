@@ -56,8 +56,14 @@
 /* Class = "NSMenuItem"; title = "Show All"; ObjectID = "Kd2-mp-pUS"; */
 "Kd2-mp-pUS.title" = "Näytä kaikki";
 
+/* Class = "NSMenuItem"; title = "Flip"; ObjectID = "TkR-03-X6l"; */
+"TkR-03-X6l.title" = "Käännä";
+
 /* Class = "NSMenuItem"; title = "Bring All to Front"; ObjectID = "LE2-aR-0XJ"; */
 "LE2-aR-0XJ.title" = "Tuo kaikki eteen";
+
+/* Class = "NSMenu"; title = "Flip"; ObjectID = "mEK-Pg-ijY"; */
+"mEK-Pg-ijY.title" = "Käännä";
 
 /* Class = "NSMenuItem"; title = "Services"; ObjectID = "NMo-om-nkz"; */
 "NMo-om-nkz.title" = "Palvelut";

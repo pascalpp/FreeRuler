@@ -56,8 +56,14 @@
 /* Class = "NSMenuItem"; title = "Show All"; ObjectID = "Kd2-mp-pUS"; */
 "Kd2-mp-pUS.title" = "显示全部";
 
+/* Class = "NSMenuItem"; title = "Flip"; ObjectID = "TkR-03-X6l"; */
+"TkR-03-X6l.title" = "翻转";
+
 /* Class = "NSMenuItem"; title = "Bring All to Front"; ObjectID = "LE2-aR-0XJ"; */
 "LE2-aR-0XJ.title" = "全部置于顶层";
+
+/* Class = "NSMenu"; title = "Flip"; ObjectID = "mEK-Pg-ijY"; */
+"mEK-Pg-ijY.title" = "翻转";
 
 /* Class = "NSMenuItem"; title = "Services"; ObjectID = "NMo-om-nkz"; */
 "NMo-om-nkz.title" = "服务";
