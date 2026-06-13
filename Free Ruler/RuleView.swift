@@ -677,47 +677,11 @@ private struct MouseTickLabelCornerPreview: View {
     }
 }
 
-private struct RuleViewPreview: NSViewRepresentable {
-    let orientation: Orientation
-
-    func makeNSView(context: Context) -> RuleView {
-        let view: RuleView
-        switch orientation {
-        case .horizontal:
-            view = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 320, height: Ruler.thickness))
-        case .vertical:
-            view = VerticalRule(frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 320))
-        }
-
-        view.showMouseTick = false
-        view.installWindowBorder()
-        return view
-    }
-
-    func updateNSView(_ view: RuleView, context: Context) {
-        view.showMouseTick = false
-        view.needsDisplay = true
-    }
-}
-
 struct RuleView_Previews: PreviewProvider {
     static var previews: some View {
-        Group {
-            HStack(alignment: .top, spacing: 24) {
-                RuleViewPreview(orientation: .horizontal)
-                    .frame(width: 320, height: Ruler.thickness)
-
-                RuleViewPreview(orientation: .vertical)
-                    .frame(width: Ruler.thickness, height: 320)
-            }
-            .padding()
+        MouseTickLabelOffsetPreview(mouseX: 8, mouseY: 8)
             .previewLayout(.sizeThatFits)
-            .previewDisplayName("Rulers")
-
-            MouseTickLabelOffsetPreview(mouseX: 8, mouseY: 8)
-                .previewLayout(.sizeThatFits)
-                .previewDisplayName("Mouse Tick Labels")
-        }
+            .previewDisplayName("Mouse Tick Labels")
     }
 }
 #endif
