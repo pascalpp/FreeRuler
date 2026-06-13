@@ -6,10 +6,10 @@ enum Orientation: String {
 }
 
 @objc enum ZeroCorner: Int {
-    case topLeft
-    case topRight
-    case bottomLeft
-    case bottomRight
+    case topLeft = 0
+    case topRight = 1
+    case bottomLeft = 2
+    case bottomRight = 3
 }
 
 class Ruler {
