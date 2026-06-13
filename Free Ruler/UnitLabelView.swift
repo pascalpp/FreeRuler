@@ -55,41 +55,30 @@ final class UnitLabelView: NSView {
     ) -> NSRect {
         let placement = ZeroCornerGeometry(zeroCorner: zeroCorner)
             .unitLabelPlacement(for: orientation)
+        let topInset: CGFloat = 2
+        let bottomInset: CGFloat = 10
+        let leftInset: CGFloat = 7
+        let rightInset: CGFloat = 7
         let x: CGFloat
         let y: CGFloat
 
-        switch (orientation, placement.xSide) {
-        case (.horizontal, .left):
-            x = 10
-        case (.horizontal, .right):
-            x = rulerSize.width - labelSize.width - 10
-        case (.vertical, .left):
-            x = 8
-        case (.vertical, .right):
-            x = rulerSize.width - labelSize.width - 8
-        case (.horizontal, .top), (.horizontal, .bottom):
-            assertionFailure("Horizontal unit label must be anchored to a horizontal corner side")
-            x = 10
-        case (.vertical, .top), (.vertical, .bottom):
-            assertionFailure("Vertical unit label must be anchored to a horizontal corner side")
-            x = 8
-        }
-
-        switch (orientation, placement.ySide) {
-        case (.horizontal, .top):
-            y = rulerSize.height - labelSize.height
-        case (.horizontal, .bottom):
-            y = 8
-        case (.vertical, .top):
-            y = rulerSize.height - labelSize.height - 2
-        case (.vertical, .bottom):
-            y = 8
-        case (.horizontal, .left), (.horizontal, .right):
-            assertionFailure("Horizontal unit label must be anchored to a vertical corner side")
-            y = rulerSize.height - labelSize.height
-        case (.vertical, .left), (.vertical, .right):
-            assertionFailure("Vertical unit label must be anchored to a vertical corner side")
-            y = 8
+        switch (placement.xSide, placement.ySide) {
+        case (.left, .top):
+            x = leftInset
+            y = rulerSize.height - labelSize.height - topInset
+        case (.right, .top):
+            x = rulerSize.width - labelSize.width - rightInset
+            y = rulerSize.height - labelSize.height - topInset
+        case (.left, .bottom):
+            x = leftInset
+            y = bottomInset
+        case (.right, .bottom):
+            x = rulerSize.width - labelSize.width - rightInset
+            y = bottomInset
+        case (_, _):
+            assertionFailure("Unit label must be anchored to left/right and top/bottom sides")
+            x = leftInset
+            y = topInset
         }
 
         return NSRect(x: x, y: y, width: labelSize.width, height: labelSize.height)
