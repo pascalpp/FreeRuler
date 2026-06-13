@@ -748,21 +748,19 @@ final class RulerCoreTests: XCTestCase {
         let defaults = UserDefaults.standard
         let previousZeroCorner = prefs.zeroCorner
         let domainName = Bundle.main.bundleIdentifier
-        let previousDomainValue = domainName
-            .flatMap { defaults.persistentDomain(forName: $0)?["zeroCorner"] }
+        let previousDomain = domainName
+            .flatMap { defaults.persistentDomain(forName: $0) }
         let previousStandardValue = defaults.object(forKey: "zeroCorner")
 
         defer {
             prefs.zeroCorner = previousZeroCorner
 
             if let domainName = domainName {
-                var domain = defaults.persistentDomain(forName: domainName) ?? [:]
-                if let previousDomainValue = previousDomainValue {
-                    domain["zeroCorner"] = previousDomainValue
+                if let previousDomain = previousDomain {
+                    defaults.setPersistentDomain(previousDomain, forName: domainName)
                 } else {
-                    domain.removeValue(forKey: "zeroCorner")
+                    defaults.removePersistentDomain(forName: domainName)
                 }
-                defaults.setPersistentDomain(domain, forName: domainName)
             } else {
                 if let previousStandardValue = previousStandardValue {
                     defaults.set(previousStandardValue, forKey: "zeroCorner")
