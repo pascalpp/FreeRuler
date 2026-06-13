@@ -1,4 +1,5 @@
 import Cocoa
+import Carbon
 import Carbon.HIToolbox
 #if DEBUG
 import Darwin
@@ -473,6 +474,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         if preferencesController != nil {
             preferencesController?.showWindow(self)
+        }
+    }
+
+    @IBAction func showFreeRulerHelp(_ sender: Any) {
+        guard let helpURL = Bundle.main.url(
+            forResource: "FreeRuler",
+            withExtension: "html",
+            subdirectory: "FreeRuler.help/Contents/Resources/English.lproj"
+        ) else {
+            NSApp.showHelp(sender)
+            return
+        }
+
+        let status = AHGotoPage(nil, helpURL.absoluteString as CFString, nil)
+        if status != noErr {
+            NSWorkspace.shared.open(helpURL)
         }
     }
 
