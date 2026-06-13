@@ -60,6 +60,141 @@ final class RulerCoreTests: XCTestCase {
         }
     }
 
+    func testZeroCornerGeometryDerivesOrientationTraits() {
+        let cases: [
+            (
+                zeroCorner: ZeroCorner,
+                horizontalGrowth: RulerGrowthDirection,
+                verticalGrowth: RulerGrowthDirection,
+                horizontalTickSide: RulerSide,
+                verticalTickSide: RulerSide,
+                horizontalResizeSide: RulerSide,
+                verticalResizeSide: RulerSide
+            )
+        ] = [
+            (.topLeft, .positive, .negative, .bottom, .right, .right, .bottom),
+            (.topRight, .negative, .negative, .bottom, .left, .left, .bottom),
+            (.bottomLeft, .positive, .positive, .top, .right, .right, .top),
+            (.bottomRight, .negative, .positive, .top, .left, .left, .top),
+        ]
+
+        for testCase in cases {
+            let geometry = ZeroCornerGeometry(zeroCorner: testCase.zeroCorner)
+
+            XCTAssertEqual(
+                geometry.growthDirection(for: .horizontal),
+                testCase.horizontalGrowth,
+                "\(testCase.zeroCorner) horizontal growth"
+            )
+            XCTAssertEqual(
+                geometry.growthDirection(for: .vertical),
+                testCase.verticalGrowth,
+                "\(testCase.zeroCorner) vertical growth"
+            )
+            XCTAssertEqual(
+                geometry.tickSide(for: .horizontal),
+                testCase.horizontalTickSide,
+                "\(testCase.zeroCorner) horizontal tick side"
+            )
+            XCTAssertEqual(
+                geometry.tickSide(for: .vertical),
+                testCase.verticalTickSide,
+                "\(testCase.zeroCorner) vertical tick side"
+            )
+            XCTAssertEqual(
+                geometry.resizeSide(for: .horizontal),
+                testCase.horizontalResizeSide,
+                "\(testCase.zeroCorner) horizontal resize side"
+            )
+            XCTAssertEqual(
+                geometry.resizeSide(for: .vertical),
+                testCase.verticalResizeSide,
+                "\(testCase.zeroCorner) vertical resize side"
+            )
+        }
+    }
+
+    func testZeroCornerGeometryPlacesFramesAroundSharedZeroPoint() {
+        let zeroPoint = NSPoint(x: 200, y: 300)
+        let horizontalSize = NSSize(width: 120, height: Ruler.thickness)
+        let verticalSize = NSSize(width: Ruler.thickness, height: 160)
+        let cases: [
+            (
+                zeroCorner: ZeroCorner,
+                horizontalFrame: NSRect,
+                verticalFrame: NSRect
+            )
+        ] = [
+            (
+                .topLeft,
+                NSRect(x: 200, y: 299, width: 120, height: Ruler.thickness),
+                NSRect(x: 161, y: 140, width: Ruler.thickness, height: 160)
+            ),
+            (
+                .topRight,
+                NSRect(x: 80, y: 299, width: 120, height: Ruler.thickness),
+                NSRect(x: 200, y: 140, width: Ruler.thickness, height: 160)
+            ),
+            (
+                .bottomLeft,
+                NSRect(x: 200, y: 261, width: 120, height: Ruler.thickness),
+                NSRect(x: 161, y: 300, width: Ruler.thickness, height: 160)
+            ),
+            (
+                .bottomRight,
+                NSRect(x: 80, y: 261, width: 120, height: Ruler.thickness),
+                NSRect(x: 200, y: 300, width: Ruler.thickness, height: 160)
+            ),
+        ]
+
+        for testCase in cases {
+            let geometry = ZeroCornerGeometry(zeroCorner: testCase.zeroCorner)
+            let horizontalFrame = geometry.frame(
+                for: .horizontal,
+                zeroPoint: zeroPoint,
+                size: horizontalSize
+            )
+            let verticalFrame = geometry.frame(
+                for: .vertical,
+                zeroPoint: zeroPoint,
+                size: verticalSize
+            )
+
+            XCTAssertEqual(horizontalFrame, testCase.horizontalFrame, "\(testCase.zeroCorner) horizontal frame")
+            XCTAssertEqual(verticalFrame, testCase.verticalFrame, "\(testCase.zeroCorner) vertical frame")
+            XCTAssertEqual(
+                geometry.zeroPoint(in: horizontalFrame, for: .horizontal),
+                zeroPoint,
+                "\(testCase.zeroCorner) horizontal zero point"
+            )
+            XCTAssertEqual(
+                geometry.zeroPoint(in: verticalFrame, for: .vertical),
+                zeroPoint,
+                "\(testCase.zeroCorner) vertical zero point"
+            )
+        }
+    }
+
+    func testZeroCornerGeometryDefaultFramesShareAZeroPointForEachCorner() {
+        let screenFrame = NSRect(x: 0, y: 0, width: 1000, height: 800)
+
+        for zeroCorner in [ZeroCorner.topLeft, .topRight, .bottomLeft, .bottomRight] {
+            let geometry = ZeroCornerGeometry(zeroCorner: zeroCorner)
+            let horizontalFrame = geometry.defaultFrame(for: .horizontal, screenFrame: screenFrame)
+            let verticalFrame = geometry.defaultFrame(for: .vertical, screenFrame: screenFrame)
+
+            XCTAssertEqual(horizontalFrame.width, 500, "\(zeroCorner) horizontal width")
+            XCTAssertEqual(horizontalFrame.height, Ruler.thickness, "\(zeroCorner) horizontal height")
+            XCTAssertEqual(verticalFrame.width, Ruler.thickness, "\(zeroCorner) vertical width")
+            XCTAssertEqual(verticalFrame.height, 400, "\(zeroCorner) vertical height")
+            XCTAssertEqual(
+                geometry.zeroPoint(in: horizontalFrame, for: .horizontal),
+                geometry.zeroPoint(in: verticalFrame, for: .vertical),
+                "\(zeroCorner) shared zero point"
+            )
+        }
+    }
+
     func testMinAndMaxSizesMatchRulerOrientation() {
         let horizontal = Ruler(.horizontal, frame: NSRect(x: 0, y: 0, width: 300, height: 40))
         let vertical = Ruler(.vertical, frame: NSRect(x: 0, y: 0, width: 40, height: 300))
@@ -395,6 +530,36 @@ final class RulerCoreTests: XCTestCase {
 
         XCTAssertEqual(frame, NSRect(x: 10, y: 120, width: Ruler.thickness, height: 200))
         XCTAssertEqual(frame.maxY, initialFrame.maxY)
+    }
+
+    func testHorizontalResizeHandleFrameMathCanResizeFromLeftEdge() {
+        let initialFrame = NSRect(x: 10, y: 20, width: 300, height: Ruler.thickness)
+        let frame = resizedRulerFrame(
+            orientation: .horizontal,
+            zeroCorner: .topRight,
+            initialFrame: initialFrame,
+            delta: NSSize(width: 50, height: 25),
+            minSize: NSSize(width: 200, height: Ruler.thickness),
+            maxSize: NSSize(width: 4000, height: Ruler.thickness)
+        )
+
+        XCTAssertEqual(frame, NSRect(x: 60, y: 20, width: 250, height: Ruler.thickness))
+        XCTAssertEqual(frame.maxX, initialFrame.maxX)
+    }
+
+    func testVerticalResizeHandleFrameMathCanResizeFromTopEdge() {
+        let initialFrame = NSRect(x: 10, y: 20, width: Ruler.thickness, height: 300)
+        let frame = resizedRulerFrame(
+            orientation: .vertical,
+            zeroCorner: .bottomLeft,
+            initialFrame: initialFrame,
+            delta: NSSize(width: 25, height: 50),
+            minSize: NSSize(width: Ruler.thickness, height: 200),
+            maxSize: NSSize(width: Ruler.thickness, height: 4000)
+        )
+
+        XCTAssertEqual(frame, NSRect(x: 10, y: 20, width: Ruler.thickness, height: 350))
+        XCTAssertEqual(frame.minY, initialFrame.minY)
     }
 
     func testResizeHandleCursorsUseCustomCenteredImages() {

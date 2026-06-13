@@ -118,6 +118,7 @@ final class ResizeHandleView: NSView {
         )
         let nextFrame = resizedRulerFrame(
             orientation: orientation,
+            zeroCorner: prefs.zeroCorner,
             initialFrame: dragInitialWindowFrame,
             delta: delta,
             minSize: window.minSize,
@@ -153,14 +154,29 @@ final class ResizeHandleView: NSView {
     }
 
     func frame(in bounds: NSRect) -> NSRect {
+        let resizeSide = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner).resizeSide(for: orientation)
+
         switch orientation {
         case .horizontal:
             let topY = bounds.maxY - horizontalYOffset
             let bottomY = topY - length
-            let firstX = bounds.maxX
-                - horizontalXOffset
-                - CGFloat(lineCount - 1) * lineSpacing
-                - 1
+            let firstX: CGFloat
+
+            switch resizeSide {
+            case .left:
+                firstX = bounds.minX + horizontalXOffset
+            case .right:
+                firstX = bounds.maxX
+                    - horizontalXOffset
+                    - CGFloat(lineCount - 1) * lineSpacing
+                    - 1
+            case .top, .bottom:
+                assertionFailure("Horizontal resize handle must be placed on a horizontal side")
+                firstX = bounds.maxX
+                    - horizontalXOffset
+                    - CGFloat(lineCount - 1) * lineSpacing
+                    - 1
+            }
 
             return NSRect(
                 x: firstX - backgroundPadding,
@@ -171,7 +187,20 @@ final class ResizeHandleView: NSView {
         case .vertical:
             let rightX = bounds.minX + verticalXOffset + length
             let leftX = rightX - length
-            let firstY = bounds.minY + verticalYOffset + 1
+            let firstY: CGFloat
+
+            switch resizeSide {
+            case .top:
+                firstY = bounds.maxY
+                    - verticalYOffset
+                    - CGFloat(lineCount - 1) * lineSpacing
+                    - 1
+            case .bottom:
+                firstY = bounds.minY + verticalYOffset + 1
+            case .left, .right:
+                assertionFailure("Vertical resize handle must be placed on a vertical side")
+                firstY = bounds.minY + verticalYOffset + 1
+            }
 
             return NSRect(
                 x: leftX - backgroundPadding,
@@ -267,28 +296,59 @@ private func screenLocation(for event: NSEvent, in window: NSWindow) -> NSPoint 
 
 func resizedRulerFrame(
     orientation: Orientation,
+    zeroCorner: ZeroCorner = .topLeft,
     initialFrame: NSRect,
     delta: NSSize,
     minSize: NSSize,
     maxSize: NSSize
 ) -> NSRect {
+    let resizeSide = ZeroCornerGeometry(zeroCorner: zeroCorner).resizeSide(for: orientation)
+
     switch orientation {
     case .horizontal:
-        let width = clamp(initialFrame.width + delta.width, minSize.width, maxSize.width)
-        return NSRect(
-            x: initialFrame.minX,
-            y: initialFrame.minY,
-            width: width,
-            height: initialFrame.height
-        )
+        switch resizeSide {
+        case .left:
+            let width = clamp(initialFrame.width - delta.width, minSize.width, maxSize.width)
+            return NSRect(
+                x: initialFrame.maxX - width,
+                y: initialFrame.minY,
+                width: width,
+                height: initialFrame.height
+            )
+        case .right:
+            let width = clamp(initialFrame.width + delta.width, minSize.width, maxSize.width)
+            return NSRect(
+                x: initialFrame.minX,
+                y: initialFrame.minY,
+                width: width,
+                height: initialFrame.height
+            )
+        case .top, .bottom:
+            assertionFailure("Horizontal ruler resize side must be left or right")
+            return initialFrame
+        }
     case .vertical:
-        let height = clamp(initialFrame.height - delta.height, minSize.height, maxSize.height)
-        return NSRect(
-            x: initialFrame.minX,
-            y: initialFrame.maxY - height,
-            width: initialFrame.width,
-            height: height
-        )
+        switch resizeSide {
+        case .top:
+            let height = clamp(initialFrame.height + delta.height, minSize.height, maxSize.height)
+            return NSRect(
+                x: initialFrame.minX,
+                y: initialFrame.minY,
+                width: initialFrame.width,
+                height: height
+            )
+        case .bottom:
+            let height = clamp(initialFrame.height - delta.height, minSize.height, maxSize.height)
+            return NSRect(
+                x: initialFrame.minX,
+                y: initialFrame.maxY - height,
+                width: initialFrame.width,
+                height: height
+            )
+        case .left, .right:
+            assertionFailure("Vertical ruler resize side must be top or bottom")
+            return initialFrame
+        }
     }
 }
 
