@@ -358,6 +358,10 @@ final class RulerCoreTests: XCTestCase {
             )
             let horizontalNumber = horizontalRule.mouseNumber(forTickX: 260, rulerWidth: 300)
             let verticalNumber = verticalRule.mouseNumber(forTickY: 40, rulerHeight: 300)
+            let horizontalDpmm = horizontalRule.screen?.dpmm.width ?? NSScreen.defaultDpmm
+            let verticalDpmm = verticalRule.screen?.dpmm.width ?? NSScreen.defaultDpmm
+            let horizontalDpi = horizontalRule.screen?.dpi.width ?? NSScreen.defaultDpi
+            let verticalDpi = verticalRule.screen?.dpi.width ?? NSScreen.defaultDpi
 
             prefs.unit = .pixels
             XCTAssertEqual(horizontalRule.getMouseNumberLabel(horizontalNumber), "40")
@@ -366,21 +370,21 @@ final class RulerCoreTests: XCTestCase {
             prefs.unit = .millimeters
             XCTAssertEqual(
                 horizontalRule.getMouseNumberLabel(horizontalNumber),
-                String(format: "%.1f", horizontalNumber / NSScreen.defaultDpmm)
+                String(format: "%.1f", horizontalNumber / horizontalDpmm)
             )
             XCTAssertEqual(
                 verticalRule.getMouseNumberLabel(verticalNumber),
-                String(format: "%.1f", verticalNumber / NSScreen.defaultDpmm)
+                String(format: "%.1f", verticalNumber / verticalDpmm)
             )
 
             prefs.unit = .inches
             XCTAssertEqual(
                 horizontalRule.getMouseNumberLabel(horizontalNumber),
-                String(format: "%.3f", horizontalNumber / NSScreen.defaultDpi)
+                String(format: "%.3f", horizontalNumber / horizontalDpi)
             )
             XCTAssertEqual(
                 verticalRule.getMouseNumberLabel(verticalNumber),
-                String(format: "%.3f", verticalNumber / NSScreen.defaultDpi)
+                String(format: "%.3f", verticalNumber / verticalDpi)
             )
         }
     }
