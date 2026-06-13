@@ -1,4 +1,5 @@
 import AppKit
+import Carbon.HIToolbox
 import XCTest
 @testable import Free_Ruler
 
@@ -1191,6 +1192,54 @@ final class RulerCoreTests: XCTestCase {
             XCTAssertEqual(horizontalController.rulerWindow.frame, horizontalFrame)
             XCTAssertEqual(verticalController.rulerWindow.frame, verticalFrame)
         }
+    }
+
+    func testShiftHotkeysFlipRulerOrigins() {
+        withRestoredZeroCornerPreference {
+            let previousGroupRulers = prefs.groupRulers
+            defer { prefs.groupRulers = previousGroupRulers }
+
+            prefs.zeroCorner = .topLeft
+            prefs.groupRulers = false
+            let appDelegate = AppDelegate()
+            let horizontalController = RulerController(
+                ruler: Ruler(.horizontal, frame: NSRect(x: 100, y: 299, width: 120, height: Ruler.thickness))
+            )
+            let verticalController = RulerController(
+                ruler: Ruler(.vertical, frame: NSRect(x: 61, y: 140, width: Ruler.thickness, height: 160))
+            )
+            appDelegate.rulers = [verticalController, horizontalController]
+
+            XCTAssertTrue(
+                appDelegate.performRulerHotkey(
+                    keyCode: kVK_ANSI_H,
+                    modifierFlags: .shift,
+                    sender: horizontalController
+                )
+            )
+            XCTAssertEqual(prefs.zeroCorner, .topRight)
+
+            XCTAssertTrue(
+                appDelegate.performRulerHotkey(
+                    keyCode: kVK_ANSI_V,
+                    modifierFlags: .shift,
+                    sender: verticalController
+                )
+            )
+            XCTAssertEqual(prefs.zeroCorner, .bottomRight)
+        }
+    }
+
+    func testNonShiftModifiedRulerHotkeysAreIgnored() {
+        let appDelegate = AppDelegate()
+
+        XCTAssertFalse(
+            appDelegate.performRulerHotkey(
+                keyCode: kVK_ANSI_H,
+                modifierFlags: .option,
+                sender: self
+            )
+        )
     }
 
     private func mouseEvent(
