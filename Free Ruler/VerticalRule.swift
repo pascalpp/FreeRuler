@@ -37,7 +37,7 @@ class VerticalRule: RuleView {
         let height = dirtyRect.height
         let path = NSBezierPath()
         let tickLayout = RulerTickLayout(unit: unit, screen: screen)
-        let geometry = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner)
+        let geometry = ZeroCornerGeometry(zeroCorner: zeroCorner)
         let tickSide = geometry.tickSide(for: .vertical)
         let growthDirection = geometry.growthDirection(for: .vertical)
         let attrs = labelAttributes(
@@ -144,6 +144,8 @@ class VerticalRule: RuleView {
             labelSize: labelSize,
             rulerSize: CGSize(width: self.frame.width, height: height)
         )
+
+        guard NSGraphicsContext.current != nil else { return }
         color.fill.setFill()
         labelRect.fill()
 
@@ -159,7 +161,7 @@ class VerticalRule: RuleView {
             labelSize: labelSize,
             rulerSize: rulerSize,
             orientation: .vertical,
-            zeroCorner: prefs.zeroCorner,
+            zeroCorner: zeroCorner,
             tickPosition: tickY
         )
     }
@@ -247,7 +249,7 @@ class VerticalRule: RuleView {
     }
 
     func mouseNumber(forTickY mouseTickY: CGFloat, rulerHeight: CGFloat) -> CGFloat {
-        let growthDirection = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner).growthDirection(for: .vertical)
+        let growthDirection = ZeroCornerGeometry(zeroCorner: zeroCorner).growthDirection(for: .vertical)
 
         switch growthDirection {
         case .positive:
@@ -262,7 +264,7 @@ class VerticalRule: RuleView {
             labelSize: labelSize,
             rulerSize: rulerSize,
             orientation: .vertical,
-            zeroCorner: prefs.zeroCorner
+            zeroCorner: zeroCorner
         )
     }
 

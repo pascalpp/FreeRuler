@@ -715,6 +715,16 @@
         }
       }
     },
+    "Mouse Tick Label Offsets (mouseX: %@, mouseY: %@)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Mouse Tick Label Offsets (mouseX: %1$@, mouseY: %2$@)"
+          }
+        }
+      }
+    },
     "Reset ruler color" : {
       "comment" : "Tooltip and accessibility label for the button that restores the default ruler color",
       "extractionState" : "manual",
