@@ -60,6 +60,11 @@ enum RulerSide: Equatable {
     }
 }
 
+struct RulerCornerPlacement: Equatable {
+    let xSide: RulerSide
+    let ySide: RulerSide
+}
+
 struct ZeroCornerGeometry {
     let zeroCorner: ZeroCorner
 
@@ -93,6 +98,21 @@ struct ZeroCornerGeometry {
             return horizontalZeroSide == .left ? .right : .left
         case .vertical:
             return verticalZeroSide == .top ? .bottom : .top
+        }
+    }
+
+    func resizeHandlePlacement(for orientation: Orientation) -> RulerCornerPlacement {
+        switch orientation {
+        case .horizontal:
+            return RulerCornerPlacement(
+                xSide: resizeSide(for: orientation),
+                ySide: tickSide(for: orientation).opposite
+            )
+        case .vertical:
+            return RulerCornerPlacement(
+                xSide: tickSide(for: orientation).opposite,
+                ySide: resizeSide(for: orientation)
+            )
         }
     }
 
