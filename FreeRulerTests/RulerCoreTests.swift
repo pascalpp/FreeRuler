@@ -822,6 +822,25 @@ final class RulerCoreTests: XCTestCase {
         }
     }
 
+    func testPreferenceRedrawUpdatesResizeHandleFrameForZeroCornerChanges() {
+        withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .topLeft
+            let rule = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
+            guard let initialFrame = rule.resizeHandleExclusionFrame else {
+                return XCTFail("Expected horizontal ruler to install a resize handle")
+            }
+
+            prefs.zeroCorner = .topRight
+            rule.redrawForPreferenceChange()
+            guard let flippedFrame = rule.resizeHandleExclusionFrame else {
+                return XCTFail("Expected horizontal ruler to keep its resize handle")
+            }
+
+            XCTAssertGreaterThan(initialFrame.midX, rule.bounds.midX)
+            XCTAssertLessThan(flippedFrame.midX, rule.bounds.midX)
+        }
+    }
+
     func testResizeHandleCursorsUseCustomCenteredImages() {
         let horizontalCursor = windowResizeCursor(for: .horizontal)
         let verticalCursor = windowResizeCursor(for: .vertical)
