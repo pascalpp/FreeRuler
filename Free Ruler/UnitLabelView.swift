@@ -28,11 +28,15 @@ final class UnitLabelView: NSView {
     }
 
     func frame(in bounds: NSRect) -> NSRect {
+        return frame(in: bounds, zeroCorner: prefs.zeroCorner)
+    }
+
+    func frame(in bounds: NSRect, zeroCorner: ZeroCorner) -> NSRect {
         return Self.labelFrame(
             labelSize: Self.labelSize(for: label),
             rulerSize: bounds.size,
             orientation: orientation,
-            zeroCorner: prefs.zeroCorner
+            zeroCorner: zeroCorner
         )
     }
 

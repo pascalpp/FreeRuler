@@ -39,7 +39,7 @@ class HorizontalRule: RuleView {
         let height = dirtyRect.height
         let path = NSBezierPath()
         let tickLayout = RulerTickLayout(unit: unit, screen: screen)
-        let geometry = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner)
+        let geometry = ZeroCornerGeometry(zeroCorner: zeroCorner)
         let tickSide = geometry.tickSide(for: .horizontal)
         let growthDirection = geometry.growthDirection(for: .horizontal)
 
@@ -144,6 +144,7 @@ class HorizontalRule: RuleView {
             rulerSize: CGSize(width: width, height: height)
         )
 
+        guard NSGraphicsContext.current != nil else { return }
         label.draw(
             with: labelRect,
             context: nil
@@ -155,7 +156,7 @@ class HorizontalRule: RuleView {
             labelSize: labelSize,
             rulerSize: rulerSize,
             orientation: .horizontal,
-            zeroCorner: prefs.zeroCorner,
+            zeroCorner: zeroCorner,
             tickPosition: tickX
         )
     }
@@ -239,7 +240,7 @@ class HorizontalRule: RuleView {
     }
 
     func mouseNumber(forTickX mouseTickX: CGFloat, rulerWidth: CGFloat) -> CGFloat {
-        let growthDirection = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner).growthDirection(for: .horizontal)
+        let growthDirection = ZeroCornerGeometry(zeroCorner: zeroCorner).growthDirection(for: .horizontal)
 
         switch growthDirection {
         case .positive:
@@ -254,7 +255,7 @@ class HorizontalRule: RuleView {
             labelSize: labelSize,
             rulerSize: rulerSize,
             orientation: .horizontal,
-            zeroCorner: prefs.zeroCorner
+            zeroCorner: zeroCorner
         )
     }
 

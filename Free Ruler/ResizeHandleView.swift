@@ -154,7 +154,11 @@ final class ResizeHandleView: NSView {
     }
 
     func frame(in bounds: NSRect) -> NSRect {
-        let placement = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner)
+        return frame(in: bounds, zeroCorner: prefs.zeroCorner)
+    }
+
+    func frame(in bounds: NSRect, zeroCorner: ZeroCorner) -> NSRect {
+        let placement = ZeroCornerGeometry(zeroCorner: zeroCorner)
             .resizeHandlePlacement(for: orientation)
 
         switch orientation {
