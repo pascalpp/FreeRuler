@@ -122,6 +122,7 @@ class RuleView: NSView {
     }
 
     func redrawForPreferenceChange() {
+        updateResizeHandleFrame()
         setNeedsDisplay(visibleRect)
         resizeHandleView?.needsDisplay = true
     }
