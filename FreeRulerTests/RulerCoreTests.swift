@@ -574,6 +574,17 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertFalse(verticalCursor.image.isTemplate)
     }
 
+    func testHorizontalResizeHandleFrameIncludesBorderInsetOnLeftEdge() {
+        withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .topRight
+
+            let resizeHandle = ResizeHandleView(orientation: .horizontal, color: RulerColors())
+            let frame = resizeHandle.frame(in: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
+
+            XCTAssertEqual(frame.minX, 4.5)
+        }
+    }
+
     func testHorizontalMouseTickLabelStopsBeforeResizeHandle() {
         let rule = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
         guard let resizeHandleFrame = rule.resizeHandleExclusionFrame else {

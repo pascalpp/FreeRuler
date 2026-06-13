@@ -164,7 +164,7 @@ final class ResizeHandleView: NSView {
 
             switch resizeSide {
             case .left:
-                firstX = bounds.minX + horizontalXOffset
+                firstX = bounds.minX + horizontalXOffset + 1
             case .right:
                 firstX = bounds.maxX
                     - horizontalXOffset
