@@ -60,7 +60,7 @@ class Prefs: NSObject {
             "foregroundOpacity": 90,
             "backgroundOpacity": 50,
             "unit":              Unit.pixels.rawValue,
-            "zeroCorner":        ZeroCorner.topLeft.rawValue
+            "zeroCorner":        defaultZeroCorner.rawValue
         ]
 
         if let defaultRulerColorData = Prefs.defaultRulerColorData {
@@ -129,6 +129,10 @@ class Prefs: NSObject {
 }
 
 extension Prefs {
+    static var defaultZeroCorner: ZeroCorner {
+        return .topLeft
+    }
+
     static var defaultRulerFillColor: NSColor {
         return defaultRulerColor
     }
@@ -138,7 +142,7 @@ extension Prefs {
     }
 
     static func zeroCorner(fromRawValue rawValue: Int) -> ZeroCorner {
-        return ZeroCorner(rawValue: rawValue) ?? .topLeft
+        return ZeroCorner(rawValue: rawValue) ?? defaultZeroCorner
     }
 
     private static func archivedColorData(_ color: NSColor) -> Data? {

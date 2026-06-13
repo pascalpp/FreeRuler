@@ -26,6 +26,10 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertEqual(ZeroCorner.bottomRight.rawValue, 3)
     }
 
+    func testDefaultZeroCornerMatchesTopLeft() {
+        XCTAssertEqual(Prefs.defaultZeroCorner, .topLeft)
+    }
+
     func testZeroCornerLoadsFromRawValue() {
         XCTAssertEqual(Prefs.zeroCorner(fromRawValue: ZeroCorner.topLeft.rawValue), .topLeft)
         XCTAssertEqual(Prefs.zeroCorner(fromRawValue: ZeroCorner.topRight.rawValue), .topRight)

@@ -481,6 +481,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBAction func resetRulerPositions(_ sender: Any) {
         createRulersIfNeeded()
 
+        prefs.zeroCorner = Prefs.defaultZeroCorner
+
         // ungroup rulers during reset operation
         let groupRulers = prefs.groupRulers
         prefs.groupRulers = false
