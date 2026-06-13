@@ -191,10 +191,10 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Flip" id="mEK-Pg-ijY">
                                     <items>
-                                        <menuItem title="Horizontal" keyEquivalent="H" id="GZl-Zd-Ad4">
+                                        <menuItem title="Flip Horizontal" keyEquivalent="H" id="GZl-Zd-Ad4">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                         </menuItem>
-                                        <menuItem title="Vertical" keyEquivalent="V" id="IQD-xF-keq">
+                                        <menuItem title="Flip Vertical" keyEquivalent="V" id="IQD-xF-keq">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                         </menuItem>
                                     </items>

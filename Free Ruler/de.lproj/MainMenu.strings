@@ -41,11 +41,17 @@
 /* Class = "NSMenuItem"; title = "Float Rulers"; ObjectID = "GDK-AC-uC8"; */
 "GDK-AC-uC8.title" = "Oben schweben";
 
+/* Class = "NSMenuItem"; title = "Flip Horizontal"; ObjectID = "GZl-Zd-Ad4"; */
+"GZl-Zd-Ad4.title" = "Horizontal spiegeln";
+
 /* Class = "NSMenuItem"; title = "Options"; ObjectID = "H8h-7b-M4v"; */
 "H8h-7b-M4v.title" = "Optionen";
 
 /* Class = "NSMenu"; title = "Options"; ObjectID = "HyV-fh-RgO"; */
 "HyV-fh-RgO.title" = "Optionen";
+
+/* Class = "NSMenuItem"; title = "Flip Vertical"; ObjectID = "IQD-xF-keq"; */
+"IQD-xF-keq.title" = "Vertikal spiegeln";
 
 /* Class = "NSMenuItem"; title = "Show All"; ObjectID = "Kd2-mp-pUS"; */
 "Kd2-mp-pUS.title" = "Alle einblenden";

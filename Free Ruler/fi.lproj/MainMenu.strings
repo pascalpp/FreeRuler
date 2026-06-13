@@ -41,11 +41,17 @@
 /* Class = "NSMenuItem"; title = "Float Rulers"; ObjectID = "GDK-AC-uC8"; */
 "GDK-AC-uC8.title" = "Kelluta viivaimet";
 
+/* Class = "NSMenuItem"; title = "Flip Horizontal"; ObjectID = "GZl-Zd-Ad4"; */
+"GZl-Zd-Ad4.title" = "Käännä vaakasuunnassa";
+
 /* Class = "NSMenuItem"; title = "Options"; ObjectID = "H8h-7b-M4v"; */
 "H8h-7b-M4v.title" = "Valinnat";
 
 /* Class = "NSMenu"; title = "Options"; ObjectID = "HyV-fh-RgO"; */
 "HyV-fh-RgO.title" = "Valinnat";
+
+/* Class = "NSMenuItem"; title = "Flip Vertical"; ObjectID = "IQD-xF-keq"; */
+"IQD-xF-keq.title" = "Käännä pystysuunnassa";
 
 /* Class = "NSMenuItem"; title = "Show All"; ObjectID = "Kd2-mp-pUS"; */
 "Kd2-mp-pUS.title" = "Näytä kaikki";

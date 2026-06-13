@@ -41,11 +41,17 @@
 /* Class = "NSMenuItem"; title = "Float Rulers"; ObjectID = "GDK-AC-uC8"; */
 "GDK-AC-uC8.title" = "悬浮尺子";
 
+/* Class = "NSMenuItem"; title = "Flip Horizontal"; ObjectID = "GZl-Zd-Ad4"; */
+"GZl-Zd-Ad4.title" = "水平翻转";
+
 /* Class = "NSMenuItem"; title = "Options"; ObjectID = "H8h-7b-M4v"; */
 "H8h-7b-M4v.title" = "选项";
 
 /* Class = "NSMenu"; title = "Options"; ObjectID = "HyV-fh-RgO"; */
 "HyV-fh-RgO.title" = "选项";
+
+/* Class = "NSMenuItem"; title = "Flip Vertical"; ObjectID = "IQD-xF-keq"; */
+"IQD-xF-keq.title" = "垂直翻转";
 
 /* Class = "NSMenuItem"; title = "Show All"; ObjectID = "Kd2-mp-pUS"; */
 "Kd2-mp-pUS.title" = "显示全部";
