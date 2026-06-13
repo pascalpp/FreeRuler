@@ -662,6 +662,108 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertEqual(frame.minY, initialFrame.minY)
     }
 
+    func testHorizontalResizeHandleFrameMathClampsLeftEdgeResizesAroundRightEdge() {
+        let initialFrame = NSRect(x: 10, y: 20, width: 300, height: Ruler.thickness)
+
+        let minFrame = resizedRulerFrame(
+            orientation: .horizontal,
+            zeroCorner: .topRight,
+            initialFrame: initialFrame,
+            delta: NSSize(width: 250, height: 0),
+            minSize: NSSize(width: 200, height: Ruler.thickness),
+            maxSize: NSSize(width: 400, height: Ruler.thickness)
+        )
+        let maxFrame = resizedRulerFrame(
+            orientation: .horizontal,
+            zeroCorner: .topRight,
+            initialFrame: initialFrame,
+            delta: NSSize(width: -250, height: 0),
+            minSize: NSSize(width: 200, height: Ruler.thickness),
+            maxSize: NSSize(width: 400, height: Ruler.thickness)
+        )
+
+        XCTAssertEqual(minFrame, NSRect(x: 110, y: 20, width: 200, height: Ruler.thickness))
+        XCTAssertEqual(maxFrame, NSRect(x: -90, y: 20, width: 400, height: Ruler.thickness))
+        XCTAssertEqual(minFrame.maxX, initialFrame.maxX)
+        XCTAssertEqual(maxFrame.maxX, initialFrame.maxX)
+    }
+
+    func testVerticalResizeHandleFrameMathClampsTopEdgeResizesAroundBottomEdge() {
+        let initialFrame = NSRect(x: 10, y: 20, width: Ruler.thickness, height: 300)
+
+        let minFrame = resizedRulerFrame(
+            orientation: .vertical,
+            zeroCorner: .bottomLeft,
+            initialFrame: initialFrame,
+            delta: NSSize(width: 0, height: -250),
+            minSize: NSSize(width: Ruler.thickness, height: 200),
+            maxSize: NSSize(width: Ruler.thickness, height: 400)
+        )
+        let maxFrame = resizedRulerFrame(
+            orientation: .vertical,
+            zeroCorner: .bottomLeft,
+            initialFrame: initialFrame,
+            delta: NSSize(width: 0, height: 250),
+            minSize: NSSize(width: Ruler.thickness, height: 200),
+            maxSize: NSSize(width: Ruler.thickness, height: 400)
+        )
+
+        XCTAssertEqual(minFrame, NSRect(x: 10, y: 20, width: Ruler.thickness, height: 200))
+        XCTAssertEqual(maxFrame, NSRect(x: 10, y: 20, width: Ruler.thickness, height: 400))
+        XCTAssertEqual(minFrame.minY, initialFrame.minY)
+        XCTAssertEqual(maxFrame.minY, initialFrame.minY)
+    }
+
+    func testResizeHandlePositionsFollowZeroCorner() {
+        withRestoredZeroCornerPreference {
+            let cases: [
+                (
+                    zeroCorner: ZeroCorner,
+                    expectedHorizontalSide: RulerSide,
+                    expectedVerticalSide: RulerSide
+                )
+            ] = [
+                (.topLeft, .right, .bottom),
+                (.topRight, .left, .bottom),
+                (.bottomLeft, .right, .top),
+                (.bottomRight, .left, .top),
+            ]
+
+            for testCase in cases {
+                prefs.zeroCorner = testCase.zeroCorner
+                let horizontalRule = HorizontalRule(
+                    frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness)
+                )
+                let verticalRule = VerticalRule(
+                    frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300)
+                )
+
+                guard let horizontalFrame = horizontalRule.resizeHandleExclusionFrame,
+                      let verticalFrame = verticalRule.resizeHandleExclusionFrame else {
+                    return XCTFail("Expected both rulers to install resize handles")
+                }
+
+                switch testCase.expectedHorizontalSide {
+                case .left:
+                    XCTAssertLessThan(horizontalFrame.midX, horizontalRule.bounds.midX, "\(testCase.zeroCorner)")
+                case .right:
+                    XCTAssertGreaterThan(horizontalFrame.midX, horizontalRule.bounds.midX, "\(testCase.zeroCorner)")
+                case .top, .bottom:
+                    XCTFail("Horizontal resize handle must be placed on a horizontal side")
+                }
+
+                switch testCase.expectedVerticalSide {
+                case .top:
+                    XCTAssertGreaterThan(verticalFrame.midY, verticalRule.bounds.midY, "\(testCase.zeroCorner)")
+                case .bottom:
+                    XCTAssertLessThan(verticalFrame.midY, verticalRule.bounds.midY, "\(testCase.zeroCorner)")
+                case .left, .right:
+                    XCTFail("Vertical resize handle must be placed on a vertical side")
+                }
+            }
+        }
+    }
+
     func testResizeHandleCursorsUseCustomCenteredImages() {
         let horizontalCursor = windowResizeCursor(for: .horizontal)
         let verticalCursor = windowResizeCursor(for: .vertical)
