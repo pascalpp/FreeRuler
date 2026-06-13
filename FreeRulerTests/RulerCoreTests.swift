@@ -295,7 +295,7 @@ final class RulerCoreTests: XCTestCase {
             )
             XCTAssertEqual(
                 rule.unitLabelRect(labelSize: NSSize(width: 12, height: 10), rulerSize: NSSize(width: 300, height: 40)),
-                CGRect(x: 278, y: 0, width: 12, height: 10)
+                CGRect(x: 278, y: 8, width: 12, height: 10)
             )
         }
     }
@@ -339,7 +339,7 @@ final class RulerCoreTests: XCTestCase {
             XCTAssertEqual(rule.mouseNumber(forTickY: 40, rulerHeight: 300), 40)
             XCTAssertEqual(
                 rule.unitLabelRect(labelSize: NSSize(width: 12, height: 10), rulerSize: NSSize(width: 40, height: 300)),
-                CGRect(x: 20, y: 2, width: 12, height: 10)
+                CGRect(x: 20, y: 8, width: 12, height: 10)
             )
         }
     }
@@ -359,8 +359,8 @@ final class RulerCoreTests: XCTestCase {
             ] = [
                 (.topLeft, CGRect(x: 10, y: 30, width: 12, height: 10), CGRect(x: 8, y: 288, width: 12, height: 10)),
                 (.topRight, CGRect(x: 278, y: 30, width: 12, height: 10), CGRect(x: 20, y: 288, width: 12, height: 10)),
-                (.bottomLeft, CGRect(x: 10, y: 0, width: 12, height: 10), CGRect(x: 8, y: 2, width: 12, height: 10)),
-                (.bottomRight, CGRect(x: 278, y: 0, width: 12, height: 10), CGRect(x: 20, y: 2, width: 12, height: 10)),
+                (.bottomLeft, CGRect(x: 10, y: 8, width: 12, height: 10), CGRect(x: 8, y: 8, width: 12, height: 10)),
+                (.bottomRight, CGRect(x: 278, y: 8, width: 12, height: 10), CGRect(x: 20, y: 8, width: 12, height: 10)),
             ]
 
             for testCase in cases {
@@ -376,6 +376,61 @@ final class RulerCoreTests: XCTestCase {
                     testCase.verticalUnitRect,
                     "\(testCase.zeroCorner) vertical unit label"
                 )
+            }
+        }
+    }
+
+    func testUnitLabelSubviewsFollowNearOppositeCornerAfterZeroCornerChange() {
+        withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .topLeft
+            let horizontalRule = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
+            let verticalRule = VerticalRule(frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
+            prefs.zeroCorner = .bottomRight
+
+            horizontalRule.redrawForPreferenceChange()
+            verticalRule.redrawForPreferenceChange()
+
+            let horizontalLabelSize = unitLabelSize(for: horizontalRule)
+            let verticalLabelSize = unitLabelSize(for: verticalRule)
+
+            XCTAssertEqual(
+                horizontalRule.unitLabelFrame,
+                horizontalRule.unitLabelRect(labelSize: horizontalLabelSize, rulerSize: horizontalRule.bounds.size)
+            )
+            XCTAssertEqual(
+                verticalRule.unitLabelFrame,
+                verticalRule.unitLabelRect(labelSize: verticalLabelSize, rulerSize: verticalRule.bounds.size)
+            )
+        }
+    }
+
+    func testUnitLabelBaselineDoesNotMoveBetweenDescenderAndNonDescenderUnits() throws {
+        try withRestoredZeroCornerPreference {
+            let previousUnit = prefs.unit
+            defer { prefs.unit = previousUnit }
+
+            let horizontalRule = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
+            let verticalRule = VerticalRule(frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
+
+            for zeroCorner in [ZeroCorner.topLeft, .bottomRight] {
+                prefs.zeroCorner = zeroCorner
+
+                prefs.unit = .pixels
+                horizontalRule.redrawForPreferenceChange()
+                verticalRule.redrawForPreferenceChange()
+                let pixelHorizontalFrame = try XCTUnwrap(horizontalRule.unitLabelFrame)
+                let pixelVerticalFrame = try XCTUnwrap(verticalRule.unitLabelFrame)
+
+                prefs.unit = .millimeters
+                horizontalRule.redrawForPreferenceChange()
+                verticalRule.redrawForPreferenceChange()
+                let millimeterHorizontalFrame = try XCTUnwrap(horizontalRule.unitLabelFrame)
+                let millimeterVerticalFrame = try XCTUnwrap(verticalRule.unitLabelFrame)
+
+                XCTAssertEqual(pixelHorizontalFrame.minY, millimeterHorizontalFrame.minY, accuracy: 0.0001)
+                XCTAssertEqual(pixelHorizontalFrame.height, millimeterHorizontalFrame.height, accuracy: 0.0001)
+                XCTAssertEqual(pixelVerticalFrame.minY, millimeterVerticalFrame.minY, accuracy: 0.0001)
+                XCTAssertEqual(pixelVerticalFrame.height, millimeterVerticalFrame.height, accuracy: 0.0001)
             }
         }
     }
@@ -1541,6 +1596,15 @@ private final class TestableFlipAppDelegate: AppDelegate {
     override func isRulerWindowShown(_ window: RulerWindow) -> Bool {
         return true
     }
+}
+
+private func unitLabelSize(for rule: RuleView) -> NSSize {
+    let label = NSAttributedString(
+        string: rule.getUnitLabel(),
+        attributes: rule.labelAttributes(alignment: .left, foregroundColor: rule.color.ticks)
+    )
+
+    return UnitLabelView.labelSize(for: label)
 }
 
 private func assertColor(

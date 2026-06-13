@@ -51,10 +51,12 @@ class RuleView: NSView {
         didSet {
             resizeHandleView?.color = color
             resizeHandleView?.needsDisplay = true
+            updateUnitLabelFrame()
         }
     }
     let mouseTickLabelResizeHandleSpacing: CGFloat = 8
     private var resizeHandleView: ResizeHandleView?
+    private var unitLabelView: UnitLabelView?
 
     var trackingArea: NSTrackingArea?
     let trackingAreaOptions: NSTrackingArea.Options = [
@@ -105,6 +107,8 @@ class RuleView: NSView {
     override func layout() {
         super.layout()
         updateResizeHandleFrame()
+        updateUnitLabelFrame()
+        updateUnitLabelVisibility()
     }
 
     func installResizeHandle(for orientation: Orientation) {
@@ -112,6 +116,14 @@ class RuleView: NSView {
         addSubview(view)
         resizeHandleView = view
         updateResizeHandleFrame()
+    }
+
+    func installUnitLabel(for orientation: Orientation) {
+        let view = UnitLabelView(orientation: orientation, label: unitLabel())
+        addSubview(view)
+        unitLabelView = view
+        updateUnitLabelFrame()
+        updateUnitLabelVisibility()
     }
 
     func drawMouseTick(at mouseLoc: NSPoint) {
@@ -123,8 +135,11 @@ class RuleView: NSView {
 
     func redrawForPreferenceChange() {
         updateResizeHandleFrame()
+        updateUnitLabelFrame()
+        updateUnitLabelVisibility()
         setNeedsDisplay(visibleRect)
         resizeHandleView?.needsDisplay = true
+        unitLabelView?.needsDisplay = true
     }
 
     var windowWidth: CGFloat {
@@ -138,6 +153,7 @@ class RuleView: NSView {
     var showMouseTick: Bool = true {
         didSet {
             if showMouseTick != oldValue {
+                updateUnitLabelVisibility()
                 needsDisplay = true
             }
         }
@@ -156,6 +172,10 @@ class RuleView: NSView {
 
     var resizeHandleExclusionFrame: NSRect? {
         return resizeHandleView?.frame
+    }
+
+    var unitLabelFrame: NSRect? {
+        return unitLabelView?.frame
     }
 
     func getUnitLabel() -> String {
@@ -199,10 +219,32 @@ class RuleView: NSView {
         }
     }
 
+    func setUnitLabelHidden(_ isHidden: Bool) {
+        unitLabelView?.isHidden = isHidden
+    }
+
+    func updateUnitLabelVisibility() {
+        setUnitLabelHidden(false)
+    }
+
     private func updateResizeHandleFrame() {
         guard let resizeHandleView = resizeHandleView else { return }
 
         resizeHandleView.frame = resizeHandleView.frame(in: bounds)
+    }
+
+    private func updateUnitLabelFrame() {
+        guard let unitLabelView = unitLabelView else { return }
+
+        unitLabelView.label = unitLabel()
+        unitLabelView.frame = unitLabelView.frame(in: bounds)
+    }
+
+    private func unitLabel() -> NSAttributedString {
+        return NSAttributedString(
+            string: getUnitLabel(),
+            attributes: labelAttributes(alignment: .left, foregroundColor: color.ticks)
+        )
     }
 
 }
