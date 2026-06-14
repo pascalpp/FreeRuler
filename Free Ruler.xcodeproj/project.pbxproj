@@ -3,68 +3,14 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		012078ADCF85378A053BB9FA /* HotkeyBezel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B149002D04A00000149C0D /* HotkeyBezel.swift */; };
-		0C56237FE08F4155F0B63FFB /* RulerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEE6227D42FD0008B95E /* RulerController.swift */; };
-		18769743B3FCD2594B0B8CF2 /* PreferencesController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 507FED42227FFF5300BD77DC /* PreferencesController.xib */; };
-		2075141A6742AF52598D0314 /* Prefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507FED5F2280E13200BD77DC /* Prefs.swift */; };
-		23E2B80975F07733EB6CF5DB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F4102882260712F00F06A10 /* AppDelegate.swift */; };
-		274FA3FF1BA7829144BBEB70 /* RulerWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEEA227D432E0008B95E /* RulerWindow.swift */; };
-		29E0CF116F5BCEA78DEA46BC /* RulerCursorController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3522D05D00100B1D135 /* RulerCursorController.swift */; };
-		2AFB3AE0D34FF01F00F671D4 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6F41028C2260713100F06A10 /* MainMenu.xib */; };
-		2ED12254704310C00A527F07 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 50B146202D03B00000146C0D /* Localizable.xcstrings */; };
-		378A15CD2C8708C2F8CB62E7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 50C6D890228BDBAD0091F19E /* Images.xcassets */; };
-		50008B6122846FCD001E3EE4 /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50008B6022846FCD001E3EE4 /* Notifications.swift */; };
-		5012CAAD226AB09000BD9565 /* VerticalRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5012CAAC226AB09000BD9565 /* VerticalRule.swift */; };
-		507FED43227FFF5300BD77DC /* PreferencesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507FED41227FFF5300BD77DC /* PreferencesController.swift */; };
-		507FED44227FFF5300BD77DC /* PreferencesController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 507FED42227FFF5300BD77DC /* PreferencesController.xib */; };
-		507FED602280E13200BD77DC /* Prefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507FED5F2280E13200BD77DC /* Prefs.swift */; };
-		50A137012D03A00000137C0D /* RulerCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A137002D03A00000137C0D /* RulerCoreTests.swift */; };
 		50A137032D03A00000137C0D /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50A137022D03A00000137C0D /* XCTest.framework */; };
-		50A147012D03C00000147C0D /* FreeRulerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A147002D03C00000147C0D /* FreeRulerUITests.swift */; };
 		50A147032D03C00000147C0D /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50A137022D03A00000137C0D /* XCTest.framework */; };
-		50B146262D03B00000146C0D /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 50B146202D03B00000146C0D /* Localizable.xcstrings */; };
-		50B149012D04A00000149C0D /* HotkeyBezel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B149002D04A00000149C0D /* HotkeyBezel.swift */; };
-		50B1D3512D05D00000B1D135 /* MouseTickTimerPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3502D05D00000B1D135 /* MouseTickTimerPolicy.swift */; };
-		50B1D3532D05D00100B1D135 /* RulerCursorController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3522D05D00100B1D135 /* RulerCursorController.swift */; };
-		50B1D3552D05E00000B1D138 /* RulerTickLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3542D05E00000B1D138 /* RulerTickLayout.swift */; };
-		50B1D3592D06000100B1D139 /* AppIconRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3582D06000100B1D139 /* AppIconRenderer.swift */; };
-		50B1D35D2D06000400B1D139 /* AppIconRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3582D06000100B1D139 /* AppIconRenderer.swift */; };
-		50B1D3602D06000600B1D139 /* AppIconGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D35F2D06000600B1D139 /* AppIconGenerator.swift */; };
-		50B1D3612D06000700B1D139 /* AppIconGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D35F2D06000600B1D139 /* AppIconGenerator.swift */; };
-		50B1D3652D06010100B1D139 /* AppStoreScreenshotPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3642D06010100B1D139 /* AppStoreScreenshotPreview.swift */; };
-		50B1D3662D06010200B1D139 /* AppStoreScreenshotPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3642D06010100B1D139 /* AppStoreScreenshotPreview.swift */; };
-		50B1D3672D06100000B1D13A /* ResizeHandleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3682D06100000B1D13A /* ResizeHandleView.swift */; };
-		50B1D3692D06100000B1D13A /* ResizeHandleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3682D06100000B1D13A /* ResizeHandleView.swift */; };
-		50B1D36A2D06110000B1D13B /* UnitLabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D36C2D06110000B1D13B /* UnitLabelView.swift */; };
-		50B1D3712D06120000B1D140 /* UITestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3702D06120000B1D140 /* UITestSupport.swift */; };
-		50B1D36B2D06110000B1D13B /* UnitLabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D36C2D06110000B1D13B /* UnitLabelView.swift */; };
-		50B1D3722D06120000B1D140 /* UITestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3702D06120000B1D140 /* UITestSupport.swift */; };
 		50B1D3732D06120000B1D141 /* UITestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3702D06120000B1D140 /* UITestSupport.swift */; };
-		50B1D3752D06120000B1D141 /* UITestSupport+App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3742D06120000B1D141 /* UITestSupport+App.swift */; };
-		50B1D3762D06120000B1D141 /* UITestSupport+App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3742D06120000B1D141 /* UITestSupport+App.swift */; };
-		50C6D891228BDBAD0091F19E /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 50C6D890228BDBAD0091F19E /* Images.xcassets */; };
-		50D7BEE7227D42FD0008B95E /* RulerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEE6227D42FD0008B95E /* RulerController.swift */; };
-		50D7BEE9227D43270008B95E /* Ruler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEE8227D43270008B95E /* Ruler.swift */; };
-		50D7BEEB227D432E0008B95E /* RulerWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEEA227D432E0008B95E /* RulerWindow.swift */; };
-		50D7BEED227D5C810008B95E /* RuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEEC227D5C810008B95E /* RuleView.swift */; };
-		50FC527E25BF326800B84228 /* FreeRuler.help in Resources */ = {isa = PBXBuildFile; fileRef = 50FC527D25BF326800B84228 /* FreeRuler.help */; };
-		56B1A9290A8ADEA46E1D3129 /* HorizontalRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F41029E22607DC900F06A10 /* HorizontalRule.swift */; };
-		5B52743D84FFD5EBF40B8558 /* VerticalRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5012CAAC226AB09000BD9565 /* VerticalRule.swift */; };
-		6F4102892260712F00F06A10 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F4102882260712F00F06A10 /* AppDelegate.swift */; };
-		6F41028E2260713100F06A10 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6F41028C2260713100F06A10 /* MainMenu.xib */; };
-		6F41029F22607DC900F06A10 /* HorizontalRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F41029E22607DC900F06A10 /* HorizontalRule.swift */; };
-		9A082BBC4A583513B0858C41 /* RuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEEC227D5C810008B95E /* RuleView.swift */; };
-		B06EA4AC302536E25093D003 /* RulerTickLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3542D05E00000B1D138 /* RulerTickLayout.swift */; };
-		C47EEBC81CE13FEB9A2ADE5A /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50008B6022846FCD001E3EE4 /* Notifications.swift */; };
-		CD78B999536A29591C97FB80 /* MouseTickTimerPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3502D05D00000B1D135 /* MouseTickTimerPolicy.swift */; };
 		DA8EDBA823F8AC60DD774681 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 7201D59F68C1B65518A4C10A /* Sparkle */; };
-		E6BC6663BAF0D11D7A9D2195 /* Ruler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEE8227D43270008B95E /* Ruler.swift */; };
-		E9A35F3EE51A34DFC9D6097E /* FreeRuler.help in Resources */ = {isa = PBXBuildFile; fileRef = 50FC527D25BF326800B84228 /* FreeRuler.help */; };
-		F73A5B5C974E514FD2663412 /* PreferencesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507FED41227FFF5300BD77DC /* PreferencesController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -107,54 +53,36 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		50008B6022846FCD001E3EE4 /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
-		5012CAAC226AB09000BD9565 /* VerticalRule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerticalRule.swift; sourceTree = "<group>"; };
-		507FED41227FFF5300BD77DC /* PreferencesController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesController.swift; sourceTree = "<group>"; };
-		507FED5F2280E13200BD77DC /* Prefs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prefs.swift; sourceTree = "<group>"; };
-		50A137002D03A00000137C0D /* RulerCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulerCoreTests.swift; sourceTree = "<group>"; };
 		50A137022D03A00000137C0D /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = System/Library/Frameworks/XCTest.framework; sourceTree = SDKROOT; };
 		50A137042D03A00000137C0D /* FreeRulerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FreeRulerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		50A147002D03C00000147C0D /* FreeRulerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeRulerUITests.swift; sourceTree = "<group>"; };
 		50A147022D03C00000147C0D /* FreeRulerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FreeRulerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		50B146202D03B00000146C0D /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
-		50B149002D04A00000149C0D /* HotkeyBezel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyBezel.swift; sourceTree = "<group>"; };
-		50B1D3502D05D00000B1D135 /* MouseTickTimerPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MouseTickTimerPolicy.swift; sourceTree = "<group>"; };
-		50B1D3522D05D00100B1D135 /* RulerCursorController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulerCursorController.swift; sourceTree = "<group>"; };
-		50B1D3542D05E00000B1D138 /* RulerTickLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulerTickLayout.swift; sourceTree = "<group>"; };
-		50B1D3582D06000100B1D139 /* AppIconRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconRenderer.swift; sourceTree = "<group>"; };
-		50B1D35F2D06000600B1D139 /* AppIconGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconGenerator.swift; sourceTree = "<group>"; };
-		50B1D3642D06010100B1D139 /* AppStoreScreenshotPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStoreScreenshotPreview.swift; sourceTree = "<group>"; };
-		50B1D3682D06100000B1D13A /* ResizeHandleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResizeHandleView.swift; sourceTree = "<group>"; };
-		50B1D36C2D06110000B1D13B /* UnitLabelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitLabelView.swift; sourceTree = "<group>"; };
-		50B1D3702D06120000B1D140 /* UITestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestSupport.swift; sourceTree = "<group>"; };
-		50B1D3742D06120000B1D141 /* UITestSupport+App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITestSupport+App.swift"; sourceTree = "<group>"; };
-		50C6D890228BDBAD0091F19E /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		50D7BEE6227D42FD0008B95E /* RulerController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RulerController.swift; sourceTree = "<group>"; };
-		50D7BEE8227D43270008B95E /* Ruler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ruler.swift; sourceTree = "<group>"; };
-		50D7BEEA227D432E0008B95E /* RulerWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RulerWindow.swift; sourceTree = "<group>"; };
-		50D7BEEC227D5C810008B95E /* RuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleView.swift; sourceTree = "<group>"; };
-		50FC527D25BF326800B84228 /* FreeRuler.help */ = {isa = PBXFileReference; lastKnownFileType = folder; path = FreeRuler.help; sourceTree = "<group>"; };
-		53AF6A4225A456E30076AAB7 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/MainMenu.strings; sourceTree = "<group>"; };
-		53AF6A4325A456E30076AAB7 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/PreferencesController.strings; sourceTree = "<group>"; };
-		55ACACE1604925BB61E9D74C /* Info.github.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.github.plist; sourceTree = "<group>"; };
-		55ACACE2604925BB61E9D74C /* Free_Ruler.github.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Free_Ruler.github.entitlements; sourceTree = "<group>"; };
+		50B1D3702D06120000B1D140 /* UITestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Free Ruler/UITestSupport.swift"; sourceTree = SOURCE_ROOT; };
 		6F4102852260712F00F06A10 /* Free Ruler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Free Ruler.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		6F4102882260712F00F06A10 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		6F41028D2260713100F06A10 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		6F41028F2260713100F06A10 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		6F4102902260713100F06A10 /* Free_Ruler.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Free_Ruler.entitlements; sourceTree = "<group>"; };
-		6F41029E22607DC900F06A10 /* HorizontalRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalRule.swift; sourceTree = "<group>"; };
-		6F8CAA3929CC8F7D00C4ED57 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-hans.lproj/MainMenu.strings"; sourceTree = "<group>"; };
-		6F8CAA3A29CC8F7D00C4ED57 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-hans.lproj/PreferencesController.strings"; sourceTree = "<group>"; };
-		8F629823243003EA004F9099 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/MainMenu.strings; sourceTree = "<group>"; };
-		8F629825243003F6004F9099 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PreferencesController.xib; sourceTree = "<group>"; };
-		8F629828243003FF004F9099 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/PreferencesController.strings; sourceTree = "<group>"; };
 		AB053EE93E1DC9AF341A8D4F /* Free Ruler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Free Ruler.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		B894A5002BBFE61A005A3B6F /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/MainMenu.strings; sourceTree = "<group>"; };
-		B894A5012BBFE61A005A3B6F /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/PreferencesController.strings; sourceTree = "<group>"; };
-		D9DBE8A12C791B1600A42589 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/MainMenu.strings; sourceTree = "<group>"; };
-		D9DBE8A22C791B1600A42589 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/PreferencesController.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		50F208010000000000000001 /* Exceptions for "Free Ruler" folder in "Free Ruler" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+				Info.github.plist,
+				Free_Ruler.entitlements,
+				Free_Ruler.github.entitlements,
+			);
+			target = 6F4102842260712F00F06A10 /* Free Ruler */;
+		};
+		50F208020000000000000002 /* Exceptions for "Free Ruler" folder in "Free Ruler GitHub" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+				Info.github.plist,
+				Free_Ruler.entitlements,
+				Free_Ruler.github.entitlements,
+			);
+			target = FC9DC639BBDB0F3C10FD4344 /* Free Ruler GitHub */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		50A137052D03A00000137C0D /* Frameworks */ = {
@@ -190,15 +118,32 @@
 		};
 /* End PBXFrameworksBuildPhase section */
 
-/* Begin PBXGroup section */
+/* Begin PBXFileSystemSynchronizedRootGroup section */
 		50A137062D03A00000137C0D /* FreeRulerTests */ = {
-			isa = PBXGroup;
-			children = (
-				50A137002D03A00000137C0D /* RulerCoreTests.swift */,
-			);
+			isa = PBXFileSystemSynchronizedRootGroup;
 			path = FreeRulerTests;
 			sourceTree = "<group>";
 		};
+		50A147072D03C00000147C0D /* FreeRulerUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = FreeRulerUITests;
+			sourceTree = "<group>";
+		};
+		6F4102872260712F00F06A10 /* Free Ruler */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				50F208010000000000000001 /* Exceptions for "Free Ruler" folder in "Free Ruler" target */,
+				50F208020000000000000002 /* Exceptions for "Free Ruler" folder in "Free Ruler GitHub" target */,
+			);
+			explicitFolders = (
+				FreeRuler.help,
+			);
+			path = "Free Ruler";
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXGroup section */
 		50A137072D03A00000137C0D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -206,14 +151,6 @@
 				637D287E638FC2DDD19B0FC8 /* OS X */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		50A147072D03C00000147C0D /* FreeRulerUITests */ = {
-			isa = PBXGroup;
-			children = (
-				50A147002D03C00000147C0D /* FreeRulerUITests.swift */,
-			);
-			path = FreeRulerUITests;
 			sourceTree = "<group>";
 		};
 		637D287E638FC2DDD19B0FC8 /* OS X */ = {
@@ -245,43 +182,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		6F4102872260712F00F06A10 /* Free Ruler */ = {
-			isa = PBXGroup;
-			children = (
-				50FC527D25BF326800B84228 /* FreeRuler.help */,
-				507FED5F2280E13200BD77DC /* Prefs.swift */,
-				50008B6022846FCD001E3EE4 /* Notifications.swift */,
-				6F4102882260712F00F06A10 /* AppDelegate.swift */,
-				50B1D3702D06120000B1D140 /* UITestSupport.swift */,
-				50B1D3742D06120000B1D141 /* UITestSupport+App.swift */,
-				50B1D3522D05D00100B1D135 /* RulerCursorController.swift */,
-				50B1D3502D05D00000B1D135 /* MouseTickTimerPolicy.swift */,
-				50B149002D04A00000149C0D /* HotkeyBezel.swift */,
-				6F41028C2260713100F06A10 /* MainMenu.xib */,
-				50B146202D03B00000146C0D /* Localizable.xcstrings */,
-				50D7BEE8227D43270008B95E /* Ruler.swift */,
-				50D7BEE6227D42FD0008B95E /* RulerController.swift */,
-				50D7BEEA227D432E0008B95E /* RulerWindow.swift */,
-				50D7BEEC227D5C810008B95E /* RuleView.swift */,
-				50B1D3682D06100000B1D13A /* ResizeHandleView.swift */,
-				50B1D36C2D06110000B1D13B /* UnitLabelView.swift */,
-				50B1D3542D05E00000B1D138 /* RulerTickLayout.swift */,
-				6F41029E22607DC900F06A10 /* HorizontalRule.swift */,
-				5012CAAC226AB09000BD9565 /* VerticalRule.swift */,
-				50B1D3582D06000100B1D139 /* AppIconRenderer.swift */,
-				50B1D35F2D06000600B1D139 /* AppIconGenerator.swift */,
-				50B1D3642D06010100B1D139 /* AppStoreScreenshotPreview.swift */,
-				507FED41227FFF5300BD77DC /* PreferencesController.swift */,
-				507FED42227FFF5300BD77DC /* PreferencesController.xib */,
-				6F4102902260713100F06A10 /* Free_Ruler.entitlements */,
-				55ACACE2604925BB61E9D74C /* Free_Ruler.github.entitlements */,
-				6F41028F2260713100F06A10 /* Info.plist */,
-				50C6D890228BDBAD0091F19E /* Images.xcassets */,
-				55ACACE1604925BB61E9D74C /* Info.github.plist */,
-			);
-			path = "Free Ruler";
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -297,6 +197,9 @@
 			);
 			dependencies = (
 				50A137112D03A00000137C0D /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				50A137062D03A00000137C0D /* FreeRulerTests */,
 			);
 			name = FreeRulerTests;
 			productName = FreeRulerTests;
@@ -315,6 +218,9 @@
 			);
 			dependencies = (
 				50A1470D2D03C00000147C0D /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				50A147072D03C00000147C0D /* FreeRulerUITests */,
 			);
 			name = FreeRulerUITests;
 			productName = FreeRulerUITests;
@@ -335,6 +241,9 @@
 			);
 			dependencies = (
 			);
+			fileSystemSynchronizedGroups = (
+				6F4102872260712F00F06A10 /* Free Ruler */,
+			);
 			name = "Free Ruler";
 			productName = "Free Ruler";
 			productReference = 6F4102852260712F00F06A10 /* Free Ruler.app */;
@@ -351,6 +260,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				6F4102872260712F00F06A10 /* Free Ruler */,
 			);
 			name = "Free Ruler GitHub";
 			packageProductDependencies = (
@@ -385,7 +297,6 @@
 				};
 			};
 			buildConfigurationList = 6F4102802260712F00F06A10 /* Build configuration list for PBXProject "Free Ruler" */;
-			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -398,9 +309,11 @@
 				es,
 			);
 			mainGroup = 6F41027C2260712F00F06A10;
+			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				B220C5E385B022DDEF9D7608 /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
+			preferredProjectObjectVersion = 77;
 			productRefGroup = 6F4102862260712F00F06A10 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -432,11 +345,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				50C6D891228BDBAD0091F19E /* Images.xcassets in Resources */,
-				50FC527E25BF326800B84228 /* FreeRuler.help in Resources */,
-				507FED44227FFF5300BD77DC /* PreferencesController.xib in Resources */,
-				50B146262D03B00000146C0D /* Localizable.xcstrings in Resources */,
-				6F41028E2260713100F06A10 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -444,11 +352,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				378A15CD2C8708C2F8CB62E7 /* Images.xcassets in Resources */,
-				E9A35F3EE51A34DFC9D6097E /* FreeRuler.help in Resources */,
-				18769743B3FCD2594B0B8CF2 /* PreferencesController.xib in Resources */,
-				2ED12254704310C00A527F07 /* Localizable.xcstrings in Resources */,
-				2AFB3AE0D34FF01F00F671D4 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -459,7 +362,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				50A137012D03A00000137C0D /* RulerCoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -467,7 +369,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				50A147012D03C00000147C0D /* FreeRulerUITests.swift in Sources */,
 				50B1D3732D06120000B1D141 /* UITestSupport.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -476,27 +377,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				50008B6122846FCD001E3EE4 /* Notifications.swift in Sources */,
-				507FED602280E13200BD77DC /* Prefs.swift in Sources */,
-				50B149012D04A00000149C0D /* HotkeyBezel.swift in Sources */,
-				50B1D3532D05D00100B1D135 /* RulerCursorController.swift in Sources */,
-				50B1D3512D05D00000B1D135 /* MouseTickTimerPolicy.swift in Sources */,
-				50B1D3552D05E00000B1D138 /* RulerTickLayout.swift in Sources */,
-				6F41029F22607DC900F06A10 /* HorizontalRule.swift in Sources */,
-				50B1D3592D06000100B1D139 /* AppIconRenderer.swift in Sources */,
-				50B1D3602D06000600B1D139 /* AppIconGenerator.swift in Sources */,
-				50B1D3652D06010100B1D139 /* AppStoreScreenshotPreview.swift in Sources */,
-				50D7BEEB227D432E0008B95E /* RulerWindow.swift in Sources */,
-				507FED43227FFF5300BD77DC /* PreferencesController.swift in Sources */,
-				50D7BEE7227D42FD0008B95E /* RulerController.swift in Sources */,
-				5012CAAD226AB09000BD9565 /* VerticalRule.swift in Sources */,
-				6F4102892260712F00F06A10 /* AppDelegate.swift in Sources */,
-				50B1D3712D06120000B1D140 /* UITestSupport.swift in Sources */,
-				50B1D3752D06120000B1D141 /* UITestSupport+App.swift in Sources */,
-				50D7BEED227D5C810008B95E /* RuleView.swift in Sources */,
-				50B1D3672D06100000B1D13A /* ResizeHandleView.swift in Sources */,
-				50B1D36A2D06110000B1D13B /* UnitLabelView.swift in Sources */,
-				50D7BEE9227D43270008B95E /* Ruler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -504,27 +384,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C47EEBC81CE13FEB9A2ADE5A /* Notifications.swift in Sources */,
-				2075141A6742AF52598D0314 /* Prefs.swift in Sources */,
-				012078ADCF85378A053BB9FA /* HotkeyBezel.swift in Sources */,
-				29E0CF116F5BCEA78DEA46BC /* RulerCursorController.swift in Sources */,
-				CD78B999536A29591C97FB80 /* MouseTickTimerPolicy.swift in Sources */,
-				B06EA4AC302536E25093D003 /* RulerTickLayout.swift in Sources */,
-				56B1A9290A8ADEA46E1D3129 /* HorizontalRule.swift in Sources */,
-				50B1D35D2D06000400B1D139 /* AppIconRenderer.swift in Sources */,
-				50B1D3612D06000700B1D139 /* AppIconGenerator.swift in Sources */,
-				50B1D3662D06010200B1D139 /* AppStoreScreenshotPreview.swift in Sources */,
-				274FA3FF1BA7829144BBEB70 /* RulerWindow.swift in Sources */,
-				F73A5B5C974E514FD2663412 /* PreferencesController.swift in Sources */,
-				0C56237FE08F4155F0B63FFB /* RulerController.swift in Sources */,
-				5B52743D84FFD5EBF40B8558 /* VerticalRule.swift in Sources */,
-				23E2B80975F07733EB6CF5DB /* AppDelegate.swift in Sources */,
-				50B1D3722D06120000B1D140 /* UITestSupport.swift in Sources */,
-				50B1D3762D06120000B1D141 /* UITestSupport+App.swift in Sources */,
-				9A082BBC4A583513B0858C41 /* RuleView.swift in Sources */,
-				50B1D3692D06100000B1D13A /* ResizeHandleView.swift in Sources */,
-				50B1D36B2D06110000B1D13B /* UnitLabelView.swift in Sources */,
-				E6BC6663BAF0D11D7A9D2195 /* Ruler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -542,35 +401,6 @@
 			targetProxy = 50A1470C2D03C00000147C0D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		507FED42227FFF5300BD77DC /* PreferencesController.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				8F629825243003F6004F9099 /* Base */,
-				8F629828243003FF004F9099 /* de */,
-				53AF6A4325A456E30076AAB7 /* fi */,
-				6F8CAA3A29CC8F7D00C4ED57 /* zh-Hans */,
-				B894A5012BBFE61A005A3B6F /* ja */,
-				D9DBE8A22C791B1600A42589 /* es */,
-			);
-			name = PreferencesController.xib;
-			sourceTree = "<group>";
-		};
-		6F41028C2260713100F06A10 /* MainMenu.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				6F41028D2260713100F06A10 /* Base */,
-				8F629823243003EA004F9099 /* de */,
-				53AF6A4225A456E30076AAB7 /* fi */,
-				6F8CAA3929CC8F7D00C4ED57 /* zh-Hans */,
-				B894A5002BBFE61A005A3B6F /* ja */,
-				D9DBE8A12C791B1600A42589 /* es */,
-			);
-			name = MainMenu.xib;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		0BD2F2D59CC819CF9A964FD8 /* Debug */ = {

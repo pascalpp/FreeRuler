@@ -23,6 +23,10 @@ Free Ruler requires macOS Sonoma or later.
 
 See the [releases page](https://github.com/pascalpp/FreeRuler/releases) for signed and notarized direct downloads. Direct downloads can check for updates automatically.
 
+### Development
+
+The Xcode project uses file-system synchronized groups and requires Xcode 16 or later.
+
 ### Feedback
 
 For bugs or feature requests, see [the list of open issues](https://github.com/pascalpp/FreeRuler/issues) or [open a new issue](https://github.com/pascalpp/FreeRuler/issues/new).
