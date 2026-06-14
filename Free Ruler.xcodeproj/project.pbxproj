@@ -32,8 +32,8 @@
 		50B1D3532D05D00100B1D135 /* RulerCursorController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3522D05D00100B1D135 /* RulerCursorController.swift */; };
 		50B1D3552D05E00000B1D138 /* RulerTickLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3542D05E00000B1D138 /* RulerTickLayout.swift */; };
 		50B1D3592D06000100B1D139 /* AppIconRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3582D06000100B1D139 /* AppIconRenderer.swift */; };
-		50B1D3602D06000600B1D139 /* AppIconGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D35F2D06000600B1D139 /* AppIconGenerator.swift */; };
 		50B1D35D2D06000400B1D139 /* AppIconRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3582D06000100B1D139 /* AppIconRenderer.swift */; };
+		50B1D3602D06000600B1D139 /* AppIconGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D35F2D06000600B1D139 /* AppIconGenerator.swift */; };
 		50B1D3612D06000700B1D139 /* AppIconGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D35F2D06000600B1D139 /* AppIconGenerator.swift */; };
 		50B1D3652D06010100B1D139 /* AppStoreScreenshotPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3642D06010100B1D139 /* AppStoreScreenshotPreview.swift */; };
 		50B1D3662D06010200B1D139 /* AppStoreScreenshotPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3642D06010100B1D139 /* AppStoreScreenshotPreview.swift */; };
@@ -142,7 +142,7 @@
 		8F629823243003EA004F9099 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		8F629825243003F6004F9099 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PreferencesController.xib; sourceTree = "<group>"; };
 		8F629828243003FF004F9099 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/PreferencesController.strings; sourceTree = "<group>"; };
-		AB053EE93E1DC9AF341A8D4F /* Free Ruler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = "Free Ruler.app"; path = "Free Ruler.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB053EE93E1DC9AF341A8D4F /* Free Ruler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Free Ruler.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B894A5002BBFE61A005A3B6F /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		B894A5012BBFE61A005A3B6F /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/PreferencesController.strings; sourceTree = "<group>"; };
 		D9DBE8A12C791B1600A42589 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/MainMenu.strings; sourceTree = "<group>"; };
@@ -814,7 +814,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 492;
+				CURRENT_PROJECT_VERSION = 491;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Free Ruler/Info.plist";
@@ -841,7 +841,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 492;
+				CURRENT_PROJECT_VERSION = 491;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Free Ruler/Info.plist";
