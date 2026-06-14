@@ -423,6 +423,30 @@ final class RulerCoreTests: XCTestCase {
         }
     }
 
+    func testVerticalMouseNumberLabelBackgroundCoversWideLabels() {
+        withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .topRight
+
+            let rule = VerticalRule(frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
+            let wideLabelSize = NSSize(width: 32, height: 10)
+            let labelRect = rule.mouseNumberLabelRect(
+                tickY: 150,
+                labelSize: wideLabelSize,
+                rulerSize: rule.bounds.size
+            )
+            let backgroundRect = rule.mouseNumberLabelBackgroundRect(
+                tickY: 150,
+                labelSize: wideLabelSize,
+                rulerSize: rule.bounds.size
+            )
+
+            XCTAssertTrue(backgroundRect.contains(labelRect))
+            XCTAssertLessThan(labelRect.minX, 10)
+            XCTAssertEqual(backgroundRect.minX, labelRect.minX, accuracy: 0.0001)
+            XCTAssertEqual(backgroundRect.maxX, rule.bounds.maxX, accuracy: 0.0001)
+        }
+    }
+
     func testResizeHandlesAreVisuallyObscuredFromLeadingEdgeToRulerEnd() {
         withRestoredZeroCornerPreference {
             prefs.zeroCorner = .topLeft

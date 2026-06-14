@@ -159,25 +159,23 @@ struct MouseTickLabelLayout {
             )
         }
 
-        let geometry = ZeroCornerGeometry(zeroCorner: zeroCorner)
-        let placement = geometry.unitLabelPlacement(for: orientation)
-        let offsets = offsets(for: orientation, placement: placement)
-        let y = verticalY(
-            forTickY: tickPosition,
+        let labelFrame = labelFrame(
             labelSize: labelSize,
             rulerSize: rulerSize,
+            orientation: orientation,
             zeroCorner: zeroCorner,
+            tickPosition: tickPosition,
             resizeHandleFrame: resizeHandleFrame,
-            unitLabelFrame: unitLabelFrame,
-            offsets: offsets
+            unitLabelFrame: unitLabelFrame
         )
+        let geometry = ZeroCornerGeometry(zeroCorner: zeroCorner)
 
         return verticalLabelLaneFrame(
             rulerSize: rulerSize,
             tickSide: geometry.tickSide(for: .vertical),
-            y: y,
-            height: labelSize.height
-        )
+            y: labelFrame.minY,
+            height: labelFrame.height
+        ).union(labelFrame)
     }
 
     private static func offsets(

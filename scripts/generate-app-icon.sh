@@ -21,8 +21,7 @@ xcrun swiftc \
 "$binary" "$output_dir"
 
 icon_hash="$(shasum -a 256 "$output_dir/icon_512x512.png" | awk '{ print substr($1, 1, 12) }')"
-generated_at="$(date -u +%Y%m%d%H%M%S)"
-help_cache_token="${generated_at}-${icon_hash}"
+help_cache_token="$icon_hash"
 help_icon_name="freeruler-help-icon-${help_cache_token}.png"
 help_icon="$help_shared_dir/$help_icon_name"
 
