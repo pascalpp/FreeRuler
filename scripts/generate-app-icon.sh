@@ -27,7 +27,6 @@ help_icon_name="freeruler-help-icon-${help_cache_token}.png"
 help_icon="$help_shared_dir/$help_icon_name"
 
 cp "$output_dir/icon_512x512.png" "$help_icon"
-rm -f "$help_shared_dir/freeruler.png"
 
 for stale_icon in "$help_shared_dir"/freeruler-help-icon-*.png; do
   if [[ -e "$stale_icon" && "$stale_icon" != "$help_icon" ]]; then
