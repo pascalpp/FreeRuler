@@ -275,7 +275,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         prefs.backgroundOpacity = 50
         prefs.rulerColor = Prefs.defaultRulerFillColor
         prefs.unit = .pixels
-        prefs.zeroCorner = .topLeft
+        prefs.zeroCorner = Prefs.defaultZeroCorner
     }
 
     func createRulersIfNeeded() {
