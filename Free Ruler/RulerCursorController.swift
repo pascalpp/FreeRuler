@@ -102,6 +102,6 @@ final class RulerCursorController {
 
 private extension RulerCursorController.CursorStyle {
     func writeUITestStateIfNeeded() {
-        writeUITestCursorState(uiTestStateValue)
+        UITestSupport.current?.writeCursorState(uiTestStateValue)
     }
 }

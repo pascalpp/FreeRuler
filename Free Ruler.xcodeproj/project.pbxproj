@@ -40,7 +40,12 @@
 		50B1D3672D06100000B1D13A /* ResizeHandleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3682D06100000B1D13A /* ResizeHandleView.swift */; };
 		50B1D3692D06100000B1D13A /* ResizeHandleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3682D06100000B1D13A /* ResizeHandleView.swift */; };
 		50B1D36A2D06110000B1D13B /* UnitLabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D36C2D06110000B1D13B /* UnitLabelView.swift */; };
+		50B1D3712D06120000B1D140 /* UITestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3702D06120000B1D140 /* UITestSupport.swift */; };
 		50B1D36B2D06110000B1D13B /* UnitLabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D36C2D06110000B1D13B /* UnitLabelView.swift */; };
+		50B1D3722D06120000B1D140 /* UITestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3702D06120000B1D140 /* UITestSupport.swift */; };
+		50B1D3732D06120000B1D141 /* UITestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3702D06120000B1D140 /* UITestSupport.swift */; };
+		50B1D3752D06120000B1D141 /* UITestSupport+App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3742D06120000B1D141 /* UITestSupport+App.swift */; };
+		50B1D3762D06120000B1D141 /* UITestSupport+App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3742D06120000B1D141 /* UITestSupport+App.swift */; };
 		50C6D891228BDBAD0091F19E /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 50C6D890228BDBAD0091F19E /* Images.xcassets */; };
 		50D7BEE7227D42FD0008B95E /* RulerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEE6227D42FD0008B95E /* RulerController.swift */; };
 		50D7BEE9227D43270008B95E /* Ruler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D7BEE8227D43270008B95E /* Ruler.swift */; };
@@ -121,6 +126,8 @@
 		50B1D3642D06010100B1D139 /* AppStoreScreenshotPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStoreScreenshotPreview.swift; sourceTree = "<group>"; };
 		50B1D3682D06100000B1D13A /* ResizeHandleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResizeHandleView.swift; sourceTree = "<group>"; };
 		50B1D36C2D06110000B1D13B /* UnitLabelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitLabelView.swift; sourceTree = "<group>"; };
+		50B1D3702D06120000B1D140 /* UITestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestSupport.swift; sourceTree = "<group>"; };
+		50B1D3742D06120000B1D141 /* UITestSupport+App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITestSupport+App.swift"; sourceTree = "<group>"; };
 		50C6D890228BDBAD0091F19E /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		50D7BEE6227D42FD0008B95E /* RulerController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RulerController.swift; sourceTree = "<group>"; };
 		50D7BEE8227D43270008B95E /* Ruler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ruler.swift; sourceTree = "<group>"; };
@@ -245,6 +252,8 @@
 				507FED5F2280E13200BD77DC /* Prefs.swift */,
 				50008B6022846FCD001E3EE4 /* Notifications.swift */,
 				6F4102882260712F00F06A10 /* AppDelegate.swift */,
+				50B1D3702D06120000B1D140 /* UITestSupport.swift */,
+				50B1D3742D06120000B1D141 /* UITestSupport+App.swift */,
 				50B1D3522D05D00100B1D135 /* RulerCursorController.swift */,
 				50B1D3502D05D00000B1D135 /* MouseTickTimerPolicy.swift */,
 				50B149002D04A00000149C0D /* HotkeyBezel.swift */,
@@ -459,6 +468,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				50A147012D03C00000147C0D /* FreeRulerUITests.swift in Sources */,
+				50B1D3732D06120000B1D141 /* UITestSupport.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -481,6 +491,8 @@
 				50D7BEE7227D42FD0008B95E /* RulerController.swift in Sources */,
 				5012CAAD226AB09000BD9565 /* VerticalRule.swift in Sources */,
 				6F4102892260712F00F06A10 /* AppDelegate.swift in Sources */,
+				50B1D3712D06120000B1D140 /* UITestSupport.swift in Sources */,
+				50B1D3752D06120000B1D141 /* UITestSupport+App.swift in Sources */,
 				50D7BEED227D5C810008B95E /* RuleView.swift in Sources */,
 				50B1D3672D06100000B1D13A /* ResizeHandleView.swift in Sources */,
 				50B1D36A2D06110000B1D13B /* UnitLabelView.swift in Sources */,
@@ -507,6 +519,8 @@
 				0C56237FE08F4155F0B63FFB /* RulerController.swift in Sources */,
 				5B52743D84FFD5EBF40B8558 /* VerticalRule.swift in Sources */,
 				23E2B80975F07733EB6CF5DB /* AppDelegate.swift in Sources */,
+				50B1D3722D06120000B1D140 /* UITestSupport.swift in Sources */,
+				50B1D3762D06120000B1D141 /* UITestSupport+App.swift in Sources */,
 				9A082BBC4A583513B0858C41 /* RuleView.swift in Sources */,
 				50B1D3692D06100000B1D13A /* ResizeHandleView.swift in Sources */,
 				50B1D36B2D06110000B1D13B /* UnitLabelView.swift in Sources */,

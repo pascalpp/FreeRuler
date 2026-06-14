@@ -7,26 +7,6 @@ import Darwin
 import Sparkle
 #endif
 
-let env = ProcessInfo.processInfo.environment
-let UI_TESTS = env["FREE_RULER_UI_TESTS"] != nil
-let UI_TEST_CURSOR_STATE_NAME: String? = {
-    guard UI_TESTS,
-          let name = env["FREE_RULER_UI_TEST_CURSOR_STATE_NAME"] else { return nil }
-
-    let lastPathComponent = URL(fileURLWithPath: name).lastPathComponent
-    guard !lastPathComponent.isEmpty, lastPathComponent == name else { return nil }
-
-    return name
-}()
-
-func writeUITestCursorState(_ value: String) {
-    guard let name = UI_TEST_CURSOR_STATE_NAME else { return }
-
-    let url = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
-        .appendingPathComponent(name)
-    try? value.write(to: url, atomically: true, encoding: .utf8)
-}
-
 private enum HotkeyBezelLocalizationKey: String {
     case rulersFloated = "HotkeyBezel.RulersFloated"
     case rulersUnfloated = "HotkeyBezel.RulersUnfloated"
@@ -117,6 +97,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     var preferencesController: PreferencesController? = nil
     private let hotkeyBezel = HotkeyBezel()
+    private var uiTestSupport: UITestSupport?
 #if SPARKLE
     private var updaterController: SPUStandardUpdaterController?
 #endif
@@ -133,13 +114,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 #endif
 
-        if UI_TESTS {
-            resetStateForUITests()
-            writeUITestCursorState("none")
-        }
+        uiTestSupport = UITestSupport.installIfNeeded()
+        uiTestSupport?.resetApplicationState()
+        uiTestSupport?.writeCursorState("none")
 
         subscribeToPrefs()
         updateDisplay()
+        uiTestSupport?.writePreferencesState()
 #if SPARKLE
         configureUpdater()
 #endif
@@ -222,15 +203,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             prefs.observe(\Prefs.unit, options: .new) { prefs, changed in
                 self.updateUnitMenu()
                 self.redrawRulers()
+                self.uiTestSupport?.writePreferencesState()
             },
             prefs.observe(\Prefs.floatRulers, options: .new) { prefs, changed in
                 self.updateFloatRulersMenuItem()
+                self.uiTestSupport?.writePreferencesState()
             },
             prefs.observe(\Prefs.groupRulers, options: .new) { prefs, changed in
                 self.updateGroupRulersMenuItem()
+                self.uiTestSupport?.writePreferencesState()
             },
             prefs.observe(\Prefs.rulerShadow, options: .new) { prefs, changed in
                 self.updateRulerShadowMenuItem()
+                self.uiTestSupport?.writePreferencesState()
             },
             prefs.observe(\Prefs.rulerColor, options: .new) { prefs, changed in
                 self.redrawRulers()
@@ -270,32 +255,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func updateRulerShadowMenuItem() {
         rulerShadowMenuItem?.state = prefs.rulerShadow ? .on : .off
-    }
-
-    private func resetStateForUITests() {
-        let defaults = UserDefaults.standard
-        [
-            "groupRulers",
-            "floatRulers",
-            "rulerShadow",
-            "foregroundOpacity",
-            "backgroundOpacity",
-            "rulerColor",
-            "unit",
-            "zeroCorner",
-            "NSWindow Frame horizontal-ruler",
-            "NSWindow Frame vertical-ruler",
-            "NSWindow Frame preferencesWindow",
-        ].forEach(defaults.removeObject(forKey:))
-
-        prefs.groupRulers = true
-        prefs.floatRulers = true
-        prefs.rulerShadow = false
-        prefs.foregroundOpacity = 90
-        prefs.backgroundOpacity = 50
-        prefs.rulerColor = Prefs.defaultRulerFillColor
-        prefs.unit = .pixels
-        prefs.zeroCorner = Prefs.defaultZeroCorner
     }
 
     func createRulersIfNeeded() {
