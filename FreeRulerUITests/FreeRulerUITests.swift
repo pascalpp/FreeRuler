@@ -396,7 +396,7 @@ final class FreeRulerUITests: XCTestCase {
     private func pressAndRelease(in element: XCUIElement, assertingCursorDuringPress expectedCursor: String) {
         let expectation = expectationForCursor(expectedCursor, after: "mousedown inside \(element.identifier)")
         let coordinate = interactionPoint(in: element)
-        coordinate.press(forDuration: 0.4)
+        coordinate.press(forDuration: 0.2)
         wait(for: [expectation], timeout: 1)
         RunLoop.current.run(until: Date().addingTimeInterval(0.1))
     }
