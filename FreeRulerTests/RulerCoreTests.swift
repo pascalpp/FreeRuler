@@ -282,9 +282,9 @@ final class RulerCoreTests: XCTestCase {
     }
 
     func testDefaultRulerRectsUseExpectedShapeAndOffsets() {
-        let screen = NSScreen.main?.frame
-        let screenWidth = screen?.width ?? 1000
-        let screenHeight = screen?.height ?? 800
+        let screenFrame = NSScreen.main?.frame ?? NSRect(x: 0, y: 0, width: 1000, height: 800)
+        let screenWidth = screenFrame.width
+        let screenHeight = screenFrame.height
         let horizontalLength = screenWidth / 2
         let verticalLength = horizontalLength / (screenWidth / screenHeight)
 
@@ -295,9 +295,9 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertEqual(vertical.width, Ruler.thickness)
         XCTAssertEqual(horizontal.width, horizontalLength, accuracy: 0.0001)
         XCTAssertEqual(vertical.height, verticalLength, accuracy: 0.0001)
-        XCTAssertEqual(horizontal.minX, 69.0, accuracy: 0.0001)
-        XCTAssertEqual(vertical.minX, 30.0, accuracy: 0.0001)
-        XCTAssertEqual(horizontal.minY, screenHeight - 90.0, accuracy: 0.0001)
+        XCTAssertEqual(horizontal.minX, screenFrame.minX + 69.0, accuracy: 0.0001)
+        XCTAssertEqual(vertical.minX, screenFrame.minX + 30.0, accuracy: 0.0001)
+        XCTAssertEqual(horizontal.minY, screenFrame.maxY - 90.0, accuracy: 0.0001)
         XCTAssertEqual(vertical.maxY, horizontal.minY + 1.0, accuracy: 0.0001)
     }
 

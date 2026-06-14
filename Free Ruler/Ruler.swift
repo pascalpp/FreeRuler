@@ -202,9 +202,7 @@ func getDefaultContentRect(orientation: Orientation) -> NSRect {
 
 func getDefaultContentRect(orientation: Orientation, zeroCorner: ZeroCorner) -> NSRect {
     let fallbackScreenFrame = NSRect(x: 0, y: 0, width: 1000, height: 800)
-    let screenFrame = NSScreen.main
-        .map { NSRect(origin: .zero, size: $0.frame.size) }
-        ?? fallbackScreenFrame
+    let screenFrame = NSScreen.main?.frame ?? fallbackScreenFrame
 
     return ZeroCornerGeometry(zeroCorner: zeroCorner).defaultFrame(
         for: orientation,
