@@ -466,6 +466,8 @@ extension NSColor {
 }
 
 #if DEBUG
+private let mouseTickLabelPreviewRulerLength: CGFloat = 260
+
 private struct MouseTickRulePreview: NSViewRepresentable {
     let orientation: Orientation
     let zeroCorner: ZeroCorner
@@ -567,9 +569,36 @@ private struct MouseTickLabelOffsetPreview: View {
     let mouseX: CGFloat
     let mouseY: CGFloat
 
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            MouseTickLabelOffsetPreviewHeading(mouseX: mouseX, mouseY: mouseY)
+
+            MouseTickLabelOffsetPreviewGrid(
+                mouseX: mouseX,
+                mouseY: mouseY
+            )
+        }
+        .padding()
+    }
+}
+
+private struct MouseTickLabelOffsetPreviewHeading: View {
+    let mouseX: CGFloat
+    let mouseY: CGFloat
+
+    var body: some View {
+        Text("Mouse Tick Label Offsets (mouseX: \(Int(mouseX)), mouseY: \(Int(mouseY)))")
+            .font(.headline)
+    }
+}
+
+private struct MouseTickLabelOffsetPreviewGrid: View {
+    let mouseX: CGFloat
+    let mouseY: CGFloat
+
     private let cellSize = CGSize(
-        width: 260 + Ruler.thickness,
-        height: 260 + Ruler.thickness
+        width: mouseTickLabelPreviewRulerLength + Ruler.thickness,
+        height: mouseTickLabelPreviewRulerLength + Ruler.thickness
     )
     private let cases: [(name: String, zeroCorner: ZeroCorner)] = [
         ("Top Left", .topLeft),
@@ -579,30 +608,28 @@ private struct MouseTickLabelOffsetPreview: View {
     ]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text("Mouse Tick Label Offsets (mouseX: \(Int(mouseX)), mouseY: \(Int(mouseY)))")
-                .font(.headline)
-
-            LazyVGrid(
-                columns: [
-                    GridItem(.fixed(cellSize.width), spacing: 24),
-                    GridItem(.fixed(cellSize.width), spacing: 24),
-                ],
-                alignment: .leading,
-                spacing: 22
-            ) {
-                ForEach(cases, id: \.name) { testCase in
-                    MouseTickLabelCornerPreview(
-                        name: testCase.name,
-                        zeroCorner: testCase.zeroCorner,
-                        rulerLength: 260,
-                        mouseX: mouseX,
-                        mouseY: mouseY
-                    )
-                }
+        LazyVGrid(
+            columns: [
+                GridItem(.fixed(cellSize.width), spacing: 24),
+                GridItem(.fixed(cellSize.width), spacing: 24),
+            ],
+            alignment: .leading,
+            spacing: 22
+        ) {
+            ForEach(cases, id: \.name) { testCase in
+                cornerPreview(name: testCase.name, zeroCorner: testCase.zeroCorner)
             }
         }
-        .padding()
+    }
+
+    private func cornerPreview(name: String, zeroCorner: ZeroCorner) -> some View {
+        MouseTickLabelCornerPreview(
+            name: name,
+            zeroCorner: zeroCorner,
+            rulerLength: mouseTickLabelPreviewRulerLength,
+            mouseX: mouseX,
+            mouseY: mouseY
+        )
     }
 }
 
@@ -677,9 +704,83 @@ private struct MouseTickLabelCornerPreview: View {
     }
 }
 
+private struct MouseTickLabelOffsetPreviewControls: View {
+    @State private var mouseX: CGFloat = 8
+    @State private var mouseY: CGFloat = 8
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            MouseTickLabelOffsetPreviewHeading(mouseX: mouseX, mouseY: mouseY)
+
+            ZStack(alignment: .top) {
+                MouseTickLabelOffsetPreviewGrid(
+                    mouseX: mouseX,
+                    mouseY: mouseY
+                )
+
+                MouseTickLabelOffsetSliderPanel(mouseX: $mouseX, mouseY: $mouseY)
+                    .frame(width: 320)
+                    .padding(.top, 126)
+            }
+        }
+        .padding()
+    }
+}
+
+private struct MouseTickLabelOffsetSliderPanel: View {
+    @Binding var mouseX: CGFloat
+    @Binding var mouseY: CGFloat
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            MouseTickLabelOffsetSlider(title: "X", value: $mouseX)
+            MouseTickLabelOffsetSlider(title: "Y", value: $mouseY)
+        }
+    }
+}
+
+private struct MouseTickLabelOffsetSlider: View {
+    let title: String
+    @Binding var value: CGFloat
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Text(title)
+                .font(.caption)
+                .frame(width: 12, alignment: .leading)
+
+            Slider(
+                value: $value,
+                in: 0...mouseTickLabelPreviewRulerLength,
+                step: 1
+            )
+
+            TextField(title, value: editableValue, format: .number.precision(.fractionLength(0)))
+                .font(.caption.monospacedDigit())
+                .multilineTextAlignment(.trailing)
+                .frame(width: 44)
+                .textFieldStyle(.roundedBorder)
+        }
+    }
+
+    private var editableValue: Binding<Double> {
+        Binding(
+            get: { Double(value) },
+            set: { newValue in
+                guard newValue.isFinite else { return }
+
+                value = min(
+                    max(CGFloat(newValue).rounded(), 0),
+                    mouseTickLabelPreviewRulerLength
+                )
+            }
+        )
+    }
+}
+
 struct RuleView_Previews: PreviewProvider {
     static var previews: some View {
-        MouseTickLabelOffsetPreview(mouseX: 8, mouseY: 8)
+        MouseTickLabelOffsetPreviewControls()
             .previewLayout(.sizeThatFits)
             .previewDisplayName("Mouse Tick Labels")
     }
