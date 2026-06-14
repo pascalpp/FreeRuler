@@ -274,6 +274,17 @@ private struct AppStoreScreenshotCopyViewLayout {
     let subtitleWidth: CGFloat
     let subtitleHeight: CGFloat
 
+    var frame: NSRect {
+        NSRect(x: viewX, y: viewY, width: boundsSize.width, height: boundsSize.height)
+    }
+
+    var boundsSize: NSSize {
+        NSSize(
+            width: max(iconX + iconSize, titleX + titleWidth, subtitleX + subtitleWidth),
+            height: max(iconY + iconSize, titleY + titleHeight, subtitleY + subtitleHeight)
+        )
+    }
+
     var iconRect: NSRect {
         rect(x: iconX, y: iconY, width: iconSize, height: iconSize)
     }
@@ -287,7 +298,7 @@ private struct AppStoreScreenshotCopyViewLayout {
     }
 
     private func rect(x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat) -> NSRect {
-        NSRect(x: viewX + x, y: viewY + y, width: width, height: height)
+        NSRect(x: x, y: y, width: width, height: height)
     }
 }
 
@@ -338,9 +349,13 @@ private enum AppStoreScreenshotLayout {
     }
 
     static var copyViewLayout: AppStoreScreenshotCopyViewLayout {
+        copyViewLayout(viewX: copyViewX, viewY: copyViewY)
+    }
+
+    static func copyViewLayout(viewX: CGFloat, viewY: CGFloat) -> AppStoreScreenshotCopyViewLayout {
         AppStoreScreenshotCopyViewLayout(
-            viewX: copyViewX,
-            viewY: copyViewY,
+            viewX: viewX,
+            viewY: viewY,
             iconX: copyIconX,
             iconY: copyIconY,
             iconSize: copyIconSize,
@@ -545,57 +560,36 @@ private enum AppStoreFlipScreenshotLayout {
     static let backgroundColor = #colorLiteral(red: 0.7959441489, green: 0.3479741865, blue: 0.516690138, alpha: 1)
 
     static let rulerScale: CGFloat = 4.5
-    static let copyViewX: CGFloat = 720
-    static let copyViewY: CGFloat = 720
-    static let copyIconX: CGFloat = 0
-    static let copyIconY: CGFloat = 0
-    static let copyIconSize: CGFloat = 290
-    static let copyTitleX: CGFloat = 340
-    static let copyTitleY: CGFloat = 35
-    static let copySubtitleX: CGFloat = 340
-    static let copySubtitleY: CGFloat = 150
+    static let copyViewX: CGFloat = 700
+    static let copyViewY: CGFloat = 700
 
     // X/Y inset each set's zero corner from its named canvas corner.
     static let topLeftX: CGFloat = 280
     static let topLeftY: CGFloat = 280
-    static let topLeftHorizontalLength: CGFloat = 2260
-    static let topLeftVerticalLength: CGFloat = 1420
+    static let topLeftHorizontalLength: CGFloat = 2200
+    static let topLeftVerticalLength: CGFloat = 1354
     static let topLeftRulerColor = #colorLiteral(red: 0.95, green: 0.7125, blue: 0.8019480475, alpha: 1)
 
     static let topRightX: CGFloat = 520
-    static let topRightY: CGFloat = 510
+    static let topRightY: CGFloat = 520
     static let topRightHorizontalLength: CGFloat = 1783
-    static let topRightVerticalLength: CGFloat = 957
+    static let topRightVerticalLength: CGFloat = 900
     static let topRightRulerColor = #colorLiteral(red: 0.98, green: 0.735, blue: 0.8272727226, alpha: 1)
 
     static let bottomRightX: CGFloat = 280
     static let bottomRightY: CGFloat = 280
-    static let bottomRightHorizontalLength: CGFloat = 2260
-    static let bottomRightVerticalLength: CGFloat = 1420
+    static let bottomRightHorizontalLength: CGFloat = 2200
+    static let bottomRightVerticalLength: CGFloat = 1354
     static let bottomRightRulerColor = #colorLiteral(red: 0.95, green: 0.7125, blue: 0.8019480475, alpha: 1)
 
-    static let bottomLeftX: CGFloat = 520
-    static let bottomLeftY: CGFloat = 510
+    static let bottomLeftX: CGFloat = 530
+    static let bottomLeftY: CGFloat = 515
     static let bottomLeftHorizontalLength: CGFloat = 1783
-    static let bottomLeftVerticalLength: CGFloat = 957
+    static let bottomLeftVerticalLength: CGFloat = 900
     static let bottomLeftRulerColor = #colorLiteral(red: 0.98, green: 0.735, blue: 0.8272727227, alpha: 1)
 
     static var copyViewLayout: AppStoreScreenshotCopyViewLayout {
-        AppStoreScreenshotCopyViewLayout(
-            viewX: copyViewX,
-            viewY: copyViewY,
-            iconX: copyIconX,
-            iconY: copyIconY,
-            iconSize: copyIconSize,
-            titleX: copyTitleX,
-            titleY: copyTitleY,
-            titleWidth: AppStoreScreenshotLayout.titleWidth,
-            titleHeight: AppStoreScreenshotLayout.titleHeight,
-            subtitleX: copySubtitleX,
-            subtitleY: copySubtitleY,
-            subtitleWidth: AppStoreScreenshotLayout.subtitleWidth,
-            subtitleHeight: AppStoreScreenshotLayout.subtitleHeight
-        )
+        AppStoreScreenshotLayout.copyViewLayout(viewX: copyViewX, viewY: copyViewY)
     }
 
     static var rulerSets: [AppStoreFlipRulerSet] {
@@ -824,6 +818,89 @@ private struct AppStoreViewPlacement {
     }
 }
 
+private final class AppStoreScreenshotCopyView: NSView {
+    private let title: String
+    private let subtitle: String
+    private let titleColor: NSColor
+    private let subtitleColor: NSColor
+    private let layout: AppStoreScreenshotCopyViewLayout
+
+    override var isFlipped: Bool {
+        true
+    }
+
+    init(
+        title: String,
+        subtitle: String,
+        titleColor: NSColor,
+        subtitleColor: NSColor,
+        layout: AppStoreScreenshotCopyViewLayout
+    ) {
+        self.title = title
+        self.subtitle = subtitle
+        self.titleColor = titleColor
+        self.subtitleColor = subtitleColor
+        self.layout = layout
+        super.init(frame: NSRect(origin: .zero, size: layout.boundsSize))
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
+
+        let icon = AppIconRenderer.image(size: 128)
+        icon.draw(in: layout.iconRect)
+
+        drawText(
+            title,
+            in: layout.titleRect,
+            size: AppStoreScreenshotLayout.titleFontSize,
+            color: titleColor,
+            weight: AppStoreScreenshotLayout.titleFontWeight
+        )
+        drawText(
+            subtitle,
+            in: layout.subtitleRect,
+            size: AppStoreScreenshotLayout.subtitleFontSize,
+            color: subtitleColor
+        )
+    }
+
+    private func drawText(
+        _ text: String,
+        in rect: NSRect,
+        size: CGFloat,
+        color: NSColor,
+        weight: NSFont.Weight = AppStoreScreenshotLayout.textFontWeight
+    ) {
+        let style = NSMutableParagraphStyle()
+        style.alignment = .left
+
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: labelFont(size: size, weight: weight),
+            .foregroundColor: color,
+            .paragraphStyle: style,
+        ]
+
+        text.draw(with: rect, options: [.usesLineFragmentOrigin], attributes: attributes)
+    }
+
+    private func labelFont(size: CGFloat, weight: NSFont.Weight) -> NSFont {
+        switch AppStoreScreenshotLayout.textFontFamily {
+        case .helveticaNeue:
+            return NSFont(
+                name: "HelveticaNeue",
+                size: size
+            ) ?? NSFont.systemFont(ofSize: size, weight: weight)
+        case .system:
+            return NSFont.systemFont(ofSize: size, weight: weight)
+        }
+    }
+}
+
 private final class AppStoreActiveSnapshotWindow: NSWindow {
     override var canBecomeKey: Bool {
         true
@@ -896,6 +973,7 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
     private let rulerPlacements: [AppStoreRulerPlacement]
     private let preferencesController: PreferencesController?
     private let viewPlacements: [AppStoreViewPlacement]
+    private let copyViewPlacement: AppStoreViewPlacement
 
     override var isFlipped: Bool {
         true
@@ -914,6 +992,7 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         let preferencesController = screen.scenario == .preferences ? Self.makePreferencesController() : nil
         self.preferencesController = preferencesController
         self.viewPlacements = Self.makeViewPlacements(for: screen, preferencesController: preferencesController)
+        self.copyViewPlacement = Self.makeCopyViewPlacement(for: screen)
         super.init(frame: NSRect(origin: .zero, size: AppStoreScreenshotLayout.canvasSize))
         for viewPlacement in viewPlacements {
             addSubview(viewPlacement.container)
@@ -922,6 +1001,7 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
             configureRuler(rulerPlacement.view)
             addSubview(rulerPlacement.container)
         }
+        addSubview(copyViewPlacement.container)
     }
 
     required init?(coder: NSCoder) {
@@ -969,6 +1049,7 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         for viewPlacement in viewPlacements {
             layoutView(viewPlacement, frame: viewPlacement.frame, transform: transform)
         }
+        layoutView(copyViewPlacement, frame: copyViewPlacement.frame, transform: transform)
     }
 
     private static func makeRulerPlacements(for screen: AppStoreScreenshotScreen) -> [AppStoreRulerPlacement] {
@@ -1130,13 +1211,37 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         imageView.image = snapshot(preferencesView, preferencesController: preferencesController)
         imageView.imageScaling = .scaleAxesIndependently
 
-        return [
-            AppStoreViewPlacement(
-                view: imageView,
-                frame: AppStorePreferencesScreenshotLayout.preferencesContentRect,
-                boundsSize: AppStorePreferencesScreenshotLayout.preferencesContentSize
-            ),
-        ]
+        return [AppStoreViewPlacement(
+            view: imageView,
+            frame: AppStorePreferencesScreenshotLayout.preferencesContentRect,
+            boundsSize: AppStorePreferencesScreenshotLayout.preferencesContentSize
+        )]
+    }
+
+    private static func makeCopyViewPlacement(for screen: AppStoreScreenshotScreen) -> AppStoreViewPlacement {
+        let palette = AppStoreScreenshotPalette()
+        let layout = copyViewLayout(for: screen)
+        let copyView = AppStoreScreenshotCopyView(
+            title: screen.title,
+            subtitle: screen.subtitle,
+            titleColor: screen.titleColor(in: palette),
+            subtitleColor: screen.subtitleColor(in: palette),
+            layout: layout
+        )
+        return AppStoreViewPlacement(
+            view: copyView,
+            frame: layout.frame,
+            boundsSize: layout.boundsSize
+        )
+    }
+
+    private static func copyViewLayout(for screen: AppStoreScreenshotScreen) -> AppStoreScreenshotCopyViewLayout {
+        switch screen.scenario {
+        case .flipRulers:
+            return AppStoreFlipScreenshotLayout.copyViewLayout
+        case .measure, .units, .colors, .preferences:
+            return AppStoreScreenshotLayout.copyViewLayout
+        }
     }
 
     private static func snapshot(_ view: NSView, preferencesController: PreferencesController?) -> NSImage {
@@ -1344,7 +1449,6 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         screen.backgroundColor.setFill()
         NSRect(origin: .zero, size: AppStoreScreenshotLayout.canvasSize).fill()
 
-        drawCopy()
         switch screen.scenario {
         case .measure:
             drawSampleWindow(AppStoreMeasureScreenshotLayout.sampleWindowRect)
@@ -1357,35 +1461,6 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
             break
         case .preferences:
             drawSampleWindow(AppStorePreferencesScreenshotLayout.preferencesWindowRect)
-        }
-    }
-
-    private func drawCopy() {
-        let copyViewLayout = copyViewLayout
-        let icon = AppIconRenderer.image(size: 128)
-        icon.draw(in: copyViewLayout.iconRect)
-
-        drawText(
-            screen.title,
-            in: copyViewLayout.titleRect,
-            size: AppStoreScreenshotLayout.titleFontSize,
-            color: screen.titleColor(in: palette),
-            weight: AppStoreScreenshotLayout.titleFontWeight
-        )
-        drawText(
-            screen.subtitle,
-            in: copyViewLayout.subtitleRect,
-            size: AppStoreScreenshotLayout.subtitleFontSize,
-            color: screen.subtitleColor(in: palette)
-        )
-    }
-
-    private var copyViewLayout: AppStoreScreenshotCopyViewLayout {
-        switch screen.scenario {
-        case .flipRulers:
-            return AppStoreFlipScreenshotLayout.copyViewLayout
-        case .measure, .units, .colors, .preferences:
-            return AppStoreScreenshotLayout.copyViewLayout
         }
     }
 
@@ -1547,37 +1622,6 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         path.stroke()
     }
 
-    private func drawText(
-        _ text: String,
-        in rect: NSRect,
-        size: CGFloat,
-        color: NSColor,
-        weight: NSFont.Weight = AppStoreScreenshotLayout.textFontWeight,
-        alignment: NSTextAlignment = .left
-    ) {
-        let style = NSMutableParagraphStyle()
-        style.alignment = alignment
-
-        let attributes: [NSAttributedString.Key: Any] = [
-            .font: labelFont(size: size, weight: weight),
-            .foregroundColor: color,
-            .paragraphStyle: style,
-        ]
-
-        text.draw(with: rect, options: [.usesLineFragmentOrigin], attributes: attributes)
-    }
-
-    private func labelFont(size: CGFloat, weight: NSFont.Weight) -> NSFont {
-        switch AppStoreScreenshotLayout.textFontFamily {
-        case .helveticaNeue:
-            return NSFont(
-                name: "HelveticaNeue",
-                size: size
-            ) ?? .systemFont(ofSize: size, weight: weight)
-        case .system:
-            return .systemFont(ofSize: size, weight: weight)
-        }
-    }
 }
 
 #endif
