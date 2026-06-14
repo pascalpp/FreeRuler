@@ -119,9 +119,11 @@ class VerticalRule: RuleView {
         let mouseTick = NSBezierPath()
         let width: CGFloat = 40
         let startX: CGFloat = 0
+        let growthDirection = ZeroCornerGeometry(zeroCorner: zeroCorner).growthDirection(for: .vertical)
+        let lineY = mouseTickLineY(forTickY: mouseTickY, growthDirection: growthDirection)
 
-        mouseTick.move(to: CGPoint(x: startX, y: mouseTickY))
-        mouseTick.line(to: CGPoint(x: width, y: mouseTickY))
+        mouseTick.move(to: CGPoint(x: startX, y: lineY))
+        mouseTick.line(to: CGPoint(x: width, y: lineY))
 
         mouseTick.transform(using: transformer)
 
@@ -144,10 +146,15 @@ class VerticalRule: RuleView {
             labelSize: labelSize,
             rulerSize: CGSize(width: self.frame.width, height: height)
         )
+        let backgroundRect = mouseNumberLabelBackgroundRect(
+            tickY: mouseTickY,
+            labelSize: labelSize,
+            rulerSize: CGSize(width: self.frame.width, height: height)
+        )
 
         guard NSGraphicsContext.current != nil else { return }
         color.fill.setFill()
-        labelRect.fill()
+        backgroundRect.fill()
 
         label.draw(
             with: labelRect,
@@ -163,7 +170,20 @@ class VerticalRule: RuleView {
             orientation: .vertical,
             zeroCorner: zeroCorner,
             tickPosition: tickY,
-            resizeHandleFrame: resizeHandleExclusionFrame
+            resizeHandleFrame: resizeHandleExclusionFrame,
+            unitLabelFrame: unitLabelFrame
+        )
+    }
+
+    func mouseNumberLabelBackgroundRect(tickY: CGFloat, labelSize: CGSize, rulerSize: CGSize) -> CGRect {
+        return MouseTickLabelLayout.labelBackgroundFrame(
+            labelSize: labelSize,
+            rulerSize: rulerSize,
+            orientation: .vertical,
+            zeroCorner: zeroCorner,
+            tickPosition: tickY,
+            resizeHandleFrame: resizeHandleExclusionFrame,
+            unitLabelFrame: unitLabelFrame
         )
     }
 
@@ -176,31 +196,19 @@ class VerticalRule: RuleView {
             return
         }
 
-        setUnitLabelHidden(
-            unitLabelZeroRegionContains(
-                tickPosition: mouseTickY,
-                orientation: .vertical,
-                labelFrame: frame
-            )
-        )
+        setUnitLabelHidden(frame.minY <= mouseTickY && mouseTickY <= frame.maxY)
     }
 
     override func updateResizeHandleVisibility() {
         guard showMouseTick,
-              mouseTickY >= 1,
-              mouseTickY < bounds.height,
+              mouseTickY >= bounds.minY,
+              mouseTickY <= bounds.maxY,
               let frame = resizeHandleExclusionFrame else {
             setResizeHandleObscured(false)
             return
         }
 
-        setResizeHandleObscured(
-            resizeHandleEndRegionContains(
-                tickPosition: mouseTickY,
-                orientation: .vertical,
-                handleFrame: frame
-            )
-        )
+        setResizeHandleObscured(frame.minY <= mouseTickY && mouseTickY <= frame.maxY)
     }
 
     func tickY(
@@ -269,6 +277,18 @@ class VerticalRule: RuleView {
             return mouseTickY
         case .negative:
             return rulerHeight - mouseTickY
+        }
+    }
+
+    func mouseTickLineY(
+        forTickY mouseTickY: CGFloat,
+        growthDirection: RulerGrowthDirection
+    ) -> CGFloat {
+        switch growthDirection {
+        case .positive:
+            return mouseTickY + 1
+        case .negative:
+            return mouseTickY
         }
     }
 

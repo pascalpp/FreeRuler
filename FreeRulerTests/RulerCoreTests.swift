@@ -255,6 +255,14 @@ final class RulerCoreTests: XCTestCase {
             rule.tickX(forOffset: 50, rulerWidth: 300, growthDirection: .negative),
             250
         )
+        XCTAssertEqual(
+            rule.mouseTickLineX(forTickX: 1, growthDirection: .positive),
+            1
+        )
+        XCTAssertEqual(
+            rule.mouseTickLineX(forTickX: 299, growthDirection: .negative),
+            298
+        )
 
         let bottomTick = rule.tickLine(forX: 50, length: 10, rulerHeight: 40, tickSide: .bottom)
         XCTAssertEqual(bottomTick.start, CGPoint(x: 50, y: 1))
@@ -283,7 +291,7 @@ final class RulerCoreTests: XCTestCase {
             XCTAssertEqual(rule.mouseNumber(forTickX: 260, rulerWidth: 300), 40)
             XCTAssertEqual(
                 rule.unitLabelRect(labelSize: NSSize(width: 12, height: 10), rulerSize: NSSize(width: 300, height: 40)),
-                CGRect(x: 280, y: 9, width: 12, height: 10)
+                CGRect(x: 280, y: 0, width: 20, height: 19)
             )
         }
     }
@@ -298,6 +306,14 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertEqual(
             rule.tickY(forOffset: 50, rulerHeight: 300, growthDirection: .positive),
             50
+        )
+        XCTAssertEqual(
+            rule.mouseTickLineY(forTickY: 299, growthDirection: .negative),
+            299
+        )
+        XCTAssertEqual(
+            rule.mouseTickLineY(forTickY: 1, growthDirection: .positive),
+            2
         )
 
         let rightTick = rule.tickLine(forY: 250, length: 10, rulerWidth: 40, tickSide: .right)
@@ -327,7 +343,7 @@ final class RulerCoreTests: XCTestCase {
             XCTAssertEqual(rule.mouseNumber(forTickY: 40, rulerHeight: 300), 40)
             XCTAssertEqual(
                 rule.unitLabelRect(labelSize: NSSize(width: 12, height: 10), rulerSize: NSSize(width: 40, height: 300)),
-                CGRect(x: 20, y: 9, width: 12, height: 10)
+                CGRect(x: 20, y: 0, width: 20, height: 19)
             )
         }
     }
@@ -341,13 +357,34 @@ final class RulerCoreTests: XCTestCase {
                 (
                     zeroCorner: ZeroCorner,
                     horizontalRect: CGRect,
-                    verticalRect: CGRect
+                    verticalRect: CGRect,
+                    verticalBackgroundRect: CGRect
                 )
             ] = [
-                (.topLeft, CGRect(x: 155, y: 28, width: 20, height: 10), CGRect(x: 7, y: 133, width: 20, height: 10)),
-                (.topRight, CGRect(x: 155, y: 28, width: 20, height: 10), CGRect(x: 13, y: 133, width: 20, height: 10)),
-                (.bottomLeft, CGRect(x: 155, y: 2, width: 20, height: 10), CGRect(x: 7, y: 133, width: 20, height: 10)),
-                (.bottomRight, CGRect(x: 155, y: 2, width: 20, height: 10), CGRect(x: 13, y: 133, width: 20, height: 10)),
+                (
+                    .topLeft,
+                    CGRect(x: 155, y: 28, width: 20, height: 10),
+                    CGRect(x: 7, y: 133, width: 20, height: 10),
+                    CGRect(x: 0, y: 133, width: 30, height: 10)
+                ),
+                (
+                    .topRight,
+                    CGRect(x: 155, y: 28, width: 20, height: 10),
+                    CGRect(x: 13, y: 133, width: 20, height: 10),
+                    CGRect(x: 10, y: 133, width: 30, height: 10)
+                ),
+                (
+                    .bottomLeft,
+                    CGRect(x: 155, y: 9, width: 20, height: 10),
+                    CGRect(x: 7, y: 133, width: 20, height: 10),
+                    CGRect(x: 0, y: 133, width: 30, height: 10)
+                ),
+                (
+                    .bottomRight,
+                    CGRect(x: 155, y: 9, width: 20, height: 10),
+                    CGRect(x: 13, y: 133, width: 20, height: 10),
+                    CGRect(x: 10, y: 133, width: 30, height: 10)
+                ),
             ]
 
             for testCase in cases {
@@ -373,6 +410,15 @@ final class RulerCoreTests: XCTestCase {
                     testCase.verticalRect,
                     "\(testCase.zeroCorner) vertical mouse number label"
                 )
+                XCTAssertEqual(
+                    verticalRule.mouseNumberLabelBackgroundRect(
+                        tickY: 150,
+                        labelSize: labelSize,
+                        rulerSize: verticalRule.bounds.size
+                    ),
+                    testCase.verticalBackgroundRect,
+                    "\(testCase.zeroCorner) vertical mouse number label background"
+                )
             }
         }
     }
@@ -393,7 +439,7 @@ final class RulerCoreTests: XCTestCase {
             XCTAssertFalse(horizontalHandle.isHidden)
             XCTAssertEqual(horizontalHandle.alphaValue, 0)
 
-            horizontalRule.mouseTickX = horizontalHandle.frame.maxX + 1
+            horizontalRule.mouseTickX = horizontalHandle.frame.maxX
             XCTAssertEqual(horizontalHandle.alphaValue, 0)
 
             horizontalRule.mouseTickX = horizontalHandle.frame.minX - 1
@@ -403,7 +449,7 @@ final class RulerCoreTests: XCTestCase {
             XCTAssertFalse(verticalHandle.isHidden)
             XCTAssertEqual(verticalHandle.alphaValue, 0)
 
-            verticalRule.mouseTickY = verticalHandle.frame.minY - 1
+            verticalRule.mouseTickY = verticalHandle.frame.minY
             XCTAssertEqual(verticalHandle.alphaValue, 0)
 
             verticalRule.mouseTickY = verticalHandle.frame.maxY + 1
@@ -419,11 +465,14 @@ final class RulerCoreTests: XCTestCase {
                 return XCTFail("Expected horizontal ruler to install a resize handle")
             }
 
-            leftEdgeRule.mouseTickX = leftEdgeHandle.frame.minX - 1
+            leftEdgeRule.mouseTickX = leftEdgeHandle.frame.maxX
             XCTAssertEqual(leftEdgeHandle.alphaValue, 0)
 
             leftEdgeRule.mouseTickX = leftEdgeHandle.frame.maxX + 1
             XCTAssertEqual(leftEdgeHandle.alphaValue, 1)
+
+            leftEdgeRule.mouseTickX = leftEdgeHandle.frame.minX
+            XCTAssertEqual(leftEdgeHandle.alphaValue, 0)
 
             prefs.zeroCorner = .bottomLeft
             let topEdgeRule = VerticalRule(frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
@@ -431,7 +480,7 @@ final class RulerCoreTests: XCTestCase {
                 return XCTFail("Expected vertical ruler to install a resize handle")
             }
 
-            topEdgeRule.mouseTickY = topEdgeHandle.frame.maxY + 1
+            topEdgeRule.mouseTickY = topEdgeHandle.frame.maxY
             XCTAssertEqual(topEdgeHandle.alphaValue, 0)
 
             topEdgeRule.mouseTickY = topEdgeHandle.frame.minY - 1
@@ -452,10 +501,10 @@ final class RulerCoreTests: XCTestCase {
                     verticalUnitRect: CGRect
                 )
             ] = [
-                (.topLeft, CGRect(x: 8, y: 28, width: 12, height: 10), CGRect(x: 8, y: 288, width: 12, height: 10)),
-                (.topRight, CGRect(x: 280, y: 28, width: 12, height: 10), CGRect(x: 20, y: 288, width: 12, height: 10)),
-                (.bottomLeft, CGRect(x: 8, y: 9, width: 12, height: 10), CGRect(x: 8, y: 9, width: 12, height: 10)),
-                (.bottomRight, CGRect(x: 280, y: 9, width: 12, height: 10), CGRect(x: 20, y: 9, width: 12, height: 10)),
+                (.topLeft, CGRect(x: 0, y: 26, width: 20, height: 14), CGRect(x: 0, y: 286, width: 20, height: 14)),
+                (.topRight, CGRect(x: 280, y: 26, width: 20, height: 14), CGRect(x: 20, y: 286, width: 20, height: 14)),
+                (.bottomLeft, CGRect(x: 0, y: 0, width: 20, height: 19), CGRect(x: 0, y: 0, width: 20, height: 19)),
+                (.bottomRight, CGRect(x: 280, y: 0, width: 20, height: 19), CGRect(x: 20, y: 0, width: 20, height: 19)),
             ]
 
             for testCase in cases {
@@ -495,6 +544,36 @@ final class RulerCoreTests: XCTestCase {
             XCTAssertEqual(
                 verticalRule.unitLabelFrame,
                 verticalRule.unitLabelRect(labelSize: verticalLabelSize, rulerSize: verticalRule.bounds.size)
+            )
+        }
+    }
+
+    func testChildViewGeometryUsesRuleZeroCornerOverride() throws {
+        try withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .topLeft
+            let rule = TestableZeroCornerHorizontalRule(
+                frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness)
+            )
+            rule.testZeroCorner = .bottomRight
+
+            rule.redrawForPreferenceChange()
+
+            let unitLabel = try XCTUnwrap(rule.subviews.first { $0 is UnitLabelView } as? UnitLabelView)
+            let resizeHandle = try XCTUnwrap(
+                rule.subviews.first { $0 is ResizeHandleView } as? ResizeHandleView
+            )
+            let labelSize = unitLabelSize(for: rule)
+
+            XCTAssertEqual(unitLabel.zeroCorner, .bottomRight)
+            XCTAssertEqual(resizeHandle.zeroCorner, .bottomRight)
+            XCTAssertEqual(
+                rule.unitLabelFrame,
+                UnitLabelView.labelFrame(
+                    labelSize: labelSize,
+                    rulerSize: rule.bounds.size,
+                    orientation: .horizontal,
+                    zeroCorner: .bottomRight
+                )
             )
         }
     }
@@ -580,6 +659,26 @@ final class RulerCoreTests: XCTestCase {
                 XCTAssertEqual(pixelVerticalFrame.height, millimeterVerticalFrame.height, accuracy: 0.0001)
             }
         }
+    }
+
+    func testTopUnitLabelDrawRectLeavesRoomForDescenders() {
+        let labelSize = NSSize(width: 12, height: 10)
+        let bounds = NSRect(x: 0, y: 0, width: 20, height: 12)
+
+        let topDrawRect = UnitLabelView.labelDrawRect(
+            labelSize: labelSize,
+            bounds: bounds,
+            placement: RulerCornerPlacement(xSide: .left, ySide: .top)
+        )
+        let bottomDrawRect = UnitLabelView.labelDrawRect(
+            labelSize: labelSize,
+            bounds: NSRect(x: 0, y: 0, width: 20, height: 19),
+            placement: RulerCornerPlacement(xSide: .left, ySide: .bottom)
+        )
+
+        XCTAssertEqual(topDrawRect.minY, 2)
+        XCTAssertLessThanOrEqual(topDrawRect.maxY, bounds.maxY)
+        XCTAssertEqual(bottomDrawRect.minY, 9)
     }
 
     func testMouseNumberLabelsRespectUnitsAfterZeroCornerFlip() {
@@ -1111,14 +1210,14 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertFalse(verticalCursor.image.isTemplate)
     }
 
-    func testHorizontalResizeHandleFrameIncludesBorderInsetOnLeftEdge() {
+    func testHorizontalResizeHandleFramePinsToLeftEdgeSlot() {
         withRestoredZeroCornerPreference {
             prefs.zeroCorner = .topRight
 
             let resizeHandle = ResizeHandleView(orientation: .horizontal, color: RulerColors())
             let frame = resizeHandle.frame(in: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
 
-            XCTAssertEqual(frame.minX, 4.5)
+            XCTAssertEqual(frame.minX, 0)
         }
     }
 
@@ -1163,6 +1262,72 @@ final class RulerCoreTests: XCTestCase {
         }
     }
 
+    func testHorizontalMouseTickLabelFlipsBeforeRightUnitLabel() {
+        withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .topRight
+
+            let rule = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
+            let labelSize = CGSize(width: 30, height: 10)
+            let tickLabelSpacing: CGFloat = 5
+            guard let unitLabelFrame = rule.unitLabelFrame else {
+                return XCTFail("Expected horizontal ruler to install a unit label")
+            }
+            let mouseTickAtRightUnitFit = unitLabelFrame.minX - labelSize.width - tickLabelSpacing
+            let mouseTickJustPastRightUnitFit = mouseTickAtRightUnitFit + 1
+
+            let fittingLabelRect = rule.mouseNumberLabelRect(
+                tickX: mouseTickAtRightUnitFit,
+                labelSize: labelSize,
+                rulerSize: rule.bounds.size
+            )
+            let flippedLabelRect = rule.mouseNumberLabelRect(
+                tickX: mouseTickJustPastRightUnitFit,
+                labelSize: labelSize,
+                rulerSize: rule.bounds.size
+            )
+
+            XCTAssertGreaterThan(fittingLabelRect.minX, mouseTickAtRightUnitFit)
+            XCTAssertEqual(
+                fittingLabelRect.maxX,
+                unitLabelFrame.minX,
+                accuracy: 0.0001
+            )
+            XCTAssertLessThan(flippedLabelRect.maxX, mouseTickJustPastRightUnitFit)
+            XCTAssertEqual(
+                mouseTickJustPastRightUnitFit - flippedLabelRect.maxX,
+                tickLabelSpacing,
+                accuracy: 0.0001
+            )
+        }
+    }
+
+    func testHorizontalMouseTickLabelStaysOnPreferredSideNearLeftResizeEnd() {
+        withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .bottomRight
+
+            let rule = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 600, height: Ruler.thickness))
+            let labelSize = CGSize(width: 30, height: 10)
+            let tickLabelSpacing: CGFloat = 5
+            guard let resizeHandleFrame = rule.resizeHandleExclusionFrame else {
+                return XCTFail("Expected horizontal ruler to install a resize handle")
+            }
+            let mouseTickInsideLeftResizeEnd = resizeHandleFrame.maxX - tickLabelSpacing - 1
+
+            let labelRect = rule.mouseNumberLabelRect(
+                tickX: mouseTickInsideLeftResizeEnd,
+                labelSize: labelSize,
+                rulerSize: rule.bounds.size
+            )
+
+            XCTAssertGreaterThan(labelRect.minX, mouseTickInsideLeftResizeEnd)
+            XCTAssertEqual(
+                labelRect.minX - mouseTickInsideLeftResizeEnd,
+                tickLabelSpacing,
+                accuracy: 0.0001
+            )
+        }
+    }
+
     func testHorizontalMouseTickLabelClampsToRulerStart() {
         withRestoredZeroCornerPreference {
             prefs.zeroCorner = .topLeft
@@ -1180,7 +1345,34 @@ final class RulerCoreTests: XCTestCase {
 
             XCTAssertEqual(
                 labelRect.minX,
-                5,
+                0,
+                accuracy: 0.0001
+            )
+        }
+    }
+
+    func testVerticalMouseTickLabelStaysOnPreferredSideNearTopResizeEnd() {
+        withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .bottomLeft
+
+            let rule = VerticalRule(frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
+            let labelSize = CGSize(width: 20, height: 10)
+            let tickLabelSpacing: CGFloat = 7
+            guard let resizeHandleFrame = rule.resizeHandleExclusionFrame else {
+                return XCTFail("Expected vertical ruler to install a resize handle")
+            }
+            let mouseTickInsideTopResizeEnd = resizeHandleFrame.minY + tickLabelSpacing + 1
+
+            let labelRect = rule.mouseNumberLabelRect(
+                tickY: mouseTickInsideTopResizeEnd,
+                labelSize: labelSize,
+                rulerSize: rule.bounds.size
+            )
+
+            XCTAssertLessThan(labelRect.maxY, mouseTickInsideTopResizeEnd)
+            XCTAssertEqual(
+                mouseTickInsideTopResizeEnd - labelRect.maxY,
+                tickLabelSpacing,
                 accuracy: 0.0001
             )
         }
@@ -1761,6 +1953,14 @@ private final class ChildAttachingRulerWindow: RulerWindow {
 private final class TestableFlipAppDelegate: AppDelegate {
     override func isRulerWindowShown(_ window: RulerWindow) -> Bool {
         return true
+    }
+}
+
+private final class TestableZeroCornerHorizontalRule: HorizontalRule {
+    var testZeroCorner: ZeroCorner = .topLeft
+
+    override var zeroCorner: ZeroCorner {
+        return testZeroCorner
     }
 }
 

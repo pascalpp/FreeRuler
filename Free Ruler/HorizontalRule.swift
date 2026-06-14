@@ -117,9 +117,11 @@ class HorizontalRule: RuleView {
     func drawMouseTick(_ mouseTickX: CGFloat) {
         let mouseTick = NSBezierPath()
         let height: CGFloat = 40
+        let growthDirection = ZeroCornerGeometry(zeroCorner: zeroCorner).growthDirection(for: .horizontal)
+        let lineX = mouseTickLineX(forTickX: mouseTickX, growthDirection: growthDirection)
 
-        mouseTick.move(to: CGPoint(x: mouseTickX, y: 0))
-        mouseTick.line(to: CGPoint(x: mouseTickX, y: height))
+        mouseTick.move(to: CGPoint(x: lineX, y: 0))
+        mouseTick.line(to: CGPoint(x: lineX, y: height))
 
         mouseTick.transform(using: transformer)
 
@@ -158,7 +160,8 @@ class HorizontalRule: RuleView {
             orientation: .horizontal,
             zeroCorner: zeroCorner,
             tickPosition: tickX,
-            resizeHandleFrame: resizeHandleExclusionFrame
+            resizeHandleFrame: resizeHandleExclusionFrame,
+            unitLabelFrame: unitLabelFrame
         )
     }
 
@@ -171,31 +174,19 @@ class HorizontalRule: RuleView {
             return
         }
 
-        setUnitLabelHidden(
-            unitLabelZeroRegionContains(
-                tickPosition: mouseTickX,
-                orientation: .horizontal,
-                labelFrame: frame
-            )
-        )
+        setUnitLabelHidden(frame.minX <= mouseTickX && mouseTickX <= frame.maxX)
     }
 
     override func updateResizeHandleVisibility() {
         guard showMouseTick,
-              mouseTickX > 0,
-              mouseTickX < bounds.width,
+              mouseTickX >= bounds.minX,
+              mouseTickX <= bounds.maxX,
               let frame = resizeHandleExclusionFrame else {
             setResizeHandleObscured(false)
             return
         }
 
-        setResizeHandleObscured(
-            resizeHandleEndRegionContains(
-                tickPosition: mouseTickX,
-                orientation: .horizontal,
-                handleFrame: frame
-            )
-        )
+        setResizeHandleObscured(frame.minX <= mouseTickX && mouseTickX <= frame.maxX)
     }
 
     func tickX(
@@ -260,6 +251,18 @@ class HorizontalRule: RuleView {
             return mouseTickX
         case .negative:
             return rulerWidth - mouseTickX
+        }
+    }
+
+    func mouseTickLineX(
+        forTickX mouseTickX: CGFloat,
+        growthDirection: RulerGrowthDirection
+    ) -> CGFloat {
+        switch growthDirection {
+        case .positive:
+            return mouseTickX
+        case .negative:
+            return mouseTickX - 1
         }
     }
 
