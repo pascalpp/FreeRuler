@@ -740,7 +740,8 @@ final class RulerCoreTests: XCTestCase {
 
                 guard let horizontalFrame = horizontalRule.resizeHandleExclusionFrame,
                       let verticalFrame = verticalRule.resizeHandleExclusionFrame else {
-                    return XCTFail("Expected both rulers to install resize handles")
+                    XCTFail("Expected both rulers to install resize handles for \(testCase.zeroCorner)")
+                    continue
                 }
 
                 switch testCase.expectedHorizontalSide {
