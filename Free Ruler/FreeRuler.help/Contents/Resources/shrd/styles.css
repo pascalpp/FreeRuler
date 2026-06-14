@@ -3,8 +3,12 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
 }
 
+h2 {
+  margin-top: 40px;
+}
+
 .title-page-header {
-  background-image: url(./freeruler.png);
+  background-image: var(--free-ruler-help-icon);
   background-size: 200px 200px;
   background-repeat: no-repeat;
   padding-top: 220px;
@@ -19,4 +23,13 @@ body {
 .keyboard-shortcuts td {
   text-align: left;
   padding-left: 10px;
+}
+
+.features {
+  margin-top: 0;
+  padding-left: 22px;
+}
+
+.features li {
+  margin-bottom: 8px;
 }

@@ -6,17 +6,21 @@ class VerticalRule: RuleView {
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
+        installUnitLabel(for: .vertical)
         installResizeHandle(for: .vertical)
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+        installUnitLabel(for: .vertical)
         installResizeHandle(for: .vertical)
     }
 
     var mouseTickY: CGFloat = 0 {
         didSet {
             if mouseTickY != oldValue {
+                updateResizeHandleVisibility()
+                updateUnitLabelVisibility()
                 needsDisplay = true
             }
         }
@@ -33,7 +37,7 @@ class VerticalRule: RuleView {
         let height = dirtyRect.height
         let path = NSBezierPath()
         let tickLayout = RulerTickLayout(unit: unit, screen: screen)
-        let geometry = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner)
+        let geometry = ZeroCornerGeometry(zeroCorner: zeroCorner)
         let tickSide = geometry.tickSide(for: .vertical)
         let growthDirection = geometry.growthDirection(for: .vertical)
         let attrs = labelAttributes(
@@ -43,7 +47,7 @@ class VerticalRule: RuleView {
 
         let labelWidth: CGFloat = 50
         let labelHeight: CGFloat = 20
-        // TODO: refactor this to use label.size() logic (see func drawUnitLabel)
+        // TODO: refactor this to use measured label sizes.
 
         // substract two so ticks don't overlap with border
         // substract from this range so we can use the height var for position calculations
@@ -96,9 +100,7 @@ class VerticalRule: RuleView {
         color.ticks.setStroke()
         path.stroke()
 
-        if !showMouseTick || self.windowHeight - mouseTickY < 0 || windowHeight - mouseTickY > 18 {
-            drawUnitLabel()
-        }
+        updateUnitLabelVisibility()
 
         // Draw the MouseTick & number
         if showMouseTick && mouseTickY >= 1 && mouseTickY < windowHeight {
@@ -117,9 +119,11 @@ class VerticalRule: RuleView {
         let mouseTick = NSBezierPath()
         let width: CGFloat = 40
         let startX: CGFloat = 0
+        let growthDirection = ZeroCornerGeometry(zeroCorner: zeroCorner).growthDirection(for: .vertical)
+        let lineY = mouseTickLineY(forTickY: mouseTickY, growthDirection: growthDirection)
 
-        mouseTick.move(to: CGPoint(x: startX, y: mouseTickY))
-        mouseTick.line(to: CGPoint(x: width, y: mouseTickY))
+        mouseTick.move(to: CGPoint(x: startX, y: lineY))
+        mouseTick.line(to: CGPoint(x: width, y: lineY))
 
         mouseTick.transform(using: transformer)
 
@@ -138,12 +142,19 @@ class VerticalRule: RuleView {
         let labelSize = label.size()
 
         let labelRect = mouseNumberLabelRect(
-            number: height - mouseTickY,
+            tickY: mouseTickY,
             labelSize: labelSize,
-            rulerHeight: height
+            rulerSize: CGSize(width: self.frame.width, height: height)
         )
+        let backgroundRect = mouseNumberLabelBackgroundRect(
+            tickY: mouseTickY,
+            labelSize: labelSize,
+            rulerSize: CGSize(width: self.frame.width, height: height)
+        )
+
+        guard NSGraphicsContext.current != nil else { return }
         color.fill.setFill()
-        labelRect.fill()
+        backgroundRect.fill()
 
         label.draw(
             with: labelRect,
@@ -152,38 +163,52 @@ class VerticalRule: RuleView {
         )
     }
 
-    func mouseNumberLabelRect(number: CGFloat, labelSize: CGSize, rulerHeight: CGFloat) -> CGRect {
-        let labelOffset: CGFloat = 2
-        let tickSide = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner).tickSide(for: .vertical)
-
-        // Offset the bottom position until text can be centered vertically in the label rect.
-        let bottomPosition = number + 7
-        let topPosition = number - labelOffset - labelSize.height
-        let enoughRoomToTheBottom = bottomPosition + labelSize.height < rulerHeight - labelOffset
-        let labelY = enoughRoomToTheBottom ? bottomPosition : topPosition
-        let labelX: CGFloat = tickSide == .right ? 7 : 11
-        var labelRect = CGRect(x: labelX, y: rulerHeight - (labelY + labelSize.height), width: 22, height: 15)
-
-        if let resizeHandleExclusionFrame = resizeHandleExclusionFrame {
-            let minLabelBottom = resizeHandleExclusionFrame.maxY + mouseTickLabelResizeHandleSpacing
-            labelRect.origin.y = max(labelRect.origin.y, minLabelBottom)
-        }
-
-        return labelRect
+    func mouseNumberLabelRect(tickY: CGFloat, labelSize: CGSize, rulerSize: CGSize) -> CGRect {
+        return MouseTickLabelLayout.labelFrame(
+            labelSize: labelSize,
+            rulerSize: rulerSize,
+            orientation: .vertical,
+            zeroCorner: zeroCorner,
+            tickPosition: tickY,
+            resizeHandleFrame: resizeHandleExclusionFrame,
+            unitLabelFrame: unitLabelFrame
+        )
     }
 
-    func drawUnitLabel() {
-        let attributes = labelAttributes(alignment: .left, foregroundColor: color.ticks)
-
-        let unitlabel = self.getUnitLabel()
-        let label = NSAttributedString(string: unitlabel, attributes: attributes)
-        let labelSize = label.size()
-        let labelRect = unitLabelRect(labelSize: labelSize, rulerSize: bounds.size)
-
-        label.draw(
-            with: labelRect,
-            context: nil
+    func mouseNumberLabelBackgroundRect(tickY: CGFloat, labelSize: CGSize, rulerSize: CGSize) -> CGRect {
+        return MouseTickLabelLayout.labelBackgroundFrame(
+            labelSize: labelSize,
+            rulerSize: rulerSize,
+            orientation: .vertical,
+            zeroCorner: zeroCorner,
+            tickPosition: tickY,
+            resizeHandleFrame: resizeHandleExclusionFrame,
+            unitLabelFrame: unitLabelFrame
         )
+    }
+
+    override func updateUnitLabelVisibility() {
+        guard showMouseTick,
+              mouseTickY >= bounds.minY,
+              mouseTickY <= bounds.maxY,
+              let frame = unitLabelFrame else {
+            setUnitLabelHidden(false)
+            return
+        }
+
+        setUnitLabelHidden(frame.minY <= mouseTickY && mouseTickY <= frame.maxY)
+    }
+
+    override func updateResizeHandleVisibility() {
+        guard showMouseTick,
+              mouseTickY >= bounds.minY,
+              mouseTickY <= bounds.maxY,
+              let frame = resizeHandleExclusionFrame else {
+            setResizeHandleObscured(false)
+            return
+        }
+
+        setResizeHandleObscured(frame.minY <= mouseTickY && mouseTickY <= frame.maxY)
     }
 
     func tickY(
@@ -245,7 +270,7 @@ class VerticalRule: RuleView {
     }
 
     func mouseNumber(forTickY mouseTickY: CGFloat, rulerHeight: CGFloat) -> CGFloat {
-        let growthDirection = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner).growthDirection(for: .vertical)
+        let growthDirection = ZeroCornerGeometry(zeroCorner: zeroCorner).growthDirection(for: .vertical)
 
         switch growthDirection {
         case .positive:
@@ -255,31 +280,25 @@ class VerticalRule: RuleView {
         }
     }
 
-    func unitLabelRect(labelSize: NSSize, rulerSize: NSSize) -> CGRect {
-        let geometry = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner)
-        let tickSide = geometry.tickSide(for: .vertical)
-        let growthDirection = geometry.growthDirection(for: .vertical)
-        let x: CGFloat
-        let y: CGFloat
-
-        switch tickSide {
-        case .right:
-            x = 8
-        case .left:
-            x = rulerSize.width - labelSize.width - 8
-        case .top, .bottom:
-            assertionFailure("Vertical unit label must be placed on a vertical side")
-            x = 8
-        }
-
+    func mouseTickLineY(
+        forTickY mouseTickY: CGFloat,
+        growthDirection: RulerGrowthDirection
+    ) -> CGFloat {
         switch growthDirection {
         case .positive:
-            y = 2
+            return mouseTickY + 1
         case .negative:
-            y = rulerSize.height - labelSize.height - 2
+            return mouseTickY
         }
+    }
 
-        return CGRect(x: x, y: y, width: labelSize.width, height: labelSize.height)
+    func unitLabelRect(labelSize: NSSize, rulerSize: NSSize) -> CGRect {
+        return UnitLabelView.labelFrame(
+            labelSize: labelSize,
+            rulerSize: rulerSize,
+            orientation: .vertical,
+            zeroCorner: zeroCorner
+        )
     }
 
 

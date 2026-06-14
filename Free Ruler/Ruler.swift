@@ -12,6 +12,29 @@ enum Orientation: String {
     case bottomRight = 3
 }
 
+extension ZeroCorner {
+    func flipped(along orientation: Orientation) -> ZeroCorner {
+        switch (self, orientation) {
+        case (.topLeft, .horizontal):
+            return .topRight
+        case (.topRight, .horizontal):
+            return .topLeft
+        case (.bottomLeft, .horizontal):
+            return .bottomRight
+        case (.bottomRight, .horizontal):
+            return .bottomLeft
+        case (.topLeft, .vertical):
+            return .bottomLeft
+        case (.topRight, .vertical):
+            return .bottomRight
+        case (.bottomLeft, .vertical):
+            return .topLeft
+        case (.bottomRight, .vertical):
+            return .topRight
+        }
+    }
+}
+
 enum RulerGrowthDirection: Equatable {
     case positive
     case negative
@@ -22,6 +45,24 @@ enum RulerSide: Equatable {
     case right
     case bottom
     case left
+
+    var opposite: RulerSide {
+        switch self {
+        case .top:
+            return .bottom
+        case .right:
+            return .left
+        case .bottom:
+            return .top
+        case .left:
+            return .right
+        }
+    }
+}
+
+struct RulerCornerPlacement: Equatable {
+    let xSide: RulerSide
+    let ySide: RulerSide
 }
 
 struct ZeroCornerGeometry {
@@ -57,6 +98,36 @@ struct ZeroCornerGeometry {
             return horizontalZeroSide == .left ? .right : .left
         case .vertical:
             return verticalZeroSide == .top ? .bottom : .top
+        }
+    }
+
+    func resizeHandlePlacement(for orientation: Orientation) -> RulerCornerPlacement {
+        switch orientation {
+        case .horizontal:
+            return RulerCornerPlacement(
+                xSide: resizeSide(for: orientation),
+                ySide: tickSide(for: orientation).opposite
+            )
+        case .vertical:
+            return RulerCornerPlacement(
+                xSide: tickSide(for: orientation).opposite,
+                ySide: resizeSide(for: orientation)
+            )
+        }
+    }
+
+    func unitLabelPlacement(for orientation: Orientation) -> RulerCornerPlacement {
+        switch orientation {
+        case .horizontal:
+            return RulerCornerPlacement(
+                xSide: resizeSide(for: orientation).opposite,
+                ySide: tickSide(for: orientation).opposite
+            )
+        case .vertical:
+            return RulerCornerPlacement(
+                xSide: tickSide(for: orientation).opposite,
+                ySide: resizeSide(for: orientation).opposite
+            )
         }
     }
 
