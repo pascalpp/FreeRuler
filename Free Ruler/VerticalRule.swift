@@ -162,20 +162,27 @@ class VerticalRule: RuleView {
             rulerSize: rulerSize,
             orientation: .vertical,
             zeroCorner: zeroCorner,
-            tickPosition: tickY
+            tickPosition: tickY,
+            resizeHandleFrame: resizeHandleExclusionFrame
         )
     }
 
     override func updateUnitLabelVisibility() {
         guard showMouseTick,
-              mouseTickY >= 1,
-              mouseTickY < windowHeight,
+              mouseTickY >= bounds.minY,
+              mouseTickY <= bounds.maxY,
               let frame = unitLabelFrame else {
             setUnitLabelHidden(false)
             return
         }
 
-        setUnitLabelHidden(frame.minY <= mouseTickY && mouseTickY <= frame.maxY)
+        setUnitLabelHidden(
+            unitLabelZeroRegionContains(
+                tickPosition: mouseTickY,
+                orientation: .vertical,
+                labelFrame: frame
+            )
+        )
     }
 
     override func updateResizeHandleVisibility() {

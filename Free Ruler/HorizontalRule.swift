@@ -157,20 +157,27 @@ class HorizontalRule: RuleView {
             rulerSize: rulerSize,
             orientation: .horizontal,
             zeroCorner: zeroCorner,
-            tickPosition: tickX
+            tickPosition: tickX,
+            resizeHandleFrame: resizeHandleExclusionFrame
         )
     }
 
     override func updateUnitLabelVisibility() {
         guard showMouseTick,
-              mouseTickX > 0,
-              mouseTickX < windowWidth,
+              mouseTickX >= bounds.minX,
+              mouseTickX <= bounds.maxX,
               let frame = unitLabelFrame else {
             setUnitLabelHidden(false)
             return
         }
 
-        setUnitLabelHidden(frame.minX <= mouseTickX && mouseTickX <= frame.maxX)
+        setUnitLabelHidden(
+            unitLabelZeroRegionContains(
+                tickPosition: mouseTickX,
+                orientation: .horizontal,
+                labelFrame: frame
+            )
+        )
     }
 
     override func updateResizeHandleVisibility() {
