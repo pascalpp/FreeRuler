@@ -32,6 +32,7 @@ class Prefs: NSObject {
     @objc dynamic var backgroundOpacity : Int
     @objc dynamic var rulerColor        : NSColor
     @objc dynamic var unit              : Unit
+    @objc dynamic var zeroCorner        : ZeroCorner
 
     // MARK: - public save method
     func save() {
@@ -58,7 +59,8 @@ class Prefs: NSObject {
             "rulerShadow":       false,
             "foregroundOpacity": 90,
             "backgroundOpacity": 50,
-            "unit":              Unit.pixels.rawValue
+            "unit":              Unit.pixels.rawValue,
+            "zeroCorner":        defaultZeroCorner.rawValue
         ]
 
         if let defaultRulerColorData = Prefs.defaultRulerColorData {
@@ -78,6 +80,7 @@ class Prefs: NSObject {
         backgroundOpacity = defaults.integer(forKey: "backgroundOpacity")
         rulerColor        = Prefs.rulerFillColor(fromArchivedData: defaults.data(forKey: "rulerColor"))
         unit              = Unit(rawValue: defaults.integer(forKey: "unit")) ?? .pixels
+        zeroCorner        = Prefs.zeroCorner(fromRawValue: defaults.integer(forKey: "zeroCorner"))
 
         super.init()
 
@@ -117,18 +120,33 @@ class Prefs: NSObject {
             observe(\Prefs.unit, options: .new) { prefs, changed in
                 self.defaults.set(prefs.unit.rawValue, forKey: "unit")
             },
+            observe(\Prefs.zeroCorner, options: .new) { prefs, changed in
+                self.defaults.set(prefs.zeroCorner.rawValue, forKey: "zeroCorner")
+            },
         ]
     }
 
 }
 
 extension Prefs {
+    static var defaultZeroCorner: ZeroCorner {
+        return .topLeft
+    }
+
     static var defaultRulerFillColor: NSColor {
         return defaultRulerColor
+    }
+  
+    static var defaultGroupRulers: Bool {
+        return true
     }
 
     static func rulerFillColor(fromArchivedData data: Data?) -> NSColor {
         return normalizedRulerColor(unarchiveColor(data) ?? defaultRulerColor)
+    }
+
+    static func zeroCorner(fromRawValue rawValue: Int) -> ZeroCorner {
+        return ZeroCorner(rawValue: rawValue) ?? defaultZeroCorner
     }
 
     private static func archivedColorData(_ color: NSColor) -> Data? {

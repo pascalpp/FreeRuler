@@ -5,6 +5,235 @@ enum Orientation: String {
     case vertical
 }
 
+@objc enum ZeroCorner: Int {
+    case topLeft = 0
+    case topRight = 1
+    case bottomLeft = 2
+    case bottomRight = 3
+}
+
+extension ZeroCorner {
+    func flipped(along orientation: Orientation) -> ZeroCorner {
+        switch (self, orientation) {
+        case (.topLeft, .horizontal):
+            return .topRight
+        case (.topRight, .horizontal):
+            return .topLeft
+        case (.bottomLeft, .horizontal):
+            return .bottomRight
+        case (.bottomRight, .horizontal):
+            return .bottomLeft
+        case (.topLeft, .vertical):
+            return .bottomLeft
+        case (.topRight, .vertical):
+            return .bottomRight
+        case (.bottomLeft, .vertical):
+            return .topLeft
+        case (.bottomRight, .vertical):
+            return .topRight
+        }
+    }
+}
+
+enum RulerGrowthDirection: Equatable {
+    case positive
+    case negative
+}
+
+enum RulerSide: Equatable {
+    case top
+    case right
+    case bottom
+    case left
+
+    var opposite: RulerSide {
+        switch self {
+        case .top:
+            return .bottom
+        case .right:
+            return .left
+        case .bottom:
+            return .top
+        case .left:
+            return .right
+        }
+    }
+}
+
+struct RulerCornerPlacement: Equatable {
+    let xSide: RulerSide
+    let ySide: RulerSide
+}
+
+struct ZeroCornerGeometry {
+    let zeroCorner: ZeroCorner
+
+    private let borderCompensation: CGFloat = 1.0
+
+    init(zeroCorner: ZeroCorner) {
+        self.zeroCorner = zeroCorner
+    }
+
+    func growthDirection(for orientation: Orientation) -> RulerGrowthDirection {
+        switch orientation {
+        case .horizontal:
+            return horizontalZeroSide == .left ? .positive : .negative
+        case .vertical:
+            return verticalZeroSide == .bottom ? .positive : .negative
+        }
+    }
+
+    func tickSide(for orientation: Orientation) -> RulerSide {
+        switch orientation {
+        case .horizontal:
+            return verticalZeroSide == .top ? .bottom : .top
+        case .vertical:
+            return horizontalZeroSide == .left ? .right : .left
+        }
+    }
+
+    func resizeSide(for orientation: Orientation) -> RulerSide {
+        switch orientation {
+        case .horizontal:
+            return horizontalZeroSide == .left ? .right : .left
+        case .vertical:
+            return verticalZeroSide == .top ? .bottom : .top
+        }
+    }
+
+    func resizeHandlePlacement(for orientation: Orientation) -> RulerCornerPlacement {
+        switch orientation {
+        case .horizontal:
+            return RulerCornerPlacement(
+                xSide: resizeSide(for: orientation),
+                ySide: tickSide(for: orientation).opposite
+            )
+        case .vertical:
+            return RulerCornerPlacement(
+                xSide: tickSide(for: orientation).opposite,
+                ySide: resizeSide(for: orientation)
+            )
+        }
+    }
+
+    func unitLabelPlacement(for orientation: Orientation) -> RulerCornerPlacement {
+        switch orientation {
+        case .horizontal:
+            return RulerCornerPlacement(
+                xSide: resizeSide(for: orientation).opposite,
+                ySide: tickSide(for: orientation).opposite
+            )
+        case .vertical:
+            return RulerCornerPlacement(
+                xSide: tickSide(for: orientation).opposite,
+                ySide: resizeSide(for: orientation).opposite
+            )
+        }
+    }
+
+    func zeroPoint(in frame: NSRect, for orientation: Orientation) -> NSPoint {
+        switch orientation {
+        case .horizontal:
+            return NSPoint(
+                x: horizontalZeroSide == .left ? frame.minX : frame.maxX,
+                y: verticalZeroSide == .top ? frame.minY + borderCompensation : frame.maxY - borderCompensation
+            )
+        case .vertical:
+            return NSPoint(
+                x: horizontalZeroSide == .left ? frame.maxX - borderCompensation : frame.minX,
+                y: verticalZeroSide == .top ? frame.maxY : frame.minY
+            )
+        }
+    }
+
+    func frame(for orientation: Orientation, zeroPoint: NSPoint, size: NSSize) -> NSRect {
+        switch orientation {
+        case .horizontal:
+            return NSRect(
+                x: horizontalZeroSide == .left ? zeroPoint.x : zeroPoint.x - size.width,
+                y: verticalZeroSide == .top ? zeroPoint.y - borderCompensation : zeroPoint.y - size.height + borderCompensation,
+                width: size.width,
+                height: size.height
+            )
+        case .vertical:
+            return NSRect(
+                x: horizontalZeroSide == .left ? zeroPoint.x - size.width + borderCompensation : zeroPoint.x,
+                y: verticalZeroSide == .top ? zeroPoint.y - size.height : zeroPoint.y,
+                width: size.width,
+                height: size.height
+            )
+        }
+    }
+
+    func defaultFrame(for orientation: Orientation, screenFrame: NSRect) -> NSRect {
+        let xOffset: CGFloat = 30
+        let yOffset: CGFloat = 50
+        let horizontalLength = screenFrame.width / 2
+        let aspectRatio = screenFrame.width / screenFrame.height
+        let verticalLength = horizontalLength / aspectRatio
+        let topLeftZeroPoint = NSPoint(
+            x: screenFrame.minX + xOffset + Ruler.thickness - borderCompensation,
+            y: screenFrame.maxY - yOffset - Ruler.thickness + borderCompensation
+        )
+        let zeroPoint = zeroPointMatchingSelectedCorner(
+            topLeftZeroPoint: topLeftZeroPoint,
+            horizontalLength: horizontalLength,
+            verticalLength: verticalLength
+        )
+
+        switch orientation {
+        case .horizontal:
+            return frame(
+                for: orientation,
+                zeroPoint: zeroPoint,
+                size: NSSize(width: horizontalLength, height: Ruler.thickness)
+            )
+        case .vertical:
+            return frame(
+                for: orientation,
+                zeroPoint: zeroPoint,
+                size: NSSize(width: Ruler.thickness, height: verticalLength)
+            )
+        }
+    }
+
+    private var horizontalZeroSide: RulerSide {
+        switch zeroCorner {
+        case .topLeft, .bottomLeft:
+            return .left
+        case .topRight, .bottomRight:
+            return .right
+        }
+    }
+
+    private var verticalZeroSide: RulerSide {
+        switch zeroCorner {
+        case .topLeft, .topRight:
+            return .top
+        case .bottomLeft, .bottomRight:
+            return .bottom
+        }
+    }
+
+    private func zeroPointMatchingSelectedCorner(
+        topLeftZeroPoint: NSPoint,
+        horizontalLength: CGFloat,
+        verticalLength: CGFloat
+    ) -> NSPoint {
+        var point = topLeftZeroPoint
+
+        if horizontalZeroSide == .right {
+            point.x += horizontalLength
+        }
+
+        if verticalZeroSide == .bottom {
+            point.y -= verticalLength
+        }
+
+        return point
+    }
+}
+
 class Ruler {
     static let thickness: CGFloat = 40
 
@@ -39,40 +268,17 @@ class Ruler {
 // MARK: - Ruler size helpers
 
 func getDefaultContentRect(orientation: Orientation) -> NSRect {
-    var screenWidth: CGFloat = 1000
-    var screenHeight: CGFloat = 800
-    if let screen = NSScreen.main?.frame {
-        screenWidth = screen.width
-        screenHeight = screen.height
-    }
+    return getDefaultContentRect(orientation: orientation, zeroCorner: .topLeft)
+}
 
-    let aspectRatio = screenWidth / screenHeight
-    let xOffset: CGFloat = 30
-    let yOffset: CGFloat = 50
-    let rulerThickness: CGFloat = 40
+func getDefaultContentRect(orientation: Orientation, zeroCorner: ZeroCorner) -> NSRect {
+    let fallbackScreenFrame = NSRect(x: 0, y: 0, width: 1000, height: 800)
+    let screenFrame = NSScreen.main?.frame ?? fallbackScreenFrame
 
-    let horizontalLength = screenWidth / 2
-    let verticalLength = horizontalLength / aspectRatio
-
-    switch orientation {
-    case .horizontal:
-        return NSRect(
-            // offset horizontal by 1px leftward to compensate for ruler border
-            x: xOffset + rulerThickness - 1.0,
-            y: screenHeight - yOffset - rulerThickness,
-            width: horizontalLength,
-            height: rulerThickness
-        )
-    case .vertical:
-        return NSRect(
-            // offset vertical by 1px upward to compensate for ruler border
-            x: xOffset,
-            y: screenHeight - yOffset - rulerThickness - verticalLength + 1.0,
-            width: rulerThickness,
-            height: verticalLength
-        )
-    }
-
+    return ZeroCornerGeometry(zeroCorner: zeroCorner).defaultFrame(
+        for: orientation,
+        screenFrame: screenFrame
+    )
 }
 
 func getMinSize(ruler: Ruler) -> NSSize {

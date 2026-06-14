@@ -14,8 +14,8 @@
 /* Class = "NSMenuItem"; title = "Redo"; ObjectID = "6dh-zS-Vam"; */
 "6dh-zS-Vam.title" = "Tee sittenkin";
 
-/* Class = "NSMenuItem"; title = "Reset Ruler Positions"; ObjectID = "6ph-5N-O9R"; */
-"6ph-5N-O9R.title" = "Nollaa viivainten sijainnit";
+/* Class = "NSMenuItem"; title = "Reset Rulers"; ObjectID = "6ph-5N-O9R"; */
+"6ph-5N-O9R.title" = "Nollaa viivaimet";
 
 /* Class = "NSMenuItem"; title = "Group Rulers"; ObjectID = "7Ga-Fb-LLc"; */
 "7Ga-Fb-LLc.title" = "Ryhmitä viivaimet";
@@ -41,17 +41,29 @@
 /* Class = "NSMenuItem"; title = "Float Rulers"; ObjectID = "GDK-AC-uC8"; */
 "GDK-AC-uC8.title" = "Kelluta viivaimet";
 
+/* Class = "NSMenuItem"; title = "Flip Horizontal"; ObjectID = "GZl-Zd-Ad4"; */
+"GZl-Zd-Ad4.title" = "Käännä vaakasuunnassa";
+
 /* Class = "NSMenuItem"; title = "Options"; ObjectID = "H8h-7b-M4v"; */
 "H8h-7b-M4v.title" = "Valinnat";
 
 /* Class = "NSMenu"; title = "Options"; ObjectID = "HyV-fh-RgO"; */
 "HyV-fh-RgO.title" = "Valinnat";
 
+/* Class = "NSMenuItem"; title = "Flip Vertical"; ObjectID = "IQD-xF-keq"; */
+"IQD-xF-keq.title" = "Käännä pystysuunnassa";
+
 /* Class = "NSMenuItem"; title = "Show All"; ObjectID = "Kd2-mp-pUS"; */
 "Kd2-mp-pUS.title" = "Näytä kaikki";
 
+/* Class = "NSMenuItem"; title = "Flip"; ObjectID = "TkR-03-X6l"; */
+"TkR-03-X6l.title" = "Käännä";
+
 /* Class = "NSMenuItem"; title = "Bring All to Front"; ObjectID = "LE2-aR-0XJ"; */
 "LE2-aR-0XJ.title" = "Tuo kaikki eteen";
+
+/* Class = "NSMenu"; title = "Flip"; ObjectID = "mEK-Pg-ijY"; */
+"mEK-Pg-ijY.title" = "Käännä";
 
 /* Class = "NSMenuItem"; title = "Services"; ObjectID = "NMo-om-nkz"; */
 "NMo-om-nkz.title" = "Palvelut";

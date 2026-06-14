@@ -98,7 +98,7 @@
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Dlw-cH-IYI">
                         <rect key="frame" x="13" y="18" width="162" height="32"/>
-                        <buttonCell key="cell" type="push" title="Reset Ruler Positions" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="10f-9L-qca">
+                        <buttonCell key="cell" type="push" title="Reset Rulers" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="10f-9L-qca">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>

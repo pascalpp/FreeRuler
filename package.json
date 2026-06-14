@@ -8,6 +8,7 @@
     "get:version": "node -p \"require('./package.json').version\"",
     "get:commits": "git log --pretty=oneline | wc -l",
     "generate:icons": "scripts/generate-app-icon.sh",
+    "generate:help": "scripts/generate-help-index.sh",
     "generate:screenshots": "scripts/generate-app-store-screenshots.sh",
     "bump:version": "node scripts/release/bump-version.js",
     "release:version": "node scripts/release/set-version.js",
