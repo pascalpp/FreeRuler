@@ -9,7 +9,7 @@
 	<key>CFBundleHelpBookFolder</key>
 	<string>FreeRuler.help</string>
 	<key>CFBundleHelpBookName</key>
-	<string>com.pascal.freeruler.help</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER).help.$(CURRENT_PROJECT_VERSION)</string>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>

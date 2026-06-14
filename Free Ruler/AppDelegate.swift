@@ -1,4 +1,5 @@
 import Cocoa
+import Carbon
 import Carbon.HIToolbox
 #if DEBUG
 import Darwin
@@ -145,14 +146,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 #endif
 
         showRulers()
-
-        // Temporary while verifying ticket #213 Help Viewer routing.
-        if !UI_TESTS {
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                self.showFreeRulerHelp(self)
-            }
-        }
     }
 
 #if DEBUG
@@ -486,7 +479,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBAction func showFreeRulerHelp(_ sender: Any) {
         let helpManager = NSHelpManager.shared
         helpManager.registerBooks(in: Bundle.main)
-        helpManager.openHelpAnchor("WelcomePage", inBook: nil)
+        AHRegisterHelpBookWithURL(Bundle.main.bundleURL as CFURL)
+
+        let status: OSStatus
+        if let bookName = Bundle.main.object(forInfoDictionaryKey: "CFBundleHelpBookName") as? String {
+            status = AHGotoPage(bookName as CFString, "FreeRuler.html" as CFString, "WelcomePage" as CFString)
+        } else {
+            status = OSStatus(paramErr)
+        }
+
+        if status != noErr {
+            helpManager.openHelpAnchor("WelcomePage", inBook: nil)
+        }
     }
 
     @IBAction func closeKeyWindow(_ sender: Any) {
