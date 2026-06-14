@@ -364,26 +364,26 @@ final class RulerCoreTests: XCTestCase {
                 (
                     .topLeft,
                     CGRect(x: 155, y: 28, width: 20, height: 10),
-                    CGRect(x: 7, y: 133, width: 20, height: 10),
-                    CGRect(x: 0, y: 133, width: 30, height: 10)
+                    CGRect(x: 7, y: 136, width: 20, height: 10),
+                    CGRect(x: 0, y: 136, width: 30, height: 10)
                 ),
                 (
                     .topRight,
                     CGRect(x: 155, y: 28, width: 20, height: 10),
-                    CGRect(x: 13, y: 133, width: 20, height: 10),
-                    CGRect(x: 10, y: 133, width: 30, height: 10)
+                    CGRect(x: 13, y: 136, width: 20, height: 10),
+                    CGRect(x: 10, y: 136, width: 30, height: 10)
                 ),
                 (
                     .bottomLeft,
-                    CGRect(x: 155, y: 9, width: 20, height: 10),
-                    CGRect(x: 7, y: 133, width: 20, height: 10),
-                    CGRect(x: 0, y: 133, width: 30, height: 10)
+                    CGRect(x: 155, y: 7, width: 20, height: 10),
+                    CGRect(x: 7, y: 136, width: 20, height: 10),
+                    CGRect(x: 0, y: 136, width: 30, height: 10)
                 ),
                 (
                     .bottomRight,
-                    CGRect(x: 155, y: 9, width: 20, height: 10),
-                    CGRect(x: 13, y: 133, width: 20, height: 10),
-                    CGRect(x: 10, y: 133, width: 30, height: 10)
+                    CGRect(x: 155, y: 7, width: 20, height: 10),
+                    CGRect(x: 13, y: 136, width: 20, height: 10),
+                    CGRect(x: 10, y: 136, width: 30, height: 10)
                 ),
             ]
 
@@ -1269,10 +1269,11 @@ final class RulerCoreTests: XCTestCase {
             let rule = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
             let labelSize = CGSize(width: 30, height: 10)
             let tickLabelSpacing: CGFloat = 5
+            let unitLabelFlipPadding: CGFloat = 3
             guard let unitLabelFrame = rule.unitLabelFrame else {
                 return XCTFail("Expected horizontal ruler to install a unit label")
             }
-            let mouseTickAtRightUnitFit = unitLabelFrame.minX - labelSize.width - tickLabelSpacing
+            let mouseTickAtRightUnitFit = unitLabelFrame.minX - unitLabelFlipPadding - labelSize.width - tickLabelSpacing
             let mouseTickJustPastRightUnitFit = mouseTickAtRightUnitFit + 1
 
             let fittingLabelRect = rule.mouseNumberLabelRect(
@@ -1289,7 +1290,7 @@ final class RulerCoreTests: XCTestCase {
             XCTAssertGreaterThan(fittingLabelRect.minX, mouseTickAtRightUnitFit)
             XCTAssertEqual(
                 fittingLabelRect.maxX,
-                unitLabelFrame.minX,
+                unitLabelFrame.minX - unitLabelFlipPadding,
                 accuracy: 0.0001
             )
             XCTAssertLessThan(flippedLabelRect.maxX, mouseTickJustPastRightUnitFit)
@@ -1357,7 +1358,7 @@ final class RulerCoreTests: XCTestCase {
 
             let rule = VerticalRule(frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
             let labelSize = CGSize(width: 20, height: 10)
-            let tickLabelSpacing: CGFloat = 7
+            let tickLabelSpacing: CGFloat = 4
             guard let resizeHandleFrame = rule.resizeHandleExclusionFrame else {
                 return XCTFail("Expected vertical ruler to install a resize handle")
             }
@@ -1372,6 +1373,49 @@ final class RulerCoreTests: XCTestCase {
             XCTAssertLessThan(labelRect.maxY, mouseTickInsideTopResizeEnd)
             XCTAssertEqual(
                 mouseTickInsideTopResizeEnd - labelRect.maxY,
+                tickLabelSpacing,
+                accuracy: 0.0001
+            )
+        }
+    }
+
+    func testVerticalMouseTickLabelFlipsBeforeBottomUnitLabel() {
+        withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .bottomLeft
+
+            let rule = VerticalRule(frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
+            let labelSize = CGSize(width: 20, height: 10)
+            let tickLabelSpacing: CGFloat = 4
+            let unitLabelFlipPadding: CGFloat = 3
+            guard let unitLabelFrame = rule.unitLabelFrame else {
+                return XCTFail("Expected vertical ruler to install a unit label")
+            }
+            let mouseTickAtBottomUnitFit = unitLabelFrame.maxY
+                + unitLabelFlipPadding
+                + tickLabelSpacing
+                + labelSize.height
+            let mouseTickJustPastBottomUnitFit = mouseTickAtBottomUnitFit - 1
+
+            let fittingLabelRect = rule.mouseNumberLabelRect(
+                tickY: mouseTickAtBottomUnitFit,
+                labelSize: labelSize,
+                rulerSize: rule.bounds.size
+            )
+            let flippedLabelRect = rule.mouseNumberLabelRect(
+                tickY: mouseTickJustPastBottomUnitFit,
+                labelSize: labelSize,
+                rulerSize: rule.bounds.size
+            )
+
+            XCTAssertLessThan(fittingLabelRect.maxY, mouseTickAtBottomUnitFit)
+            XCTAssertEqual(
+                fittingLabelRect.minY,
+                unitLabelFrame.maxY + unitLabelFlipPadding,
+                accuracy: 0.0001
+            )
+            XCTAssertGreaterThan(flippedLabelRect.minY, mouseTickJustPastBottomUnitFit)
+            XCTAssertEqual(
+                flippedLabelRect.minY - mouseTickJustPastBottomUnitFit,
                 tickLabelSpacing,
                 accuracy: 0.0001
             )
@@ -1393,7 +1437,7 @@ final class RulerCoreTests: XCTestCase {
             )
             XCTAssertEqual(
                 labelNearBottom.minY,
-                8,
+                5,
                 accuracy: 0.0001
             )
 
@@ -1404,7 +1448,7 @@ final class RulerCoreTests: XCTestCase {
             )
             XCTAssertEqual(
                 labelNearTop.minY,
-                282,
+                285,
                 accuracy: 0.0001
             )
         }

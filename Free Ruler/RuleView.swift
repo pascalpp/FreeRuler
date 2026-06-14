@@ -47,6 +47,7 @@ struct RulerColors {
 
 struct MouseTickLabelLayout {
     private static let longestTickLength: CGFloat = 10
+    private static let unitLabelFlipPadding: CGFloat = 3
 
     private struct Offsets {
         let topInset: CGFloat
@@ -189,17 +190,17 @@ struct MouseTickLabelLayout {
         case (.horizontal, .right, .top):
             return Offsets(topInset: 2, bottomInset: 2, leftInset: 0, rightInset: 0, tickLabelSpacing: 5)
         case (.horizontal, .left, .bottom):
-            return Offsets(topInset: 2, bottomInset: 9, leftInset: 5, rightInset: 0, tickLabelSpacing: 5)
+            return Offsets(topInset: 2, bottomInset: 7, leftInset: 5, rightInset: 0, tickLabelSpacing: 5)
         case (.horizontal, .right, .bottom):
-            return Offsets(topInset: 2, bottomInset: 9, leftInset: 5, rightInset: 0, tickLabelSpacing: 5)
+            return Offsets(topInset: 2, bottomInset: 7, leftInset: 5, rightInset: 0, tickLabelSpacing: 5)
         case (.vertical, .left, .top):
-            return Offsets(topInset: 2, bottomInset: 2, leftInset: 7, rightInset: 7, tickLabelSpacing: 5)
+            return Offsets(topInset: 2, bottomInset: 2, leftInset: 7, rightInset: 7, tickLabelSpacing: 4)
         case (.vertical, .right, .top):
-            return Offsets(topInset: 2, bottomInset: 2, leftInset: 5, rightInset: 7, tickLabelSpacing: 5)
+            return Offsets(topInset: 2, bottomInset: 2, leftInset: 7, rightInset: 7, tickLabelSpacing: 4)
         case (.vertical, .left, .bottom):
-            return Offsets(topInset: 2, bottomInset: 2, leftInset: 7, rightInset: 7, tickLabelSpacing: 5)
+            return Offsets(topInset: 2, bottomInset: 2, leftInset: 7, rightInset: 7, tickLabelSpacing: 4)
         case (.vertical, .right, .bottom):
-            return Offsets(topInset: 2, bottomInset: 2, leftInset: 5, rightInset: 7, tickLabelSpacing: 5)
+            return Offsets(topInset: 2, bottomInset: 2, leftInset: 7, rightInset: 7, tickLabelSpacing: 4)
         case (_, _, _):
             assertionFailure("Mouse tick label offsets require left/right and top/bottom placement")
             return Offsets(topInset: 2, bottomInset: 2, leftInset: 5, rightInset: 5, tickLabelSpacing: 5)
@@ -245,7 +246,7 @@ struct MouseTickLabelLayout {
         let geometry = ZeroCornerGeometry(zeroCorner: zeroCorner)
         if let unitLabelFrame = unitLabelFrame,
            geometry.unitLabelPlacement(for: .horizontal).xSide == .right,
-           labelX + labelSize.width > unitLabelFrame.minX {
+           labelX + labelSize.width > unitLabelFrame.minX - unitLabelFlipPadding {
             return false
         }
 
@@ -345,7 +346,7 @@ struct MouseTickLabelLayout {
         let geometry = ZeroCornerGeometry(zeroCorner: zeroCorner)
         if let unitLabelFrame = unitLabelFrame,
            geometry.unitLabelPlacement(for: .vertical).ySide == .bottom,
-           labelY < unitLabelFrame.maxY {
+           labelY < unitLabelFrame.maxY + unitLabelFlipPadding {
             return false
         }
 
