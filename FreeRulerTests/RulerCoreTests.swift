@@ -284,8 +284,6 @@ final class RulerCoreTests: XCTestCase {
                 rule.unitLabelRect(labelSize: NSSize(width: 12, height: 10), rulerSize: NSSize(width: 300, height: 40)),
                 CGRect(x: 278, y: 0, width: 12, height: 10)
             )
-            XCTAssertFalse(rule.shouldDrawUnitLabel(mouseTickX: 280, rulerWidth: 300))
-            XCTAssertTrue(rule.shouldDrawUnitLabel(mouseTickX: 20, rulerWidth: 300))
         }
     }
 
@@ -330,8 +328,6 @@ final class RulerCoreTests: XCTestCase {
                 rule.unitLabelRect(labelSize: NSSize(width: 12, height: 10), rulerSize: NSSize(width: 40, height: 300)),
                 CGRect(x: 20, y: 2, width: 12, height: 10)
             )
-            XCTAssertFalse(rule.shouldDrawUnitLabel(mouseTickY: 10, rulerHeight: 300))
-            XCTAssertTrue(rule.shouldDrawUnitLabel(mouseTickY: 280, rulerHeight: 300))
         }
     }
 

@@ -94,7 +94,7 @@ class HorizontalRule: RuleView {
         color.ticks.setStroke()
         path.stroke()
 
-        if shouldDrawUnitLabel(mouseTickX: mouseTickX, rulerWidth: windowWidth) {
+        if !showMouseTick || mouseTickX < 0 || mouseTickX > 26 {
             drawUnitLabel()
         }
 
@@ -287,21 +287,6 @@ class HorizontalRule: RuleView {
         }
 
         return CGRect(x: x, y: y, width: labelSize.width, height: labelSize.height)
-    }
-
-    func shouldDrawUnitLabel(mouseTickX: CGFloat, rulerWidth: CGFloat) -> Bool {
-        guard showMouseTick else {
-            return true
-        }
-
-        let growthDirection = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner).growthDirection(for: .horizontal)
-
-        switch growthDirection {
-        case .positive:
-            return mouseTickX < 0 || mouseTickX > 26
-        case .negative:
-            return mouseTickX < rulerWidth - 26 || mouseTickX > rulerWidth
-        }
     }
 
 }
