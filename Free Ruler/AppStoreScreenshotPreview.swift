@@ -573,18 +573,18 @@ private enum AppStoreFlipScreenshotLayout {
     static let topRightX: CGFloat = 520
     static let topRightY: CGFloat = 520
     static let topRightHorizontalLength: CGFloat = 1783
-    static let topRightVerticalLength: CGFloat = 900
+    static let topRightVerticalLength: CGFloat = 895
     static let topRightRulerColor = #colorLiteral(red: 0.98, green: 0.735, blue: 0.8272727226, alpha: 1)
 
     static let bottomRightX: CGFloat = 280
     static let bottomRightY: CGFloat = 280
-    static let bottomRightHorizontalLength: CGFloat = 2200
-    static let bottomRightVerticalLength: CGFloat = 1354
+    static let bottomRightHorizontalLength: CGFloat = 2196
+    static let bottomRightVerticalLength: CGFloat = 1351
     static let bottomRightRulerColor = #colorLiteral(red: 0.95, green: 0.7125, blue: 0.8019480475, alpha: 1)
 
     static let bottomLeftX: CGFloat = 530
     static let bottomLeftY: CGFloat = 515
-    static let bottomLeftHorizontalLength: CGFloat = 1783
+    static let bottomLeftHorizontalLength: CGFloat = 1777
     static let bottomLeftVerticalLength: CGFloat = 900
     static let bottomLeftRulerColor = #colorLiteral(red: 0.98, green: 0.735, blue: 0.8272727227, alpha: 1)
 
