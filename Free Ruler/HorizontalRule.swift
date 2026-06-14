@@ -182,7 +182,13 @@ class HorizontalRule: RuleView {
             return
         }
 
-        setResizeHandleObscured(frame.minX <= mouseTickX && mouseTickX <= frame.maxX)
+        setResizeHandleObscured(
+            resizeHandleEndRegionContains(
+                tickPosition: mouseTickX,
+                orientation: .horizontal,
+                handleFrame: frame
+            )
+        )
     }
 
     func tickX(

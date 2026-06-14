@@ -375,6 +375,29 @@ class RuleView: NSView {
         resizeHandleView?.alphaValue = isObscured ? 0 : 1
     }
 
+    func resizeHandleEndRegionContains(
+        tickPosition: CGFloat,
+        orientation: Orientation,
+        handleFrame: NSRect
+    ) -> Bool {
+        let resizeSide = ZeroCornerGeometry(zeroCorner: zeroCorner)
+            .resizeSide(for: orientation)
+
+        switch (orientation, resizeSide) {
+        case (.horizontal, .left):
+            return bounds.minX <= tickPosition && tickPosition <= handleFrame.maxX
+        case (.horizontal, .right):
+            return handleFrame.minX <= tickPosition && tickPosition <= bounds.maxX
+        case (.vertical, .bottom):
+            return bounds.minY <= tickPosition && tickPosition <= handleFrame.maxY
+        case (.vertical, .top):
+            return handleFrame.minY <= tickPosition && tickPosition <= bounds.maxY
+        case (_, _):
+            assertionFailure("Resize handle end region requires the resize side for the ruler orientation")
+            return false
+        }
+    }
+
     func updateResizeHandleVisibility() {
         setResizeHandleObscured(false)
     }
