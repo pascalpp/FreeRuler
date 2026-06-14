@@ -38,9 +38,7 @@ class RulerWindow: NSPanel {
         self.isMovableByWindowBackground = true
         self.hasShadow = prefs.rulerShadow
 
-        rule.wantsLayer = true
-        rule.layer?.borderColor = CGColor(gray: 0, alpha: 0.5)
-        rule.layer?.borderWidth = 1.0
+        rule.installWindowBorder()
         rule.setAccessibilityElement(true)
         rule.setAccessibilityIdentifier(getRuleIdentifier(for: ruler.orientation))
 

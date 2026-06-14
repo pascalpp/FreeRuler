@@ -7,6 +7,12 @@ import SwiftUI
 final class ResizeHandleView: NSView {
 
     var color: RulerColors
+    var zeroCorner = prefs.zeroCorner {
+        didSet {
+            needsDisplay = true
+        }
+    }
+
     private let orientation: Orientation
     private var trackingArea: NSTrackingArea?
     private var dragInitialMouseLocation: NSPoint?
@@ -154,15 +160,24 @@ final class ResizeHandleView: NSView {
     }
 
     func frame(in bounds: NSRect) -> NSRect {
-        let resizeSide = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner).resizeSide(for: orientation)
+        return frame(in: bounds, zeroCorner: zeroCorner)
+    }
 
+    func frame(in bounds: NSRect, zeroCorner: ZeroCorner) -> NSRect {
+        let placement = ZeroCornerGeometry(zeroCorner: zeroCorner)
+            .resizeHandlePlacement(for: orientation)
+        let gripFrame = gripFrame(in: bounds, placement: placement)
+
+        return slotFrame(for: gripFrame, in: bounds, placement: placement)
+    }
+
+    private func gripFrame(in bounds: NSRect, placement: RulerCornerPlacement) -> NSRect {
         switch orientation {
         case .horizontal:
-            let topY = bounds.maxY - horizontalYOffset
-            let bottomY = topY - length
+            let bottomY: CGFloat
             let firstX: CGFloat
 
-            switch resizeSide {
+            switch placement.xSide {
             case .left:
                 firstX = bounds.minX + horizontalXOffset + 1
             case .right:
@@ -178,6 +193,16 @@ final class ResizeHandleView: NSView {
                     - 1
             }
 
+            switch placement.ySide {
+            case .top:
+                bottomY = bounds.maxY - horizontalYOffset - length
+            case .bottom:
+                bottomY = bounds.minY + horizontalYOffset
+            case .left, .right:
+                assertionFailure("Horizontal resize handle must be placed on a vertical side")
+                bottomY = bounds.maxY - horizontalYOffset - length
+            }
+
             return NSRect(
                 x: firstX - backgroundPadding,
                 y: bottomY - backgroundPadding,
@@ -185,11 +210,20 @@ final class ResizeHandleView: NSView {
                 height: length + (backgroundPadding * 2)
             )
         case .vertical:
-            let rightX = bounds.minX + verticalXOffset + length
-            let leftX = rightX - length
+            let leftX: CGFloat
             let firstY: CGFloat
 
-            switch resizeSide {
+            switch placement.xSide {
+            case .left:
+                leftX = bounds.minX + verticalXOffset
+            case .right:
+                leftX = bounds.maxX - verticalXOffset - length
+            case .top, .bottom:
+                assertionFailure("Vertical resize handle must be placed on a horizontal side")
+                leftX = bounds.minX + verticalXOffset
+            }
+
+            switch placement.ySide {
             case .top:
                 firstY = bounds.maxY
                     - verticalYOffset
@@ -211,9 +245,49 @@ final class ResizeHandleView: NSView {
         }
     }
 
+    private func slotFrame(
+        for gripFrame: NSRect,
+        in bounds: NSRect,
+        placement: RulerCornerPlacement
+    ) -> NSRect {
+        let x: CGFloat
+        let y: CGFloat
+        let width: CGFloat
+        let height: CGFloat
+
+        switch placement.xSide {
+        case .left:
+            x = bounds.minX
+            width = gripFrame.maxX - bounds.minX
+        case .right:
+            x = gripFrame.minX
+            width = bounds.maxX - gripFrame.minX
+        case .top, .bottom:
+            assertionFailure("Resize handle slot must be anchored to a horizontal side")
+            x = gripFrame.minX
+            width = gripFrame.width
+        }
+
+        switch placement.ySide {
+        case .top:
+            y = gripFrame.minY
+            height = bounds.maxY - gripFrame.minY
+        case .bottom:
+            y = bounds.minY
+            height = gripFrame.maxY - bounds.minY
+        case .left, .right:
+            assertionFailure("Resize handle slot must be anchored to a vertical side")
+            y = gripFrame.minY
+            height = gripFrame.height
+        }
+
+        return NSRect(x: x, y: y, width: width, height: height)
+    }
+
     private func drawBackground() {
+        let gripRect = gripRect(in: bounds)
         let path = NSBezierPath(
-            roundedRect: bounds,
+            roundedRect: gripRect,
             xRadius: backgroundBorderRadius,
             yRadius: backgroundBorderRadius
         )
@@ -223,35 +297,82 @@ final class ResizeHandleView: NSView {
     }
 
     private func drawGripLines() {
+        let gripRect = gripRect(in: bounds)
+
         switch orientation {
         case .horizontal:
             for index in 0..<lineCount {
-                let x = backgroundPadding + CGFloat(index) * lineSpacing
+                let x = gripRect.minX + backgroundPadding + CGFloat(index) * lineSpacing
                 strokeLine(
-                    from: CGPoint(x: x + 0.5, y: backgroundPadding),
-                    to: CGPoint(x: x + 0.5, y: bounds.maxY - backgroundPadding),
+                    from: CGPoint(x: x + 0.5, y: gripRect.minY + backgroundPadding),
+                    to: CGPoint(x: x + 0.5, y: gripRect.maxY - backgroundPadding),
                     color: color.resizeHandleLight
                 )
                 strokeLine(
-                    from: CGPoint(x: x + 1.5, y: backgroundPadding),
-                    to: CGPoint(x: x + 1.5, y: bounds.maxY - backgroundPadding),
+                    from: CGPoint(x: x + 1.5, y: gripRect.minY + backgroundPadding),
+                    to: CGPoint(x: x + 1.5, y: gripRect.maxY - backgroundPadding),
                     color: color.resizeHandleShadow
                 )
             }
         case .vertical:
             for index in 0..<lineCount {
-                let y = backgroundPadding + 1 + CGFloat(index) * lineSpacing
+                let y = gripRect.minY + backgroundPadding + 1 + CGFloat(index) * lineSpacing
                 strokeLine(
-                    from: CGPoint(x: backgroundPadding, y: y + 0.5),
-                    to: CGPoint(x: bounds.maxX - backgroundPadding, y: y + 0.5),
+                    from: CGPoint(x: gripRect.minX + backgroundPadding, y: y + 0.5),
+                    to: CGPoint(x: gripRect.maxX - backgroundPadding, y: y + 0.5),
                     color: color.resizeHandleLight
                 )
                 strokeLine(
-                    from: CGPoint(x: backgroundPadding, y: y - 0.5),
-                    to: CGPoint(x: bounds.maxX - backgroundPadding, y: y - 0.5),
+                    from: CGPoint(x: gripRect.minX + backgroundPadding, y: y - 0.5),
+                    to: CGPoint(x: gripRect.maxX - backgroundPadding, y: y - 0.5),
                     color: color.resizeHandleShadow
                 )
             }
+        }
+    }
+
+    private func gripRect(in bounds: NSRect) -> NSRect {
+        let placement = ZeroCornerGeometry(zeroCorner: zeroCorner)
+            .resizeHandlePlacement(for: orientation)
+        let gripSize = self.gripSize()
+        let x: CGFloat
+        let y: CGFloat
+
+        switch placement.xSide {
+        case .left:
+            x = bounds.maxX - gripSize.width
+        case .right:
+            x = bounds.minX
+        case .top, .bottom:
+            assertionFailure("Resize handle grip must be anchored to a horizontal side")
+            x = bounds.minX
+        }
+
+        switch placement.ySide {
+        case .top:
+            y = bounds.minY
+        case .bottom:
+            y = bounds.maxY - gripSize.height
+        case .left, .right:
+            assertionFailure("Resize handle grip must be anchored to a vertical side")
+            y = bounds.minY
+        }
+
+        return NSRect(origin: NSPoint(x: x, y: y), size: gripSize)
+    }
+
+    private func gripSize() -> NSSize {
+        switch orientation {
+        case .horizontal:
+            return NSSize(
+                width: CGFloat(lineCount - 1) * lineSpacing + 2 + (backgroundPadding * 2),
+                height: length + (backgroundPadding * 2)
+            )
+        case .vertical:
+            return NSSize(
+                width: length + (backgroundPadding * 2),
+                height: CGFloat(lineCount - 1) * lineSpacing + 2 + (backgroundPadding * 2)
+            )
         }
     }
 

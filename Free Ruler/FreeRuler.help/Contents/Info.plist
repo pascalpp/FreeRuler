@@ -13,11 +13,11 @@
 	<key>CFBundlePackageType</key>
 	<string>BNDL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1</string>
+	<string>2</string>
 	<key>CFBundleSignature</key>
 	<string>hbwr</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>2</string>
 	<key>HPDBookAccessPath</key>
 	<string>FreeRuler.html</string>
 	<key>HPDBookIconPath</key>
@@ -25,7 +25,7 @@
 	<key>HPDBookIndexPath</key>
 	<string>English.lproj.helpindex</string>
 	<key>HPDBookKBProduct</key>
-	<string>freeruler1</string>
+	<string>freeruler2</string>
 	<key>HPDBookTitle</key>
 	<string>Free Ruler Help</string>
 	<key>HPDBookType</key>
