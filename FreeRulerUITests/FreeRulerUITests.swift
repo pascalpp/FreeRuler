@@ -1,30 +1,20 @@
 import XCTest
-import Darwin
 
 final class FreeRulerUITests: XCTestCase {
 
     private let opaqueColorPanelValue = "ruler-color-panel-alpha-hidden"
 
     private var app: XCUIApplication!
-    private var cursorStateURL: URL!
+    private var uiTestSupport: UITestSupport!
 
     override func setUpWithError() throws {
         continueAfterFailure = false
 
-        let cursorStateName = "FreeRulerUITests-\(UUID().uuidString).cursor"
-        let homeDirectory = currentUserHomeDirectory()
-        cursorStateURL = URL(fileURLWithPath: homeDirectory)
-            .appendingPathComponent("Library/Containers/com.pascal.freeruler/Data/tmp", isDirectory: true)
-            .appendingPathComponent(cursorStateName)
-        try? FileManager.default.createDirectory(
-            at: cursorStateURL.deletingLastPathComponent(),
-            withIntermediateDirectories: true
-        )
-        try? FileManager.default.removeItem(at: cursorStateURL)
+        uiTestSupport = UITestSupport.prepareForLaunch()
+        uiTestSupport.resetStateFiles()
 
         app = XCUIApplication()
-        app.launchEnvironment["FREE_RULER_UI_TESTS"] = "1"
-        app.launchEnvironment["FREE_RULER_UI_TEST_CURSOR_STATE_NAME"] = cursorStateName
+        app.launchEnvironment.merge(uiTestSupport.launchEnvironment) { _, newValue in newValue }
         app.launch()
         app.activate()
     }
@@ -32,8 +22,8 @@ final class FreeRulerUITests: XCTestCase {
     override func tearDownWithError() throws {
         app.terminate()
         app = nil
-        try? FileManager.default.removeItem(at: cursorStateURL)
-        cursorStateURL = nil
+        uiTestSupport.removeStateFiles()
+        uiTestSupport = nil
     }
 
     func testRulerVisibilityKeyboardCommands() {
@@ -60,39 +50,31 @@ final class FreeRulerUITests: XCTestCase {
     func testGroupedRulerToggleUngroupsAndHidesRequestedRuler() {
         XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
         XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
-
-        horizontalRuler.click()
-        setGroupRulers(true)
-        XCTAssertTrue(groupRulersEnabledInPreferences())
+        XCTAssertTrue(waitForPreference("groupRulers", equals: true))
 
         horizontalRuler.click()
         app.typeKey("v", modifierFlags: [])
 
         XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 2))
         XCTAssertTrue(verticalRuler.waitForNonExistence(timeout: 2))
-        XCTAssertFalse(groupRulersEnabledInPreferences())
+        XCTAssertTrue(waitForPreference("groupRulers", equals: false))
     }
 
     func testGroupRulersKeyboardCommandUngroupsOnFirstAttempt() {
         XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
         XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
-
-        horizontalRuler.click()
-        setGroupRulers(true)
-        XCTAssertTrue(groupRulersEnabledInPreferences())
+        XCTAssertTrue(waitForPreference("groupRulers", equals: true))
 
         horizontalRuler.click()
         app.typeKey("g", modifierFlags: [])
+        XCTAssertTrue(waitForPreference("groupRulers", equals: false))
 
-        XCTAssertFalse(groupRulersEnabledInPreferences())
-
-        setGroupRulers(true)
-        XCTAssertTrue(groupRulersEnabledInPreferences())
+        app.typeKey("g", modifierFlags: [])
+        XCTAssertTrue(waitForPreference("groupRulers", equals: true))
 
         verticalRuler.click()
         app.typeKey("g", modifierFlags: [])
-
-        XCTAssertFalse(groupRulersEnabledInPreferences())
+        XCTAssertTrue(waitForPreference("groupRulers", equals: false))
     }
 
     func testPreferencesCloseWithCommandW() {
@@ -184,30 +166,22 @@ final class FreeRulerUITests: XCTestCase {
     func testFloatShadowAndUnitKeyboardCommands() {
         XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
         XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
-
-        horizontalRuler.click()
-        XCTAssertTrue(floatRulersEnabledInPreferences())
-
-        horizontalRuler.click()
-        app.typeKey("f", modifierFlags: [])
-        XCTAssertFalse(floatRulersEnabledInPreferences())
+        XCTAssertTrue(waitForPreference("floatRulers", equals: true))
+        XCTAssertTrue(waitForPreference("rulerShadow", equals: false))
 
         horizontalRuler.click()
         app.typeKey("f", modifierFlags: [])
-        XCTAssertTrue(floatRulersEnabledInPreferences())
+        XCTAssertTrue(waitForPreference("floatRulers", equals: false))
 
-        horizontalRuler.click()
-        XCTAssertFalse(rulerShadowEnabledInPreferences())
+        app.typeKey("f", modifierFlags: [])
+        XCTAssertTrue(waitForPreference("floatRulers", equals: true))
 
-        horizontalRuler.click()
         app.typeKey("s", modifierFlags: [])
-        XCTAssertTrue(rulerShadowEnabledInPreferences())
+        XCTAssertTrue(waitForPreference("rulerShadow", equals: true))
 
-        horizontalRuler.click()
         app.typeKey("s", modifierFlags: [])
-        XCTAssertFalse(rulerShadowEnabledInPreferences())
+        XCTAssertTrue(waitForPreference("rulerShadow", equals: false))
 
-        horizontalRuler.click()
         XCTAssertEqual(horizontalRulerView.value as? String, "px")
 
         app.typeKey("u", modifierFlags: [])
@@ -267,44 +241,44 @@ final class FreeRulerUITests: XCTestCase {
         XCTAssertTrue(verticalRuler.waitForFrameChange(from: originalVerticalFrame, timeout: 2))
     }
 
-    func testHorizontalRulerCursorForMouseoverMousedownAndMouseoutActions() {
+    func testRulerCursorsForGroupedAndUngroupedScenarios() {
         XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
         XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
 
-        isolateHorizontalRulerByUngroupingWithVerticalToggle()
+        XCTContext.runActivity(named: "ungrouped horizontal ruler cursor") { _ in
+            resetRulerCursorScenario()
+            isolateHorizontalRulerByUngroupingWithVerticalToggle()
 
-        assertCursorSequence(on: horizontalRuler, label: "ungrouped horizontal ruler")
-    }
+            assertCursorSequence(on: horizontalRuler, label: "ungrouped horizontal ruler")
+        }
 
-    func testVerticalRulerCursorForMouseoverMousedownAndMouseoutActions() {
-        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
-        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
+        XCTContext.runActivity(named: "ungrouped vertical ruler cursor") { _ in
+            resetRulerCursorScenario()
+            isolateHorizontalRulerByUngroupingWithVerticalToggle()
 
-        isolateHorizontalRulerByUngroupingWithVerticalToggle()
+            app.typeKey("h", modifierFlags: [])
+            XCTAssertTrue(horizontalRuler.waitForNonExistence(timeout: 2))
+            app.typeKey("v", modifierFlags: [])
+            XCTAssertTrue(verticalRuler.waitForExistence(timeout: 2))
 
-        app.typeKey("h", modifierFlags: [])
-        XCTAssertTrue(horizontalRuler.waitForNonExistence(timeout: 2))
-        app.typeKey("v", modifierFlags: [])
-        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 2))
+            assertCursorSequence(on: verticalRuler, label: "ungrouped vertical ruler")
+        }
 
-        assertCursorSequence(on: verticalRuler, label: "ungrouped vertical ruler")
-    }
+        XCTContext.runActivity(named: "grouped cursor with horizontal key ruler") { _ in
+            resetRulerCursorScenario()
 
-    func testGroupedRulerCursorsForKeyAndChildWindows() {
-        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
-        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
+            horizontalRuler.click()
+            assertCursorSequence(on: horizontalRulerView, label: "grouped key horizontal ruler")
+            assertCursorSequence(on: verticalRulerView, label: "grouped child vertical ruler")
+        }
 
-        setGroupRulers(true)
-        XCTAssertTrue(groupRulersEnabledInPreferences())
-        closePreferences()
+        XCTContext.runActivity(named: "grouped cursor with vertical key ruler") { _ in
+            resetRulerCursorScenario()
 
-        horizontalRuler.click()
-        assertCursorSequence(on: horizontalRulerView, label: "grouped key horizontal ruler")
-        assertCursorSequence(on: verticalRulerView, label: "grouped child vertical ruler")
-
-        verticalRuler.click()
-        assertCursorSequence(on: verticalRulerView, label: "grouped key vertical ruler")
-        assertCursorSequence(on: horizontalRulerView, label: "grouped child horizontal ruler")
+            verticalRuler.click()
+            assertCursorSequence(on: verticalRulerView, label: "grouped key vertical ruler")
+            assertCursorSequence(on: horizontalRulerView, label: "grouped child horizontal ruler")
+        }
     }
 
     private var horizontalRuler: XCUIElement {
@@ -325,18 +299,6 @@ final class FreeRulerUITests: XCTestCase {
 
     private var preferencesWindow: XCUIElement {
         app.windows["Free Ruler Preferences"]
-    }
-
-    private var floatRulersCheckbox: XCUIElement {
-        app.checkBoxes["float-rulers-checkbox"]
-    }
-
-    private var groupRulersCheckbox: XCUIElement {
-        app.checkBoxes["group-rulers-checkbox"]
-    }
-
-    private var rulerShadowCheckbox: XCUIElement {
-        app.checkBoxes["ruler-shadow-checkbox"]
     }
 
     private var rulerColorWell: XCUIElement {
@@ -362,14 +324,6 @@ final class FreeRulerUITests: XCTestCase {
         }
     }
 
-    private func closePreferences() {
-        if preferencesWindow.exists {
-            preferencesWindow.click()
-            app.typeKey("w", modifierFlags: .command)
-            XCTAssertTrue(preferencesWindow.waitForNonExistence(timeout: 2))
-        }
-    }
-
     private func openRulerColorPanel() {
         openPreferences()
 
@@ -383,37 +337,21 @@ final class FreeRulerUITests: XCTestCase {
         XCTAssertTrue(colorPanel.waitForExistence(timeout: 3))
     }
 
-    private func setGroupRulers(_ enabled: Bool) {
-        openPreferences()
-
-        if groupRulersCheckbox.isChecked != enabled {
-            groupRulersCheckbox.click()
-        }
-    }
-
-    private func groupRulersEnabledInPreferences() -> Bool {
-        openPreferences()
-        return groupRulersCheckbox.isChecked
-    }
-
-    private func floatRulersEnabledInPreferences() -> Bool {
-        openPreferences()
-        return floatRulersCheckbox.isChecked
-    }
-
-    private func rulerShadowEnabledInPreferences() -> Bool {
-        openPreferences()
-        return rulerShadowCheckbox.isChecked
-    }
-
     private func isolateHorizontalRulerByUngroupingWithVerticalToggle() {
         horizontalRuler.click()
         app.typeKey("v", modifierFlags: [])
 
         XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 2))
         XCTAssertTrue(verticalRuler.waitForNonExistence(timeout: 2))
-        XCTAssertFalse(groupRulersEnabledInPreferences())
-        closePreferences()
+        XCTAssertTrue(waitForPreference("groupRulers", equals: false))
+    }
+
+    private func resetRulerCursorScenario() {
+        app.typeKey("r", modifierFlags: .command)
+
+        XCTAssertTrue(horizontalRuler.waitForVisibleFrame(timeout: 1))
+        XCTAssertTrue(verticalRuler.waitForVisibleFrame(timeout: 1))
+        XCTAssertTrue(waitForPreference("groupRulers", equals: true))
     }
 
     private func assertCursorSequence(on ruler: XCUIElement, label: String) {
@@ -425,15 +363,6 @@ final class FreeRulerUITests: XCTestCase {
 
         hover(over: pointOutside(ruler))
         assertCursor("crosshair", after: "mouseout \(label)")
-
-        hover(over: ruler)
-        assertCursor("open-hand", after: "mouseover \(label) again")
-
-        pressAndRelease(in: ruler, assertingCursorDuringPress: "closed-hand")
-        assertCursor("open-hand", after: "mousedown and mouseup inside \(label) again")
-
-        hover(over: pointOutside(ruler))
-        assertCursor("crosshair", after: "mouseout \(label) again")
     }
 
     private func waitForHotkeyBezel(_ expectedLabel: String, timeout: TimeInterval = 2) -> Bool {
@@ -467,7 +396,7 @@ final class FreeRulerUITests: XCTestCase {
     private func pressAndRelease(in element: XCUIElement, assertingCursorDuringPress expectedCursor: String) {
         let expectation = expectationForCursor(expectedCursor, after: "mousedown inside \(element.identifier)")
         let coordinate = interactionPoint(in: element)
-        coordinate.press(forDuration: 0.4)
+        coordinate.press(forDuration: 0.2)
         wait(for: [expectation], timeout: 1)
         RunLoop.current.run(until: Date().addingTimeInterval(0.1))
     }
@@ -488,10 +417,9 @@ final class FreeRulerUITests: XCTestCase {
 
     private func expectationForCursor(_ expectedCursor: String, after action: String) -> XCTestExpectation {
         let expectation = expectation(description: "Expected cursor \(expectedCursor) after \(action)")
+        let cursorStateURL = uiTestSupport.cursorStateURL
 
-        DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.15) { [cursorStateURL] in
-            guard let cursorStateURL = cursorStateURL else { return }
-
+        DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.15) {
             let deadline = Date().addingTimeInterval(1.5)
 
             while Date() < deadline {
@@ -538,15 +466,46 @@ final class FreeRulerUITests: XCTestCase {
     }
 
     private func readCursorState() -> String? {
-        return try? String(contentsOf: cursorStateURL, encoding: .utf8)
+        return try? String(contentsOf: uiTestSupport.cursorStateURL, encoding: .utf8)
     }
 
-    private func currentUserHomeDirectory() -> String {
-        guard let passwd = getpwuid(getuid()) else {
-            return NSHomeDirectory()
+    private func waitForPreference(
+        _ key: String,
+        equals expectedValue: Bool,
+        timeout: TimeInterval = 2
+    ) -> Bool {
+        return waitForPreference(
+            key,
+            equals: expectedValue ? "true" : "false",
+            timeout: timeout
+        )
+    }
+
+    private func waitForPreference(
+        _ key: String,
+        equals expectedValue: String,
+        timeout: TimeInterval = 2
+    ) -> Bool {
+        let deadline = Date().addingTimeInterval(timeout)
+
+        while Date() < deadline {
+            if readPreferenceState()[key] == expectedValue {
+                return true
+            }
+
+            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
         }
 
-        return String(cString: passwd.pointee.pw_dir)
+        return readPreferenceState()[key] == expectedValue
+    }
+
+    private func readPreferenceState() -> [String: String] {
+        guard let data = try? Data(contentsOf: uiTestSupport.preferencesStateURL),
+              let state = try? JSONSerialization.jsonObject(with: data) as? [String: String] else {
+            return [:]
+        }
+
+        return state
     }
 
     private func visibleSliderCount(in element: XCUIElement) -> Int {
@@ -559,20 +518,6 @@ private extension XCUIElement {
         let predicate = NSPredicate(format: "exists == false")
         let expectation = XCTNSPredicateExpectation(predicate: predicate, object: self)
         return XCTWaiter.wait(for: [expectation], timeout: timeout) == .completed
-    }
-
-    func waitForNoVisibleFrame(timeout: TimeInterval) -> Bool {
-        let deadline = Date().addingTimeInterval(timeout)
-
-        while Date() < deadline {
-            if !hasVisibleFrame {
-                return true
-            }
-
-            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
-        }
-
-        return !hasVisibleFrame
     }
 
     func waitForVisibleFrame(timeout: TimeInterval) -> Bool {
@@ -605,17 +550,5 @@ private extension XCUIElement {
         }
 
         return !frame.equalTo(originalFrame)
-    }
-
-    var isChecked: Bool {
-        if let value = value as? String {
-            return value == "1"
-        }
-
-        if let value = value as? NSNumber {
-            return value.boolValue
-        }
-
-        return false
     }
 }

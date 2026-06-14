@@ -8,7 +8,7 @@ func configureOpaqueColorPicking() {
     let colorPanel = NSColorPanel.shared
     colorPanel.identifier = rulerColorPanelIdentifier
     colorPanel.setAccessibilityIdentifier(rulerColorPanelIdentifier.rawValue)
-    if UI_TESTS {
+    if UITestSupport.isEnabled {
         colorPanel.setAccessibilityValue(rulerColorPanelOpaqueAccessibilityValue)
     }
     setColorPickingIgnoresAlpha(true)

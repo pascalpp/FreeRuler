@@ -4,7 +4,9 @@
   "description": "A free ruler for macOS",
   "main": "none",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "yarn test:unit && yarn test:ui",
+    "test:unit": "xcodebuild -project 'Free Ruler.xcodeproj' -scheme 'Free Ruler' test -only-testing:FreeRulerTests",
+    "test:ui": "xcodebuild -project 'Free Ruler.xcodeproj' -scheme 'Free Ruler' test -only-testing:FreeRulerUITests",
     "get:version": "node -p \"require('./package.json').version\"",
     "get:commits": "git log --pretty=oneline | wc -l",
     "generate:icons": "scripts/generate-app-icon.sh",
