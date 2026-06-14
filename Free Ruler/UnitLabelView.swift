@@ -1,7 +1,22 @@
 import Cocoa
 
 final class UnitLabelView: NSView {
+    private struct Padding {
+        let top: CGFloat
+        let bottom: CGFloat
+        let left: CGFloat
+        let right: CGFloat
+    }
+
+    private static let padding = Padding(top: 4, bottom: 9, left: 8, right: 8)
+    private static let descenderSafetyPadding: CGFloat = 2
+
     var label: NSAttributedString {
+        didSet {
+            needsDisplay = true
+        }
+    }
+    var zeroCorner = prefs.zeroCorner {
         didSet {
             needsDisplay = true
         }
@@ -24,11 +39,19 @@ final class UnitLabelView: NSView {
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
 
-        label.draw(with: bounds, context: nil)
+        let placement = ZeroCornerGeometry(zeroCorner: zeroCorner)
+            .unitLabelPlacement(for: orientation)
+        let labelRect = Self.labelDrawRect(
+            labelSize: Self.labelSize(for: label),
+            bounds: bounds,
+            placement: placement
+        )
+
+        label.draw(with: labelRect, context: nil)
     }
 
     func frame(in bounds: NSRect) -> NSRect {
-        return frame(in: bounds, zeroCorner: prefs.zeroCorner)
+        return frame(in: bounds, zeroCorner: zeroCorner)
     }
 
     func frame(in bounds: NSRect, zeroCorner: ZeroCorner) -> NSRect {
@@ -59,30 +82,69 @@ final class UnitLabelView: NSView {
     ) -> NSRect {
         let placement = ZeroCornerGeometry(zeroCorner: zeroCorner)
             .unitLabelPlacement(for: orientation)
-        let topInset: CGFloat = 2
-        let bottomInset: CGFloat = 9
-        let leftInset: CGFloat = 8
-        let rightInset: CGFloat = 8
+        let x: CGFloat
+        let y: CGFloat
+        let width: CGFloat
+        let height: CGFloat
+
+        switch placement.xSide {
+        case .left:
+            x = 0
+            width = Self.padding.left + labelSize.width
+        case .right:
+            x = rulerSize.width - labelSize.width - Self.padding.right
+            width = labelSize.width + Self.padding.right
+        case .top, .bottom:
+            assertionFailure("Unit label must be anchored to a horizontal side")
+            x = 0
+            width = Self.padding.left + labelSize.width
+        }
+
+        switch placement.ySide {
+        case .top:
+            y = rulerSize.height - labelSize.height - Self.padding.top
+            height = labelSize.height + Self.padding.top
+        case .bottom:
+            y = 0
+            height = Self.padding.bottom + labelSize.height
+        case .left, .right:
+            assertionFailure("Unit label must be anchored to a vertical side")
+            y = 0
+            height = Self.padding.bottom + labelSize.height
+        }
+
+        return NSRect(x: x, y: y, width: width, height: height)
+    }
+
+    static func labelDrawRect(
+        labelSize: NSSize,
+        bounds: NSRect,
+        placement: RulerCornerPlacement
+    ) -> NSRect {
         let x: CGFloat
         let y: CGFloat
 
-        switch (placement.xSide, placement.ySide) {
-        case (.left, .top):
-            x = leftInset
-            y = rulerSize.height - labelSize.height - topInset
-        case (.right, .top):
-            x = rulerSize.width - labelSize.width - rightInset
-            y = rulerSize.height - labelSize.height - topInset
-        case (.left, .bottom):
-            x = leftInset
-            y = bottomInset
-        case (.right, .bottom):
-            x = rulerSize.width - labelSize.width - rightInset
-            y = bottomInset
-        case (_, _):
-            assertionFailure("Unit label must be anchored to left/right and top/bottom sides")
-            x = leftInset
-            y = topInset
+        switch placement.xSide {
+        case .left:
+            x = bounds.maxX - labelSize.width
+        case .right:
+            x = bounds.minX
+        case .top, .bottom:
+            assertionFailure("Unit label must be anchored to a horizontal side")
+            x = bounds.minX
+        }
+
+        switch placement.ySide {
+        case .top:
+            y = bounds.minY + min(
+                Self.descenderSafetyPadding,
+                max(0, bounds.height - labelSize.height)
+            )
+        case .bottom:
+            y = bounds.maxY - labelSize.height
+        case .left, .right:
+            assertionFailure("Unit label must be anchored to a vertical side")
+            y = bounds.minY
         }
 
         return NSRect(x: x, y: y, width: labelSize.width, height: labelSize.height)

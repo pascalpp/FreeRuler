@@ -46,6 +46,8 @@ struct RulerColors {
 }
 
 struct MouseTickLabelLayout {
+    private static let longestTickLength: CGFloat = 10
+
     private struct Offsets {
         let topInset: CGFloat
         let bottomInset: CGFloat
@@ -60,10 +62,11 @@ struct MouseTickLabelLayout {
         orientation: Orientation,
         zeroCorner: ZeroCorner,
         tickPosition: CGFloat,
-        resizeHandleFrame: NSRect? = nil
+        resizeHandleFrame: NSRect? = nil,
+        unitLabelFrame: NSRect? = nil
     ) -> NSRect {
-        let placement = ZeroCornerGeometry(zeroCorner: zeroCorner)
-            .unitLabelPlacement(for: orientation)
+        let geometry = ZeroCornerGeometry(zeroCorner: zeroCorner)
+        let placement = geometry.unitLabelPlacement(for: orientation)
         let offsets = offsets(for: orientation, placement: placement)
         let x: CGFloat
         let y: CGFloat
@@ -76,6 +79,7 @@ struct MouseTickLabelLayout {
                 rulerSize: rulerSize,
                 zeroCorner: zeroCorner,
                 resizeHandleFrame: resizeHandleFrame,
+                unitLabelFrame: unitLabelFrame,
                 offsets: offsets
             )
             y = rulerSize.height - labelSize.height - offsets.topInset
@@ -86,27 +90,42 @@ struct MouseTickLabelLayout {
                 rulerSize: rulerSize,
                 zeroCorner: zeroCorner,
                 resizeHandleFrame: resizeHandleFrame,
+                unitLabelFrame: unitLabelFrame,
                 offsets: offsets
             )
             y = offsets.bottomInset
         case (.vertical, .left, .top), (.vertical, .left, .bottom):
-            x = offsets.leftInset
+            x = verticalX(
+                labelSize: labelSize,
+                rulerSize: rulerSize,
+                tickSide: geometry.tickSide(for: .vertical),
+                placement: placement,
+                offsets: offsets
+            )
             y = verticalY(
                 forTickY: tickPosition,
                 labelSize: labelSize,
                 rulerSize: rulerSize,
                 zeroCorner: zeroCorner,
                 resizeHandleFrame: resizeHandleFrame,
+                unitLabelFrame: unitLabelFrame,
                 offsets: offsets
             )
         case (.vertical, .right, .top), (.vertical, .right, .bottom):
-            x = rulerSize.width - labelSize.width - offsets.rightInset
+            x = verticalX(
+                labelSize: labelSize,
+                rulerSize: rulerSize,
+                tickSide: geometry.tickSide(for: .vertical),
+                placement: placement,
+                offsets: offsets
+            )
             y = verticalY(
                 forTickY: tickPosition,
                 labelSize: labelSize,
                 rulerSize: rulerSize,
                 zeroCorner: zeroCorner,
                 resizeHandleFrame: resizeHandleFrame,
+                unitLabelFrame: unitLabelFrame,
                 offsets: offsets
             )
         case (_, _, _):
@@ -118,27 +137,69 @@ struct MouseTickLabelLayout {
         return NSRect(x: x, y: y, width: labelSize.width, height: labelSize.height)
     }
 
+    static func labelBackgroundFrame(
+        labelSize: NSSize,
+        rulerSize: NSSize,
+        orientation: Orientation,
+        zeroCorner: ZeroCorner,
+        tickPosition: CGFloat,
+        resizeHandleFrame: NSRect? = nil,
+        unitLabelFrame: NSRect? = nil
+    ) -> NSRect {
+        guard orientation == .vertical else {
+            return labelFrame(
+                labelSize: labelSize,
+                rulerSize: rulerSize,
+                orientation: orientation,
+                zeroCorner: zeroCorner,
+                tickPosition: tickPosition,
+                resizeHandleFrame: resizeHandleFrame,
+                unitLabelFrame: unitLabelFrame
+            )
+        }
+
+        let geometry = ZeroCornerGeometry(zeroCorner: zeroCorner)
+        let placement = geometry.unitLabelPlacement(for: orientation)
+        let offsets = offsets(for: orientation, placement: placement)
+        let y = verticalY(
+            forTickY: tickPosition,
+            labelSize: labelSize,
+            rulerSize: rulerSize,
+            zeroCorner: zeroCorner,
+            resizeHandleFrame: resizeHandleFrame,
+            unitLabelFrame: unitLabelFrame,
+            offsets: offsets
+        )
+
+        return verticalLabelLaneFrame(
+            rulerSize: rulerSize,
+            tickSide: geometry.tickSide(for: .vertical),
+            y: y,
+            height: labelSize.height
+        )
+    }
+
     private static func offsets(
         for orientation: Orientation,
         placement: RulerCornerPlacement
     ) -> Offsets {
         switch (orientation, placement.xSide, placement.ySide) {
         case (.horizontal, .left, .top):
-            return Offsets(topInset: 2, bottomInset: 2, leftInset: 5, rightInset: 5, tickLabelSpacing: 5)
+            return Offsets(topInset: 2, bottomInset: 2, leftInset: 0, rightInset: 0, tickLabelSpacing: 5)
         case (.horizontal, .right, .top):
-            return Offsets(topInset: 2, bottomInset: 2, leftInset: 5, rightInset: 5, tickLabelSpacing: 5)
+            return Offsets(topInset: 2, bottomInset: 2, leftInset: 0, rightInset: 0, tickLabelSpacing: 5)
         case (.horizontal, .left, .bottom):
-            return Offsets(topInset: 2, bottomInset: 2, leftInset: 5, rightInset: 5, tickLabelSpacing: 5)
+            return Offsets(topInset: 2, bottomInset: 9, leftInset: 5, rightInset: 0, tickLabelSpacing: 5)
         case (.horizontal, .right, .bottom):
-            return Offsets(topInset: 2, bottomInset: 2, leftInset: 5, rightInset: 5, tickLabelSpacing: 5)
+            return Offsets(topInset: 2, bottomInset: 9, leftInset: 5, rightInset: 0, tickLabelSpacing: 5)
         case (.vertical, .left, .top):
-            return Offsets(topInset: 2, bottomInset: 2, leftInset: 7, rightInset: 7, tickLabelSpacing: 7)
+            return Offsets(topInset: 2, bottomInset: 2, leftInset: 7, rightInset: 7, tickLabelSpacing: 5)
         case (.vertical, .right, .top):
-            return Offsets(topInset: 2, bottomInset: 2, leftInset: 7, rightInset: 7, tickLabelSpacing: 7)
+            return Offsets(topInset: 2, bottomInset: 2, leftInset: 5, rightInset: 7, tickLabelSpacing: 5)
         case (.vertical, .left, .bottom):
-            return Offsets(topInset: 2, bottomInset: 2, leftInset: 7, rightInset: 7, tickLabelSpacing: 7)
+            return Offsets(topInset: 2, bottomInset: 2, leftInset: 7, rightInset: 7, tickLabelSpacing: 5)
         case (.vertical, .right, .bottom):
-            return Offsets(topInset: 2, bottomInset: 2, leftInset: 7, rightInset: 7, tickLabelSpacing: 7)
+            return Offsets(topInset: 2, bottomInset: 2, leftInset: 5, rightInset: 7, tickLabelSpacing: 5)
         case (_, _, _):
             assertionFailure("Mouse tick label offsets require left/right and top/bottom placement")
             return Offsets(topInset: 2, bottomInset: 2, leftInset: 5, rightInset: 5, tickLabelSpacing: 5)
@@ -151,6 +212,7 @@ struct MouseTickLabelLayout {
         rulerSize: NSSize,
         zeroCorner: ZeroCorner,
         resizeHandleFrame: NSRect?,
+        unitLabelFrame: NSRect?,
         offsets: Offsets
     ) -> CGFloat {
         let minLabelX = offsets.leftInset
@@ -163,7 +225,8 @@ struct MouseTickLabelLayout {
             labelSize: labelSize,
             maxLabelX: maxLabelX,
             zeroCorner: zeroCorner,
-            resizeHandleFrame: resizeHandleFrame
+            resizeHandleFrame: resizeHandleFrame,
+            unitLabelFrame: unitLabelFrame
         ) ? rightX : leftX
 
         return clamp(preferredX, lowerBound: minLabelX, upperBound: maxLabelX)
@@ -174,14 +237,23 @@ struct MouseTickLabelLayout {
         labelSize: NSSize,
         maxLabelX: CGFloat,
         zeroCorner: ZeroCorner,
-        resizeHandleFrame: NSRect?
+        resizeHandleFrame: NSRect?,
+        unitLabelFrame: NSRect?
     ) -> Bool {
         guard labelX <= maxLabelX else { return false }
+
+        let geometry = ZeroCornerGeometry(zeroCorner: zeroCorner)
+        if let unitLabelFrame = unitLabelFrame,
+           geometry.unitLabelPlacement(for: .horizontal).xSide == .right,
+           labelX + labelSize.width > unitLabelFrame.minX {
+            return false
+        }
+
         guard let resizeHandleFrame = resizeHandleFrame else { return true }
 
-        switch ZeroCornerGeometry(zeroCorner: zeroCorner).resizeSide(for: .horizontal) {
+        switch geometry.resizeSide(for: .horizontal) {
         case .left:
-            return labelX >= resizeHandleFrame.maxX
+            return true
         case .right:
             return labelX + labelSize.width <= resizeHandleFrame.minX
         case .top, .bottom:
@@ -196,6 +268,7 @@ struct MouseTickLabelLayout {
         rulerSize: NSSize,
         zeroCorner: ZeroCorner,
         resizeHandleFrame: NSRect?,
+        unitLabelFrame: NSRect?,
         offsets: Offsets
     ) -> CGFloat {
         let minLabelY = offsets.bottomInset
@@ -208,10 +281,55 @@ struct MouseTickLabelLayout {
             labelSize: labelSize,
             minLabelY: minLabelY,
             zeroCorner: zeroCorner,
-            resizeHandleFrame: resizeHandleFrame
+            resizeHandleFrame: resizeHandleFrame,
+            unitLabelFrame: unitLabelFrame
         ) ? belowTickY : aboveTickY
 
         return clamp(preferredY, lowerBound: minLabelY, upperBound: maxLabelY)
+    }
+
+    private static func verticalX(
+        labelSize: NSSize,
+        rulerSize: NSSize,
+        tickSide: RulerSide,
+        placement: RulerCornerPlacement,
+        offsets: Offsets
+    ) -> CGFloat {
+        let laneFrame = verticalLabelLaneFrame(
+            rulerSize: rulerSize,
+            tickSide: tickSide,
+            y: 0,
+            height: labelSize.height
+        )
+
+        switch placement.xSide {
+        case .left:
+            return laneFrame.minX + offsets.leftInset
+        case .right:
+            return laneFrame.maxX - labelSize.width - offsets.rightInset
+        case .top, .bottom:
+            assertionFailure("Vertical mouse tick labels must be padded from a left or right lane edge")
+            return laneFrame.minX + offsets.leftInset
+        }
+    }
+
+    private static func verticalLabelLaneFrame(
+        rulerSize: NSSize,
+        tickSide: RulerSide,
+        y: CGFloat,
+        height: CGFloat
+    ) -> NSRect {
+        let laneWidth = max(0, rulerSize.width - longestTickLength)
+
+        switch tickSide {
+        case .right:
+            return NSRect(x: 0, y: y, width: laneWidth, height: height)
+        case .left:
+            return NSRect(x: rulerSize.width - laneWidth, y: y, width: laneWidth, height: height)
+        case .top, .bottom:
+            assertionFailure("Vertical mouse tick label lane must follow a vertical tick side")
+            return NSRect(x: 0, y: y, width: laneWidth, height: height)
+        }
     }
 
     private static func verticalLabelFitsPreferredSide(
@@ -219,16 +337,25 @@ struct MouseTickLabelLayout {
         labelSize: NSSize,
         minLabelY: CGFloat,
         zeroCorner: ZeroCorner,
-        resizeHandleFrame: NSRect?
+        resizeHandleFrame: NSRect?,
+        unitLabelFrame: NSRect?
     ) -> Bool {
         guard labelY >= minLabelY else { return false }
+
+        let geometry = ZeroCornerGeometry(zeroCorner: zeroCorner)
+        if let unitLabelFrame = unitLabelFrame,
+           geometry.unitLabelPlacement(for: .vertical).ySide == .bottom,
+           labelY < unitLabelFrame.maxY {
+            return false
+        }
+
         guard let resizeHandleFrame = resizeHandleFrame else { return true }
 
-        switch ZeroCornerGeometry(zeroCorner: zeroCorner).resizeSide(for: .vertical) {
+        switch geometry.resizeSide(for: .vertical) {
         case .bottom:
             return labelY >= resizeHandleFrame.maxY
         case .top:
-            return labelY + labelSize.height <= resizeHandleFrame.minY
+            return true
         case .left, .right:
             assertionFailure("Vertical resize side must be top or bottom")
             return true
@@ -442,49 +569,6 @@ class RuleView: NSView {
         resizeHandleView?.alphaValue = isObscured ? 0 : 1
     }
 
-    func resizeHandleEndRegionContains(
-        tickPosition: CGFloat,
-        orientation: Orientation,
-        handleFrame: NSRect
-    ) -> Bool {
-        let resizeSide = ZeroCornerGeometry(zeroCorner: zeroCorner)
-            .resizeSide(for: orientation)
-
-        switch (orientation, resizeSide) {
-        case (.horizontal, .left):
-            return bounds.minX <= tickPosition && tickPosition <= handleFrame.maxX
-        case (.horizontal, .right):
-            return handleFrame.minX <= tickPosition && tickPosition <= bounds.maxX
-        case (.vertical, .bottom):
-            return bounds.minY <= tickPosition && tickPosition <= handleFrame.maxY
-        case (.vertical, .top):
-            return handleFrame.minY <= tickPosition && tickPosition <= bounds.maxY
-        case (_, _):
-            assertionFailure("Resize handle end region requires the resize side for the ruler orientation")
-            return false
-        }
-    }
-
-    func unitLabelZeroRegionContains(
-        tickPosition: CGFloat,
-        orientation: Orientation,
-        labelFrame: NSRect
-    ) -> Bool {
-        let growthDirection = ZeroCornerGeometry(zeroCorner: zeroCorner)
-            .growthDirection(for: orientation)
-
-        switch (orientation, growthDirection) {
-        case (.horizontal, .positive):
-            return bounds.minX <= tickPosition && tickPosition <= labelFrame.maxX
-        case (.horizontal, .negative):
-            return labelFrame.minX <= tickPosition && tickPosition <= bounds.maxX
-        case (.vertical, .positive):
-            return bounds.minY <= tickPosition && tickPosition <= labelFrame.maxY
-        case (.vertical, .negative):
-            return labelFrame.minY <= tickPosition && tickPosition <= bounds.maxY
-        }
-    }
-
     func updateResizeHandleVisibility() {
         setResizeHandleObscured(false)
     }
@@ -496,12 +580,14 @@ class RuleView: NSView {
     private func updateResizeHandleFrame() {
         guard let resizeHandleView = resizeHandleView else { return }
 
+        resizeHandleView.zeroCorner = zeroCorner
         resizeHandleView.frame = resizeHandleView.frame(in: bounds, zeroCorner: zeroCorner)
     }
 
     private func updateUnitLabelFrame() {
         guard let unitLabelView = unitLabelView else { return }
 
+        unitLabelView.zeroCorner = zeroCorner
         unitLabelView.label = unitLabel()
         unitLabelView.frame = unitLabelView.frame(in: bounds, zeroCorner: zeroCorner)
     }
@@ -823,8 +909,8 @@ private struct MouseTickLabelCornerPreview: View {
 }
 
 private struct MouseTickLabelOffsetPreviewControls: View {
-    @State private var mouseX: CGFloat = 270
-    @State private var mouseY: CGFloat = 8
+    @State private var mouseX: CGFloat = 36
+    @State private var mouseY: CGFloat = 200
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
