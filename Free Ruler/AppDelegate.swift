@@ -145,7 +145,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 #endif
 
         showRulers()
-
     }
 
 #if DEBUG
