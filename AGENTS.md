@@ -45,6 +45,18 @@ zips or other generated artifacts.
   AppKit patterns, explicit `NS*` types, and straightforward helpers rather than
   heavy abstraction.
 
+## GitHub CLI In Codex
+
+`gh` is authenticated for the `pascalpp` account through the macOS keyring.
+Sandboxed agent commands may not be able to read that keyring entry and can
+report the token in `~/.config/gh/hosts.yml` as invalid even when
+`gh auth status` works in the user's terminal.
+
+Before concluding that GitHub CLI auth is missing, retry authenticated `gh`
+commands outside the sandbox with approval/escalation. Do not run `gh auth
+login`, `gh auth logout`, or edit `~/.config/gh/hosts.yml` unless the escalated
+`gh auth status` check also fails or the user explicitly asks for reauth.
+
 ## PR Review Comment Resolution
 
 When asked to address PR review comments, inspect the pull request associated
