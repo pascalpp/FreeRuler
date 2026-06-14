@@ -7,7 +7,6 @@ output_dir="$PWD/Free Ruler/Images.xcassets/AppIcon.appiconset"
 help_resource_dir="$PWD/Free Ruler/FreeRuler.help/Contents/Resources"
 help_shared_dir="$help_resource_dir/shrd"
 help_html="$help_resource_dir/English.lproj/FreeRuler.html"
-help_css="$help_shared_dir/styles.css"
 binary="${TMPDIR:-/tmp}/freeruler-generate-app-icon"
 module_cache="${TMPDIR:-/tmp}/freeruler-generate-app-icon-module-cache"
 
@@ -36,10 +35,7 @@ for stale_icon in "$help_shared_dir"/freeruler-help-icon-*.png; do
   fi
 done
 
-HELP_ICON_NAME="$help_icon_name" perl -0pi -e \
-  's#background-image: url\(\./(?:freeruler\.png|freeruler-help-icon-[^)]+)\);#background-image: url(./$ENV{HELP_ICON_NAME});#' \
-  "$help_css"
-
-HELP_CACHE_TOKEN="$help_cache_token" perl -0pi -e \
-  's#href="\.\./shrd/styles\.css(?:\?[^"]*)?"#href="../shrd/styles.css?icon=$ENV{HELP_CACHE_TOKEN}"#' \
+HELP_ICON_NAME="$help_icon_name" HELP_CACHE_TOKEN="$help_cache_token" perl -0pi -e \
+  's#href="\.\./shrd/styles\.css(?:\?[^"]*)?"#href="../shrd/styles.css?icon=$ENV{HELP_CACHE_TOKEN}"#;
+   s#--free-ruler-help-icon: url\("[^"]+"\);#--free-ruler-help-icon: url("../shrd/$ENV{HELP_ICON_NAME}");#' \
   "$help_html"
