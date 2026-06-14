@@ -245,32 +245,17 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
         guard let window = window else { return }
 
         let frame = window.frame
-        var x: CGFloat
-        var y: CGFloat
-
-        switch window.ruler.orientation {
-        case .horizontal:
-            // offset horizontal by 1px downward to compensate for ruler border
-            x = point.x
-            y = point.y - 1.0
-        case .vertical:
-            // offset vertical by 1px rightward to compensate for ruler border
-            x = point.x - frame.width + 1.0
-            y = point.y - frame.height
-        }
-
-        let rect = NSRect(
-            x: x,
-            y: y,
-            width: frame.width,
-            height: frame.height
+        let rect = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner).frame(
+            for: window.ruler.orientation,
+            zeroPoint: point,
+            size: frame.size
         )
 
         window.setFrame(rect, display: false)
     }
 
     func resetPosition() {
-        let frame = getDefaultContentRect(orientation: ruler.orientation)
+        let frame = getDefaultContentRect(orientation: ruler.orientation, zeroCorner: prefs.zeroCorner)
         rulerWindow.setFrame(frame, display: true)
     }
 
@@ -301,10 +286,13 @@ extension RulerController {
         let shift = event.modifierFlags.contains(.shift)
         let keyboardModifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
 
-        if keyboardModifiers.isEmpty,
-           rulerWindow.isKeyWindow,
+        if rulerWindow.isKeyWindow,
            let appDelegate = NSApp.delegate as? AppDelegate,
-           appDelegate.performRulerHotkey(keyCode: Int(event.keyCode), sender: self) {
+           appDelegate.performRulerHotkey(
+               keyCode: Int(event.keyCode),
+               modifierFlags: keyboardModifiers,
+               sender: self
+           ) {
             return nil
         }
 

@@ -7,6 +7,12 @@ import SwiftUI
 final class ResizeHandleView: NSView {
 
     var color: RulerColors
+    var zeroCorner = prefs.zeroCorner {
+        didSet {
+            needsDisplay = true
+        }
+    }
+
     private let orientation: Orientation
     private var trackingArea: NSTrackingArea?
     private var dragInitialMouseLocation: NSPoint?
@@ -118,6 +124,7 @@ final class ResizeHandleView: NSView {
         )
         let nextFrame = resizedRulerFrame(
             orientation: orientation,
+            zeroCorner: prefs.zeroCorner,
             initialFrame: dragInitialWindowFrame,
             delta: delta,
             minSize: window.minSize,
@@ -153,14 +160,48 @@ final class ResizeHandleView: NSView {
     }
 
     func frame(in bounds: NSRect) -> NSRect {
+        return frame(in: bounds, zeroCorner: zeroCorner)
+    }
+
+    func frame(in bounds: NSRect, zeroCorner: ZeroCorner) -> NSRect {
+        let placement = ZeroCornerGeometry(zeroCorner: zeroCorner)
+            .resizeHandlePlacement(for: orientation)
+        let gripFrame = gripFrame(in: bounds, placement: placement)
+
+        return slotFrame(for: gripFrame, in: bounds, placement: placement)
+    }
+
+    private func gripFrame(in bounds: NSRect, placement: RulerCornerPlacement) -> NSRect {
         switch orientation {
         case .horizontal:
-            let topY = bounds.maxY - horizontalYOffset
-            let bottomY = topY - length
-            let firstX = bounds.maxX
-                - horizontalXOffset
-                - CGFloat(lineCount - 1) * lineSpacing
-                - 1
+            let bottomY: CGFloat
+            let firstX: CGFloat
+
+            switch placement.xSide {
+            case .left:
+                firstX = bounds.minX + horizontalXOffset + 1
+            case .right:
+                firstX = bounds.maxX
+                    - horizontalXOffset
+                    - CGFloat(lineCount - 1) * lineSpacing
+                    - 1
+            case .top, .bottom:
+                assertionFailure("Horizontal resize handle must be placed on a horizontal side")
+                firstX = bounds.maxX
+                    - horizontalXOffset
+                    - CGFloat(lineCount - 1) * lineSpacing
+                    - 1
+            }
+
+            switch placement.ySide {
+            case .top:
+                bottomY = bounds.maxY - horizontalYOffset - length
+            case .bottom:
+                bottomY = bounds.minY + horizontalYOffset
+            case .left, .right:
+                assertionFailure("Horizontal resize handle must be placed on a vertical side")
+                bottomY = bounds.maxY - horizontalYOffset - length
+            }
 
             return NSRect(
                 x: firstX - backgroundPadding,
@@ -169,9 +210,31 @@ final class ResizeHandleView: NSView {
                 height: length + (backgroundPadding * 2)
             )
         case .vertical:
-            let rightX = bounds.minX + verticalXOffset + length
-            let leftX = rightX - length
-            let firstY = bounds.minY + verticalYOffset + 1
+            let leftX: CGFloat
+            let firstY: CGFloat
+
+            switch placement.xSide {
+            case .left:
+                leftX = bounds.minX + verticalXOffset
+            case .right:
+                leftX = bounds.maxX - verticalXOffset - length
+            case .top, .bottom:
+                assertionFailure("Vertical resize handle must be placed on a horizontal side")
+                leftX = bounds.minX + verticalXOffset
+            }
+
+            switch placement.ySide {
+            case .top:
+                firstY = bounds.maxY
+                    - verticalYOffset
+                    - CGFloat(lineCount - 1) * lineSpacing
+                    - 1
+            case .bottom:
+                firstY = bounds.minY + verticalYOffset + 1
+            case .left, .right:
+                assertionFailure("Vertical resize handle must be placed on a vertical side")
+                firstY = bounds.minY + verticalYOffset + 1
+            }
 
             return NSRect(
                 x: leftX - backgroundPadding,
@@ -182,9 +245,49 @@ final class ResizeHandleView: NSView {
         }
     }
 
+    private func slotFrame(
+        for gripFrame: NSRect,
+        in bounds: NSRect,
+        placement: RulerCornerPlacement
+    ) -> NSRect {
+        let x: CGFloat
+        let y: CGFloat
+        let width: CGFloat
+        let height: CGFloat
+
+        switch placement.xSide {
+        case .left:
+            x = bounds.minX
+            width = gripFrame.maxX - bounds.minX
+        case .right:
+            x = gripFrame.minX
+            width = bounds.maxX - gripFrame.minX
+        case .top, .bottom:
+            assertionFailure("Resize handle slot must be anchored to a horizontal side")
+            x = gripFrame.minX
+            width = gripFrame.width
+        }
+
+        switch placement.ySide {
+        case .top:
+            y = gripFrame.minY
+            height = bounds.maxY - gripFrame.minY
+        case .bottom:
+            y = bounds.minY
+            height = gripFrame.maxY - bounds.minY
+        case .left, .right:
+            assertionFailure("Resize handle slot must be anchored to a vertical side")
+            y = gripFrame.minY
+            height = gripFrame.height
+        }
+
+        return NSRect(x: x, y: y, width: width, height: height)
+    }
+
     private func drawBackground() {
+        let gripRect = gripRect(in: bounds)
         let path = NSBezierPath(
-            roundedRect: bounds,
+            roundedRect: gripRect,
             xRadius: backgroundBorderRadius,
             yRadius: backgroundBorderRadius
         )
@@ -194,35 +297,82 @@ final class ResizeHandleView: NSView {
     }
 
     private func drawGripLines() {
+        let gripRect = gripRect(in: bounds)
+
         switch orientation {
         case .horizontal:
             for index in 0..<lineCount {
-                let x = backgroundPadding + CGFloat(index) * lineSpacing
+                let x = gripRect.minX + backgroundPadding + CGFloat(index) * lineSpacing
                 strokeLine(
-                    from: CGPoint(x: x + 0.5, y: backgroundPadding),
-                    to: CGPoint(x: x + 0.5, y: bounds.maxY - backgroundPadding),
+                    from: CGPoint(x: x + 0.5, y: gripRect.minY + backgroundPadding),
+                    to: CGPoint(x: x + 0.5, y: gripRect.maxY - backgroundPadding),
                     color: color.resizeHandleLight
                 )
                 strokeLine(
-                    from: CGPoint(x: x + 1.5, y: backgroundPadding),
-                    to: CGPoint(x: x + 1.5, y: bounds.maxY - backgroundPadding),
+                    from: CGPoint(x: x + 1.5, y: gripRect.minY + backgroundPadding),
+                    to: CGPoint(x: x + 1.5, y: gripRect.maxY - backgroundPadding),
                     color: color.resizeHandleShadow
                 )
             }
         case .vertical:
             for index in 0..<lineCount {
-                let y = backgroundPadding + 1 + CGFloat(index) * lineSpacing
+                let y = gripRect.minY + backgroundPadding + 1 + CGFloat(index) * lineSpacing
                 strokeLine(
-                    from: CGPoint(x: backgroundPadding, y: y + 0.5),
-                    to: CGPoint(x: bounds.maxX - backgroundPadding, y: y + 0.5),
+                    from: CGPoint(x: gripRect.minX + backgroundPadding, y: y + 0.5),
+                    to: CGPoint(x: gripRect.maxX - backgroundPadding, y: y + 0.5),
                     color: color.resizeHandleLight
                 )
                 strokeLine(
-                    from: CGPoint(x: backgroundPadding, y: y - 0.5),
-                    to: CGPoint(x: bounds.maxX - backgroundPadding, y: y - 0.5),
+                    from: CGPoint(x: gripRect.minX + backgroundPadding, y: y - 0.5),
+                    to: CGPoint(x: gripRect.maxX - backgroundPadding, y: y - 0.5),
                     color: color.resizeHandleShadow
                 )
             }
+        }
+    }
+
+    private func gripRect(in bounds: NSRect) -> NSRect {
+        let placement = ZeroCornerGeometry(zeroCorner: zeroCorner)
+            .resizeHandlePlacement(for: orientation)
+        let gripSize = self.gripSize()
+        let x: CGFloat
+        let y: CGFloat
+
+        switch placement.xSide {
+        case .left:
+            x = bounds.maxX - gripSize.width
+        case .right:
+            x = bounds.minX
+        case .top, .bottom:
+            assertionFailure("Resize handle grip must be anchored to a horizontal side")
+            x = bounds.minX
+        }
+
+        switch placement.ySide {
+        case .top:
+            y = bounds.minY
+        case .bottom:
+            y = bounds.maxY - gripSize.height
+        case .left, .right:
+            assertionFailure("Resize handle grip must be anchored to a vertical side")
+            y = bounds.minY
+        }
+
+        return NSRect(origin: NSPoint(x: x, y: y), size: gripSize)
+    }
+
+    private func gripSize() -> NSSize {
+        switch orientation {
+        case .horizontal:
+            return NSSize(
+                width: CGFloat(lineCount - 1) * lineSpacing + 2 + (backgroundPadding * 2),
+                height: length + (backgroundPadding * 2)
+            )
+        case .vertical:
+            return NSSize(
+                width: length + (backgroundPadding * 2),
+                height: CGFloat(lineCount - 1) * lineSpacing + 2 + (backgroundPadding * 2)
+            )
         }
     }
 
@@ -267,28 +417,59 @@ private func screenLocation(for event: NSEvent, in window: NSWindow) -> NSPoint 
 
 func resizedRulerFrame(
     orientation: Orientation,
+    zeroCorner: ZeroCorner = .topLeft,
     initialFrame: NSRect,
     delta: NSSize,
     minSize: NSSize,
     maxSize: NSSize
 ) -> NSRect {
+    let resizeSide = ZeroCornerGeometry(zeroCorner: zeroCorner).resizeSide(for: orientation)
+
     switch orientation {
     case .horizontal:
-        let width = clamp(initialFrame.width + delta.width, minSize.width, maxSize.width)
-        return NSRect(
-            x: initialFrame.minX,
-            y: initialFrame.minY,
-            width: width,
-            height: initialFrame.height
-        )
+        switch resizeSide {
+        case .left:
+            let width = clamp(initialFrame.width - delta.width, minSize.width, maxSize.width)
+            return NSRect(
+                x: initialFrame.maxX - width,
+                y: initialFrame.minY,
+                width: width,
+                height: initialFrame.height
+            )
+        case .right:
+            let width = clamp(initialFrame.width + delta.width, minSize.width, maxSize.width)
+            return NSRect(
+                x: initialFrame.minX,
+                y: initialFrame.minY,
+                width: width,
+                height: initialFrame.height
+            )
+        case .top, .bottom:
+            assertionFailure("Horizontal ruler resize side must be left or right")
+            return initialFrame
+        }
     case .vertical:
-        let height = clamp(initialFrame.height - delta.height, minSize.height, maxSize.height)
-        return NSRect(
-            x: initialFrame.minX,
-            y: initialFrame.maxY - height,
-            width: initialFrame.width,
-            height: height
-        )
+        switch resizeSide {
+        case .top:
+            let height = clamp(initialFrame.height + delta.height, minSize.height, maxSize.height)
+            return NSRect(
+                x: initialFrame.minX,
+                y: initialFrame.minY,
+                width: initialFrame.width,
+                height: height
+            )
+        case .bottom:
+            let height = clamp(initialFrame.height - delta.height, minSize.height, maxSize.height)
+            return NSRect(
+                x: initialFrame.minX,
+                y: initialFrame.maxY - height,
+                width: initialFrame.width,
+                height: height
+            )
+        case .left, .right:
+            assertionFailure("Vertical ruler resize side must be top or bottom")
+            return initialFrame
+        }
     }
 }
 
