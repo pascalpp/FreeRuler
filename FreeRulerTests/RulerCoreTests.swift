@@ -377,7 +377,7 @@ final class RulerCoreTests: XCTestCase {
         }
     }
 
-    func testResizeHandlesAreVisuallyObscuredWhenMouseTickOverlaps() {
+    func testResizeHandlesAreVisuallyObscuredFromLeadingEdgeToRulerEnd() {
         withRestoredZeroCornerPreference {
             prefs.zeroCorner = .topLeft
             let horizontalRule = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
@@ -393,11 +393,17 @@ final class RulerCoreTests: XCTestCase {
             XCTAssertFalse(horizontalHandle.isHidden)
             XCTAssertEqual(horizontalHandle.alphaValue, 0)
 
+            horizontalRule.mouseTickX = horizontalHandle.frame.maxX + 1
+            XCTAssertEqual(horizontalHandle.alphaValue, 0)
+
             horizontalRule.mouseTickX = horizontalHandle.frame.minX - 1
             XCTAssertEqual(horizontalHandle.alphaValue, 1)
 
             verticalRule.mouseTickY = verticalHandle.frame.midY
             XCTAssertFalse(verticalHandle.isHidden)
+            XCTAssertEqual(verticalHandle.alphaValue, 0)
+
+            verticalRule.mouseTickY = verticalHandle.frame.minY - 1
             XCTAssertEqual(verticalHandle.alphaValue, 0)
 
             verticalRule.mouseTickY = verticalHandle.frame.maxY + 1
@@ -406,6 +412,30 @@ final class RulerCoreTests: XCTestCase {
             verticalRule.mouseTickY = verticalHandle.frame.midY
             verticalRule.showMouseTick = false
             XCTAssertEqual(verticalHandle.alphaValue, 1)
+
+            prefs.zeroCorner = .topRight
+            let leftEdgeRule = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
+            guard let leftEdgeHandle = leftEdgeRule.subviews.first(where: { $0 is ResizeHandleView }) as? ResizeHandleView else {
+                return XCTFail("Expected horizontal ruler to install a resize handle")
+            }
+
+            leftEdgeRule.mouseTickX = leftEdgeHandle.frame.minX - 1
+            XCTAssertEqual(leftEdgeHandle.alphaValue, 0)
+
+            leftEdgeRule.mouseTickX = leftEdgeHandle.frame.maxX + 1
+            XCTAssertEqual(leftEdgeHandle.alphaValue, 1)
+
+            prefs.zeroCorner = .bottomLeft
+            let topEdgeRule = VerticalRule(frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
+            guard let topEdgeHandle = topEdgeRule.subviews.first(where: { $0 is ResizeHandleView }) as? ResizeHandleView else {
+                return XCTFail("Expected vertical ruler to install a resize handle")
+            }
+
+            topEdgeRule.mouseTickY = topEdgeHandle.frame.maxY + 1
+            XCTAssertEqual(topEdgeHandle.alphaValue, 0)
+
+            topEdgeRule.mouseTickY = topEdgeHandle.frame.minY - 1
+            XCTAssertEqual(topEdgeHandle.alphaValue, 1)
         }
     }
 

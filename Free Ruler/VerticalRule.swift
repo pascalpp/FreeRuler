@@ -187,7 +187,13 @@ class VerticalRule: RuleView {
             return
         }
 
-        setResizeHandleObscured(frame.minY <= mouseTickY && mouseTickY <= frame.maxY)
+        setResizeHandleObscured(
+            resizeHandleEndRegionContains(
+                tickPosition: mouseTickY,
+                orientation: .vertical,
+                handleFrame: frame
+            )
+        )
     }
 
     func tickY(
