@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		50A137032D03A00000137C0D /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50A137022D03A00000137C0D /* XCTest.framework */; };
 		50A147032D03C00000147C0D /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50A137022D03A00000137C0D /* XCTest.framework */; };
-		50B1D3732D06120000B1D141 /* UITestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1D3702D06120000B1D140 /* UITestSupport.swift */; };
 		DA8EDBA823F8AC60DD774681 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 7201D59F68C1B65518A4C10A /* Sparkle */; };
 /* End PBXBuildFile section */
 
@@ -56,7 +55,6 @@
 		50A137022D03A00000137C0D /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = System/Library/Frameworks/XCTest.framework; sourceTree = SDKROOT; };
 		50A137042D03A00000137C0D /* FreeRulerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FreeRulerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		50A147022D03C00000147C0D /* FreeRulerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FreeRulerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		50B1D3702D06120000B1D140 /* UITestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Free Ruler/UITestSupport.swift"; sourceTree = SOURCE_ROOT; };
 		6F4102852260712F00F06A10 /* Free Ruler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Free Ruler.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB053EE93E1DC9AF341A8D4F /* Free Ruler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Free Ruler.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -65,24 +63,47 @@
 		50F208010000000000000001 /* Exceptions for "Free Ruler" folder in "Free Ruler" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
 				Info.github.plist,
-				Free_Ruler.entitlements,
-				Free_Ruler.github.entitlements,
+				Info.plist,
 			);
 			target = 6F4102842260712F00F06A10 /* Free Ruler */;
 		};
 		50F208020000000000000002 /* Exceptions for "Free Ruler" folder in "Free Ruler GitHub" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
 				Info.github.plist,
-				Free_Ruler.entitlements,
-				Free_Ruler.github.entitlements,
+				Info.plist,
 			);
 			target = FC9DC639BBDB0F3C10FD4344 /* Free Ruler GitHub */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		50A137062D03A00000137C0D /* FreeRulerTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = FreeRulerTests;
+			sourceTree = "<group>";
+		};
+		50A147072D03C00000147C0D /* FreeRulerUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = FreeRulerUITests;
+			sourceTree = "<group>";
+		};
+		50B5DB0C2FDF402A0056ECF4 /* FreeRulerUITestSupport */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = FreeRulerUITestSupport;
+			sourceTree = "<group>";
+		};
+		6F4102872260712F00F06A10 /* Free Ruler */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				50F208010000000000000001 /* Exceptions for "Free Ruler" folder in "Free Ruler" target */,
+				50F208020000000000000002 /* Exceptions for "Free Ruler" folder in "Free Ruler GitHub" target */,
+			);
+			path = "Free Ruler";
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		50A137052D03A00000137C0D /* Frameworks */ = {
@@ -118,31 +139,6 @@
 		};
 /* End PBXFrameworksBuildPhase section */
 
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		50A137062D03A00000137C0D /* FreeRulerTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = FreeRulerTests;
-			sourceTree = "<group>";
-		};
-		50A147072D03C00000147C0D /* FreeRulerUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = FreeRulerUITests;
-			sourceTree = "<group>";
-		};
-		6F4102872260712F00F06A10 /* Free Ruler */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				50F208010000000000000001 /* Exceptions for "Free Ruler" folder in "Free Ruler" target */,
-				50F208020000000000000002 /* Exceptions for "Free Ruler" folder in "Free Ruler GitHub" target */,
-			);
-			explicitFolders = (
-				FreeRuler.help,
-			);
-			path = "Free Ruler";
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
-
 /* Begin PBXGroup section */
 		50A137072D03A00000137C0D /* Frameworks */ = {
 			isa = PBXGroup;
@@ -166,6 +162,7 @@
 				6F4102872260712F00F06A10 /* Free Ruler */,
 				50A137062D03A00000137C0D /* FreeRulerTests */,
 				50A147072D03C00000147C0D /* FreeRulerUITests */,
+				50B5DB0C2FDF402A0056ECF4 /* FreeRulerUITestSupport */,
 				50A137072D03A00000137C0D /* Frameworks */,
 				6F4102862260712F00F06A10 /* Products */,
 			);
@@ -221,6 +218,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				50A147072D03C00000147C0D /* FreeRulerUITests */,
+				50B5DB0C2FDF402A0056ECF4 /* FreeRulerUITestSupport */,
 			);
 			name = FreeRulerUITests;
 			productName = FreeRulerUITests;
@@ -243,6 +241,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				6F4102872260712F00F06A10 /* Free Ruler */,
+				50B5DB0C2FDF402A0056ECF4 /* FreeRulerUITestSupport */,
 			);
 			name = "Free Ruler";
 			productName = "Free Ruler";
@@ -263,6 +262,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				6F4102872260712F00F06A10 /* Free Ruler */,
+				50B5DB0C2FDF402A0056ECF4 /* FreeRulerUITestSupport */,
 			);
 			name = "Free Ruler GitHub";
 			packageProductDependencies = (
@@ -307,6 +307,7 @@
 				"zh-Hans",
 				ja,
 				es,
+				"zh-hans",
 			);
 			mainGroup = 6F41027C2260712F00F06A10;
 			minimizedProjectReferenceProxies = 1;
@@ -369,7 +370,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				50B1D3732D06120000B1D141 /* UITestSupport.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
