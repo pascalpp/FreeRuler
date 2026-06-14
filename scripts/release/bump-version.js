@@ -142,7 +142,7 @@ async function promptForInput(lineIterator, text) {
   const normalizedAnswer = answer.toLowerCase();
 
   if (normalizedAnswer === "" || normalizedAnswer === "y" || normalizedAnswer === "yes") {
-    run("git", ["add", "package.json", "Free Ruler.xcodeproj/project.pbxproj", "Free Ruler/FreeRuler.help/Contents/Info.plist"]);
+    run("git", ["add", "package.json", "Free Ruler.xcodeproj/project.pbxproj"]);
     run("git", ["commit", "-m", `Bump version to ${nextVersion}`]);
     run("git", ["push", "origin", "main"]);
     console.log(`Committed and pushed v${nextVersion} (${buildNumber}).`);
