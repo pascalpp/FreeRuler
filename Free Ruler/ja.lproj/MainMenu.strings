@@ -17,8 +17,8 @@
 /* Class = "NSMenuItem"; title = "Redo"; ObjectID = "6dh-zS-Vam"; */
 "6dh-zS-Vam.title" = "やり直し";
 
-/* Class = "NSMenuItem"; title = "Reset Ruler Positions"; ObjectID = "6ph-5N-O9R"; */
-"6ph-5N-O9R.title" = "定規の位置を元に戻す";
+/* Class = "NSMenuItem"; title = "Reset Rulers"; ObjectID = "6ph-5N-O9R"; */
+"6ph-5N-O9R.title" = "定規をリセット";
 
 /* Class = "NSMenuItem"; title = "Group Rulers"; ObjectID = "7Ga-Fb-LLc"; */
 "7Ga-Fb-LLc.title" = "定規をグループ化";

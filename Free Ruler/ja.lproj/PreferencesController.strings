@@ -1,6 +1,6 @@
 
-/* Class = "NSButtonCell"; title = "Reset Ruler Positions"; ObjectID = "10f-9L-qca"; */
-"10f-9L-qca.title" = "定規の位置を元に戻す";
+/* Class = "NSButtonCell"; title = "Reset Rulers"; ObjectID = "10f-9L-qca"; */
+"10f-9L-qca.title" = "定規をリセット";
 
 /* Class = "NSTextFieldCell"; title = "Foreground Opacity"; ObjectID = "BgV-9N-IVn"; */
 "BgV-9N-IVn.title" = "前景の不透明度";

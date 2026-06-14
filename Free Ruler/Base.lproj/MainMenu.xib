@@ -231,7 +231,7 @@
                                     <action selector="alignRulersAtMouseLocation:" target="Voe-Tx-rLC" id="sGx-h4-she"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Reset Ruler Positions" keyEquivalent="r" id="6ph-5N-O9R">
+                            <menuItem title="Reset Rulers" keyEquivalent="r" id="6ph-5N-O9R">
                                 <connections>
                                     <action selector="resetRulerPositions:" target="Voe-Tx-rLC" id="fZ7-JH-EKI"/>
                                 </connections>

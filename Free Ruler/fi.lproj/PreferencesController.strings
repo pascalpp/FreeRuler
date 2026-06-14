@@ -1,6 +1,6 @@
 
-/* Class = "NSButtonCell"; title = "Reset Ruler Positions"; ObjectID = "10f-9L-qca"; */
-"10f-9L-qca.title" = "Nollaa viivainten sijainnit";
+/* Class = "NSButtonCell"; title = "Reset Rulers"; ObjectID = "10f-9L-qca"; */
+"10f-9L-qca.title" = "Nollaa viivaimet";
 
 /* Class = "NSTextFieldCell"; title = "Foreground Opacity"; ObjectID = "BgV-9N-IVn"; */
 "BgV-9N-IVn.title" = "Peittävyys edustalla";

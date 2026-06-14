@@ -17,8 +17,8 @@
 /* Class = "NSMenuItem"; title = "Redo"; ObjectID = "6dh-zS-Vam"; */
 "6dh-zS-Vam.title" = "Rehacer";
 
-/* Class = "NSMenuItem"; title = "Reset Ruler Positions"; ObjectID = "6ph-5N-O9R"; */
-"6ph-5N-O9R.title" = "Restablecer posiciones de las reglas";
+/* Class = "NSMenuItem"; title = "Reset Rulers"; ObjectID = "6ph-5N-O9R"; */
+"6ph-5N-O9R.title" = "Restablecer reglas";
 
 /* Class = "NSMenuItem"; title = "Group Rulers"; ObjectID = "7Ga-Fb-LLc"; */
 "7Ga-Fb-LLc.title" = "Agrupar reglas";
