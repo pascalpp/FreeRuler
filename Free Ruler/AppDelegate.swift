@@ -504,14 +504,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         prefs.zeroCorner = Prefs.defaultZeroCorner
 
         // ungroup rulers during reset operation
-        let groupRulers = prefs.groupRulers
         prefs.groupRulers = false
         for ruler in rulers {
             ruler.resetPosition()
             showRuler(ruler)
         }
-        // reset groupRulers to previous value
-        prefs.groupRulers = groupRulers
+
+        prefs.groupRulers = Prefs.defaultGroupRulers
         updateRulerGrouping()
     }
 

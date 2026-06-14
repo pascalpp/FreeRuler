@@ -136,6 +136,10 @@ extension Prefs {
     static var defaultRulerFillColor: NSColor {
         return defaultRulerColor
     }
+  
+    static var defaultGroupRulers: Bool {
+        return true
+    }
 
     static func rulerFillColor(fromArchivedData data: Data?) -> NSColor {
         return normalizedRulerColor(unarchiveColor(data) ?? defaultRulerColor)
