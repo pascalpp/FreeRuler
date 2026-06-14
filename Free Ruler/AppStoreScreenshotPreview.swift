@@ -560,25 +560,25 @@ private enum AppStoreFlipScreenshotLayout {
     static let topLeftY: CGFloat = 280
     static let topLeftHorizontalLength: CGFloat = 2260
     static let topLeftVerticalLength: CGFloat = 1420
-    static let topLeftRulerColor = #colorLiteral(red: 0.6087534469, green: 0.820760822, blue: 0.9005485372, alpha: 1)
+    static let topLeftRulerColor = #colorLiteral(red: 0.95, green: 0.7125, blue: 0.8019480475, alpha: 1)
 
     static let topRightX: CGFloat = 520
     static let topRightY: CGFloat = 510
-    static let topRightHorizontalLength: CGFloat = 1790
+    static let topRightHorizontalLength: CGFloat = 1783
     static let topRightVerticalLength: CGFloat = 957
-    static let topRightRulerColor = #colorLiteral(red: 0.9411764741, green: 0.5226356855, blue: 0.3855913656, alpha: 1)
+    static let topRightRulerColor = #colorLiteral(red: 0.98, green: 0.735, blue: 0.8272727226, alpha: 1)
 
     static let bottomRightX: CGFloat = 280
     static let bottomRightY: CGFloat = 280
     static let bottomRightHorizontalLength: CGFloat = 2260
     static let bottomRightVerticalLength: CGFloat = 1420
-    static let bottomRightRulerColor = #colorLiteral(red: 0.4883768284, green: 0.8372174202, blue: 0.4186087101, alpha: 1)
+    static let bottomRightRulerColor = #colorLiteral(red: 0.95, green: 0.7125, blue: 0.8019480475, alpha: 1)
 
     static let bottomLeftX: CGFloat = 520
     static let bottomLeftY: CGFloat = 510
-    static let bottomLeftHorizontalLength: CGFloat = 1790
+    static let bottomLeftHorizontalLength: CGFloat = 1783
     static let bottomLeftVerticalLength: CGFloat = 957
-    static let bottomLeftRulerColor = #colorLiteral(red: 0.9607843161, green: 0.7421451104, blue: 0.3082303408, alpha: 1)
+    static let bottomLeftRulerColor = #colorLiteral(red: 0.98, green: 0.735, blue: 0.8272727227, alpha: 1)
 
     static var copyViewLayout: AppStoreScreenshotCopyViewLayout {
         AppStoreScreenshotCopyViewLayout(
