@@ -83,14 +83,18 @@ Use Xcode's command-line tools from the repository root:
 ```sh
 xcodebuild -project "Free Ruler.xcodeproj" -scheme "Free Ruler" build
 xcodebuild -project "Free Ruler.xcodeproj" -scheme "Free Ruler" test -only-testing:FreeRulerTests
+yarn test
+yarn test:unit
+yarn test:ui
 ```
 
 For focused test work, prefer the smallest relevant Xcode test invocation first,
 then run the core/unit tests if the change affects shared behavior. Do not run
 the UI tests unless the user explicitly asks for them.
 
-The `package.json` scripts are for versioning and release automation, not the
-normal test suite. `npm test` is intentionally not wired to the Xcode tests.
+The `package.json` test scripts are aliases for the Xcode test commands:
+`yarn test:unit` runs `FreeRulerTests`; `yarn test:ui` runs
+`FreeRulerUITests`; `yarn test` runs both.
 
 ## App Behavior Notes
 
