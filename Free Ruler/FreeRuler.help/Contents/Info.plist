@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en_US</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.pascal.freeruler.help</string>
+	<string>com.pascal.freeruler.help.492</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -17,7 +17,7 @@
 	<key>CFBundleSignature</key>
 	<string>hbwr</string>
 	<key>CFBundleVersion</key>
-	<string>491</string>
+	<string>492</string>
 	<key>HPDBookAccessPath</key>
 	<string>FreeRuler.html</string>
 	<key>HPDBookIconPath</key>

@@ -44,6 +44,7 @@ helpInfo = replacePlistString(helpInfo, "HPDBookKBProduct", `freeruler${version}
 
 if (build) {
   helpInfo = replacePlistString(helpInfo, "CFBundleVersion", build);
+  helpInfo = replacePlistString(helpInfo, "CFBundleIdentifier", `com.pascal.freeruler.help.${build}`);
 }
 
 fs.writeFileSync(helpInfoPath, helpInfo);
