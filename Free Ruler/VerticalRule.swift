@@ -96,7 +96,7 @@ class VerticalRule: RuleView {
         color.ticks.setStroke()
         path.stroke()
 
-        if !showMouseTick || self.windowHeight - mouseTickY < 0 || windowHeight - mouseTickY > 18 {
+        if shouldDrawUnitLabel(mouseTickY: mouseTickY, rulerHeight: windowHeight) {
             drawUnitLabel()
         }
 
@@ -282,5 +282,19 @@ class VerticalRule: RuleView {
         return CGRect(x: x, y: y, width: labelSize.width, height: labelSize.height)
     }
 
+    func shouldDrawUnitLabel(mouseTickY: CGFloat, rulerHeight: CGFloat) -> Bool {
+        guard showMouseTick else {
+            return true
+        }
+
+        let growthDirection = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner).growthDirection(for: .vertical)
+
+        switch growthDirection {
+        case .positive:
+            return mouseTickY < 0 || mouseTickY > 18
+        case .negative:
+            return mouseTickY < rulerHeight - 18 || mouseTickY > rulerHeight
+        }
+    }
 
 }
