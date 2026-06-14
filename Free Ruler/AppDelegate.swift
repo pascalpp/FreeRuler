@@ -1,5 +1,4 @@
 import Cocoa
-import Carbon
 import Carbon.HIToolbox
 #if DEBUG
 import Darwin
@@ -473,23 +472,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         if preferencesController != nil {
             preferencesController?.showWindow(self)
-        }
-    }
-
-    @IBAction func showFreeRulerHelp(_ sender: Any) {
-        let helpManager = NSHelpManager.shared
-        helpManager.registerBooks(in: Bundle.main)
-        AHRegisterHelpBookWithURL(Bundle.main.bundleURL as CFURL)
-
-        let status: OSStatus
-        if let bookName = Bundle.main.object(forInfoDictionaryKey: "CFBundleHelpBookName") as? String {
-            status = AHGotoPage(bookName as CFString, "FreeRuler.html" as CFString, "WelcomePage" as CFString)
-        } else {
-            status = OSStatus(paramErr)
-        }
-
-        if status != noErr {
-            helpManager.openHelpAnchor("WelcomePage", inBook: nil)
         }
     }
 
