@@ -92,19 +92,19 @@ struct ZeroCornerGeometry {
     }
 
     var horizontalTickSide: RulerVerticalSide {
-        return verticalZeroSide == .top ? .bottom : .top
+        return verticalZeroSide.opposite
     }
 
     var verticalTickSide: RulerHorizontalSide {
-        return horizontalZeroSide == .left ? .right : .left
+        return horizontalZeroSide.opposite
     }
 
     var horizontalResizeSide: RulerHorizontalSide {
-        return horizontalZeroSide == .left ? .right : .left
+        return horizontalZeroSide.opposite
     }
 
     var verticalResizeSide: RulerVerticalSide {
-        return verticalZeroSide == .top ? .bottom : .top
+        return verticalZeroSide.opposite
     }
 
     func resizeHandlePlacement(for orientation: Orientation) -> RulerCornerPlacement {
