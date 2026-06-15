@@ -35,8 +35,8 @@ class HorizontalRule: RuleView {
 
         let attrs = labelAttributes(alignment: .center, foregroundColor: color.numbers)
 
-        let width = dirtyRect.width
-        let height = dirtyRect.height
+        let width = bounds.width
+        let height = bounds.height
         let path = NSBezierPath()
         let tickLayout = RulerTickLayout(unit: unit, screen: screen)
         let geometry = ZeroCornerGeometry(zeroCorner: zeroCorner)
@@ -98,10 +98,14 @@ class HorizontalRule: RuleView {
         color.ticks.setStroke()
         path.stroke()
 
+        if showsZeroTick {
+            drawZeroTick()
+        }
+
         updateUnitLabelVisibility()
 
         // Draw the MouseTick & number
-        if showMouseTick && mouseTickX > 0 && mouseTickX < self.windowWidth {
+        if showMouseTick && mouseTickX >= bounds.minX && mouseTickX <= bounds.maxX {
             drawMouseTick(mouseTickX)
             drawMouseNumber(mouseTickX)
         }
@@ -109,9 +113,11 @@ class HorizontalRule: RuleView {
     }
 
     override func drawMouseTick(at mouseLoc: NSPoint) {
-        let windowX = self.window?.frame.origin.x ?? 0
-        let mouseX = mouseLoc.x
-        self.mouseTickX = mouseX - windowX
+        guard let window = window else { return }
+
+        let windowPoint = window.convertPoint(fromScreen: mouseLoc)
+        let viewPoint = convert(windowPoint, from: nil)
+        mouseTickX = viewPoint.x
     }
 
     func drawMouseTick(_ mouseTickX: CGFloat) {
@@ -127,6 +133,35 @@ class HorizontalRule: RuleView {
 
         color.mouseTick.setStroke()
         mouseTick.stroke()
+    }
+
+    func drawZeroTick() {
+        let geometry = ZeroCornerGeometry(zeroCorner: zeroCorner)
+        let growthDirection = geometry.growthDirection(for: .horizontal)
+        let zeroTickX: CGFloat
+
+        switch growthDirection {
+        case .positive:
+            zeroTickX = bounds.minX
+        case .negative:
+            zeroTickX = bounds.maxX
+        }
+
+        let lineX = mouseTickLineX(forTickX: zeroTickX, growthDirection: growthDirection)
+        let tickLine = tickLine(
+            forX: lineX,
+            length: 10,
+            rulerHeight: bounds.height,
+            tickSide: geometry.horizontalTickSide
+        )
+        let path = NSBezierPath()
+
+        path.move(to: tickLine.start)
+        path.line(to: tickLine.end)
+        path.transform(using: transformer)
+
+        color.ticks.setStroke()
+        path.stroke()
     }
 
     func drawMouseNumber(_ mouseTickX: CGFloat) {

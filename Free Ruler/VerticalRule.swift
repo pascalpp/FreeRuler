@@ -26,6 +26,10 @@ class VerticalRule: RuleView {
         }
     }
 
+    var rulerWidth: CGFloat {
+        return bounds.width
+    }
+
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
 
@@ -33,8 +37,8 @@ class VerticalRule: RuleView {
         color.fill.setFill()
         dirtyRect.fill()
 
-        let width = dirtyRect.width
-        let height = dirtyRect.height
+        let width = rulerWidth
+        let height = bounds.height
         let path = NSBezierPath()
         let tickLayout = RulerTickLayout(unit: unit, screen: screen)
         let geometry = ZeroCornerGeometry(zeroCorner: zeroCorner)
@@ -100,30 +104,35 @@ class VerticalRule: RuleView {
         color.ticks.setStroke()
         path.stroke()
 
+        if showsZeroTick {
+            drawZeroTick()
+        }
+
         updateUnitLabelVisibility()
 
         // Draw the MouseTick & number
-        if showMouseTick && mouseTickY >= 1 && mouseTickY < windowHeight {
+        if showMouseTick && mouseTickY >= bounds.minY && mouseTickY <= bounds.maxY {
             drawMouseTick(mouseTickY)
             drawMouseNumber(mouseTickY)
         }
     }
 
     override func drawMouseTick(at mouseLoc: NSPoint) {
-        let windowY = self.window?.frame.origin.y ?? 0
-        let mouseY = mouseLoc.y
-        self.mouseTickY = mouseY - windowY
+        guard let window = window else { return }
+
+        let windowPoint = window.convertPoint(fromScreen: mouseLoc)
+        let viewPoint = convert(windowPoint, from: nil)
+        mouseTickY = viewPoint.y
     }
 
     func drawMouseTick(_ mouseTickY: CGFloat) {
         let mouseTick = NSBezierPath()
-        let width: CGFloat = 40
         let startX: CGFloat = 0
         let growthDirection = ZeroCornerGeometry(zeroCorner: zeroCorner).growthDirection(for: .vertical)
         let lineY = mouseTickLineY(forTickY: mouseTickY, growthDirection: growthDirection)
 
         mouseTick.move(to: CGPoint(x: startX, y: lineY))
-        mouseTick.line(to: CGPoint(x: width, y: lineY))
+        mouseTick.line(to: CGPoint(x: rulerWidth, y: lineY))
 
         mouseTick.transform(using: transformer)
 
@@ -131,8 +140,38 @@ class VerticalRule: RuleView {
         mouseTick.stroke()
     }
 
+    func drawZeroTick() {
+        let geometry = ZeroCornerGeometry(zeroCorner: zeroCorner)
+        let growthDirection = geometry.growthDirection(for: .vertical)
+        let zeroTickY: CGFloat
+
+        switch growthDirection {
+        case .positive:
+            zeroTickY = bounds.minY
+        case .negative:
+            zeroTickY = bounds.maxY
+        }
+
+        let lineY = mouseTickLineY(forTickY: zeroTickY, growthDirection: growthDirection)
+        let tickLine = tickLine(
+            forY: lineY,
+            length: 10,
+            rulerWidth: rulerWidth,
+            tickSide: geometry.verticalTickSide
+        )
+        let path = NSBezierPath()
+
+        path.move(to: tickLine.start)
+        path.line(to: tickLine.end)
+        path.transform(using: transformer)
+
+        color.ticks.setStroke()
+        path.stroke()
+    }
+
     func drawMouseNumber(_ mouseTickY: CGFloat) {
         let height = self.frame.height
+        let width = rulerWidth
         let number = mouseNumber(forTickY: mouseTickY, rulerHeight: height)
 
         let attributes = labelAttributes(alignment: .left, foregroundColor: color.mouseNumber)
@@ -144,12 +183,12 @@ class VerticalRule: RuleView {
         let labelRect = mouseNumberLabelRect(
             tickY: mouseTickY,
             labelSize: labelSize,
-            rulerSize: CGSize(width: self.frame.width, height: height)
+            rulerSize: CGSize(width: width, height: height)
         )
         let backgroundRect = mouseNumberLabelBackgroundRect(
             tickY: mouseTickY,
             labelSize: labelSize,
-            rulerSize: CGSize(width: self.frame.width, height: height)
+            rulerSize: CGSize(width: width, height: height)
         )
 
         guard NSGraphicsContext.current != nil else { return }
@@ -196,7 +235,20 @@ class VerticalRule: RuleView {
             return
         }
 
-        setUnitLabelHidden(frame.minY <= mouseTickY && mouseTickY <= frame.maxY)
+        let number = mouseNumber(forTickY: mouseTickY, rulerHeight: bounds.height)
+        let mouseNumber = getMouseNumberLabel(number)
+        let attributes = labelAttributes(alignment: .left, foregroundColor: color.mouseNumber)
+        let labelSize = NSAttributedString(string: mouseNumber, attributes: attributes).size()
+        let backgroundRect = mouseNumberLabelBackgroundRect(
+            tickY: mouseTickY,
+            labelSize: labelSize,
+            rulerSize: CGSize(width: rulerWidth, height: bounds.height)
+        )
+
+        setUnitLabelHidden(
+            (frame.minY <= mouseTickY && mouseTickY <= frame.maxY)
+                || frame.intersects(backgroundRect)
+        )
     }
 
     override func updateResizeHandleVisibility() {

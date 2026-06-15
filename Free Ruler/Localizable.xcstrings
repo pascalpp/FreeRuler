@@ -43,6 +43,18 @@
         }
       }
     },
+    "Grouped Rulers" : {
+      "comment" : "Window title for the grouped ruler window",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grouped Rulers"
+          }
+        }
+      }
+    },
     "Hide Horizontal Ruler" : {
       "comment" : "Menu item title to hide the horizontal ruler",
       "extractionState" : "manual",

@@ -326,6 +326,38 @@ struct MouseTickLabelLayout {
     }
 }
 
+class RulerBorderView: NSView {
+    static let borderColor = NSColor(calibratedWhite: 0, alpha: 0.5)
+    static let borderWidth: CGFloat = 1
+    static let borderCenterInset: CGFloat = borderWidth / 2
+
+    override var isOpaque: Bool {
+        return false
+    }
+
+    override func hitTest(_ point: NSPoint) -> NSView? {
+        return nil
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
+
+        let path = borderPath(in: bounds)
+        path.lineWidth = Self.borderWidth
+        path.lineJoinStyle = .miter
+        path.lineCapStyle = .butt
+        Self.borderColor.setStroke()
+        path.stroke()
+    }
+
+    func borderPath(in bounds: NSRect) -> NSBezierPath {
+        return NSBezierPath(rect: bounds.insetBy(
+            dx: Self.borderCenterInset,
+            dy: Self.borderCenterInset
+        ))
+    }
+}
+
 class RuleView: NSView {
 
     var color = RulerColors() {
@@ -337,6 +369,7 @@ class RuleView: NSView {
     }
     private var resizeHandleView: ResizeHandleView?
     private var unitLabelView: UnitLabelView?
+    private var borderView: RulerBorderView?
 
     var trackingArea: NSTrackingArea?
     let trackingAreaOptions: NSTrackingArea.Options = [
@@ -390,6 +423,7 @@ class RuleView: NSView {
         updateUnitLabelFrame()
         updateResizeHandleVisibility()
         updateUnitLabelVisibility()
+        updateBorderFrame()
     }
 
     func installResizeHandle(for orientation: Orientation) {
@@ -422,12 +456,19 @@ class RuleView: NSView {
         setNeedsDisplay(visibleRect)
         resizeHandleView?.needsDisplay = true
         unitLabelView?.needsDisplay = true
+        borderView?.needsDisplay = true
     }
 
     func installWindowBorder() {
-        wantsLayer = true
-        layer?.borderColor = CGColor(gray: 0, alpha: 0.5)
-        layer?.borderWidth = 1.0
+        if borderView == nil {
+            let view = RulerBorderView(frame: bounds)
+            view.autoresizingMask = [.width, .height]
+            addSubview(view, positioned: .above, relativeTo: nil)
+            borderView = view
+        }
+
+        updateBorderFrame()
+        borderView?.needsDisplay = true
     }
 
     var windowWidth: CGFloat {
@@ -447,7 +488,19 @@ class RuleView: NSView {
             }
         }
     }
-    
+
+    var showsUnitLabel: Bool = true {
+        didSet {
+            updateUnitLabelVisibility()
+        }
+    }
+
+    var showsZeroTick: Bool = false {
+        didSet {
+            needsDisplay = true
+        }
+    }
+
     var screen: NSScreen? {
         guard let window = window else {
             return nil
@@ -468,6 +521,7 @@ class RuleView: NSView {
     }
 
     var unitLabelFrame: NSRect? {
+        guard showsUnitLabel else { return nil }
         return unitLabelView?.frame
     }
 
@@ -513,7 +567,7 @@ class RuleView: NSView {
     }
 
     func setUnitLabelHidden(_ isHidden: Bool) {
-        unitLabelView?.isHidden = isHidden
+        unitLabelView?.isHidden = !showsUnitLabel || isHidden
     }
 
     func setResizeHandleObscured(_ isObscured: Bool) {
@@ -541,6 +595,10 @@ class RuleView: NSView {
         unitLabelView.zeroCorner = zeroCorner
         unitLabelView.label = unitLabel()
         unitLabelView.frame = unitLabelView.frame(in: bounds, zeroCorner: zeroCorner)
+    }
+
+    private func updateBorderFrame() {
+        borderView?.frame = bounds
     }
 
     private func unitLabel() -> NSAttributedString {
