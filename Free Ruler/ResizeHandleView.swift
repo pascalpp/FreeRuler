@@ -185,12 +185,6 @@ final class ResizeHandleView: NSView {
                     - horizontalXOffset
                     - CGFloat(lineCount - 1) * lineSpacing
                     - 1
-            case .top, .bottom:
-                assertionFailure("Horizontal resize handle must be placed on a horizontal side")
-                firstX = bounds.maxX
-                    - horizontalXOffset
-                    - CGFloat(lineCount - 1) * lineSpacing
-                    - 1
             }
 
             switch placement.ySide {
@@ -198,9 +192,6 @@ final class ResizeHandleView: NSView {
                 bottomY = bounds.maxY - horizontalYOffset - length
             case .bottom:
                 bottomY = bounds.minY + horizontalYOffset
-            case .left, .right:
-                assertionFailure("Horizontal resize handle must be placed on a vertical side")
-                bottomY = bounds.maxY - horizontalYOffset - length
             }
 
             return NSRect(
@@ -218,9 +209,6 @@ final class ResizeHandleView: NSView {
                 leftX = bounds.minX + verticalXOffset
             case .right:
                 leftX = bounds.maxX - verticalXOffset - length
-            case .top, .bottom:
-                assertionFailure("Vertical resize handle must be placed on a horizontal side")
-                leftX = bounds.minX + verticalXOffset
             }
 
             switch placement.ySide {
@@ -230,9 +218,6 @@ final class ResizeHandleView: NSView {
                     - CGFloat(lineCount - 1) * lineSpacing
                     - 1
             case .bottom:
-                firstY = bounds.minY + verticalYOffset + 1
-            case .left, .right:
-                assertionFailure("Vertical resize handle must be placed on a vertical side")
                 firstY = bounds.minY + verticalYOffset + 1
             }
 
@@ -262,10 +247,6 @@ final class ResizeHandleView: NSView {
         case .right:
             x = gripFrame.minX
             width = bounds.maxX - gripFrame.minX
-        case .top, .bottom:
-            assertionFailure("Resize handle slot must be anchored to a horizontal side")
-            x = gripFrame.minX
-            width = gripFrame.width
         }
 
         switch placement.ySide {
@@ -275,10 +256,6 @@ final class ResizeHandleView: NSView {
         case .bottom:
             y = bounds.minY
             height = gripFrame.maxY - bounds.minY
-        case .left, .right:
-            assertionFailure("Resize handle slot must be anchored to a vertical side")
-            y = gripFrame.minY
-            height = gripFrame.height
         }
 
         return NSRect(x: x, y: y, width: width, height: height)
@@ -343,9 +320,6 @@ final class ResizeHandleView: NSView {
             x = bounds.maxX - gripSize.width
         case .right:
             x = bounds.minX
-        case .top, .bottom:
-            assertionFailure("Resize handle grip must be anchored to a horizontal side")
-            x = bounds.minX
         }
 
         switch placement.ySide {
@@ -353,9 +327,6 @@ final class ResizeHandleView: NSView {
             y = bounds.minY
         case .bottom:
             y = bounds.maxY - gripSize.height
-        case .left, .right:
-            assertionFailure("Resize handle grip must be anchored to a vertical side")
-            y = bounds.minY
         }
 
         return NSRect(origin: NSPoint(x: x, y: y), size: gripSize)
@@ -423,11 +394,11 @@ func resizedRulerFrame(
     minSize: NSSize,
     maxSize: NSSize
 ) -> NSRect {
-    let resizeSide = ZeroCornerGeometry(zeroCorner: zeroCorner).resizeSide(for: orientation)
+    let geometry = ZeroCornerGeometry(zeroCorner: zeroCorner)
 
     switch orientation {
     case .horizontal:
-        switch resizeSide {
+        switch geometry.horizontalResizeSide {
         case .left:
             let width = clamp(initialFrame.width - delta.width, minSize.width, maxSize.width)
             return NSRect(
@@ -444,12 +415,9 @@ func resizedRulerFrame(
                 width: width,
                 height: initialFrame.height
             )
-        case .top, .bottom:
-            assertionFailure("Horizontal ruler resize side must be left or right")
-            return initialFrame
         }
     case .vertical:
-        switch resizeSide {
+        switch geometry.verticalResizeSide {
         case .top:
             let height = clamp(initialFrame.height + delta.height, minSize.height, maxSize.height)
             return NSRect(
@@ -466,9 +434,6 @@ func resizedRulerFrame(
                 width: initialFrame.width,
                 height: height
             )
-        case .left, .right:
-            assertionFailure("Vertical ruler resize side must be top or bottom")
-            return initialFrame
         }
     }
 }

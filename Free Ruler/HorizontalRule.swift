@@ -40,7 +40,7 @@ class HorizontalRule: RuleView {
         let path = NSBezierPath()
         let tickLayout = RulerTickLayout(unit: unit, screen: screen)
         let geometry = ZeroCornerGeometry(zeroCorner: zeroCorner)
-        let tickSide = geometry.tickSide(for: .horizontal)
+        let tickSide = geometry.horizontalTickSide
         let growthDirection = geometry.growthDirection(for: .horizontal)
 
         let labelWidth: CGFloat = 50
@@ -206,16 +206,13 @@ class HorizontalRule: RuleView {
         forX x: CGFloat,
         length: CGFloat,
         rulerHeight: CGFloat,
-        tickSide: RulerSide
+        tickSide: RulerVerticalSide
     ) -> (start: CGPoint, end: CGPoint) {
         switch tickSide {
         case .bottom:
             return (CGPoint(x: x, y: 1), CGPoint(x: x, y: length))
         case .top:
             return (CGPoint(x: x, y: rulerHeight - 1), CGPoint(x: x, y: rulerHeight - length))
-        case .left, .right:
-            assertionFailure("Horizontal ruler ticks must be placed on a horizontal side")
-            return (CGPoint(x: x, y: 1), CGPoint(x: x, y: length))
         }
     }
 
@@ -223,7 +220,7 @@ class HorizontalRule: RuleView {
         forX x: CGFloat,
         labelSize: NSSize,
         rulerHeight: CGFloat,
-        tickSide: RulerSide
+        tickSide: RulerVerticalSide
     ) -> CGRect {
         let labelOffset: CGFloat = 13
         let textHeight: CGFloat = 8
@@ -235,9 +232,6 @@ class HorizontalRule: RuleView {
             labelY = labelOffset
         case .top:
             labelY = rulerHeight - labelOffset - textHeight
-        case .left, .right:
-            assertionFailure("Horizontal ruler labels must be placed on a horizontal side")
-            labelY = labelOffset
         }
 
         return CGRect(x: labelX, y: labelY, width: labelSize.width, height: labelSize.height)

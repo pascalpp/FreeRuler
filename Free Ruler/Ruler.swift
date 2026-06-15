@@ -40,29 +40,37 @@ enum RulerGrowthDirection: Equatable {
     case negative
 }
 
-enum RulerSide: Equatable {
-    case top
-    case right
-    case bottom
+enum RulerHorizontalSide: Equatable {
     case left
+    case right
 
-    var opposite: RulerSide {
+    var opposite: RulerHorizontalSide {
+        switch self {
+        case .left:
+            return .right
+        case .right:
+            return .left
+        }
+    }
+}
+
+enum RulerVerticalSide: Equatable {
+    case top
+    case bottom
+
+    var opposite: RulerVerticalSide {
         switch self {
         case .top:
             return .bottom
-        case .right:
-            return .left
         case .bottom:
             return .top
-        case .left:
-            return .right
         }
     }
 }
 
 struct RulerCornerPlacement: Equatable {
-    let xSide: RulerSide
-    let ySide: RulerSide
+    let xSide: RulerHorizontalSide
+    let ySide: RulerVerticalSide
 }
 
 struct ZeroCornerGeometry {
@@ -83,52 +91,42 @@ struct ZeroCornerGeometry {
         }
     }
 
-    func tickSide(for orientation: Orientation) -> RulerSide {
-        switch orientation {
-        case .horizontal:
-            return verticalZeroSide == .top ? .bottom : .top
-        case .vertical:
-            return horizontalZeroSide == .left ? .right : .left
-        }
+    var horizontalTickSide: RulerVerticalSide {
+        return verticalZeroSide == .top ? .bottom : .top
     }
 
-    func resizeSide(for orientation: Orientation) -> RulerSide {
-        switch orientation {
-        case .horizontal:
-            return horizontalZeroSide == .left ? .right : .left
-        case .vertical:
-            return verticalZeroSide == .top ? .bottom : .top
-        }
+    var verticalTickSide: RulerHorizontalSide {
+        return horizontalZeroSide == .left ? .right : .left
+    }
+
+    var horizontalResizeSide: RulerHorizontalSide {
+        return horizontalZeroSide == .left ? .right : .left
+    }
+
+    var verticalResizeSide: RulerVerticalSide {
+        return verticalZeroSide == .top ? .bottom : .top
     }
 
     func resizeHandlePlacement(for orientation: Orientation) -> RulerCornerPlacement {
         switch orientation {
         case .horizontal:
             return RulerCornerPlacement(
-                xSide: resizeSide(for: orientation),
-                ySide: tickSide(for: orientation).opposite
+                xSide: horizontalZeroSide.opposite,
+                ySide: verticalZeroSide
             )
         case .vertical:
             return RulerCornerPlacement(
-                xSide: tickSide(for: orientation).opposite,
-                ySide: resizeSide(for: orientation)
+                xSide: horizontalZeroSide,
+                ySide: verticalZeroSide.opposite
             )
         }
     }
 
     func unitLabelPlacement(for orientation: Orientation) -> RulerCornerPlacement {
-        switch orientation {
-        case .horizontal:
-            return RulerCornerPlacement(
-                xSide: resizeSide(for: orientation).opposite,
-                ySide: tickSide(for: orientation).opposite
-            )
-        case .vertical:
-            return RulerCornerPlacement(
-                xSide: tickSide(for: orientation).opposite,
-                ySide: resizeSide(for: orientation).opposite
-            )
-        }
+        return RulerCornerPlacement(
+            xSide: horizontalZeroSide,
+            ySide: verticalZeroSide
+        )
     }
 
     func zeroPoint(in frame: NSRect, for orientation: Orientation) -> NSPoint {
@@ -197,7 +195,7 @@ struct ZeroCornerGeometry {
         }
     }
 
-    private var horizontalZeroSide: RulerSide {
+    private var horizontalZeroSide: RulerHorizontalSide {
         switch zeroCorner {
         case .topLeft, .bottomLeft:
             return .left
@@ -206,7 +204,7 @@ struct ZeroCornerGeometry {
         }
     }
 
-    private var verticalZeroSide: RulerSide {
+    private var verticalZeroSide: RulerVerticalSide {
         switch zeroCorner {
         case .topLeft, .topRight:
             return .top

@@ -38,7 +38,7 @@ class VerticalRule: RuleView {
         let path = NSBezierPath()
         let tickLayout = RulerTickLayout(unit: unit, screen: screen)
         let geometry = ZeroCornerGeometry(zeroCorner: zeroCorner)
-        let tickSide = geometry.tickSide(for: .vertical)
+        let tickSide = geometry.verticalTickSide
         let growthDirection = geometry.growthDirection(for: .vertical)
         let attrs = labelAttributes(
             alignment: tickSide == .right ? .right : .left,
@@ -228,16 +228,13 @@ class VerticalRule: RuleView {
         forY y: CGFloat,
         length: CGFloat,
         rulerWidth: CGFloat,
-        tickSide: RulerSide
+        tickSide: RulerHorizontalSide
     ) -> (start: CGPoint, end: CGPoint) {
         switch tickSide {
         case .right:
             return (CGPoint(x: rulerWidth - 1, y: y), CGPoint(x: rulerWidth - length, y: y))
         case .left:
             return (CGPoint(x: 1, y: y), CGPoint(x: length, y: y))
-        case .top, .bottom:
-            assertionFailure("Vertical ruler ticks must be placed on a vertical side")
-            return (CGPoint(x: rulerWidth - 1, y: y), CGPoint(x: rulerWidth - length, y: y))
         }
     }
 
@@ -245,7 +242,7 @@ class VerticalRule: RuleView {
         forY y: CGFloat,
         labelSize: NSSize,
         rulerWidth: CGFloat,
-        tickSide: RulerSide
+        tickSide: RulerHorizontalSide
     ) -> CGRect {
         let labelOffset: CGFloat = 13
         let textHeight: CGFloat = 8
@@ -256,9 +253,6 @@ class VerticalRule: RuleView {
             labelX = rulerWidth - labelSize.width - labelOffset
         case .left:
             labelX = labelOffset
-        case .top, .bottom:
-            assertionFailure("Vertical ruler labels must be placed on a vertical side")
-            labelX = rulerWidth - labelSize.width - labelOffset
         }
 
         return CGRect(
