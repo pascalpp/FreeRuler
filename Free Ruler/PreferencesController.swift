@@ -44,7 +44,6 @@ class RulerColorWell: NSColorWell {
         colorPanel.setAction(#selector(takeColorFrom(_:)))
         colorPanel.orderFront(self)
         configureForOpaqueColors()
-        configureOpaqueColorPicking()
     }
 
     override func draw(_ dirtyRect: NSRect) {
