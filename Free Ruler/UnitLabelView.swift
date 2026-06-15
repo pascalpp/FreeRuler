@@ -94,10 +94,6 @@ final class UnitLabelView: NSView {
         case .right:
             x = rulerSize.width - labelSize.width - Self.padding.right
             width = labelSize.width + Self.padding.right
-        case .top, .bottom:
-            assertionFailure("Unit label must be anchored to a horizontal side")
-            x = 0
-            width = Self.padding.left + labelSize.width
         }
 
         switch placement.ySide {
@@ -105,10 +101,6 @@ final class UnitLabelView: NSView {
             y = rulerSize.height - labelSize.height - Self.padding.top
             height = labelSize.height + Self.padding.top
         case .bottom:
-            y = 0
-            height = Self.padding.bottom + labelSize.height
-        case .left, .right:
-            assertionFailure("Unit label must be anchored to a vertical side")
             y = 0
             height = Self.padding.bottom + labelSize.height
         }
@@ -129,9 +121,6 @@ final class UnitLabelView: NSView {
             x = bounds.maxX - labelSize.width
         case .right:
             x = bounds.minX
-        case .top, .bottom:
-            assertionFailure("Unit label must be anchored to a horizontal side")
-            x = bounds.minX
         }
 
         switch placement.ySide {
@@ -142,9 +131,6 @@ final class UnitLabelView: NSView {
             )
         case .bottom:
             y = bounds.maxY - labelSize.height
-        case .left, .right:
-            assertionFailure("Unit label must be anchored to a vertical side")
-            y = bounds.minY
         }
 
         return NSRect(x: x, y: y, width: labelSize.width, height: labelSize.height)

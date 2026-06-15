@@ -67,10 +67,10 @@ final class RulerCoreTests: XCTestCase {
                 zeroCorner: ZeroCorner,
                 horizontalGrowth: RulerGrowthDirection,
                 verticalGrowth: RulerGrowthDirection,
-                horizontalTickSide: RulerSide,
-                verticalTickSide: RulerSide,
-                horizontalResizeSide: RulerSide,
-                verticalResizeSide: RulerSide
+                horizontalTickSide: RulerVerticalSide,
+                verticalTickSide: RulerHorizontalSide,
+                horizontalResizeSide: RulerHorizontalSide,
+                verticalResizeSide: RulerVerticalSide
             )
         ] = [
             (.topLeft, .positive, .negative, .bottom, .right, .right, .bottom),
@@ -93,24 +93,85 @@ final class RulerCoreTests: XCTestCase {
                 "\(testCase.zeroCorner) vertical growth"
             )
             XCTAssertEqual(
-                geometry.tickSide(for: .horizontal),
+                geometry.horizontalTickSide,
                 testCase.horizontalTickSide,
                 "\(testCase.zeroCorner) horizontal tick side"
             )
             XCTAssertEqual(
-                geometry.tickSide(for: .vertical),
+                geometry.verticalTickSide,
                 testCase.verticalTickSide,
                 "\(testCase.zeroCorner) vertical tick side"
             )
             XCTAssertEqual(
-                geometry.resizeSide(for: .horizontal),
+                geometry.horizontalResizeSide,
                 testCase.horizontalResizeSide,
                 "\(testCase.zeroCorner) horizontal resize side"
             )
             XCTAssertEqual(
-                geometry.resizeSide(for: .vertical),
+                geometry.verticalResizeSide,
                 testCase.verticalResizeSide,
                 "\(testCase.zeroCorner) vertical resize side"
+            )
+        }
+    }
+
+    func testZeroCornerGeometryDerivesAxisSpecificCornerPlacements() {
+        let cases: [
+            (
+                zeroCorner: ZeroCorner,
+                unitLabelPlacement: RulerCornerPlacement,
+                horizontalResizePlacement: RulerCornerPlacement,
+                verticalResizePlacement: RulerCornerPlacement
+            )
+        ] = [
+            (
+                .topLeft,
+                RulerCornerPlacement(xSide: .left, ySide: .top),
+                RulerCornerPlacement(xSide: .right, ySide: .top),
+                RulerCornerPlacement(xSide: .left, ySide: .bottom)
+            ),
+            (
+                .topRight,
+                RulerCornerPlacement(xSide: .right, ySide: .top),
+                RulerCornerPlacement(xSide: .left, ySide: .top),
+                RulerCornerPlacement(xSide: .right, ySide: .bottom)
+            ),
+            (
+                .bottomLeft,
+                RulerCornerPlacement(xSide: .left, ySide: .bottom),
+                RulerCornerPlacement(xSide: .right, ySide: .bottom),
+                RulerCornerPlacement(xSide: .left, ySide: .top)
+            ),
+            (
+                .bottomRight,
+                RulerCornerPlacement(xSide: .right, ySide: .bottom),
+                RulerCornerPlacement(xSide: .left, ySide: .bottom),
+                RulerCornerPlacement(xSide: .right, ySide: .top)
+            ),
+        ]
+
+        for testCase in cases {
+            let geometry = ZeroCornerGeometry(zeroCorner: testCase.zeroCorner)
+
+            XCTAssertEqual(
+                geometry.unitLabelPlacement(for: .horizontal),
+                testCase.unitLabelPlacement,
+                "\(testCase.zeroCorner) horizontal unit label placement"
+            )
+            XCTAssertEqual(
+                geometry.unitLabelPlacement(for: .vertical),
+                testCase.unitLabelPlacement,
+                "\(testCase.zeroCorner) vertical unit label placement"
+            )
+            XCTAssertEqual(
+                geometry.resizeHandlePlacement(for: .horizontal),
+                testCase.horizontalResizePlacement,
+                "\(testCase.zeroCorner) horizontal resize handle placement"
+            )
+            XCTAssertEqual(
+                geometry.resizeHandlePlacement(for: .vertical),
+                testCase.verticalResizePlacement,
+                "\(testCase.zeroCorner) vertical resize handle placement"
             )
         }
     }
@@ -1138,10 +1199,10 @@ final class RulerCoreTests: XCTestCase {
             let cases: [
                 (
                     zeroCorner: ZeroCorner,
-                    expectedHorizontalXSide: RulerSide,
-                    expectedHorizontalYSide: RulerSide,
-                    expectedVerticalXSide: RulerSide,
-                    expectedVerticalYSide: RulerSide
+                    expectedHorizontalXSide: RulerHorizontalSide,
+                    expectedHorizontalYSide: RulerVerticalSide,
+                    expectedVerticalXSide: RulerHorizontalSide,
+                    expectedVerticalYSide: RulerVerticalSide
                 )
             ] = [
                 (.topLeft, .right, .top, .left, .bottom),
@@ -1170,8 +1231,6 @@ final class RulerCoreTests: XCTestCase {
                     XCTAssertLessThan(horizontalFrame.midX, horizontalRule.bounds.midX, "\(testCase.zeroCorner)")
                 case .right:
                     XCTAssertGreaterThan(horizontalFrame.midX, horizontalRule.bounds.midX, "\(testCase.zeroCorner)")
-                case .top, .bottom:
-                    XCTFail("Horizontal resize handle X must be placed on a horizontal side")
                 }
 
                 switch testCase.expectedHorizontalYSide {
@@ -1179,8 +1238,6 @@ final class RulerCoreTests: XCTestCase {
                     XCTAssertGreaterThan(horizontalFrame.midY, horizontalRule.bounds.midY, "\(testCase.zeroCorner)")
                 case .bottom:
                     XCTAssertLessThan(horizontalFrame.midY, horizontalRule.bounds.midY, "\(testCase.zeroCorner)")
-                case .left, .right:
-                    XCTFail("Horizontal resize handle Y must be placed on a vertical side")
                 }
 
                 switch testCase.expectedVerticalXSide {
@@ -1188,8 +1245,6 @@ final class RulerCoreTests: XCTestCase {
                     XCTAssertLessThan(verticalFrame.midX, verticalRule.bounds.midX, "\(testCase.zeroCorner)")
                 case .right:
                     XCTAssertGreaterThan(verticalFrame.midX, verticalRule.bounds.midX, "\(testCase.zeroCorner)")
-                case .top, .bottom:
-                    XCTFail("Vertical resize handle X must be placed on a horizontal side")
                 }
 
                 switch testCase.expectedVerticalYSide {
@@ -1197,8 +1252,6 @@ final class RulerCoreTests: XCTestCase {
                     XCTAssertGreaterThan(verticalFrame.midY, verticalRule.bounds.midY, "\(testCase.zeroCorner)")
                 case .bottom:
                     XCTAssertLessThan(verticalFrame.midY, verticalRule.bounds.midY, "\(testCase.zeroCorner)")
-                case .left, .right:
-                    XCTFail("Vertical resize handle Y must be placed on a vertical side")
                 }
             }
         }
