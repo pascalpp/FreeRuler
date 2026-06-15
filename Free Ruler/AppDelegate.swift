@@ -108,6 +108,49 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         case separate
     }
 
+    private struct RulerVisibility {
+        var horizontal = true
+        var vertical = true
+
+        var hasVisibleRuler: Bool {
+            return horizontal || vertical
+        }
+
+        mutating func showAll() {
+            horizontal = true
+            vertical = true
+        }
+
+        mutating func hideAll() {
+            horizontal = false
+            vertical = false
+        }
+
+        mutating func toggle(_ orientation: Orientation) {
+            set(orientation, isVisible: !isVisible(orientation))
+        }
+
+        mutating func set(_ orientation: Orientation, isVisible: Bool) {
+            switch orientation {
+            case .horizontal:
+                horizontal = isVisible
+            case .vertical:
+                vertical = isVisible
+            }
+        }
+
+        func isVisible(_ orientation: Orientation) -> Bool {
+            switch orientation {
+            case .horizontal:
+                return horizontal
+            case .vertical:
+                return vertical
+            }
+        }
+    }
+
+    private var rulerVisibility = RulerVisibility()
+
     // MARK: - Lifecycle
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
@@ -290,23 +333,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func showRulers() {
         createRulersIfNeeded()
+        rulerVisibility.showAll()
         applyRulerWindowMode(showRulersIfNeeded: true)
     }
 
     func toggleRuler(orientation: Orientation) {
         guard canToggleRulerVisibility else { return }
-        guard let ruler = rulerController(orientation: orientation) else { return }
+        guard rulerController(orientation: orientation) != nil else { return }
 
         if prefs.groupRulers {
-            prefs.groupRulers = false
-            detachRulerWindows()
+            syncGroupedRulerFramesToRulerWindows()
         }
 
-        if ruler.rulerWindow.isVisible {
-            hideRuler(ruler)
-        } else {
-            showRuler(ruler)
-        }
+        rulerVisibility.toggle(orientation)
+        applyRulerWindowMode()
     }
 
     private func detachRulerWindows() {
@@ -330,12 +370,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if updateMode {
             applyRulerWindowMode()
         }
-    }
-
-    private func hideRuler(_ ruler: RulerController) {
-        detachRulerWindow(ruler.rulerWindow)
-        ruler.rulerWindow.orderOut(self)
-        applyRulerWindowMode()
     }
 
     private func detachRulerWindow(_ window: RulerWindow) {
@@ -372,10 +406,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
+        guard rulerVisibility.hasVisibleRuler else {
+            groupedRulerController.hide()
+            horizontalRuler.rulerWindow.orderOut(self)
+            verticalRuler.rulerWindow.orderOut(self)
+            return
+        }
+
         let shouldShowGroupedRuler = showRulersIfNeeded
             || groupedRulerController.isVisible
             || horizontalRuler.rulerWindow.isVisible
             || verticalRuler.rulerWindow.isVisible
+            || rulerVisibility.hasVisibleRuler
 
         guard shouldShowGroupedRuler else { return }
 
@@ -388,7 +430,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         groupedRulerController.show(
             horizontalFrame: horizontalFrame,
-            verticalFrame: verticalFrame
+            verticalFrame: verticalFrame,
+            showsHorizontalRule: rulerVisibility.horizontal,
+            showsVerticalRule: rulerVisibility.vertical
         )
         horizontalRuler.rulerWindow.orderOut(self)
         verticalRuler.rulerWindow.orderOut(self)
@@ -399,16 +443,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        let shouldShowSeparateRulers = showRulersIfNeeded || groupedRulerController.isVisible
-
         if groupedRulerController.isVisible {
             syncGroupedRulerFramesToRulerWindows()
             groupedRulerController.hide()
         }
 
-        if shouldShowSeparateRulers {
-            for ruler in rulers {
+        for ruler in rulers {
+            if rulerVisibility.isVisible(ruler.ruler.orientation) {
                 showRuler(ruler, updateMode: false)
+            } else {
+                ruler.rulerWindow.orderOut(self)
             }
         }
 
@@ -435,11 +479,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func isRulerVisible(_ ruler: RulerController?) -> Bool {
-        if isGroupedRulerVisible {
-            return true
-        }
-
-        return ruler?.rulerWindow.isVisible == true
+        guard let ruler = ruler else { return false }
+        return rulerVisibility.isVisible(ruler.ruler.orientation)
     }
 
     private var isRulerFrontmost: Bool {
@@ -547,18 +588,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if let groupedRulerController = groupedRulerController,
            groupedRulerController.groupedWindow.isKeyWindow {
             syncGroupedRulerFramesToRulerWindows()
-            groupedRulerController.hide()
-            updateMouseTickTimer()
+            rulerVisibility.hideAll()
+            applyRulerWindowMode()
             return
         }
 
         if let ruler = rulers.first(where: { $0.rulerWindow.isKeyWindow }) {
-            if prefs.groupRulers {
-                prefs.groupRulers = false
-                detachRulerWindows()
-            }
-
-            hideRuler(ruler)
+            rulerVisibility.set(ruler.ruler.orientation, isVisible: false)
+            applyRulerWindowMode()
             return
         }
 
@@ -590,6 +627,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         // ungroup rulers during reset operation
         prefs.groupRulers = false
+        rulerVisibility.showAll()
         for ruler in rulers {
             ruler.resetPosition()
             showRuler(ruler, updateMode: false)

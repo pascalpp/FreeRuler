@@ -240,22 +240,34 @@ final class ResizeHandleView: NSView {
         let width: CGFloat
         let height: CGFloat
 
-        switch placement.xSide {
-        case .left:
+        switch orientation {
+        case .horizontal:
+            switch placement.xSide {
+            case .left:
+                x = bounds.minX
+                width = gripFrame.maxX - bounds.minX
+            case .right:
+                x = gripFrame.minX
+                width = bounds.maxX - gripFrame.minX
+            }
+        case .vertical:
             x = bounds.minX
-            width = gripFrame.maxX - bounds.minX
-        case .right:
-            x = gripFrame.minX
-            width = bounds.maxX - gripFrame.minX
+            width = bounds.width
         }
 
-        switch placement.ySide {
-        case .top:
-            y = gripFrame.minY
-            height = bounds.maxY - gripFrame.minY
-        case .bottom:
+        switch orientation {
+        case .horizontal:
             y = bounds.minY
-            height = gripFrame.maxY - bounds.minY
+            height = bounds.height
+        case .vertical:
+            switch placement.ySide {
+            case .top:
+                y = gripFrame.minY
+                height = bounds.maxY - gripFrame.minY
+            case .bottom:
+                y = bounds.minY
+                height = gripFrame.maxY - bounds.minY
+            }
         }
 
         return NSRect(x: x, y: y, width: width, height: height)
@@ -315,18 +327,35 @@ final class ResizeHandleView: NSView {
         let x: CGFloat
         let y: CGFloat
 
-        switch placement.xSide {
-        case .left:
-            x = bounds.maxX - gripSize.width
-        case .right:
-            x = bounds.minX
-        }
+        switch orientation {
+        case .horizontal:
+            switch placement.xSide {
+            case .left:
+                x = bounds.maxX - gripSize.width
+            case .right:
+                x = bounds.minX
+            }
 
-        switch placement.ySide {
-        case .top:
-            y = bounds.minY
-        case .bottom:
-            y = bounds.maxY - gripSize.height
+            switch placement.ySide {
+            case .top:
+                y = bounds.maxY - gripSize.height
+            case .bottom:
+                y = bounds.minY
+            }
+        case .vertical:
+            switch placement.xSide {
+            case .left:
+                x = bounds.minX
+            case .right:
+                x = bounds.maxX - gripSize.width
+            }
+
+            switch placement.ySide {
+            case .top:
+                y = bounds.minY
+            case .bottom:
+                y = bounds.maxY - gripSize.height
+            }
         }
 
         return NSRect(origin: NSPoint(x: x, y: y), size: gripSize)

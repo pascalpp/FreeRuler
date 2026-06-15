@@ -341,6 +341,22 @@ final class GroupedRulerWindow: NSPanel {
         return convertToScreen(groupedContentView.localFrame(for: orientation))
     }
 
+    func setVisibleRules(horizontal: Bool, vertical: Bool) {
+        groupedContentView.showsHorizontalRule = horizontal
+        groupedContentView.showsVerticalRule = vertical
+        groupedContentView.needsLayout = true
+        groupedContentView.layoutSubtreeIfNeeded()
+    }
+
+    func isRuleVisible(_ orientation: Orientation) -> Bool {
+        switch orientation {
+        case .horizontal:
+            return groupedContentView.showsHorizontalRule
+        case .vertical:
+            return groupedContentView.showsVerticalRule
+        }
+    }
+
     func zeroPoint() -> NSPoint {
         return ZeroCornerGeometry(zeroCorner: prefs.zeroCorner).zeroPoint(
             in: screenFrame(for: .horizontal),
@@ -456,10 +472,23 @@ private final class GroupedRulerBorderView: RulerBorderView {
         }
     }
 
+    var showsVerticalRule = true {
+        didSet {
+            needsDisplay = true
+        }
+    }
+
     override func borderPath(in bounds: NSRect) -> NSBezierPath {
-        return showsHorizontalRule
-            ? lShapedBorderPath()
-            : super.borderPath(in: bounds)
+        switch (showsHorizontalRule, showsVerticalRule) {
+        case (true, true):
+            return lShapedBorderPath()
+        case (true, false):
+            return borderPath(for: .horizontal)
+        case (false, true):
+            return borderPath(for: .vertical)
+        case (false, false):
+            return NSBezierPath()
+        }
     }
 
     private func lShapedBorderPath() -> NSBezierPath {
@@ -530,6 +559,16 @@ private final class GroupedRulerBorderView: RulerBorderView {
         path.close()
         return path
     }
+
+    private func borderPath(for orientation: Orientation) -> NSBezierPath {
+        let layout = GroupedRulerLayout.layout(groupFrame: bounds, zeroCorner: zeroCorner)
+        let frame = layout.localFrame(for: orientation)
+
+        return NSBezierPath(rect: frame.insetBy(
+            dx: Self.borderCenterInset,
+            dy: Self.borderCenterInset
+        ))
+    }
 }
 
 private final class GroupedRulerZeroLabelsView: NSView {
@@ -568,6 +607,12 @@ private final class GroupedRulerZeroLabelsView: NSView {
         }
     }
 
+    var showsVerticalRule = true {
+        didSet {
+            needsDisplay = true
+        }
+    }
+
     init(horizontalRule: HorizontalRule, verticalRule: VerticalRule) {
         self.horizontalRule = horizontalRule
         self.verticalRule = verticalRule
@@ -589,10 +634,14 @@ private final class GroupedRulerZeroLabelsView: NSView {
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
 
+        guard showsHorizontalRule && showsVerticalRule else { return }
+
         if showsHorizontalRule {
             drawHorizontalZeroLabel()
         }
-        drawVerticalZeroLabel()
+        if showsVerticalRule {
+            drawVerticalZeroLabel()
+        }
     }
 
     private func drawHorizontalZeroLabel() {
@@ -687,14 +736,14 @@ final class GroupedRulerContentView: NSView {
     var showsHorizontalRule = true {
         didSet {
             guard showsHorizontalRule != oldValue else { return }
+            updateRuleVisibility()
+        }
+    }
 
-            if showsHorizontalRule {
-                addSubview(horizontalHost, positioned: .below, relativeTo: verticalHost)
-            } else {
-                horizontalHost.removeFromSuperview()
-            }
-            needsLayout = true
-            needsDisplay = true
+    var showsVerticalRule = true {
+        didSet {
+            guard showsVerticalRule != oldValue else { return }
+            updateRuleVisibility()
         }
     }
 
@@ -750,6 +799,7 @@ final class GroupedRulerContentView: NSView {
         addSubview(borderView)
         zeroLabelsView.color = color
         zeroLabelsView.zeroCorner = zeroCorner
+        updateRuleVisibility()
         updateUnitLabel()
     }
 
@@ -770,10 +820,8 @@ final class GroupedRulerContentView: NSView {
 
         let layout = GroupedRulerLayout.layout(groupFrame: bounds, zeroCorner: zeroCorner)
         let cornerFrame = layout.emptyCornerFrame(zeroCorner: zeroCorner)
-        if showsHorizontalRule {
-            setFrame(layout.localFrame(for: .horizontal), for: horizontalHost)
-            setFrame(horizontalHost.bounds, for: horizontalRule)
-        }
+        setFrame(layout.localFrame(for: .horizontal), for: horizontalHost)
+        setFrame(horizontalHost.bounds, for: horizontalRule)
         setFrame(layout.localFrame(for: .vertical), for: verticalHost)
         setFrame(verticalHost.bounds, for: verticalRule)
         updateUnitLabel()
@@ -782,9 +830,11 @@ final class GroupedRulerContentView: NSView {
         zeroLabelsView.horizontalRuleFrame = horizontalHost.frame
         zeroLabelsView.verticalRuleFrame = verticalHost.frame
         zeroLabelsView.showsHorizontalRule = showsHorizontalRule
+        zeroLabelsView.showsVerticalRule = showsVerticalRule
         setFrame(bounds, for: borderView)
         borderView.zeroCorner = zeroCorner
         borderView.showsHorizontalRule = showsHorizontalRule
+        borderView.showsVerticalRule = showsVerticalRule
         horizontalRule.needsDisplay = true
         verticalRule.needsDisplay = true
     }
@@ -792,7 +842,7 @@ final class GroupedRulerContentView: NSView {
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
 
-        guard showsHorizontalRule else { return }
+        guard showsHorizontalRule && showsVerticalRule else { return }
 
         color.fill.setFill()
         cornerFrame().fill()
@@ -807,7 +857,7 @@ final class GroupedRulerContentView: NSView {
             return hitView
         }
 
-        return showsHorizontalRule && cornerFrame().contains(point) ? self : nil
+        return showsHorizontalRule && showsVerticalRule && cornerFrame().contains(point) ? self : nil
     }
 
     func localFrame(for orientation: Orientation) -> NSRect {
@@ -828,6 +878,40 @@ final class GroupedRulerContentView: NSView {
     private func setFrame(_ frame: NSRect, for view: NSView) {
         view.setFrameOrigin(frame.origin)
         view.setFrameSize(frame.size)
+    }
+
+    private func updateRuleVisibility() {
+        rebuildSubviews()
+        updateRuleViewLabels()
+        needsLayout = true
+        needsDisplay = true
+    }
+
+    private func rebuildSubviews() {
+        for view in [horizontalHost, verticalHost, unitLabelView, zeroLabelsView, borderView] {
+            view.removeFromSuperview()
+        }
+
+        if showsHorizontalRule {
+            addSubview(horizontalHost)
+        }
+        if showsVerticalRule {
+            addSubview(verticalHost)
+        }
+
+        addSubview(unitLabelView)
+        addSubview(zeroLabelsView)
+        addSubview(borderView)
+    }
+
+    private func updateRuleViewLabels() {
+        let showsBothRules = showsHorizontalRule && showsVerticalRule
+        unitLabelView.isHidden = !showsBothRules
+        zeroLabelsView.isHidden = !showsBothRules
+        horizontalRule.showsUnitLabel = showsHorizontalRule && !showsVerticalRule
+        verticalRule.showsUnitLabel = showsVerticalRule && !showsHorizontalRule
+        horizontalRule.showsZeroTick = showsHorizontalRule
+        verticalRule.showsZeroTick = showsVerticalRule
     }
 
     private func unitLabelFrame(in cornerFrame: NSRect) -> NSRect {
@@ -930,12 +1014,18 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
 
     func show(
         horizontalFrame: NSRect,
-        verticalFrame: NSRect
+        verticalFrame: NSRect,
+        showsHorizontalRule: Bool,
+        showsVerticalRule: Bool
     ) {
         let layout = GroupedRulerLayout.joined(
             horizontalFrame: horizontalFrame,
             verticalFrame: verticalFrame,
             zeroCorner: prefs.zeroCorner
+        )
+        groupedWindow.setVisibleRules(
+            horizontal: showsHorizontalRule,
+            vertical: showsVerticalRule
         )
         groupedWindow.setFrame(layout.groupFrame, display: false)
         groupedWindow.updateLayoutForCurrentZeroCorner()
@@ -1006,8 +1096,12 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
     }
 
     func drawMouseTick(at mouseLoc: NSPoint) {
-        groupedWindow.horizontalRule.drawMouseTick(at: mouseLoc)
-        groupedWindow.verticalRule.drawMouseTick(at: mouseLoc)
+        if groupedWindow.isRuleVisible(.horizontal) {
+            groupedWindow.horizontalRule.drawMouseTick(at: mouseLoc)
+        }
+        if groupedWindow.isRuleVisible(.vertical) {
+            groupedWindow.verticalRule.drawMouseTick(at: mouseLoc)
+        }
     }
 
     func windowWillStartLiveResize(_ notification: Notification) {
@@ -1070,14 +1164,22 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
     private func disableMouseTicks() {
         mouseTickResumeTimer?.invalidate()
         mouseTickResumeTimer = nil
-        groupedWindow.horizontalRule.showMouseTick = false
-        groupedWindow.verticalRule.showMouseTick = false
+        if groupedWindow.isRuleVisible(.horizontal) {
+            groupedWindow.horizontalRule.showMouseTick = false
+        }
+        if groupedWindow.isRuleVisible(.vertical) {
+            groupedWindow.verticalRule.showMouseTick = false
+        }
         appDelegate?.suspendMouseTickUpdates(owner: self)
     }
 
     private func enableMouseTicks() {
-        groupedWindow.horizontalRule.showMouseTick = true
-        groupedWindow.verticalRule.showMouseTick = true
+        if groupedWindow.isRuleVisible(.horizontal) {
+            groupedWindow.horizontalRule.showMouseTick = true
+        }
+        if groupedWindow.isRuleVisible(.vertical) {
+            groupedWindow.verticalRule.showMouseTick = true
+        }
         appDelegate?.resumeMouseTickUpdates(owner: self)
     }
 
@@ -1108,11 +1210,13 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
         let horizontalLocation = groupedWindow.horizontalRule.convert(event.locationInWindow, from: nil)
         let verticalLocation = groupedWindow.verticalRule.convert(event.locationInWindow, from: nil)
 
-        if groupedWindow.horizontalRule.bounds.contains(horizontalLocation) {
+        if groupedWindow.isRuleVisible(.horizontal),
+           groupedWindow.horizontalRule.bounds.contains(horizontalLocation) {
             return .horizontal
         }
 
-        if groupedWindow.verticalRule.bounds.contains(verticalLocation) {
+        if groupedWindow.isRuleVisible(.vertical),
+           groupedWindow.verticalRule.bounds.contains(verticalLocation) {
             return .vertical
         }
 
