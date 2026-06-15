@@ -7,6 +7,7 @@
     "test": "yarn test:unit && yarn test:ui",
     "test:unit": "xcodebuild -project 'Free Ruler.xcodeproj' -scheme 'Free Ruler' test -only-testing:FreeRulerTests",
     "test:ui": "xcodebuild -project 'Free Ruler.xcodeproj' -scheme 'Free Ruler' test -only-testing:FreeRulerUITests",
+    "test:regenerate:snapshots": "scripts/generate-ruler-snapshots.sh",
     "get:version": "node -p \"require('./package.json').version\"",
     "get:commits": "git log --pretty=oneline | wc -l",
     "generate:icons": "scripts/generate-app-icon.sh",
