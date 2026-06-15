@@ -132,8 +132,8 @@ enum RulerSnapshotFactory {
                     size: verticalSize
                 )
             )
-            configure(horizontalRule, fill: SnapshotColors.lightRuler)
-            configure(verticalRule, fill: SnapshotColors.lightRuler)
+            configure(horizontalRule, fill: SnapshotColors.lightRuler, showsMouseTick: false)
+            configure(verticalRule, fill: SnapshotColors.lightRuler, showsMouseTick: false)
 
             container.addSubview(verticalRule)
             container.addSubview(horizontalRule)
@@ -145,13 +145,14 @@ enum RulerSnapshotFactory {
     static func mouseTickLabelSnapshotView() -> NSView {
         let horizontalSize = NSSize(width: 320, height: Ruler.thickness)
         let verticalSize = NSSize(width: Ruler.thickness, height: 220)
+        let margin: CGFloat = 16
         let spacing: CGFloat = 18
         let canvas = SnapshotCanvasView(
             frame: NSRect(
                 x: 0,
                 y: 0,
-                width: horizontalSize.width + spacing + (verticalSize.width * 2) + spacing,
-                height: (Ruler.thickness * 2) + spacing + verticalSize.height
+                width: (margin * 2) + horizontalSize.width + spacing + (verticalSize.width * 2) + spacing,
+                height: (margin * 2) + (Ruler.thickness * 2) + (spacing * 2) + verticalSize.height
             )
         )
 
@@ -159,56 +160,56 @@ enum RulerSnapshotFactory {
             unit: .pixels,
             zeroCorner: .topLeft,
             frame: NSRect(
-                x: 0,
-                y: verticalSize.height + spacing + Ruler.thickness + spacing,
+                x: margin,
+                y: margin + verticalSize.height + spacing + Ruler.thickness + spacing,
                 width: horizontalSize.width,
                 height: Ruler.thickness
             )
         )
         topLeftHorizontal.mouseTickX = 292
-        configure(topLeftHorizontal, fill: SnapshotColors.lightRuler)
+        configure(topLeftHorizontal, fill: SnapshotColors.lightRuler, showsMouseTick: true)
         canvas.addSubview(topLeftHorizontal)
 
         let topRightHorizontal = SnapshotHorizontalRule(
             unit: .inches,
             zeroCorner: .topRight,
             frame: NSRect(
-                x: 0,
-                y: verticalSize.height + spacing,
+                x: margin,
+                y: margin + verticalSize.height + spacing,
                 width: horizontalSize.width,
                 height: Ruler.thickness
             )
         )
         topRightHorizontal.mouseTickX = 268
-        configure(topRightHorizontal, fill: SnapshotColors.darkRuler)
+        configure(topRightHorizontal, fill: SnapshotColors.darkRuler, showsMouseTick: true)
         canvas.addSubview(topRightHorizontal)
 
         let bottomLeftVertical = SnapshotVerticalRule(
             unit: .pixels,
             zeroCorner: .bottomLeft,
             frame: NSRect(
-                x: horizontalSize.width + spacing,
-                y: 0,
+                x: margin + horizontalSize.width + spacing,
+                y: margin,
                 width: Ruler.thickness,
                 height: verticalSize.height
             )
         )
         bottomLeftVertical.mouseTickY = 26
-        configure(bottomLeftVertical, fill: SnapshotColors.lightRuler)
+        configure(bottomLeftVertical, fill: SnapshotColors.lightRuler, showsMouseTick: true)
         canvas.addSubview(bottomLeftVertical)
 
         let bottomRightVertical = SnapshotVerticalRule(
             unit: .inches,
             zeroCorner: .bottomRight,
             frame: NSRect(
-                x: horizontalSize.width + spacing + Ruler.thickness + spacing,
-                y: 0,
+                x: margin + horizontalSize.width + spacing + Ruler.thickness + spacing,
+                y: margin,
                 width: Ruler.thickness,
                 height: verticalSize.height
             )
         )
         bottomRightVertical.mouseTickY = 194
-        configure(bottomRightVertical, fill: SnapshotColors.darkRuler)
+        configure(bottomRightVertical, fill: SnapshotColors.darkRuler, showsMouseTick: true)
         canvas.addSubview(bottomRightVertical)
 
         return canvas
@@ -287,7 +288,8 @@ enum RulerSnapshotFactory {
         context.cgContext.restoreGState()
     }
 
-    private static func configure(_ rule: RuleView, fill: NSColor) {
+    private static func configure(_ rule: RuleView, fill: NSColor, showsMouseTick: Bool) {
+        rule.showMouseTick = showsMouseTick
         rule.color = RulerColors(customFill: fill)
         rule.layoutSubtreeIfNeeded()
         rule.needsDisplay = true
