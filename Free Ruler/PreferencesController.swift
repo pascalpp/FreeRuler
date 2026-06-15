@@ -1,6 +1,5 @@
 import Cocoa
 
-private let colorPanelOpaqueConfigurationRetryDelays: [TimeInterval] = [0.1, 0.3]
 private let rulerColorPanelIdentifier = NSUserInterfaceItemIdentifier("ruler-color-panel")
 private let rulerColorPanelOpaqueAccessibilityValue = "ruler-color-panel-alpha-hidden"
 
@@ -15,10 +14,6 @@ func configureOpaqueColorPicking() {
     colorPanel.isContinuous = true
     colorPanel.animationBehavior = .none
     colorPanel.isRestorable = false
-}
-
-private func configureOpaqueColorPickingAfterPanelUpdates() {
-    configureOpaqueColorPicking()
 }
 
 class RulerColorWell: NSColorWell {
@@ -49,7 +44,7 @@ class RulerColorWell: NSColorWell {
         colorPanel.setAction(#selector(takeColorFrom(_:)))
         colorPanel.orderFront(self)
         configureForOpaqueColors()
-        configureOpaqueColorPickingAfterPanelUpdates()
+        configureOpaqueColorPicking()
     }
 
     override func draw(_ dirtyRect: NSRect) {
