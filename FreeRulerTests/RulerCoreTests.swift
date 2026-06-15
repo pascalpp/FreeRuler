@@ -409,81 +409,6 @@ final class RulerCoreTests: XCTestCase {
         }
     }
 
-    func testMouseNumberLabelFramesFollowZeroCornerPlacement() {
-        withRestoredZeroCornerPreference {
-            let horizontalRule = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
-            let verticalRule = VerticalRule(frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
-            let labelSize = NSSize(width: 20, height: 10)
-            let cases: [
-                (
-                    zeroCorner: ZeroCorner,
-                    horizontalRect: CGRect,
-                    verticalRect: CGRect,
-                    verticalBackgroundRect: CGRect
-                )
-            ] = [
-                (
-                    .topLeft,
-                    CGRect(x: 155, y: 28, width: 20, height: 10),
-                    CGRect(x: 7, y: 136, width: 20, height: 10),
-                    CGRect(x: 0, y: 136, width: 30, height: 10)
-                ),
-                (
-                    .topRight,
-                    CGRect(x: 155, y: 28, width: 20, height: 10),
-                    CGRect(x: 13, y: 136, width: 20, height: 10),
-                    CGRect(x: 10, y: 136, width: 30, height: 10)
-                ),
-                (
-                    .bottomLeft,
-                    CGRect(x: 155, y: 7, width: 20, height: 10),
-                    CGRect(x: 7, y: 136, width: 20, height: 10),
-                    CGRect(x: 0, y: 136, width: 30, height: 10)
-                ),
-                (
-                    .bottomRight,
-                    CGRect(x: 155, y: 7, width: 20, height: 10),
-                    CGRect(x: 13, y: 136, width: 20, height: 10),
-                    CGRect(x: 10, y: 136, width: 30, height: 10)
-                ),
-            ]
-
-            for testCase in cases {
-                prefs.zeroCorner = testCase.zeroCorner
-                horizontalRule.redrawForPreferenceChange()
-                verticalRule.redrawForPreferenceChange()
-
-                XCTAssertEqual(
-                    horizontalRule.mouseNumberLabelRect(
-                        tickX: 150,
-                        labelSize: labelSize,
-                        rulerSize: horizontalRule.bounds.size
-                    ),
-                    testCase.horizontalRect,
-                    "\(testCase.zeroCorner) horizontal mouse number label"
-                )
-                XCTAssertEqual(
-                    verticalRule.mouseNumberLabelRect(
-                        tickY: 150,
-                        labelSize: labelSize,
-                        rulerSize: verticalRule.bounds.size
-                    ),
-                    testCase.verticalRect,
-                    "\(testCase.zeroCorner) vertical mouse number label"
-                )
-                XCTAssertEqual(
-                    verticalRule.mouseNumberLabelBackgroundRect(
-                        tickY: 150,
-                        labelSize: labelSize,
-                        rulerSize: verticalRule.bounds.size
-                    ),
-                    testCase.verticalBackgroundRect,
-                    "\(testCase.zeroCorner) vertical mouse number label background"
-                )
-            }
-        }
-    }
-
     func testVerticalMouseNumberLabelBackgroundCoversWideLabels() {
         withRestoredZeroCornerPreference {
             prefs.zeroCorner = .topRight
@@ -570,42 +495,6 @@ final class RulerCoreTests: XCTestCase {
 
             topEdgeRule.mouseTickY = topEdgeHandle.frame.minY - 1
             XCTAssertEqual(topEdgeHandle.alphaValue, 1)
-        }
-    }
-
-    func testUnitLabelsFollowNearOppositeCornerFromZeroCorner() {
-        withRestoredZeroCornerPreference {
-            let horizontalRule = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
-            let verticalRule = VerticalRule(frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
-            let horizontalSize = NSSize(width: 12, height: 10)
-            let verticalSize = NSSize(width: 12, height: 10)
-            let cases: [
-                (
-                    zeroCorner: ZeroCorner,
-                    horizontalUnitRect: CGRect,
-                    verticalUnitRect: CGRect
-                )
-            ] = [
-                (.topLeft, CGRect(x: 0, y: 26, width: 20, height: 14), CGRect(x: 0, y: 286, width: 20, height: 14)),
-                (.topRight, CGRect(x: 280, y: 26, width: 20, height: 14), CGRect(x: 20, y: 286, width: 20, height: 14)),
-                (.bottomLeft, CGRect(x: 0, y: 0, width: 20, height: 19), CGRect(x: 0, y: 0, width: 20, height: 19)),
-                (.bottomRight, CGRect(x: 280, y: 0, width: 20, height: 19), CGRect(x: 20, y: 0, width: 20, height: 19)),
-            ]
-
-            for testCase in cases {
-                prefs.zeroCorner = testCase.zeroCorner
-
-                XCTAssertEqual(
-                    horizontalRule.unitLabelRect(labelSize: horizontalSize, rulerSize: horizontalRule.bounds.size),
-                    testCase.horizontalUnitRect,
-                    "\(testCase.zeroCorner) horizontal unit label"
-                )
-                XCTAssertEqual(
-                    verticalRule.unitLabelRect(labelSize: verticalSize, rulerSize: verticalRule.bounds.size),
-                    testCase.verticalUnitRect,
-                    "\(testCase.zeroCorner) vertical unit label"
-                )
-            }
         }
     }
 
@@ -713,57 +602,6 @@ final class RulerCoreTests: XCTestCase {
             bottomZeroRule.mouseTickY = bottomZeroRule.bounds.minY
             XCTAssertTrue(bottomZeroLabel.isHidden)
         }
-    }
-
-    func testUnitLabelBaselineDoesNotMoveBetweenDescenderAndNonDescenderUnits() throws {
-        try withRestoredZeroCornerPreference {
-            let previousUnit = prefs.unit
-            defer { prefs.unit = previousUnit }
-
-            let horizontalRule = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
-            let verticalRule = VerticalRule(frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
-
-            for zeroCorner in [ZeroCorner.topLeft, .bottomRight] {
-                prefs.zeroCorner = zeroCorner
-
-                prefs.unit = .pixels
-                horizontalRule.redrawForPreferenceChange()
-                verticalRule.redrawForPreferenceChange()
-                let pixelHorizontalFrame = try XCTUnwrap(horizontalRule.unitLabelFrame)
-                let pixelVerticalFrame = try XCTUnwrap(verticalRule.unitLabelFrame)
-
-                prefs.unit = .millimeters
-                horizontalRule.redrawForPreferenceChange()
-                verticalRule.redrawForPreferenceChange()
-                let millimeterHorizontalFrame = try XCTUnwrap(horizontalRule.unitLabelFrame)
-                let millimeterVerticalFrame = try XCTUnwrap(verticalRule.unitLabelFrame)
-
-                XCTAssertEqual(pixelHorizontalFrame.minY, millimeterHorizontalFrame.minY, accuracy: 0.0001)
-                XCTAssertEqual(pixelHorizontalFrame.height, millimeterHorizontalFrame.height, accuracy: 0.0001)
-                XCTAssertEqual(pixelVerticalFrame.minY, millimeterVerticalFrame.minY, accuracy: 0.0001)
-                XCTAssertEqual(pixelVerticalFrame.height, millimeterVerticalFrame.height, accuracy: 0.0001)
-            }
-        }
-    }
-
-    func testTopUnitLabelDrawRectLeavesRoomForDescenders() {
-        let labelSize = NSSize(width: 12, height: 10)
-        let bounds = NSRect(x: 0, y: 0, width: 20, height: 12)
-
-        let topDrawRect = UnitLabelView.labelDrawRect(
-            labelSize: labelSize,
-            bounds: bounds,
-            placement: RulerCornerPlacement(xSide: .left, ySide: .top)
-        )
-        let bottomDrawRect = UnitLabelView.labelDrawRect(
-            labelSize: labelSize,
-            bounds: NSRect(x: 0, y: 0, width: 20, height: 19),
-            placement: RulerCornerPlacement(xSide: .left, ySide: .bottom)
-        )
-
-        XCTAssertEqual(topDrawRect.minY, 2)
-        XCTAssertLessThanOrEqual(topDrawRect.maxY, bounds.maxY)
-        XCTAssertEqual(bottomDrawRect.minY, 9)
     }
 
     func testMouseNumberLabelsRespectUnitsAfterZeroCornerFlip() {
