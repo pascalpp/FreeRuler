@@ -11,7 +11,6 @@ func configureOpaqueColorPicking() {
     if UITestSupport.isEnabled {
         colorPanel.setAccessibilityValue(rulerColorPanelOpaqueAccessibilityValue)
     }
-    setColorPickingIgnoresAlpha(true)
     colorPanel.showsAlpha = false
     colorPanel.isContinuous = true
     colorPanel.animationBehavior = .none
@@ -20,19 +19,6 @@ func configureOpaqueColorPicking() {
 
 private func configureOpaqueColorPickingAfterPanelUpdates() {
     configureOpaqueColorPicking()
-
-    // The shared color panel can rebuild picker controls shortly after opening; reapply during
-    // that churn so alpha controls stay hidden without doing work for every color change.
-    for delay in colorPanelOpaqueConfigurationRetryDelays {
-        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-            configureOpaqueColorPicking()
-        }
-    }
-}
-
-private func setColorPickingIgnoresAlpha(_ ignoresAlpha: Bool) {
-    // AppKit still consults this deprecated global switch when deciding whether color wells support alpha.
-    NSColor.ignoresAlpha = ignoresAlpha
 }
 
 class RulerColorWell: NSColorWell {
