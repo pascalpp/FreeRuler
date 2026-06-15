@@ -46,8 +46,11 @@ final class ResizeHandleView: NSView {
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
 
+        NSGraphicsContext.saveGraphicsState()
+        NSBezierPath(rect: gripClipRect(in: bounds)).addClip()
         drawBackground()
         drawGripLines()
+        NSGraphicsContext.restoreGraphicsState()
     }
 
     override func updateTrackingAreas() {
@@ -338,16 +341,22 @@ final class ResizeHandleView: NSView {
 
             switch placement.ySide {
             case .top:
-                y = bounds.maxY - gripSize.height
+                y = bounds.maxY
+                    - horizontalYOffset
+                    - length
+                    - backgroundPadding
             case .bottom:
-                y = bounds.minY
+                y = bounds.minY + horizontalYOffset - backgroundPadding
             }
         case .vertical:
             switch placement.xSide {
             case .left:
-                x = bounds.minX
+                x = bounds.minX + verticalXOffset - backgroundPadding
             case .right:
-                x = bounds.maxX - gripSize.width
+                x = bounds.maxX
+                    - verticalXOffset
+                    - length
+                    - backgroundPadding
             }
 
             switch placement.ySide {
@@ -359,6 +368,49 @@ final class ResizeHandleView: NSView {
         }
 
         return NSRect(origin: NSPoint(x: x, y: y), size: gripSize)
+    }
+
+    private func gripClipRect(in bounds: NSRect) -> NSRect {
+        let placement = ZeroCornerGeometry(zeroCorner: zeroCorner)
+            .resizeHandlePlacement(for: orientation)
+        let gripRect = self.gripRect(in: bounds)
+
+        switch orientation {
+        case .horizontal:
+            switch placement.ySide {
+            case .top:
+                return NSRect(
+                    x: bounds.minX,
+                    y: gripRect.minY,
+                    width: bounds.width,
+                    height: bounds.maxY - gripRect.minY
+                )
+            case .bottom:
+                return NSRect(
+                    x: bounds.minX,
+                    y: bounds.minY,
+                    width: bounds.width,
+                    height: gripRect.maxY - bounds.minY
+                )
+            }
+        case .vertical:
+            switch placement.xSide {
+            case .left:
+                return NSRect(
+                    x: bounds.minX,
+                    y: bounds.minY,
+                    width: gripRect.maxX - bounds.minX,
+                    height: bounds.height
+                )
+            case .right:
+                return NSRect(
+                    x: gripRect.minX,
+                    y: bounds.minY,
+                    width: bounds.maxX - gripRect.minX,
+                    height: bounds.height
+                )
+            }
+        }
     }
 
     private func gripSize() -> NSSize {
