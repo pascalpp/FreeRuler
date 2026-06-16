@@ -405,6 +405,13 @@ final class GroupedRulerWindow: NSPanel {
         return convertToScreen(groupedContentView.localFrame(for: orientation))
     }
 
+    func visibleFrame(in layout: GroupedRulerLayout) -> NSRect {
+        return layout.visibleFrame(
+            showsHorizontalRule: groupedContentView.showsHorizontalRule,
+            showsVerticalRule: groupedContentView.showsVerticalRule
+        )
+    }
+
     func setVisibleRules(horizontal: Bool, vertical: Bool) {
         groupedContentView.showsHorizontalRule = horizontal
         groupedContentView.showsVerticalRule = vertical
@@ -428,10 +435,23 @@ final class GroupedRulerWindow: NSPanel {
     }
 
     func zeroPoint() -> NSPoint {
-        return ZeroCornerGeometry(zeroCorner: prefs.zeroCorner).zeroPoint(
-            in: screenFrame(for: .horizontal),
-            for: .horizontal
-        )
+        let geometry = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner)
+
+        if isRuleVisible(.horizontal) {
+            return geometry.zeroPoint(
+                in: screenFrame(for: .horizontal),
+                for: .horizontal
+            )
+        }
+
+        if isRuleVisible(.vertical) {
+            return geometry.zeroPoint(
+                in: screenFrame(for: .vertical),
+                for: .vertical
+            )
+        }
+
+        return frame.origin
     }
 
     private var leftMouseButtonIsPressed: Bool {
@@ -1227,7 +1247,7 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
             zeroCorner: prefs.zeroCorner
         )
 
-        groupedWindow.setFrame(layout.groupFrame, display: true)
+        groupedWindow.setFrame(groupedWindow.visibleFrame(in: layout), display: true)
         groupedWindow.updateLayoutForCurrentZeroCorner()
     }
 
@@ -1242,7 +1262,7 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
             zeroCorner: zeroCorner
         )
 
-        groupedWindow.setFrame(layout.groupFrame, display: true)
+        groupedWindow.setFrame(groupedWindow.visibleFrame(in: layout), display: true)
     }
 
     func foreground() {

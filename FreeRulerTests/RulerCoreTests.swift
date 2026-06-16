@@ -481,6 +481,91 @@ final class RulerCoreTests: XCTestCase {
         }
     }
 
+    func testGroupedRulerControllerAlignsOnlyVisibleLegWithoutExpandingWindow() {
+        withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .topLeft
+            let horizontalFrame = NSRect(x: 200, y: 299, width: 320, height: Ruler.thickness)
+            let verticalFrame = NSRect(x: 161, y: 120, width: Ruler.thickness, height: 180)
+            let controller = GroupedRulerController(
+                frame: GroupedRulerLayout.joined(
+                    horizontalFrame: horizontalFrame,
+                    verticalFrame: verticalFrame,
+                    zeroCorner: .topLeft
+                ).groupFrame
+            )
+            let targetZeroPoint = NSPoint(x: 350, y: 500)
+
+            controller.show(
+                horizontalFrame: horizontalFrame,
+                verticalFrame: verticalFrame,
+                showsHorizontalRule: false,
+                showsVerticalRule: true
+            )
+
+            controller.align(at: targetZeroPoint)
+
+            let expectedFrame = GroupedRulerLayout.layout(
+                horizontalLength: 0,
+                verticalLength: verticalFrame.height,
+                zeroPoint: targetZeroPoint,
+                zeroCorner: .topLeft
+            ).visibleFrame(showsHorizontalRule: false, showsVerticalRule: true)
+            XCTAssertEqual(controller.groupedWindow.frame, expectedFrame)
+            XCTAssertEqual(controller.groupedWindow.frame.size, verticalFrame.size)
+            XCTAssertEqual(
+                ZeroCornerGeometry(zeroCorner: .topLeft).zeroPoint(
+                    in: controller.groupedWindow.screenFrame(for: .vertical),
+                    for: .vertical
+                ),
+                targetZeroPoint
+            )
+            controller.groupedWindow.orderOut(self)
+        }
+    }
+
+    func testGroupedRulerControllerFlipsOnlyVisibleLegWithoutExpandingWindow() {
+        withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .topLeft
+            let horizontalFrame = NSRect(x: 200, y: 299, width: 320, height: Ruler.thickness)
+            let verticalFrame = NSRect(x: 161, y: 120, width: Ruler.thickness, height: 180)
+            let controller = GroupedRulerController(
+                frame: GroupedRulerLayout.joined(
+                    horizontalFrame: horizontalFrame,
+                    verticalFrame: verticalFrame,
+                    zeroCorner: .topLeft
+                ).groupFrame
+            )
+            let oldZeroPoint = ZeroCornerGeometry(zeroCorner: .topLeft)
+                .zeroPoint(in: verticalFrame, for: .vertical)
+
+            controller.show(
+                horizontalFrame: horizontalFrame,
+                verticalFrame: verticalFrame,
+                showsHorizontalRule: false,
+                showsVerticalRule: true
+            )
+
+            controller.prepareForZeroCornerChange(to: .topRight)
+
+            let expectedFrame = GroupedRulerLayout.layout(
+                horizontalLength: 0,
+                verticalLength: verticalFrame.height,
+                zeroPoint: oldZeroPoint,
+                zeroCorner: .topRight
+            ).visibleFrame(showsHorizontalRule: false, showsVerticalRule: true)
+            XCTAssertEqual(controller.groupedWindow.frame, expectedFrame)
+            XCTAssertEqual(controller.groupedWindow.frame.size, verticalFrame.size)
+            XCTAssertEqual(
+                ZeroCornerGeometry(zeroCorner: .topRight).zeroPoint(
+                    in: controller.groupedWindow.frame,
+                    for: .vertical
+                ),
+                oldZeroPoint
+            )
+            controller.groupedWindow.orderOut(self)
+        }
+    }
+
     func testMinAndMaxSizesMatchRulerOrientation() {
         let horizontal = Ruler(.horizontal, frame: NSRect(x: 0, y: 0, width: 300, height: 40))
         let vertical = Ruler(.vertical, frame: NSRect(x: 0, y: 0, width: 40, height: 300))
