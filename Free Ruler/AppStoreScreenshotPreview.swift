@@ -381,8 +381,10 @@ private enum AppStoreMeasureScreenshotLayout {
     static let rulerScale: CGFloat = 4.4
     static let rulerCornerX: CGFloat = 420
     static let rulerCornerY: CGFloat = 500
-    static let horizontalRulerLength: CGFloat = 1850
-    static let verticalRulerLength: CGFloat = 1040
+    static let horizontalRulerLength: CGFloat = 1888
+    static let verticalRulerLength: CGFloat = 1070
+    static let sampleWindowWidth: CGFloat = 1850
+    static let sampleWindowHeight: CGFloat = 1040
 
     static let boxGutter: CGFloat = 70
     static let box1Width: CGFloat = 800
@@ -413,12 +415,23 @@ private enum AppStoreMeasureScreenshotLayout {
         )
     }
 
+    static var groupedRulerRect: NSRect {
+        horizontalRulerRect.union(verticalRulerRect)
+    }
+
+    static var groupedRulerBoundsSize: NSSize {
+        NSSize(
+            width: groupedRulerRect.width / rulerScale,
+            height: groupedRulerRect.height / rulerScale
+        )
+    }
+
     static var sampleWindowRect: NSRect {
         NSRect(
             x: horizontalRulerRect.minX,
             y: verticalRulerRect.minY,
-            width: horizontalRulerLength,
-            height: verticalRulerLength
+            width: sampleWindowWidth,
+            height: sampleWindowHeight
         )
     }
 
@@ -498,7 +511,7 @@ private enum AppStoreColorsScreenshotLayout {
 
     static let rulerOpacity: CGFloat = 1
     static let rulerCount = 7
-    static let rulerGap: CGFloat = 30
+    static let rulerGap: CGFloat = 50
     static let firstRulerStart: CGFloat = rulerGap
     static let lastRulerEnd: CGFloat = AppStoreScreenshotLayout.canvasWidth - rulerGap
     static let rulerArcTop: CGFloat = 450
@@ -1055,26 +1068,7 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
     private static func makeRulerPlacements(for screen: AppStoreScreenshotScreen) -> [AppStoreRulerPlacement] {
         switch screen.scenario {
         case .measure:
-            let horizontalBoundsSize = NSSize(
-                width: AppStoreMeasureScreenshotLayout.horizontalRulerLength / AppStoreMeasureScreenshotLayout.rulerScale,
-                height: Ruler.thickness
-            )
-            let verticalBoundsSize = NSSize(
-                width: Ruler.thickness,
-                height: AppStoreMeasureScreenshotLayout.verticalRulerLength / AppStoreMeasureScreenshotLayout.rulerScale
-            )
-            return [
-                AppStoreRulerPlacement(
-                    view: AppStoreHorizontalRule(unit: .pixels, frame: NSRect(origin: .zero, size: horizontalBoundsSize)),
-                    frame: AppStoreMeasureScreenshotLayout.horizontalRulerRect,
-                    boundsSize: horizontalBoundsSize
-                ),
-                AppStoreRulerPlacement(
-                    view: AppStoreVerticalRule(unit: .pixels, frame: NSRect(origin: .zero, size: verticalBoundsSize)),
-                    frame: AppStoreMeasureScreenshotLayout.verticalRulerRect,
-                    boundsSize: verticalBoundsSize
-                ),
-            ]
+            return []
         case .units:
             let rulerBoundsSize = NSSize(
                 width: AppStoreUnitsScreenshotLayout.rulerLength / AppStoreUnitsScreenshotLayout.rulerScale,
@@ -1171,6 +1165,47 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         }
     }
 
+    private static func makeMeasureGroupedRulerPlacement() -> AppStoreViewPlacement {
+        let horizontalBoundsSize = NSSize(
+            width: AppStoreMeasureScreenshotLayout.horizontalRulerLength / AppStoreMeasureScreenshotLayout.rulerScale,
+            height: Ruler.thickness
+        )
+        let verticalBoundsSize = NSSize(
+            width: Ruler.thickness,
+            height: AppStoreMeasureScreenshotLayout.verticalRulerLength / AppStoreMeasureScreenshotLayout.rulerScale
+        )
+        let boundsSize = AppStoreMeasureScreenshotLayout.groupedRulerBoundsSize
+        let horizontalRule = AppStoreHorizontalRule(
+            unit: .pixels,
+            frame: NSRect(origin: .zero, size: horizontalBoundsSize)
+        )
+        let verticalRule = AppStoreVerticalRule(
+            unit: .pixels,
+            frame: NSRect(origin: .zero, size: verticalBoundsSize)
+        )
+        let color = RulerColors(customFill: Prefs.defaultRulerFillColor)
+        let groupedView = GroupedRulerContentView(
+            frame: NSRect(origin: .zero, size: boundsSize),
+            horizontalRule: horizontalRule,
+            verticalRule: verticalRule
+        )
+
+        horizontalRule.color = color
+        verticalRule.color = color
+        horizontalRule.showMouseTick = false
+        verticalRule.showMouseTick = false
+        groupedView.color = color
+        groupedView.zeroCorner = .topLeft
+        groupedView.needsLayout = true
+        groupedView.layoutSubtreeIfNeeded()
+
+        return AppStoreViewPlacement(
+            view: groupedView,
+            frame: AppStoreMeasureScreenshotLayout.groupedRulerRect,
+            boundsSize: boundsSize
+        )
+    }
+
     private static func makePreferencesController() -> PreferencesController {
         let controller = PreferencesController()
         controller.loadWindow()
@@ -1183,39 +1218,45 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         for screen: AppStoreScreenshotScreen,
         preferencesController: PreferencesController?
     ) -> [AppStoreViewPlacement] {
-        guard screen.scenario == .preferences,
-              let preferencesView = preferencesController?.window?.contentView else {
+        switch screen.scenario {
+        case .measure:
+            return [makeMeasureGroupedRulerPlacement()]
+        case .units, .colors, .flipRulers:
             return []
-        }
-        let originalForegroundOpacity = prefs.foregroundOpacity
-        let originalBackgroundOpacity = prefs.backgroundOpacity
-        let originalFloatRulers = prefs.floatRulers
-        let originalGroupRulers = prefs.groupRulers
-        let originalRulerShadow = prefs.rulerShadow
-        prefs.foregroundOpacity = AppStorePreferencesScreenshotLayout.foregroundOpacityPercent
-        prefs.backgroundOpacity = AppStorePreferencesScreenshotLayout.backgroundOpacityPercent
-        prefs.floatRulers = AppStorePreferencesScreenshotLayout.floatRulers
-        prefs.groupRulers = AppStorePreferencesScreenshotLayout.groupRulers
-        prefs.rulerShadow = AppStorePreferencesScreenshotLayout.rulerShadow
-        preferencesController?.updateView()
-        preferencesController?.window?.contentView?.layoutSubtreeIfNeeded()
-        defer {
-            prefs.foregroundOpacity = originalForegroundOpacity
-            prefs.backgroundOpacity = originalBackgroundOpacity
-            prefs.floatRulers = originalFloatRulers
-            prefs.groupRulers = originalGroupRulers
-            prefs.rulerShadow = originalRulerShadow
-        }
+        case .preferences:
+            guard let preferencesView = preferencesController?.window?.contentView else {
+                return []
+            }
+            let originalForegroundOpacity = prefs.foregroundOpacity
+            let originalBackgroundOpacity = prefs.backgroundOpacity
+            let originalFloatRulers = prefs.floatRulers
+            let originalGroupRulers = prefs.groupRulers
+            let originalRulerShadow = prefs.rulerShadow
+            prefs.foregroundOpacity = AppStorePreferencesScreenshotLayout.foregroundOpacityPercent
+            prefs.backgroundOpacity = AppStorePreferencesScreenshotLayout.backgroundOpacityPercent
+            prefs.floatRulers = AppStorePreferencesScreenshotLayout.floatRulers
+            prefs.groupRulers = AppStorePreferencesScreenshotLayout.groupRulers
+            prefs.rulerShadow = AppStorePreferencesScreenshotLayout.rulerShadow
+            preferencesController?.updateView()
+            preferencesController?.window?.contentView?.layoutSubtreeIfNeeded()
+            defer {
+                prefs.foregroundOpacity = originalForegroundOpacity
+                prefs.backgroundOpacity = originalBackgroundOpacity
+                prefs.floatRulers = originalFloatRulers
+                prefs.groupRulers = originalGroupRulers
+                prefs.rulerShadow = originalRulerShadow
+            }
 
-        let imageView = NSImageView(frame: NSRect(origin: .zero, size: AppStorePreferencesScreenshotLayout.preferencesContentSize))
-        imageView.image = snapshot(preferencesView, preferencesController: preferencesController)
-        imageView.imageScaling = .scaleAxesIndependently
+            let imageView = NSImageView(frame: NSRect(origin: .zero, size: AppStorePreferencesScreenshotLayout.preferencesContentSize))
+            imageView.image = snapshot(preferencesView, preferencesController: preferencesController)
+            imageView.imageScaling = .scaleAxesIndependently
 
-        return [AppStoreViewPlacement(
-            view: imageView,
-            frame: AppStorePreferencesScreenshotLayout.preferencesContentRect,
-            boundsSize: AppStorePreferencesScreenshotLayout.preferencesContentSize
-        )]
+            return [AppStoreViewPlacement(
+                view: imageView,
+                frame: AppStorePreferencesScreenshotLayout.preferencesContentRect,
+                boundsSize: AppStorePreferencesScreenshotLayout.preferencesContentSize
+            )]
+        }
     }
 
     private static func makeCopyViewPlacement(for screen: AppStoreScreenshotScreen) -> AppStoreViewPlacement {
