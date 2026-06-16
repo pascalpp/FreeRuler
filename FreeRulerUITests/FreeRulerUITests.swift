@@ -62,6 +62,27 @@ final class FreeRulerUITests: XCTestCase {
         XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 2))
         XCTAssertTrue(verticalRuler.waitForNonExistence(timeout: 2))
         XCTAssertTrue(groupedRuler.exists)
+        assertFrame(
+            groupedRuler.frame,
+            matches: horizontalRuler.frame,
+            message: "Grouped window should shrink to the visible horizontal ruler frame"
+        )
+        XCTAssertTrue(waitForPreference("groupRulers", equals: true))
+
+        app.typeKey("v", modifierFlags: [])
+        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 2))
+
+        verticalRuler.click()
+        app.typeKey("h", modifierFlags: [])
+
+        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 2))
+        XCTAssertTrue(horizontalRuler.waitForNonExistence(timeout: 2))
+        XCTAssertTrue(groupedRuler.exists)
+        assertFrame(
+            groupedRuler.frame,
+            matches: verticalRuler.frame,
+            message: "Grouped window should shrink to the visible vertical ruler frame"
+        )
         XCTAssertTrue(waitForPreference("groupRulers", equals: true))
     }
 
@@ -409,6 +430,20 @@ final class FreeRulerUITests: XCTestCase {
 
         hover(over: pointOutside(ruler))
         assertCursor("crosshair", after: "mouseout \(label)")
+    }
+
+    private func assertFrame(
+        _ actual: CGRect,
+        matches expected: CGRect,
+        accuracy: CGFloat = 1,
+        message: String,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        XCTAssertEqual(actual.minX, expected.minX, accuracy: accuracy, message, file: file, line: line)
+        XCTAssertEqual(actual.minY, expected.minY, accuracy: accuracy, message, file: file, line: line)
+        XCTAssertEqual(actual.width, expected.width, accuracy: accuracy, message, file: file, line: line)
+        XCTAssertEqual(actual.height, expected.height, accuracy: accuracy, message, file: file, line: line)
     }
 
     private func waitForHotkeyBezel(_ expectedLabel: String, timeout: TimeInterval = 2) -> Bool {
