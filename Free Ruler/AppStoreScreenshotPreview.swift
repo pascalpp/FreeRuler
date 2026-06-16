@@ -170,6 +170,11 @@ private struct AppStoreFlipRulerSet {
         return NSRect(x: frameX, y: frameY, width: thickness, height: verticalLength)
     }
 
+    func groupedFrame(rulerScale: CGFloat) -> NSRect {
+        horizontalFrame(rulerScale: rulerScale)
+            .union(verticalFrame(rulerScale: rulerScale))
+    }
+
     private var zeroCornerX: CGFloat {
         switch zeroCorner {
         case .topLeft, .bottomLeft:
@@ -576,30 +581,91 @@ private enum AppStoreFlipScreenshotLayout {
     static let copyViewX: CGFloat = 700
     static let copyViewY: CGFloat = 700
 
-    // X/Y inset each set's zero corner from its named canvas corner.
-    static let topLeftX: CGFloat = 280
-    static let topLeftY: CGFloat = 280
-    static let topLeftHorizontalLength: CGFloat = 2200
-    static let topLeftVerticalLength: CGFloat = 1354
+    // Canvas edge to the outside edge of the outer grouped rulers.
+    static let outerGap: CGFloat = 80
+    // Outside edge of an outer grouped ruler to the nearest nested grouped ruler.
+    static let innerGap: CGFloat = 80
+
     static let topLeftRulerColor = #colorLiteral(red: 0.95, green: 0.7125, blue: 0.8019480475, alpha: 1)
 
-    static let topRightX: CGFloat = 520
-    static let topRightY: CGFloat = 520
-    static let topRightHorizontalLength: CGFloat = 1783
-    static let topRightVerticalLength: CGFloat = 895
     static let topRightRulerColor = #colorLiteral(red: 0.98, green: 0.735, blue: 0.8272727226, alpha: 1)
 
-    static let bottomRightX: CGFloat = 280
-    static let bottomRightY: CGFloat = 280
-    static let bottomRightHorizontalLength: CGFloat = 2196
-    static let bottomRightVerticalLength: CGFloat = 1351
     static let bottomRightRulerColor = #colorLiteral(red: 0.95, green: 0.7125, blue: 0.8019480475, alpha: 1)
 
-    static let bottomLeftX: CGFloat = 530
-    static let bottomLeftY: CGFloat = 515
-    static let bottomLeftHorizontalLength: CGFloat = 1777
-    static let bottomLeftVerticalLength: CGFloat = 900
     static let bottomLeftRulerColor = #colorLiteral(red: 0.98, green: 0.735, blue: 0.8272727227, alpha: 1)
+
+    private static var scaledRulerThickness: CGFloat {
+        Ruler.thickness * rulerScale
+    }
+
+    private static var overlap: CGFloat {
+        rulerScale
+    }
+
+    private static var outerLeadingZeroInset: CGFloat {
+        outerGap + scaledRulerThickness
+    }
+
+    private static var outerTrailingZeroInset: CGFloat {
+        outerGap + scaledRulerThickness - overlap
+    }
+
+    private static var innerLeadingZeroInset: CGFloat {
+        innerRulerEdgeInset + scaledRulerThickness
+    }
+
+    private static var innerTrailingZeroInset: CGFloat {
+        innerRulerEdgeInset + scaledRulerThickness - overlap
+    }
+
+    private static var innerRulerEdgeInset: CGFloat {
+        outerGap + scaledRulerThickness + innerGap
+    }
+
+    private static var leadingOuterVerticalMaxX: CGFloat {
+        outerLeadingZeroInset
+    }
+
+    private static var trailingOuterVerticalMinX: CGFloat {
+        AppStoreScreenshotLayout.canvasWidth - outerTrailingZeroInset - overlap
+    }
+
+    private static var leadingInnerVerticalMaxX: CGFloat {
+        innerLeadingZeroInset
+    }
+
+    private static var trailingInnerVerticalMinX: CGFloat {
+        AppStoreScreenshotLayout.canvasWidth - innerTrailingZeroInset - overlap
+    }
+
+    private static func horizontalLength(
+        from minX: CGFloat,
+        stoppingBefore verticalMinX: CGFloat
+    ) -> CGFloat {
+        verticalMinX - innerGap - minX
+    }
+
+    private static func horizontalLength(
+        to maxX: CGFloat,
+        stoppingAfter verticalMaxX: CGFloat
+    ) -> CGFloat {
+        maxX - innerGap - verticalMaxX
+    }
+
+    private static var outerVerticalLength: CGFloat {
+        verticalLength(forEdgeInset: outerGap)
+    }
+
+    private static var innerVerticalLength: CGFloat {
+        verticalLength(forEdgeInset: innerRulerEdgeInset)
+    }
+
+    private static func verticalLength(forEdgeInset edgeInset: CGFloat) -> CGFloat {
+        AppStoreScreenshotLayout.canvasHeight
+            - (edgeInset * 2)
+            - scaledRulerThickness
+            + overlap
+    }
 
     static var copyViewLayout: AppStoreScreenshotCopyViewLayout {
         AppStoreScreenshotLayout.copyViewLayout(viewX: copyViewX, viewY: copyViewY)
@@ -610,37 +676,49 @@ private enum AppStoreFlipScreenshotLayout {
         return [
             AppStoreFlipRulerSet(
                 zeroCorner: .topLeft,
-                x: topLeftX,
-                y: topLeftY,
-                horizontalLength: topLeftHorizontalLength,
-                verticalLength: topLeftVerticalLength,
+                x: outerLeadingZeroInset,
+                y: outerLeadingZeroInset,
+                horizontalLength: horizontalLength(
+                    from: outerLeadingZeroInset - overlap,
+                    stoppingBefore: trailingOuterVerticalMinX
+                ),
+                verticalLength: outerVerticalLength,
                 fillColor: topLeftRulerColor,
                 layoutSize: layoutSize
             ),
             AppStoreFlipRulerSet(
                 zeroCorner: .topRight,
-                x: topRightX,
-                y: topRightY,
-                horizontalLength: topRightHorizontalLength,
-                verticalLength: topRightVerticalLength,
+                x: innerTrailingZeroInset,
+                y: innerLeadingZeroInset,
+                horizontalLength: horizontalLength(
+                    to: AppStoreScreenshotLayout.canvasWidth - innerTrailingZeroInset,
+                    stoppingAfter: leadingInnerVerticalMaxX
+                ),
+                verticalLength: innerVerticalLength,
                 fillColor: topRightRulerColor,
                 layoutSize: layoutSize
             ),
             AppStoreFlipRulerSet(
                 zeroCorner: .bottomLeft,
-                x: bottomLeftX,
-                y: bottomLeftY,
-                horizontalLength: bottomLeftHorizontalLength,
-                verticalLength: bottomLeftVerticalLength,
+                x: innerLeadingZeroInset,
+                y: innerTrailingZeroInset,
+                horizontalLength: horizontalLength(
+                    from: innerLeadingZeroInset - overlap,
+                    stoppingBefore: trailingInnerVerticalMinX
+                ),
+                verticalLength: innerVerticalLength,
                 fillColor: bottomLeftRulerColor,
                 layoutSize: layoutSize
             ),
             AppStoreFlipRulerSet(
                 zeroCorner: .bottomRight,
-                x: bottomRightX,
-                y: bottomRightY,
-                horizontalLength: bottomRightHorizontalLength,
-                verticalLength: bottomRightVerticalLength,
+                x: outerTrailingZeroInset,
+                y: outerTrailingZeroInset,
+                horizontalLength: horizontalLength(
+                    to: AppStoreScreenshotLayout.canvasWidth - outerTrailingZeroInset,
+                    stoppingAfter: leadingOuterVerticalMaxX
+                ),
+                verticalLength: outerVerticalLength,
                 fillColor: bottomRightRulerColor,
                 layoutSize: layoutSize
             ),
@@ -658,6 +736,14 @@ private enum AppStoreFlipScreenshotLayout {
         NSSize(
             width: Ruler.thickness,
             height: rulerSet.verticalLength / rulerScale
+        )
+    }
+
+    static func groupedBoundsSize(for rulerSet: AppStoreFlipRulerSet) -> NSSize {
+        let groupedFrame = rulerSet.groupedFrame(rulerScale: rulerScale)
+        return NSSize(
+            width: groupedFrame.width / rulerScale,
+            height: groupedFrame.height / rulerScale
         )
     }
 }
@@ -1111,34 +1197,7 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
                 )
             }
         case .flipRulers:
-            return AppStoreFlipScreenshotLayout.rulerSets.flatMap { rulerSet in
-                let horizontalBoundsSize = AppStoreFlipScreenshotLayout.horizontalBoundsSize(for: rulerSet)
-                let verticalBoundsSize = AppStoreFlipScreenshotLayout.verticalBoundsSize(for: rulerSet)
-                let style = AppStoreRulerStyle(fillColor: rulerSet.fillColor)
-
-                return [
-                    AppStoreRulerPlacement(
-                        view: AppStoreVerticalRule(
-                            unit: .pixels,
-                            frame: NSRect(origin: .zero, size: verticalBoundsSize),
-                            zeroCorner: rulerSet.zeroCorner
-                        ),
-                        frame: rulerSet.verticalFrame(rulerScale: AppStoreFlipScreenshotLayout.rulerScale),
-                        boundsSize: verticalBoundsSize,
-                        style: style
-                    ),
-                    AppStoreRulerPlacement(
-                        view: AppStoreHorizontalRule(
-                            unit: .pixels,
-                            frame: NSRect(origin: .zero, size: horizontalBoundsSize),
-                            zeroCorner: rulerSet.zeroCorner
-                        ),
-                        frame: rulerSet.horizontalFrame(rulerScale: AppStoreFlipScreenshotLayout.rulerScale),
-                        boundsSize: horizontalBoundsSize,
-                        style: style
-                    ),
-                ]
-            }
+            return []
         case .preferences:
             let horizontalBoundsSize = NSSize(
                 width: AppStorePreferencesScreenshotLayout.horizontalRulerLength / AppStorePreferencesScreenshotLayout.rulerScale,
@@ -1206,6 +1265,45 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         )
     }
 
+    private static func makeFlipGroupedRulerPlacements() -> [AppStoreViewPlacement] {
+        AppStoreFlipScreenshotLayout.rulerSets.map { rulerSet in
+            let horizontalBoundsSize = AppStoreFlipScreenshotLayout.horizontalBoundsSize(for: rulerSet)
+            let verticalBoundsSize = AppStoreFlipScreenshotLayout.verticalBoundsSize(for: rulerSet)
+            let boundsSize = AppStoreFlipScreenshotLayout.groupedBoundsSize(for: rulerSet)
+            let horizontalRule = AppStoreHorizontalRule(
+                unit: .pixels,
+                frame: NSRect(origin: .zero, size: horizontalBoundsSize),
+                zeroCorner: rulerSet.zeroCorner
+            )
+            let verticalRule = AppStoreVerticalRule(
+                unit: .pixels,
+                frame: NSRect(origin: .zero, size: verticalBoundsSize),
+                zeroCorner: rulerSet.zeroCorner
+            )
+            let color = RulerColors(customFill: rulerSet.fillColor)
+            let groupedView = GroupedRulerContentView(
+                frame: NSRect(origin: .zero, size: boundsSize),
+                horizontalRule: horizontalRule,
+                verticalRule: verticalRule
+            )
+
+            horizontalRule.color = color
+            verticalRule.color = color
+            horizontalRule.showMouseTick = false
+            verticalRule.showMouseTick = false
+            groupedView.color = color
+            groupedView.zeroCorner = rulerSet.zeroCorner
+            groupedView.needsLayout = true
+            groupedView.layoutSubtreeIfNeeded()
+
+            return AppStoreViewPlacement(
+                view: groupedView,
+                frame: rulerSet.groupedFrame(rulerScale: AppStoreFlipScreenshotLayout.rulerScale),
+                boundsSize: boundsSize
+            )
+        }
+    }
+
     private static func makePreferencesController() -> PreferencesController {
         let controller = PreferencesController()
         controller.loadWindow()
@@ -1221,7 +1319,9 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         switch screen.scenario {
         case .measure:
             return [makeMeasureGroupedRulerPlacement()]
-        case .units, .colors, .flipRulers:
+        case .flipRulers:
+            return makeFlipGroupedRulerPlacements()
+        case .units, .colors:
             return []
         case .preferences:
             guard let preferencesView = preferencesController?.window?.contentView else {
