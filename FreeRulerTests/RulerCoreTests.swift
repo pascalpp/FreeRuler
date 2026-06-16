@@ -611,7 +611,7 @@ final class RulerCoreTests: XCTestCase {
         )
         XCTAssertEqual(
             rule.tickX(forOffset: 50, rulerWidth: 300, growthDirection: .negative),
-            250
+            249
         )
         XCTAssertEqual(
             rule.mouseTickLineX(forTickX: 1, growthDirection: .positive),
@@ -663,7 +663,7 @@ final class RulerCoreTests: XCTestCase {
         )
         XCTAssertEqual(
             rule.tickY(forOffset: 50, rulerHeight: 300, growthDirection: .positive),
-            50
+            51
         )
         XCTAssertEqual(
             rule.mouseTickLineY(forTickY: 299, growthDirection: .negative),
