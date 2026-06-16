@@ -14,12 +14,8 @@ private enum HotkeyBezelLocalizationKey: String {
     case rulersUngrouped = "HotkeyBezel.RulersUngrouped"
     case shadowEnabled = "HotkeyBezel.ShadowEnabled"
     case shadowDisabled = "HotkeyBezel.ShadowDisabled"
-    case horizontalOriginFormat = "HotkeyBezel.HorizontalOriginFormat"
-    case verticalOriginFormat = "HotkeyBezel.VerticalOriginFormat"
-    case originLeft = "HotkeyBezel.OriginLeft"
-    case originRight = "HotkeyBezel.OriginRight"
-    case originTop = "HotkeyBezel.OriginTop"
-    case originBottom = "HotkeyBezel.OriginBottom"
+    case flipHorizontal = "HotkeyBezel.FlipHorizontal"
+    case flipVertical = "HotkeyBezel.FlipVertical"
     case unitsFormat = "HotkeyBezel.UnitsFormat"
     case pixelsUnit = "Unit.Pixels.Abbreviation"
     case millimetersUnit = "Unit.Millimeters.Abbreviation"
@@ -43,18 +39,10 @@ private enum HotkeyBezelLocalizationKey: String {
             return "Hotkey status bezel text indicating ruler shadow is enabled"
         case .shadowDisabled:
             return "Hotkey status bezel text indicating ruler shadow is disabled"
-        case .horizontalOriginFormat:
-            return "Hotkey status bezel format for the horizontal ruler origin side"
-        case .verticalOriginFormat:
-            return "Hotkey status bezel format for the vertical ruler origin side"
-        case .originLeft:
-            return "Hotkey status bezel value for a ruler origin on the left"
-        case .originRight:
-            return "Hotkey status bezel value for a ruler origin on the right"
-        case .originTop:
-            return "Hotkey status bezel value for a ruler origin at the top"
-        case .originBottom:
-            return "Hotkey status bezel value for a ruler origin at the bottom"
+        case .flipHorizontal:
+            return "Hotkey status bezel text indicating the horizontal ruler was flipped"
+        case .flipVertical:
+            return "Hotkey status bezel text indicating the vertical ruler was flipped"
         case .unitsFormat:
             return "Hotkey status bezel format for the selected measurement unit"
         case .pixelsUnit:
@@ -798,37 +786,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func showHorizontalOriginHotkeyBezel(on screen: NSScreen?) {
-        switch prefs.zeroCorner {
-        case .topLeft, .bottomLeft:
-            showHotkeyBezel(
-                format: .horizontalOriginFormat,
-                HotkeyBezelLocalizationKey.originLeft.localizedString,
-                on: screen
-            )
-        case .topRight, .bottomRight:
-            showHotkeyBezel(
-                format: .horizontalOriginFormat,
-                HotkeyBezelLocalizationKey.originRight.localizedString,
-                on: screen
-            )
-        }
+        showHotkeyBezel(.flipHorizontal, on: screen)
     }
 
     private func showVerticalOriginHotkeyBezel(on screen: NSScreen?) {
-        switch prefs.zeroCorner {
-        case .topLeft, .topRight:
-            showHotkeyBezel(
-                format: .verticalOriginFormat,
-                HotkeyBezelLocalizationKey.originTop.localizedString,
-                on: screen
-            )
-        case .bottomLeft, .bottomRight:
-            showHotkeyBezel(
-                format: .verticalOriginFormat,
-                HotkeyBezelLocalizationKey.originBottom.localizedString,
-                on: screen
-            )
-        }
+        showHotkeyBezel(.flipVertical, on: screen)
     }
 
     private func bezelScreen(for sender: Any) -> NSScreen? {
