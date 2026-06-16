@@ -321,6 +321,18 @@ final class GroupedRulerWindow: NSPanel {
         super.mouseUp(with: event)
     }
 
+    override func mouseEntered(with event: NSEvent) {
+        nextResponder?.mouseEntered(with: event)
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        nextResponder?.mouseExited(with: event)
+    }
+
+    override func mouseMoved(with event: NSEvent) {
+        nextResponder?.mouseMoved(with: event)
+    }
+
     func updateLayoutForCurrentZeroCorner() {
         minSize = GroupedRulerLayout.minSize(zeroCorner: prefs.zeroCorner)
         maxSize = GroupedRulerLayout.maxSize(zeroCorner: prefs.zeroCorner)
@@ -355,6 +367,11 @@ final class GroupedRulerWindow: NSPanel {
         case .vertical:
             return groupedContentView.showsVerticalRule
         }
+    }
+
+    func isEmptyCorner(atWindowPoint windowPoint: NSPoint) -> Bool {
+        let contentPoint = groupedContentView.convert(windowPoint, from: nil)
+        return groupedContentView.containsEmptyCorner(contentPoint)
     }
 
     func zeroPoint() -> NSPoint {
@@ -732,6 +749,7 @@ final class GroupedRulerContentView: NSView {
     )
     private let zeroLabelsView: GroupedRulerZeroLabelsView
     private let borderView = GroupedRulerBorderView(frame: .zero)
+    private var cornerTrackingArea: NSTrackingArea?
 
     var showsHorizontalRule = true {
         didSet {
@@ -815,6 +833,19 @@ final class GroupedRulerContentView: NSView {
         return true
     }
 
+    override func updateTrackingAreas() {
+        super.updateTrackingAreas()
+        rebuildCornerTrackingArea()
+    }
+
+    override func resetCursorRects() {
+        super.resetCursorRects()
+
+        if showsHorizontalRule && showsVerticalRule {
+            addCursorRect(cornerFrame(), cursor: .openHand)
+        }
+    }
+
     override func layout() {
         super.layout()
 
@@ -837,6 +868,8 @@ final class GroupedRulerContentView: NSView {
         borderView.showsVerticalRule = showsVerticalRule
         horizontalRule.needsDisplay = true
         verticalRule.needsDisplay = true
+        window?.invalidateCursorRects(for: self)
+        rebuildCornerTrackingArea()
     }
 
     override func draw(_ dirtyRect: NSRect) {
@@ -857,7 +890,31 @@ final class GroupedRulerContentView: NSView {
             return hitView
         }
 
-        return showsHorizontalRule && showsVerticalRule && cornerFrame().contains(point) ? self : nil
+        return containsEmptyCorner(point) ? self : nil
+    }
+
+    override func mouseEntered(with event: NSEvent) {
+        nextResponder?.mouseEntered(with: event)
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        nextResponder?.mouseExited(with: event)
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        nextResponder?.mouseDown(with: event)
+    }
+
+    override func mouseUp(with event: NSEvent) {
+        nextResponder?.mouseUp(with: event)
+    }
+
+    override func mouseMoved(with event: NSEvent) {
+        nextResponder?.mouseMoved(with: event)
+    }
+
+    func containsEmptyCorner(_ point: NSPoint) -> Bool {
+        return showsHorizontalRule && showsVerticalRule && cornerFrame().contains(point)
     }
 
     func localFrame(for orientation: Orientation) -> NSRect {
@@ -873,6 +930,31 @@ final class GroupedRulerContentView: NSView {
         return GroupedRulerLayout
             .layout(groupFrame: bounds, zeroCorner: zeroCorner)
             .emptyCornerFrame(zeroCorner: zeroCorner)
+    }
+
+    private func rebuildCornerTrackingArea() {
+        if let cornerTrackingArea = cornerTrackingArea {
+            removeTrackingArea(cornerTrackingArea)
+            self.cornerTrackingArea = nil
+        }
+
+        let frame = cornerFrame()
+        guard showsHorizontalRule && showsVerticalRule,
+              frame.width > 0,
+              frame.height > 0 else { return }
+
+        let trackingArea = NSTrackingArea(
+            rect: frame,
+            options: [
+                .activeAlways,
+                .mouseEnteredAndExited,
+                .mouseMoved,
+            ],
+            owner: self,
+            userInfo: nil
+        )
+        addTrackingArea(trackingArea)
+        cornerTrackingArea = trackingArea
     }
 
     private func setFrame(_ frame: NSRect, for view: NSView) {
@@ -967,6 +1049,7 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
     private var mouseTickResumeTimer: Timer?
     private let mouseTickResumeDelay: TimeInterval = 0.15
     private var mouseIsDraggingRuler = false
+    private var mouseIsHoveringRuler = false
 
     var isLeftMouseButtonPressed = {
         return NSEvent.pressedMouseButtons & 1 == 1
@@ -1104,12 +1187,17 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
         }
     }
 
+    func setMouseTickDrawingEnabled(_ isEnabled: Bool) {
+        groupedWindow.horizontalRule.showMouseTick = isEnabled && groupedWindow.isRuleVisible(.horizontal)
+        groupedWindow.verticalRule.showMouseTick = isEnabled && groupedWindow.isRuleVisible(.vertical)
+    }
+
     func windowWillStartLiveResize(_ notification: Notification) {
         disableMouseTicks()
     }
 
     func windowDidEndLiveResize(_ notification: Notification) {
-        enableMouseTicks()
+        resumeMouseTicksUnlessHovering()
     }
 
     func windowWillMove(_ notification: Notification) {
@@ -1119,7 +1207,7 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
     func windowDidMove(_ notification: Notification) {
         groupedWindow.invalidateShadow()
         guard !mouseIsDraggingRuler && !isLeftMouseButtonPressed() else { return }
-        scheduleMouseTickResume()
+        resumeMouseTicksUnlessHovering()
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
@@ -1131,10 +1219,16 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
     }
 
     override func mouseEntered(with event: NSEvent) {
+        mouseIsHoveringRuler = true
+        hideMouseTicksForHover()
         rulerCursorController?.mouseEnteredRuler()
     }
 
     override func mouseExited(with event: NSEvent) {
+        mouseIsHoveringRuler = false
+        if !mouseIsDraggingRuler {
+            enableMouseTicks()
+        }
         rulerCursorController?.mouseExitedRuler()
     }
 
@@ -1152,34 +1246,31 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
         guard mouseIsDraggingRuler else { return }
 
         mouseIsDraggingRuler = false
-        scheduleMouseTickResume()
-        rulerCursorController?.mouseUpInRuler(mouseIsInsideRuler: mouseIsInsideRuler(with: event))
+        mouseIsHoveringRuler = mouseIsInsideRuler(with: event)
+        resumeMouseTicksUnlessHovering()
+
+        rulerCursorController?.mouseUpInRuler(mouseIsInsideRuler: mouseIsHoveringRuler)
     }
 
     override func mouseMoved(with event: NSEvent) {
         guard !mouseIsDraggingRuler else { return }
-        enableMouseTicks()
+        mouseIsHoveringRuler = mouseIsInsideRuler(with: event)
+        if mouseIsHoveringRuler {
+            hideMouseTicksForHover()
+        } else {
+            enableMouseTicks()
+        }
     }
 
     private func disableMouseTicks() {
         mouseTickResumeTimer?.invalidate()
         mouseTickResumeTimer = nil
-        if groupedWindow.isRuleVisible(.horizontal) {
-            groupedWindow.horizontalRule.showMouseTick = false
-        }
-        if groupedWindow.isRuleVisible(.vertical) {
-            groupedWindow.verticalRule.showMouseTick = false
-        }
+        appDelegate?.suppressMouseTickDrawing(owner: self)
         appDelegate?.suspendMouseTickUpdates(owner: self)
     }
 
     private func enableMouseTicks() {
-        if groupedWindow.isRuleVisible(.horizontal) {
-            groupedWindow.horizontalRule.showMouseTick = true
-        }
-        if groupedWindow.isRuleVisible(.vertical) {
-            groupedWindow.verticalRule.showMouseTick = true
-        }
+        appDelegate?.unsuppressMouseTickDrawing(owner: self)
         appDelegate?.resumeMouseTickUpdates(owner: self)
     }
 
@@ -1194,6 +1285,21 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
         }
     }
 
+    private func resumeMouseTicksUnlessHovering() {
+        if mouseIsHoveringRuler {
+            hideMouseTicksForHover()
+            appDelegate?.resumeMouseTickUpdates(owner: self)
+        } else {
+            scheduleMouseTickResume()
+        }
+    }
+
+    private func hideMouseTicksForHover() {
+        mouseTickResumeTimer?.invalidate()
+        mouseTickResumeTimer = nil
+        appDelegate?.suppressMouseTickDrawing(owner: self)
+    }
+
     private var rulerCursorController: RulerCursorController? {
         return appDelegate?.rulerCursorController
     }
@@ -1204,6 +1310,7 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
 
     private func mouseIsInsideRuler(with event: NSEvent) -> Bool {
         return orientation(at: event) != nil
+            || groupedWindow.isEmptyCorner(atWindowPoint: event.locationInWindow)
     }
 
     private func orientation(at event: NSEvent) -> Orientation? {

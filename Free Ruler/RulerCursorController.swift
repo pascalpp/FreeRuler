@@ -77,6 +77,18 @@ final class RulerCursorController {
         mouseIsOverRuler = mouseIsInsideRuler
         mouseIsDraggingRuler = false
         updateCursor()
+
+        if mouseIsInsideRuler {
+            DispatchQueue.main.async { [weak self] in
+                self?.refreshCurrentCursor()
+            }
+        }
+    }
+
+    func refreshCurrentCursor() {
+        guard appIsActive, let currentCursor = currentCursor else { return }
+
+        applyCursor(currentCursor)
     }
 
     private func updateCursor() {

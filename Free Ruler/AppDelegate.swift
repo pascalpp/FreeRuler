@@ -77,6 +77,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     var timer: Timer?
     private var timerInterval: TimeInterval?
+    private let mouseTickDrawingSuppressedOwners = NSHashTable<AnyObject>.weakObjects()
     let foregroundTimerInterval: TimeInterval = 1 / 60 // 60 fps
     let backgroundTimerInterval: TimeInterval = 1 / 30 // 30 fps
 
@@ -910,6 +911,37 @@ extension AppDelegate {
     func resumeMouseTickUpdates(owner: AnyObject) {
         mouseTickTimerPolicy.resume(owner: owner)
         updateMouseTickTimer()
+    }
+
+    func suppressMouseTickDrawing(owner: AnyObject) {
+        guard !mouseTickDrawingSuppressedOwners.contains(owner) else { return }
+
+        mouseTickDrawingSuppressedOwners.add(owner)
+        updateMouseTickDrawingVisibility()
+    }
+
+    func unsuppressMouseTickDrawing(owner: AnyObject) {
+        guard mouseTickDrawingSuppressedOwners.contains(owner) else { return }
+
+        mouseTickDrawingSuppressedOwners.remove(owner)
+        updateMouseTickDrawingVisibility()
+    }
+
+    private func updateMouseTickDrawingVisibility() {
+        setMouseTickDrawingEnabled(!hasMouseTickDrawingSuppressedOwners)
+    }
+
+    private var hasMouseTickDrawingSuppressedOwners: Bool {
+        guard mouseTickDrawingSuppressedOwners.count > 0 else { return false }
+        return mouseTickDrawingSuppressedOwners.anyObject != nil
+    }
+
+    private func setMouseTickDrawingEnabled(_ isEnabled: Bool) {
+        for ruler in rulers {
+            ruler.rulerWindow.rule.showMouseTick = isEnabled
+        }
+
+        groupedRulerController?.setMouseTickDrawingEnabled(isEnabled)
     }
 
     private func updateMouseTickTimer() {

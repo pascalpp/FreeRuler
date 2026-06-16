@@ -19,6 +19,7 @@ final class ResizeHandleView: NSView {
     private var dragInitialWindowFrame: NSRect?
     private var wasMovableByWindowBackgroundBeforeDrag: Bool?
     private var childWindowFramesBeforeDrag: [(window: NSWindow, frame: NSRect)] = []
+    private var mouseTicksSuspendedDuringResize = false
 
     private let length: CGFloat = 12
     private let lineCount = 4
@@ -102,6 +103,7 @@ final class ResizeHandleView: NSView {
     override func mouseDown(with event: NSEvent) {
         guard let window = window else { return }
 
+        suspendMouseTicksDuringResize()
         dragInitialMouseLocation = screenLocation(for: event, in: window)
         dragInitialWindowFrame = window.frame
         wasMovableByWindowBackgroundBeforeDrag = window.isMovableByWindowBackground
@@ -141,6 +143,10 @@ final class ResizeHandleView: NSView {
     }
 
     override func mouseUp(with event: NSEvent) {
+        defer {
+            resumeMouseTicksAfterResize(with: event)
+        }
+
         guard let window = window else {
             resetDragState()
             return
@@ -155,10 +161,9 @@ final class ResizeHandleView: NSView {
         }
 
         resetDragState()
+        restoreRulerCursor(with: event)
         if contains(event) {
             windowResizeCursor(for: orientation).set()
-        } else {
-            restoreRulerCursor(with: event)
         }
     }
 
@@ -445,6 +450,22 @@ final class ResizeHandleView: NSView {
         childWindowFramesBeforeDrag = []
     }
 
+    private func suspendMouseTicksDuringResize() {
+        guard !mouseTicksSuspendedDuringResize else { return }
+
+        appDelegate?.suppressMouseTickDrawing(owner: self)
+        appDelegate?.suspendMouseTickUpdates(owner: self)
+        mouseTicksSuspendedDuringResize = true
+    }
+
+    private func resumeMouseTicksAfterResize(with event: NSEvent) {
+        guard mouseTicksSuspendedDuringResize else { return }
+
+        mouseTicksSuspendedDuringResize = false
+        appDelegate?.resumeMouseTickUpdates(owner: self)
+        appDelegate?.unsuppressMouseTickDrawing(owner: self)
+    }
+
     private func restoreRulerCursor(with event: NSEvent) {
         guard let superview = superview else { return }
 
@@ -459,6 +480,10 @@ final class ResizeHandleView: NSView {
     private func contains(_ event: NSEvent) -> Bool {
         let locationInView = convert(event.locationInWindow, from: nil)
         return bounds.contains(locationInView)
+    }
+
+    private var appDelegate: AppDelegate? {
+        return NSApp.delegate as? AppDelegate
     }
 
 }
