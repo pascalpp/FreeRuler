@@ -343,7 +343,7 @@ final class RulerCoreTests: XCTestCase {
             view.layoutSubtreeIfNeeded()
 
             XCTAssertFalse(view.containsEmptyCorner(emptyCornerPoint), "\(zeroCorner) hidden vertical corner")
-            XCTAssertNil(view.hitTest(emptyCornerPoint), "\(zeroCorner) hidden vertical hit test")
+            XCTAssertFalse(view.hitTest(emptyCornerPoint) === view, "\(zeroCorner) hidden vertical hit test")
         }
     }
 
@@ -396,6 +396,88 @@ final class RulerCoreTests: XCTestCase {
 
             XCTAssertFalse(controller.groupedWindow.horizontalRule.showMouseTick)
             XCTAssertFalse(controller.groupedWindow.verticalRule.showMouseTick)
+        }
+    }
+
+    func testGroupedRulerControllerShrinksWindowToOnlyVisibleLeg() {
+        withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .topLeft
+            let horizontalFrame = NSRect(x: 200, y: 299, width: 320, height: Ruler.thickness)
+            let verticalFrame = NSRect(x: 161, y: 120, width: Ruler.thickness, height: 180)
+            let controller = GroupedRulerController(
+                frame: GroupedRulerLayout.joined(
+                    horizontalFrame: horizontalFrame,
+                    verticalFrame: verticalFrame,
+                    zeroCorner: .topLeft
+                ).groupFrame
+            )
+
+            controller.show(
+                horizontalFrame: horizontalFrame,
+                verticalFrame: verticalFrame,
+                showsHorizontalRule: true,
+                showsVerticalRule: false
+            )
+
+            XCTAssertEqual(controller.groupedWindow.frame, horizontalFrame)
+            XCTAssertEqual(
+                controller.groupedWindow.screenFrame(for: .horizontal),
+                horizontalFrame
+            )
+            XCTAssertFalse(controller.groupedWindow.isRuleVisible(.vertical))
+
+            controller.show(
+                horizontalFrame: horizontalFrame,
+                verticalFrame: verticalFrame,
+                showsHorizontalRule: false,
+                showsVerticalRule: true
+            )
+
+            XCTAssertEqual(controller.groupedWindow.frame, verticalFrame)
+            XCTAssertEqual(
+                controller.groupedWindow.screenFrame(for: .vertical),
+                verticalFrame
+            )
+            XCTAssertFalse(controller.groupedWindow.isRuleVisible(.horizontal))
+            controller.groupedWindow.orderOut(self)
+        }
+    }
+
+    func testGroupedRulerControllerSyncsHiddenLegToVisibleZeroPoint() {
+        withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .topLeft
+            let horizontalWindow = RulerWindow(
+                Ruler(.horizontal, frame: NSRect(x: 200, y: 299, width: 320, height: Ruler.thickness))
+            )
+            let verticalWindow = RulerWindow(
+                Ruler(.vertical, frame: NSRect(x: 161, y: 120, width: Ruler.thickness, height: 180))
+            )
+            let controller = GroupedRulerController(
+                frame: GroupedRulerLayout.joined(
+                    horizontalFrame: horizontalWindow.frame,
+                    verticalFrame: verticalWindow.frame,
+                    zeroCorner: .topLeft
+                ).groupFrame
+            )
+
+            controller.show(
+                horizontalFrame: horizontalWindow.frame,
+                verticalFrame: verticalWindow.frame,
+                showsHorizontalRule: false,
+                showsVerticalRule: true
+            )
+            controller.groupedWindow.setFrameOrigin(NSPoint(x: 300, y: 200))
+
+            controller.syncFrames(to: horizontalWindow, and: verticalWindow)
+
+            let geometry = ZeroCornerGeometry(zeroCorner: .topLeft)
+            XCTAssertEqual(verticalWindow.frame, controller.groupedWindow.frame)
+            XCTAssertEqual(horizontalWindow.frame.size, NSSize(width: 320, height: Ruler.thickness))
+            XCTAssertEqual(
+                geometry.zeroPoint(in: horizontalWindow.frame, for: .horizontal),
+                geometry.zeroPoint(in: verticalWindow.frame, for: .vertical)
+            )
+            controller.groupedWindow.orderOut(self)
         }
     }
 

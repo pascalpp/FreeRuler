@@ -423,9 +423,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         guard shouldShowGroupedRuler else { return }
 
         let horizontalFrame = groupedRulerController.isVisible
+            && groupedRulerController.groupedWindow.isRuleVisible(.horizontal)
             ? groupedRulerController.groupedWindow.screenFrame(for: .horizontal)
             : horizontalRuler.rulerWindow.frame
         let verticalFrame = groupedRulerController.isVisible
+            && groupedRulerController.groupedWindow.isRuleVisible(.vertical)
             ? groupedRulerController.groupedWindow.screenFrame(for: .vertical)
             : verticalRuler.rulerWindow.frame
 
@@ -462,7 +464,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    private func syncGroupedRulerFramesToRulerWindows() {
+    func syncGroupedRulerFramesToRulerWindows() {
         guard let groupedRulerController = groupedRulerController,
               let horizontalRuler = existingRulerController(orientation: .horizontal),
               let verticalRuler = existingRulerController(orientation: .vertical) else {
