@@ -451,19 +451,23 @@ final class ResizeHandleView: NSView {
     }
 
     private func suspendMouseTicksDuringResize() {
+        #if !SNAPSHOT_GENERATOR
         guard !mouseTicksSuspendedDuringResize else { return }
 
         appDelegate?.suppressMouseTickDrawing(owner: self)
         appDelegate?.suspendMouseTickUpdates(owner: self)
         mouseTicksSuspendedDuringResize = true
+        #endif
     }
 
     private func resumeMouseTicksAfterResize(with event: NSEvent) {
+        #if !SNAPSHOT_GENERATOR
         guard mouseTicksSuspendedDuringResize else { return }
 
         mouseTicksSuspendedDuringResize = false
         appDelegate?.resumeMouseTickUpdates(owner: self)
         appDelegate?.unsuppressMouseTickDrawing(owner: self)
+        #endif
     }
 
     private func restoreRulerCursor(with event: NSEvent) {
@@ -482,9 +486,11 @@ final class ResizeHandleView: NSView {
         return bounds.contains(locationInView)
     }
 
+#if !SNAPSHOT_GENERATOR
     private var appDelegate: AppDelegate? {
         return NSApp.delegate as? AppDelegate
     }
+#endif
 
 }
 

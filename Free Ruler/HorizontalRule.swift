@@ -30,8 +30,10 @@ class HorizontalRule: RuleView {
         super.draw(dirtyRect)
 
         // Drawing code here.
-        color.fill.setFill()
-        dirtyRect.fill()
+        if drawsBackground {
+            color.fill.setFill()
+            dirtyRect.fill()
+        }
 
         let attrs = labelAttributes(alignment: .center, foregroundColor: color.numbers)
 
@@ -68,7 +70,7 @@ class HorizontalRule: RuleView {
                     rulerHeight: height,
                     tickSide: tickSide
                 )
-                
+
                 label.draw(
                     with: labelRect,
                     attributes: attrs,
@@ -233,7 +235,8 @@ class HorizontalRule: RuleView {
         case .positive:
             return offset
         case .negative:
-            return rulerWidth - offset
+            // subtract 1 so first tick doesn't abut the border
+            return rulerWidth - offset - 1
         }
     }
 

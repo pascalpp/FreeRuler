@@ -595,72 +595,11 @@ private final class GroupedRulerBorderView: RulerBorderView {
     }
 
     private func lShapedBorderPath() -> NSBezierPath {
-        let layout = GroupedRulerLayout.layout(groupFrame: bounds, zeroCorner: zeroCorner)
-        let horizontalFrame = layout.localFrame(for: .horizontal)
-        let verticalFrame = layout.localFrame(for: .vertical)
-        let inset = Self.borderCenterInset
-        let minX = bounds.minX + inset
-        let maxX = bounds.maxX - inset
-        let minY = bounds.minY + inset
-        let maxY = bounds.maxY - inset
-        let path = NSBezierPath()
-        let points: [NSPoint]
-
-        switch zeroCorner {
-        case .topLeft:
-            let innerX = verticalFrame.maxX - inset
-            let innerY = horizontalFrame.minY + inset
-            points = [
-                NSPoint(x: minX, y: minY),
-                NSPoint(x: innerX, y: minY),
-                NSPoint(x: innerX, y: innerY),
-                NSPoint(x: maxX, y: innerY),
-                NSPoint(x: maxX, y: maxY),
-                NSPoint(x: minX, y: maxY),
-            ]
-        case .topRight:
-            let innerX = verticalFrame.minX + inset
-            let innerY = horizontalFrame.minY + inset
-            points = [
-                NSPoint(x: minX, y: innerY),
-                NSPoint(x: innerX, y: innerY),
-                NSPoint(x: innerX, y: minY),
-                NSPoint(x: maxX, y: minY),
-                NSPoint(x: maxX, y: maxY),
-                NSPoint(x: minX, y: maxY),
-            ]
-        case .bottomLeft:
-            let innerX = verticalFrame.maxX - inset
-            let innerY = horizontalFrame.maxY - inset
-            points = [
-                NSPoint(x: minX, y: minY),
-                NSPoint(x: maxX, y: minY),
-                NSPoint(x: maxX, y: innerY),
-                NSPoint(x: innerX, y: innerY),
-                NSPoint(x: innerX, y: maxY),
-                NSPoint(x: minX, y: maxY),
-            ]
-        case .bottomRight:
-            let innerX = verticalFrame.minX + inset
-            let innerY = horizontalFrame.maxY - inset
-            points = [
-                NSPoint(x: minX, y: minY),
-                NSPoint(x: maxX, y: minY),
-                NSPoint(x: maxX, y: maxY),
-                NSPoint(x: innerX, y: maxY),
-                NSPoint(x: innerX, y: innerY),
-                NSPoint(x: minX, y: innerY),
-            ]
-        }
-
-        guard let firstPoint = points.first else { return path }
-
-        path.move(to: firstPoint)
-        for point in points.dropFirst() {
-            path.line(to: point)
-        }
-        path.close()
-        return path
+        return groupedRulerLShapedPath(
+            in: bounds,
+            zeroCorner: zeroCorner,
+            inset: Self.borderCenterInset
+        )
     }
 
     private func visibleBoundsBorderPath() -> NSBezierPath {
@@ -887,6 +826,8 @@ final class GroupedRulerContentView: NSView {
         unitLabelView.autoresizingMask = []
         zeroLabelsView.autoresizingMask = []
         borderView.autoresizingMask = []
+        horizontalRule.drawsBackground = false
+        verticalRule.drawsBackground = false
         horizontalRule.showsUnitLabel = false
         verticalRule.showsUnitLabel = false
         horizontalRule.showsZeroTick = true
@@ -958,10 +899,8 @@ final class GroupedRulerContentView: NSView {
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
 
-        guard showsHorizontalRule && showsVerticalRule else { return }
-
         color.fill.setFill()
-        cornerFrame().fill()
+        rulerFillPath().fill()
     }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
@@ -1092,6 +1031,21 @@ final class GroupedRulerContentView: NSView {
         verticalRule.showsZeroTick = showsVerticalRule
     }
 
+    private func rulerFillPath() -> NSBezierPath {
+        let layout = GroupedRulerLayout.layout(groupFrame: bounds, zeroCorner: zeroCorner)
+
+        switch (showsHorizontalRule, showsVerticalRule) {
+        case (true, true):
+            return groupedRulerLShapedPath(in: bounds, zeroCorner: zeroCorner, inset: 0)
+        case (true, false):
+            return NSBezierPath(rect: ruleFrame(for: .horizontal, in: bounds, layout: layout))
+        case (false, true):
+            return NSBezierPath(rect: ruleFrame(for: .vertical, in: bounds, layout: layout))
+        case (false, false):
+            return NSBezierPath()
+        }
+    }
+
     private func unitLabelFrame(in cornerFrame: NSRect) -> NSRect {
         let labelFrame = unitLabelView.frame(in: NSRect(origin: .zero, size: cornerFrame.size))
         return NSRect(
@@ -1111,14 +1065,7 @@ final class GroupedRulerContentView: NSView {
     }
 
     private func unitLabelString() -> String {
-        switch prefs.unit {
-        case .pixels:
-            return "px"
-        case .millimeters:
-            return "mm"
-        case .inches:
-            return "in"
-        }
+        return horizontalRule.getUnitLabel()
     }
 
     private func unitLabelAttributes() -> [NSAttributedString.Key: Any] {
@@ -1584,3 +1531,75 @@ extension GroupedRulerController {
     }
 }
 #endif
+
+private func groupedRulerLShapedPath(
+    in bounds: NSRect,
+    zeroCorner: ZeroCorner,
+    inset: CGFloat
+) -> NSBezierPath {
+    let layout = GroupedRulerLayout.layout(groupFrame: bounds, zeroCorner: zeroCorner)
+    let horizontalFrame = layout.localFrame(for: .horizontal)
+    let verticalFrame = layout.localFrame(for: .vertical)
+    let minX = bounds.minX + inset
+    let maxX = bounds.maxX - inset
+    let minY = bounds.minY + inset
+    let maxY = bounds.maxY - inset
+    let path = NSBezierPath()
+    let points: [NSPoint]
+
+    switch zeroCorner {
+    case .topLeft:
+        let innerX = verticalFrame.maxX - inset
+        let innerY = horizontalFrame.minY + inset
+        points = [
+            NSPoint(x: minX, y: minY),
+            NSPoint(x: innerX, y: minY),
+            NSPoint(x: innerX, y: innerY),
+            NSPoint(x: maxX, y: innerY),
+            NSPoint(x: maxX, y: maxY),
+            NSPoint(x: minX, y: maxY),
+        ]
+    case .topRight:
+        let innerX = verticalFrame.minX + inset
+        let innerY = horizontalFrame.minY + inset
+        points = [
+            NSPoint(x: minX, y: innerY),
+            NSPoint(x: innerX, y: innerY),
+            NSPoint(x: innerX, y: minY),
+            NSPoint(x: maxX, y: minY),
+            NSPoint(x: maxX, y: maxY),
+            NSPoint(x: minX, y: maxY),
+        ]
+    case .bottomLeft:
+        let innerX = verticalFrame.maxX - inset
+        let innerY = horizontalFrame.maxY - inset
+        points = [
+            NSPoint(x: minX, y: minY),
+            NSPoint(x: maxX, y: minY),
+            NSPoint(x: maxX, y: innerY),
+            NSPoint(x: innerX, y: innerY),
+            NSPoint(x: innerX, y: maxY),
+            NSPoint(x: minX, y: maxY),
+        ]
+    case .bottomRight:
+        let innerX = verticalFrame.minX + inset
+        let innerY = horizontalFrame.maxY - inset
+        points = [
+            NSPoint(x: minX, y: minY),
+            NSPoint(x: maxX, y: minY),
+            NSPoint(x: maxX, y: maxY),
+            NSPoint(x: innerX, y: maxY),
+            NSPoint(x: innerX, y: innerY),
+            NSPoint(x: minX, y: innerY),
+        ]
+    }
+
+    guard let firstPoint = points.first else { return path }
+
+    path.move(to: firstPoint)
+    for point in points.dropFirst() {
+        path.line(to: point)
+    }
+    path.close()
+    return path
+}
