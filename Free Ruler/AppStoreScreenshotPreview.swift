@@ -601,7 +601,8 @@ private enum AppStoreGroupsScreenshotLayout {
     static let bottomBackgroundColor = #colorLiteral(red: 0.8283244681, green: 0.7442385697, blue: 0.5931689895, alpha: 1)
 
     static let rulerScale: CGFloat = 5.5
-    static let rulerColor = #colorLiteral(red: 0.1046039086, green: 0.2732335166, blue: 0.7791223404, alpha: 0.8429164487)
+    static let rulerColor = #colorLiteral(red: 0.1046039086, green: 0.2732335166, blue: 0.7791223404, alpha: 1)
+    static let rulerOpacity: CGFloat = 0.85
 
     static let ungroupedVerticalRulerX: CGFloat = 250
     static let ungroupedVerticalRulerY: CGFloat = 150
@@ -1364,7 +1365,10 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
                 )
             }
         case .groups:
-            let style = AppStoreRulerStyle(fillColor: AppStoreGroupsScreenshotLayout.rulerColor)
+            let style = AppStoreRulerStyle(
+                fillColor: AppStoreGroupsScreenshotLayout.rulerColor,
+                opacity: AppStoreGroupsScreenshotLayout.rulerOpacity
+            )
             return [
                 AppStoreRulerPlacement(
                     view: AppStoreVerticalRule(
@@ -1478,6 +1482,7 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         horizontalRule.showMouseTick = false
         verticalRule.showMouseTick = false
         groupedView.color = color
+        groupedView.alphaValue = AppStoreGroupsScreenshotLayout.rulerOpacity
         groupedView.zeroCorner = .topLeft
         groupedView.needsLayout = true
         groupedView.layoutSubtreeIfNeeded()
