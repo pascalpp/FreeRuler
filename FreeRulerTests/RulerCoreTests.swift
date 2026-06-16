@@ -269,6 +269,136 @@ final class RulerCoreTests: XCTestCase {
         }
     }
 
+    func testGroupedRulerLayoutJoinsSeparateRulersWithoutChangingRuleFrames() {
+        let zeroPoint = NSPoint(x: 200, y: 300)
+        let horizontalSize = NSSize(width: 120, height: Ruler.thickness)
+        let verticalSize = NSSize(width: Ruler.thickness, height: 160)
+
+        for zeroCorner in [ZeroCorner.topLeft, .topRight, .bottomLeft, .bottomRight] {
+            let geometry = ZeroCornerGeometry(zeroCorner: zeroCorner)
+            let horizontalFrame = geometry.frame(
+                for: .horizontal,
+                zeroPoint: zeroPoint,
+                size: horizontalSize
+            )
+            let verticalFrame = geometry.frame(
+                for: .vertical,
+                zeroPoint: zeroPoint,
+                size: verticalSize
+            )
+
+            let layout = GroupedRulerLayout.joined(
+                horizontalFrame: horizontalFrame,
+                verticalFrame: verticalFrame,
+                zeroCorner: zeroCorner
+            )
+            let roundTrippedLayout = GroupedRulerLayout.layout(
+                groupFrame: layout.groupFrame,
+                zeroCorner: zeroCorner
+            )
+
+            XCTAssertEqual(layout.horizontalFrame, horizontalFrame, "\(zeroCorner) horizontal frame")
+            XCTAssertEqual(layout.verticalFrame, verticalFrame, "\(zeroCorner) vertical frame")
+            XCTAssertEqual(layout.groupFrame, horizontalFrame.union(verticalFrame), "\(zeroCorner) group frame")
+            XCTAssertEqual(roundTrippedLayout, layout, "\(zeroCorner) round trip")
+            XCTAssertEqual(
+                layout.localFrame(for: Orientation.horizontal).size,
+                horizontalSize,
+                "\(zeroCorner) horizontal local size"
+            )
+            XCTAssertEqual(
+                layout.localFrame(for: Orientation.vertical).size,
+                verticalSize,
+                "\(zeroCorner) vertical local size"
+            )
+        }
+    }
+
+    func testGroupedRulerContentViewLaysOutLegsAndHitTestsCorner() {
+        let contentSize = NSSize(width: 260, height: 220)
+
+        for zeroCorner in [ZeroCorner.topLeft, .topRight, .bottomLeft, .bottomRight] {
+            let view = groupedContentView(size: contentSize, zeroCorner: zeroCorner)
+            let layout = GroupedRulerLayout.layout(groupFrame: view.bounds, zeroCorner: zeroCorner)
+            let emptyCornerPoint = pointInsideEmptyGroupedCorner(
+                horizontalFrame: layout.localFrame(for: Orientation.horizontal),
+                verticalFrame: layout.localFrame(for: Orientation.vertical),
+                bounds: view.bounds
+            )
+
+            XCTAssertEqual(
+                view.localFrame(for: Orientation.horizontal),
+                layout.localFrame(for: Orientation.horizontal),
+                "\(zeroCorner) horizontal local frame"
+            )
+            XCTAssertEqual(
+                view.localFrame(for: Orientation.vertical),
+                layout.localFrame(for: Orientation.vertical),
+                "\(zeroCorner) vertical local frame"
+            )
+            XCTAssertTrue(view.containsEmptyCorner(emptyCornerPoint), "\(zeroCorner) empty corner")
+            XCTAssertTrue(view.hitTest(emptyCornerPoint) === view, "\(zeroCorner) empty corner hit test")
+
+            view.showsVerticalRule = false
+            view.layoutSubtreeIfNeeded()
+
+            XCTAssertFalse(view.containsEmptyCorner(emptyCornerPoint), "\(zeroCorner) hidden vertical corner")
+            XCTAssertNil(view.hitTest(emptyCornerPoint), "\(zeroCorner) hidden vertical hit test")
+        }
+    }
+
+    func testGroupedRulerContentViewRestoresStandaloneLabelsWhenOnlyOneLegIsVisible() {
+        let view = groupedContentView(size: NSSize(width: 260, height: 220), zeroCorner: .topLeft)
+
+        XCTAssertFalse(view.horizontalRule.showsUnitLabel)
+        XCTAssertFalse(view.verticalRule.showsUnitLabel)
+        XCTAssertTrue(view.horizontalRule.showsZeroTick)
+        XCTAssertTrue(view.verticalRule.showsZeroTick)
+
+        view.showsVerticalRule = false
+        view.layoutSubtreeIfNeeded()
+
+        XCTAssertTrue(view.horizontalRule.showsUnitLabel)
+        XCTAssertFalse(view.verticalRule.showsUnitLabel)
+        XCTAssertTrue(view.horizontalRule.showsZeroTick)
+        XCTAssertFalse(view.verticalRule.showsZeroTick)
+
+        view.showsVerticalRule = true
+        view.showsHorizontalRule = false
+        view.layoutSubtreeIfNeeded()
+
+        XCTAssertFalse(view.horizontalRule.showsUnitLabel)
+        XCTAssertTrue(view.verticalRule.showsUnitLabel)
+        XCTAssertFalse(view.horizontalRule.showsZeroTick)
+        XCTAssertTrue(view.verticalRule.showsZeroTick)
+    }
+
+    func testGroupedRulerControllerEnablesMouseTicksOnlyForVisibleLegs() {
+        withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .topLeft
+            let controller = GroupedRulerController(
+                frame: NSRect(x: 100, y: 100, width: 260, height: 220)
+            )
+
+            controller.groupedWindow.setVisibleRules(horizontal: true, vertical: false)
+            controller.setMouseTickDrawingEnabled(true)
+
+            XCTAssertTrue(controller.groupedWindow.horizontalRule.showMouseTick)
+            XCTAssertFalse(controller.groupedWindow.verticalRule.showMouseTick)
+
+            controller.groupedWindow.setVisibleRules(horizontal: false, vertical: true)
+            controller.setMouseTickDrawingEnabled(true)
+
+            XCTAssertFalse(controller.groupedWindow.horizontalRule.showMouseTick)
+            XCTAssertTrue(controller.groupedWindow.verticalRule.showMouseTick)
+
+            controller.setMouseTickDrawingEnabled(false)
+
+            XCTAssertFalse(controller.groupedWindow.horizontalRule.showMouseTick)
+            XCTAssertFalse(controller.groupedWindow.verticalRule.showMouseTick)
+        }
+    }
+
     func testMinAndMaxSizesMatchRulerOrientation() {
         let horizontal = Ruler(.horizontal, frame: NSRect(x: 0, y: 0, width: 300, height: 40))
         let vertical = Ruler(.vertical, frame: NSRect(x: 0, y: 0, width: 40, height: 300))
@@ -1038,15 +1168,13 @@ final class RulerCoreTests: XCTestCase {
                 (
                     zeroCorner: ZeroCorner,
                     expectedHorizontalXSide: RulerHorizontalSide,
-                    expectedHorizontalYSide: RulerVerticalSide,
-                    expectedVerticalXSide: RulerHorizontalSide,
                     expectedVerticalYSide: RulerVerticalSide
                 )
             ] = [
-                (.topLeft, .right, .top, .left, .bottom),
-                (.topRight, .left, .top, .right, .bottom),
-                (.bottomLeft, .right, .bottom, .left, .top),
-                (.bottomRight, .left, .bottom, .right, .top),
+                (.topLeft, .right, .bottom),
+                (.topRight, .left, .bottom),
+                (.bottomLeft, .right, .top),
+                (.bottomRight, .left, .top),
             ]
 
             for testCase in cases {
@@ -1071,19 +1199,10 @@ final class RulerCoreTests: XCTestCase {
                     XCTAssertGreaterThan(horizontalFrame.midX, horizontalRule.bounds.midX, "\(testCase.zeroCorner)")
                 }
 
-                switch testCase.expectedHorizontalYSide {
-                case .top:
-                    XCTAssertGreaterThan(horizontalFrame.midY, horizontalRule.bounds.midY, "\(testCase.zeroCorner)")
-                case .bottom:
-                    XCTAssertLessThan(horizontalFrame.midY, horizontalRule.bounds.midY, "\(testCase.zeroCorner)")
-                }
-
-                switch testCase.expectedVerticalXSide {
-                case .left:
-                    XCTAssertLessThan(verticalFrame.midX, verticalRule.bounds.midX, "\(testCase.zeroCorner)")
-                case .right:
-                    XCTAssertGreaterThan(verticalFrame.midX, verticalRule.bounds.midX, "\(testCase.zeroCorner)")
-                }
+                XCTAssertEqual(horizontalFrame.minY, horizontalRule.bounds.minY, "\(testCase.zeroCorner)")
+                XCTAssertEqual(horizontalFrame.maxY, horizontalRule.bounds.maxY, "\(testCase.zeroCorner)")
+                XCTAssertEqual(verticalFrame.minX, verticalRule.bounds.minX, "\(testCase.zeroCorner)")
+                XCTAssertEqual(verticalFrame.maxX, verticalRule.bounds.maxX, "\(testCase.zeroCorner)")
 
                 switch testCase.expectedVerticalYSide {
                 case .top:
@@ -1497,104 +1616,158 @@ final class RulerCoreTests: XCTestCase {
     }
 
     func testRulerControllerKeepsMouseTicksHiddenWhileDragging() {
-        let ruler = Ruler(.horizontal, frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
-        let controller = RulerController(ruler: ruler)
-        let mouseDownEvent = NSEvent.mouseEvent(
-            with: .leftMouseDown,
-            location: NSPoint(x: 10, y: 10),
-            modifierFlags: [],
-            timestamp: 0,
-            windowNumber: controller.rulerWindow.windowNumber,
-            context: nil,
-            eventNumber: 0,
-            clickCount: 1,
-            pressure: 1
-        )!
-        let mouseUpEvent = NSEvent.mouseEvent(
-            with: .leftMouseUp,
-            location: NSPoint(x: 10, y: 10),
-            modifierFlags: [],
-            timestamp: 0.1,
-            windowNumber: controller.rulerWindow.windowNumber,
-            context: nil,
-            eventNumber: 1,
-            clickCount: 1,
-            pressure: 0
-        )!
+        withInstalledAppDelegate { appDelegate in
+            let ruler = Ruler(.horizontal, frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
+            let controller = RulerController(ruler: ruler)
+            appDelegate.rulers = [controller]
+            let mouseDownEvent = NSEvent.mouseEvent(
+                with: .leftMouseDown,
+                location: NSPoint(x: 10, y: 10),
+                modifierFlags: [],
+                timestamp: 0,
+                windowNumber: controller.rulerWindow.windowNumber,
+                context: nil,
+                eventNumber: 0,
+                clickCount: 1,
+                pressure: 1
+            )!
+            let mouseUpEvent = NSEvent.mouseEvent(
+                with: .leftMouseUp,
+                location: NSPoint(x: 10, y: 10),
+                modifierFlags: [],
+                timestamp: 0.1,
+                windowNumber: controller.rulerWindow.windowNumber,
+                context: nil,
+                eventNumber: 1,
+                clickCount: 1,
+                pressure: 0
+            )!
 
-        controller.mouseDown(with: mouseDownEvent)
-        controller.windowDidMove(Notification(name: NSWindow.didMoveNotification, object: controller.rulerWindow))
-        RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+            controller.mouseDown(with: mouseDownEvent)
+            controller.windowDidMove(Notification(name: NSWindow.didMoveNotification, object: controller.rulerWindow))
+            RunLoop.current.run(until: Date().addingTimeInterval(0.2))
 
-        XCTAssertFalse(controller.rulerWindow.rule.showMouseTick)
+            XCTAssertFalse(controller.rulerWindow.rule.showMouseTick)
 
-        controller.mouseUp(with: mouseUpEvent)
-        RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+            controller.mouseUp(with: mouseUpEvent)
+            RunLoop.current.run(until: Date().addingTimeInterval(0.2))
 
-        XCTAssertTrue(controller.rulerWindow.rule.showMouseTick)
+            XCTAssertFalse(controller.rulerWindow.rule.showMouseTick)
+
+            controller.mouseExited(with: mouseUpEvent)
+
+            XCTAssertTrue(controller.rulerWindow.rule.showMouseTick)
+        }
     }
 
     func testRulerControllerResumesMouseTicksWhenWindowDragLoopEnds() {
-        let ruler = Ruler(.horizontal, frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
-        let controller = RulerController(ruler: ruler)
-        let otherWindow = RulerWindow(Ruler(.vertical, frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300)))
-        controller.otherWindow = otherWindow
-        let mouseDownEvent = NSEvent.mouseEvent(
-            with: .leftMouseDown,
-            location: NSPoint(x: 10, y: 10),
-            modifierFlags: [],
-            timestamp: 0,
-            windowNumber: controller.rulerWindow.windowNumber,
-            context: nil,
-            eventNumber: 0,
-            clickCount: 1,
-            pressure: 1
-        )!
+        withInstalledAppDelegate { appDelegate in
+            let controller = RulerController(
+                ruler: Ruler(.horizontal, frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
+            )
+            let otherController = RulerController(
+                ruler: Ruler(.vertical, frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
+            )
+            controller.otherWindow = otherController.rulerWindow
+            appDelegate.rulers = [controller, otherController]
+            let mouseDownEvent = NSEvent.mouseEvent(
+                with: .leftMouseDown,
+                location: NSPoint(x: 10, y: 10),
+                modifierFlags: [],
+                timestamp: 0,
+                windowNumber: controller.rulerWindow.windowNumber,
+                context: nil,
+                eventNumber: 0,
+                clickCount: 1,
+                pressure: 1
+            )!
+            let mouseUpOutsideEvent = NSEvent.mouseEvent(
+                with: .leftMouseUp,
+                location: NSPoint(x: -10, y: -10),
+                modifierFlags: [],
+                timestamp: 0.1,
+                windowNumber: controller.rulerWindow.windowNumber,
+                context: nil,
+                eventNumber: 1,
+                clickCount: 1,
+                pressure: 0
+            )!
 
-        controller.mouseDown(with: mouseDownEvent)
-        controller.windowDidMove(Notification(name: NSWindow.didMoveNotification, object: controller.rulerWindow))
-        RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+            controller.mouseDown(with: mouseDownEvent)
+            controller.windowDidMove(Notification(name: NSWindow.didMoveNotification, object: controller.rulerWindow))
+            RunLoop.current.run(until: Date().addingTimeInterval(0.2))
 
-        XCTAssertFalse(controller.rulerWindow.rule.showMouseTick)
-        XCTAssertFalse(otherWindow.rule.showMouseTick)
+            XCTAssertFalse(controller.rulerWindow.rule.showMouseTick)
+            XCTAssertFalse(otherController.rulerWindow.rule.showMouseTick)
 
-        controller.finishMouseDrag(with: mouseDownEvent)
-        RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+            controller.finishMouseDrag(with: mouseUpOutsideEvent)
+            RunLoop.current.run(until: Date().addingTimeInterval(0.2))
 
-        XCTAssertTrue(controller.rulerWindow.rule.showMouseTick)
-        XCTAssertTrue(otherWindow.rule.showMouseTick)
+            XCTAssertTrue(controller.rulerWindow.rule.showMouseTick)
+            XCTAssertTrue(otherController.rulerWindow.rule.showMouseTick)
+        }
     }
 
     func testGroupedChildMoveDoesNotResumeMouseTicksDuringDrag() {
-        let draggedController = RulerController(
-            ruler: Ruler(.horizontal, frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
-        )
-        let groupedChildController = RulerController(
-            ruler: Ruler(.vertical, frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
-        )
-        draggedController.otherWindow = groupedChildController.rulerWindow
-        groupedChildController.otherWindow = draggedController.rulerWindow
-        groupedChildController.isLeftMouseButtonPressed = { true }
-        let mouseDownEvent = NSEvent.mouseEvent(
-            with: .leftMouseDown,
-            location: NSPoint(x: 10, y: 10),
-            modifierFlags: [],
-            timestamp: 0,
-            windowNumber: draggedController.rulerWindow.windowNumber,
-            context: nil,
-            eventNumber: 0,
-            clickCount: 1,
-            pressure: 1
-        )!
+        withInstalledAppDelegate { appDelegate in
+            let draggedController = RulerController(
+                ruler: Ruler(.horizontal, frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
+            )
+            let groupedChildController = RulerController(
+                ruler: Ruler(.vertical, frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
+            )
+            appDelegate.rulers = [draggedController, groupedChildController]
+            draggedController.otherWindow = groupedChildController.rulerWindow
+            groupedChildController.otherWindow = draggedController.rulerWindow
+            groupedChildController.isLeftMouseButtonPressed = { true }
+            let mouseDownEvent = NSEvent.mouseEvent(
+                with: .leftMouseDown,
+                location: NSPoint(x: 10, y: 10),
+                modifierFlags: [],
+                timestamp: 0,
+                windowNumber: draggedController.rulerWindow.windowNumber,
+                context: nil,
+                eventNumber: 0,
+                clickCount: 1,
+                pressure: 1
+            )!
 
-        draggedController.mouseDown(with: mouseDownEvent)
-        groupedChildController.windowDidMove(
-            Notification(name: NSWindow.didMoveNotification, object: groupedChildController.rulerWindow)
-        )
-        RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+            draggedController.mouseDown(with: mouseDownEvent)
+            groupedChildController.windowDidMove(
+                Notification(name: NSWindow.didMoveNotification, object: groupedChildController.rulerWindow)
+            )
+            RunLoop.current.run(until: Date().addingTimeInterval(0.2))
 
-        XCTAssertFalse(draggedController.rulerWindow.rule.showMouseTick)
-        XCTAssertFalse(groupedChildController.rulerWindow.rule.showMouseTick)
+            XCTAssertFalse(draggedController.rulerWindow.rule.showMouseTick)
+            XCTAssertFalse(groupedChildController.rulerWindow.rule.showMouseTick)
+        }
+    }
+
+    func testGroupedRulerHotkeysToggleLegVisibilityWithoutUngrouping() {
+        withRestoredZeroCornerPreference {
+            let previousGroupRulers = prefs.groupRulers
+            defer { prefs.groupRulers = previousGroupRulers }
+
+            prefs.zeroCorner = .topLeft
+            prefs.groupRulers = true
+            let appDelegate = AppDelegate()
+
+            XCTAssertTrue(
+                appDelegate.performRulerHotkey(
+                    keyCode: kVK_ANSI_H,
+                    modifierFlags: [],
+                    sender: appDelegate
+                )
+            )
+
+            let groupedWindow = appDelegate.groupedRulerController?.groupedWindow
+            XCTAssertTrue(prefs.groupRulers)
+            XCTAssertFalse(groupedWindow?.isRuleVisible(.horizontal) ?? true)
+            XCTAssertTrue(groupedWindow?.isRuleVisible(.vertical) ?? false)
+            XCTAssertFalse(appDelegate.rulers.first { $0.ruler.orientation == .horizontal }?.rulerWindow.isVisible ?? true)
+            XCTAssertFalse(appDelegate.rulers.first { $0.ruler.orientation == .vertical }?.rulerWindow.isVisible ?? true)
+            groupedWindow?.orderOut(self)
+        }
     }
 
     func testUngroupedHorizontalFlipDoesNotMoveRulerWindows() {
@@ -1922,6 +2095,58 @@ private final class TestableZeroCornerHorizontalRule: HorizontalRule {
     override var zeroCorner: ZeroCorner {
         return testZeroCorner
     }
+}
+
+private func groupedContentView(size: NSSize, zeroCorner: ZeroCorner) -> GroupedRulerContentView {
+    let horizontalRule = HorizontalRule(
+        frame: NSRect(x: 0, y: 0, width: 120, height: Ruler.thickness)
+    )
+    let verticalRule = VerticalRule(
+        frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 160)
+    )
+    let view = GroupedRulerContentView(
+        frame: NSRect(origin: .zero, size: size),
+        horizontalRule: horizontalRule,
+        verticalRule: verticalRule
+    )
+
+    view.zeroCorner = zeroCorner
+    view.layoutSubtreeIfNeeded()
+    return view
+}
+
+private func pointInsideEmptyGroupedCorner(
+    horizontalFrame: NSRect,
+    verticalFrame: NSRect,
+    bounds: NSRect
+) -> NSPoint {
+    let x: CGFloat
+    if horizontalFrame.minX > bounds.minX {
+        x = (bounds.minX + horizontalFrame.minX) / 2
+    } else {
+        x = (horizontalFrame.maxX + bounds.maxX) / 2
+    }
+
+    let y: CGFloat
+    if verticalFrame.maxY < bounds.maxY {
+        y = (verticalFrame.maxY + bounds.maxY) / 2
+    } else {
+        y = (bounds.minY + verticalFrame.minY) / 2
+    }
+
+    return NSPoint(x: x, y: y)
+}
+
+private func withInstalledAppDelegate(_ test: (AppDelegate) throws -> Void) rethrows {
+    let previousDelegate = NSApp.delegate
+    let appDelegate = AppDelegate()
+    NSApp.delegate = appDelegate
+
+    defer {
+        NSApp.delegate = previousDelegate
+    }
+
+    try test(appDelegate)
 }
 
 private func unitLabelSize(for rule: RuleView) -> NSSize {
