@@ -30,8 +30,10 @@ class HorizontalRule: RuleView {
         super.draw(dirtyRect)
 
         // Drawing code here.
-        color.fill.setFill()
-        dirtyRect.fill()
+        if drawsBackground {
+            color.fill.setFill()
+            dirtyRect.fill()
+        }
 
         let attrs = labelAttributes(alignment: .center, foregroundColor: color.numbers)
 
@@ -233,7 +235,7 @@ class HorizontalRule: RuleView {
         case .positive:
             return offset
         case .negative:
-            return rulerWidth - offset
+            return rulerWidth - offset - 1
         }
     }
 

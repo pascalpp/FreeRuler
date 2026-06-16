@@ -34,8 +34,10 @@ class VerticalRule: RuleView {
         super.draw(dirtyRect)
 
         // Drawing code here.
-        color.fill.setFill()
-        dirtyRect.fill()
+        if drawsBackground {
+            color.fill.setFill()
+            dirtyRect.fill()
+        }
 
         let width = rulerWidth
         let height = bounds.height
@@ -270,7 +272,7 @@ class VerticalRule: RuleView {
     ) -> CGFloat {
         switch growthDirection {
         case .positive:
-            return offset
+            return offset + 1
         case .negative:
             return rulerHeight - offset
         }

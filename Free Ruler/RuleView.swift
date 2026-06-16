@@ -367,6 +367,11 @@ class RuleView: NSView {
             updateUnitLabelFrame()
         }
     }
+    var drawsBackground = true {
+        didSet {
+            needsDisplay = true
+        }
+    }
     private var resizeHandleView: ResizeHandleView?
     private var unitLabelView: UnitLabelView?
     private var borderView: RulerBorderView?
