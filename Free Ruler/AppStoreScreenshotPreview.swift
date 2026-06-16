@@ -41,6 +41,7 @@ private struct AppStoreScreenshotScreen {
     let previewName: String
     let outputFilename: String
     let backgroundColor: NSColor
+    let bottomBackgroundColor: NSColor
     let usesDarkCopy: Bool
 
     static let measure = AppStoreScreenshotScreen(
@@ -50,6 +51,7 @@ private struct AppStoreScreenshotScreen {
         previewName: AppStoreMeasureScreenshotLayout.previewName,
         outputFilename: AppStoreMeasureScreenshotLayout.outputFilename,
         backgroundColor: AppStoreMeasureScreenshotLayout.backgroundColor,
+        bottomBackgroundColor: AppStoreMeasureScreenshotLayout.bottomBackgroundColor,
         usesDarkCopy: false
     )
 
@@ -60,6 +62,7 @@ private struct AppStoreScreenshotScreen {
         previewName: AppStoreUnitsScreenshotLayout.previewName,
         outputFilename: AppStoreUnitsScreenshotLayout.outputFilename,
         backgroundColor: AppStoreUnitsScreenshotLayout.backgroundColor,
+        bottomBackgroundColor: AppStoreUnitsScreenshotLayout.bottomBackgroundColor,
         usesDarkCopy: false
     )
 
@@ -70,6 +73,7 @@ private struct AppStoreScreenshotScreen {
         previewName: AppStoreColorsScreenshotLayout.previewName,
         outputFilename: AppStoreColorsScreenshotLayout.outputFilename,
         backgroundColor: AppStoreColorsScreenshotLayout.backgroundColor,
+        bottomBackgroundColor: AppStoreColorsScreenshotLayout.bottomBackgroundColor,
         usesDarkCopy: true
     )
 
@@ -80,6 +84,7 @@ private struct AppStoreScreenshotScreen {
         previewName: AppStoreGroupsScreenshotLayout.previewName,
         outputFilename: AppStoreGroupsScreenshotLayout.outputFilename,
         backgroundColor: AppStoreGroupsScreenshotLayout.backgroundColor,
+        bottomBackgroundColor: AppStoreGroupsScreenshotLayout.bottomBackgroundColor,
         usesDarkCopy: true
     )
 
@@ -90,6 +95,7 @@ private struct AppStoreScreenshotScreen {
         previewName: AppStoreFlipScreenshotLayout.previewName,
         outputFilename: AppStoreFlipScreenshotLayout.outputFilename,
         backgroundColor: AppStoreFlipScreenshotLayout.backgroundColor,
+        bottomBackgroundColor: AppStoreFlipScreenshotLayout.bottomBackgroundColor,
         usesDarkCopy: false
     )
 
@@ -100,6 +106,7 @@ private struct AppStoreScreenshotScreen {
         previewName: AppStorePreferencesScreenshotLayout.previewName,
         outputFilename: AppStorePreferencesScreenshotLayout.outputFilename,
         backgroundColor: AppStorePreferencesScreenshotLayout.backgroundColor,
+        bottomBackgroundColor: AppStorePreferencesScreenshotLayout.bottomBackgroundColor,
         usesDarkCopy: false
     )
 
@@ -394,12 +401,13 @@ private enum AppStoreMeasureScreenshotLayout {
     static let previewName = "Measure anything"
     static let outputFilename = "01-measure-anything.png"
     static let backgroundColor = #colorLiteral(red: 0.385, green: 0.49, blue: 0.7, alpha: 1)
+    static let bottomBackgroundColor = #colorLiteral(red: 0.2844348404, green: 0.3620079787, blue: 0.5171542553, alpha: 1)
 
     static let rulerScale: CGFloat = 4.4
     static let rulerCornerX: CGFloat = 420
     static let rulerCornerY: CGFloat = 500
-    static let horizontalRulerLength: CGFloat = 1888
-    static let verticalRulerLength: CGFloat = 1070
+    static let horizontalRulerLength: CGFloat = 1860
+    static let verticalRulerLength: CGFloat = 1050
     static let sampleWindowWidth: CGFloat = 1850
     static let sampleWindowHeight: CGFloat = 1040
 
@@ -496,7 +504,8 @@ private enum AppStoreUnitsScreenshotLayout {
     static let subtitle = "Use pixels, millimeters, or inches."
     static let previewName = "Units"
     static let outputFilename = "05-switch-units.png"
-    static let backgroundColor = #colorLiteral(red: 0.3084420562, green: 0.521068275, blue: 0.509829402, alpha: 1)
+    static let backgroundColor = #colorLiteral(red: 0.3528921235, green: 0.5961602394, blue: 0.5833017148, alpha: 1)
+    static let bottomBackgroundColor = #colorLiteral(red: 0.3084420562, green: 0.521068275, blue: 0.509829402, alpha: 1)
 
     static let rulerScale: CGFloat = 6
     static let rulerX: CGFloat = 550
@@ -524,7 +533,8 @@ private enum AppStoreColorsScreenshotLayout {
     static let subtitle = "Follow your heart. Be hue you want to be."
     static let previewName = "Colors"
     static let outputFilename = "02-custom-colors.png"
-    static let backgroundColor = #colorLiteral(red: 0.875857736, green: 0.8972384907, blue: 0.94, alpha: 1)
+    static let backgroundColor = #colorLiteral(red: 0.6497740259, green: 0.7557746611, blue: 0.9677759309, alpha: 1)
+    static let bottomBackgroundColor = #colorLiteral(red: 0.875857736, green: 0.8972384907, blue: 0.94, alpha: 1)
 
     static let rulerOpacity: CGFloat = 1
     static let rulerCount = 7
@@ -584,28 +594,30 @@ private enum AppStoreColorsScreenshotLayout {
 
 private enum AppStoreGroupsScreenshotLayout {
     static let previewName = "Groups"
-    static let title = "Be independent, or join the group."
-    static let subtitle = "Separate horizontal and vertical rulers, or join forces."
+    static let title = "Be independent, or join forces."
+    static let subtitle = "Drag rulers separately or as a group."
     static let outputFilename = "03-groups.png"
-    static let backgroundColor = #colorLiteral(red: 0.906, green: 0.847, blue: 0.741, alpha: 1)
+    static let backgroundColor = #colorLiteral(red: 0.9411402926, green: 0.8768328317, blue: 0.7612973936, alpha: 1)
+    static let bottomBackgroundColor = #colorLiteral(red: 0.8283244681, green: 0.7442385697, blue: 0.5931689895, alpha: 1)
 
-    static let rulerScale: CGFloat = 4.5
-    static let rulerColor = #colorLiteral(red: 0.3738226593, green: 0.4209153354, blue: 0.9898249507, alpha: 1)
+    static let rulerScale: CGFloat = 5.5
+    static let rulerColor = #colorLiteral(red: 0.1046039086, green: 0.2732335166, blue: 0.7791223404, alpha: 0.8429164487)
 
-    static let groupedRulerX: CGFloat = 1050
-    static let groupedRulerY: CGFloat = 850
-    static let groupedRulerLength: CGFloat = 1330
-    static let groupedRulerWidth: CGFloat = 680
+    static let ungroupedVerticalRulerX: CGFloat = 250
+    static let ungroupedVerticalRulerY: CGFloat = 150
+    static let ungroupedVerticalRulerLength: CGFloat = 1450
 
-    static let ungroupedHorizontalRulerX: CGFloat = 700
-    static let ungroupedHorizontalRulerY: CGFloat = 520
-    static let ungroupedHorizontalRulerLength: CGFloat = 1430
+    static let ungroupedHorizontalRulerX: CGFloat = 125
+    static let ungroupedHorizontalRulerY: CGFloat = 1100
+    static let ungroupedHorizontalRulerLength: CGFloat = 2600
 
-    static let ungroupedVerticalRulerX: CGFloat = 450
-    static let ungroupedVerticalRulerY: CGFloat = 650
-    static let ungroupedVerticalRulerLength: CGFloat = 880
+    static let groupedRulerX: CGFloat = 630
+    static let groupedRulerY: CGFloat = 525
+    static let groupedRulerLength: CGFloat = 1630
+    static let groupedRulerWidth: CGFloat = 975
 
-    static let copyViewX: CGFloat = 360
+
+    static let copyViewX: CGFloat = 640
     static let copyViewY: CGFloat = 80
     static let copyIconX: CGFloat = AppStoreScreenshotLayout.copyIconX
     static let copyIconY: CGFloat = AppStoreScreenshotLayout.copyIconY
@@ -711,6 +723,7 @@ private enum AppStoreFlipScreenshotLayout {
     static let subtitle = "Your rulers, in any orientation."
     static let outputFilename = "04-flip-rulers.png"
     static let backgroundColor = #colorLiteral(red: 0.7959441489, green: 0.3479741865, blue: 0.516690138, alpha: 1)
+    static let bottomBackgroundColor = #colorLiteral(red: 0.7124833777, green: 0.311486458, blue: 0.4625112644, alpha: 1)
 
     static let rulerScale: CGFloat = 4.5
     static let copyViewX: CGFloat = 700
@@ -885,15 +898,16 @@ private enum AppStoreFlipScreenshotLayout {
 
 private enum AppStorePreferencesScreenshotLayout {
     static let title = "Pick your preferences"
-    static let subtitle = "Change color, opacity, and more."
+    static let subtitle = "Change opacity, add shadows, and more."
     static let previewName = "Preferences"
     static let outputFilename = "06-customize-rulers.png"
     static let backgroundColor = #colorLiteral(red: 0.5181607008, green: 0.4312165375, blue: 0.6487324834, alpha: 1)
+    static let bottomBackgroundColor = #colorLiteral(red: 0.4593747268, green: 0.3822944866, blue: 0.5751329787, alpha: 1)
 
     static let rulerScale: CGFloat = 6
     static let rulerOpacity: CGFloat = 0.75
-    static let verticalRulerX: CGFloat = 2300
-    static let verticalRulerY: CGFloat = 100
+    static let verticalRulerX: CGFloat = 250
+    static let verticalRulerY: CGFloat = 212
     static let verticalRulerLength: CGFloat = 2050
     static let horizontalRulerX: CGFloat = 100
     static let horizontalRulerY: CGFloat = 1180
@@ -1228,18 +1242,36 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         self.viewPlacements = Self.makeViewPlacements(for: screen, preferencesController: preferencesController)
         self.copyViewPlacement = Self.makeCopyViewPlacement(for: screen)
         super.init(frame: NSRect(origin: .zero, size: AppStoreScreenshotLayout.canvasSize))
-        for viewPlacement in viewPlacements {
-            addSubview(viewPlacement.container)
-        }
-        for rulerPlacement in rulerPlacements {
-            configureRuler(rulerPlacement.view)
-            addSubview(rulerPlacement.container)
-        }
+        installPlacements()
         addSubview(copyViewPlacement.container)
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    private func installPlacements() {
+        switch screen.scenario {
+        case .groups:
+            installRulerPlacements()
+            installViewPlacements()
+        case .measure, .units, .colors, .flipRulers, .preferences:
+            installViewPlacements()
+            installRulerPlacements()
+        }
+    }
+
+    private func installViewPlacements() {
+        for viewPlacement in viewPlacements {
+            addSubview(viewPlacement.container)
+        }
+    }
+
+    private func installRulerPlacements() {
+        for rulerPlacement in rulerPlacements {
+            configureRuler(rulerPlacement.view)
+            addSubview(rulerPlacement.container)
+        }
     }
 
     override func draw(_ dirtyRect: NSRect) {
@@ -1783,8 +1815,7 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
     }
 
     private func drawScenario() {
-        screen.backgroundColor.setFill()
-        NSRect(origin: .zero, size: AppStoreScreenshotLayout.canvasSize).fill()
+        drawBackground()
 
         switch screen.scenario {
         case .measure:
@@ -1801,6 +1832,38 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         case .preferences:
             drawSampleWindow(AppStorePreferencesScreenshotLayout.preferencesWindowRect)
         }
+    }
+
+    private func drawBackground() {
+        let rect = NSRect(origin: .zero, size: AppStoreScreenshotLayout.canvasSize)
+
+        drawVerticalGradient(
+            in: rect,
+            topColor: screen.backgroundColor,
+            bottomColor: screen.bottomBackgroundColor
+        )
+    }
+
+    private func drawVerticalGradient(in rect: NSRect, topColor: NSColor, bottomColor: NSColor) {
+        guard let context = NSGraphicsContext.current?.cgContext,
+              let gradient = CGGradient(
+                colorsSpace: CGColorSpaceCreateDeviceRGB(),
+                colors: [topColor.cgColor, bottomColor.cgColor] as CFArray,
+                locations: [0, 1]
+              ) else {
+            topColor.setFill()
+            rect.fill()
+            return
+        }
+
+        context.saveGState()
+        context.drawLinearGradient(
+            gradient,
+            start: CGPoint(x: rect.midX, y: rect.minY),
+            end: CGPoint(x: rect.midX, y: rect.maxY),
+            options: []
+        )
+        context.restoreGState()
     }
 
     private func configureRuler(_ view: RuleView) {
