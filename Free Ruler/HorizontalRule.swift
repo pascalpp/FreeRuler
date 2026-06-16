@@ -70,7 +70,7 @@ class HorizontalRule: RuleView {
                     rulerHeight: height,
                     tickSide: tickSide
                 )
-                
+
                 label.draw(
                     with: labelRect,
                     attributes: attrs,
@@ -235,6 +235,7 @@ class HorizontalRule: RuleView {
         case .positive:
             return offset
         case .negative:
+            // subtract 1 so first tick doesn't abut the border
             return rulerWidth - offset - 1
         }
     }
