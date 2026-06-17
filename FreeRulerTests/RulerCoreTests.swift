@@ -20,6 +20,124 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertEqual(ruler.name, "test-ruler")
     }
 
+    func testRulerInstanceCreationCopiesDefaultsWithoutControllers() {
+        withRestoredRulerPreferences {
+            prefs.unit = .inches
+            prefs.rulerColor = NSColor(deviceRed: 0.25, green: 0.5, blue: 0.75, alpha: 0.4)
+            prefs.foregroundOpacity = 82
+            prefs.backgroundOpacity = 38
+            prefs.floatRulers = false
+            prefs.rulerShadow = true
+            prefs.zeroCorner = .bottomRight
+
+            let id = UUID(uuidString: "B74A48A7-235A-43DB-8C01-A7D8F44B1976")!
+            let screenFrame = NSRect(x: 0, y: 0, width: 1000, height: 800)
+            let state = RulerInstanceState.createFromDefaults(
+                id: id,
+                screenFrame: screenFrame
+            )
+
+            XCTAssertEqual(state.id, id)
+            XCTAssertEqual(state.settings.unit, .inches)
+            assertColor(
+                state.settings.rulerColor,
+                equals: NSColor(deviceRed: 0.25, green: 0.5, blue: 0.75, alpha: 1)
+            )
+            XCTAssertEqual(state.settings.foregroundOpacity, 82)
+            XCTAssertEqual(state.settings.backgroundOpacity, 38)
+            XCTAssertFalse(state.settings.floatRulers)
+            XCTAssertTrue(state.settings.rulerShadow)
+            XCTAssertEqual(state.settings.zeroCorner, .bottomRight)
+            XCTAssertTrue(state.isWingVisible(.horizontal))
+            XCTAssertTrue(state.isWingVisible(.vertical))
+            XCTAssertEqual(state.layout.horizontalLength, 500)
+            XCTAssertEqual(state.layout.verticalLength, 400)
+        }
+    }
+
+    func testRulerWingVisibilityPreservesAtLeastOneVisibleWing() {
+        var visibility = RulerWingVisibility(horizontal: true, vertical: false)
+
+        XCTAssertFalse(visibility.set(.horizontal, isVisible: false))
+        XCTAssertTrue(visibility.showsHorizontal)
+        XCTAssertFalse(visibility.showsVertical)
+
+        XCTAssertTrue(visibility.set(.vertical, isVisible: true))
+        XCTAssertTrue(visibility.set(.horizontal, isVisible: false))
+        XCTAssertFalse(visibility.showsHorizontal)
+        XCTAssertTrue(visibility.showsVertical)
+
+        XCTAssertFalse(visibility.toggle(.vertical))
+        XCTAssertFalse(visibility.showsHorizontal)
+        XCTAssertTrue(visibility.showsVertical)
+
+        let decodedFallback = RulerWingVisibility(horizontal: false, vertical: false)
+        XCTAssertTrue(decodedFallback.showsHorizontal)
+        XCTAssertTrue(decodedFallback.showsVertical)
+    }
+
+    func testRulerInstanceStateStoresHorizontalOnlyVerticalOnlyAndBothWingRulers() {
+        let settings = RulerSettings(zeroCorner: .topLeft)
+        let layout = RulerLayoutState(
+            zeroPoint: NSPoint(x: 200, y: 300),
+            horizontalLength: 320,
+            verticalLength: 180
+        )
+        let both = RulerInstanceState(
+            settings: settings,
+            visibility: RulerWingVisibility(horizontal: true, vertical: true),
+            layout: layout
+        )
+        let horizontalOnly = RulerInstanceState(
+            settings: settings,
+            visibility: RulerWingVisibility(horizontal: true, vertical: false),
+            layout: layout
+        )
+        let verticalOnly = RulerInstanceState(
+            settings: settings,
+            visibility: RulerWingVisibility(horizontal: false, vertical: true),
+            layout: layout
+        )
+
+        XCTAssertTrue(both.isWingVisible(.horizontal))
+        XCTAssertTrue(both.isWingVisible(.vertical))
+        XCTAssertTrue(horizontalOnly.isWingVisible(.horizontal))
+        XCTAssertFalse(horizontalOnly.isWingVisible(.vertical))
+        XCTAssertFalse(verticalOnly.isWingVisible(.horizontal))
+        XCTAssertTrue(verticalOnly.isWingVisible(.vertical))
+    }
+
+    func testRulerInstanceStateRoundTripsThroughJSON() throws {
+        let id = UUID(uuidString: "CBAB5338-CB56-42C5-9B76-F7B7B57D8013")!
+        let state = RulerInstanceState(
+            id: id,
+            settings: RulerSettings(
+                unit: .millimeters,
+                rulerColor: NSColor(deviceRed: 0.1, green: 0.2, blue: 0.3, alpha: 1),
+                foregroundOpacity: 70,
+                backgroundOpacity: 25,
+                floatRulers: false,
+                rulerShadow: true,
+                zeroCorner: .bottomLeft
+            ),
+            visibility: RulerWingVisibility(horizontal: false, vertical: true),
+            layout: RulerLayoutState(
+                zeroPoint: NSPoint(x: 120, y: 440),
+                horizontalLength: 640,
+                verticalLength: 260
+            )
+        )
+
+        let data = try JSONEncoder().encode(state)
+        let decoded = try JSONDecoder().decode(RulerInstanceState.self, from: data)
+
+        XCTAssertEqual(decoded, state)
+        assertColor(
+            decoded.settings.rulerColor,
+            equals: NSColor(deviceRed: 0.1, green: 0.2, blue: 0.3, alpha: 1)
+        )
+    }
+
     func testZeroCornerRawValuesPreservePersistedOrder() {
         XCTAssertEqual(ZeroCorner.topLeft.rawValue, 0)
         XCTAssertEqual(ZeroCorner.topRight.rawValue, 1)
@@ -2268,6 +2386,28 @@ final class RulerCoreTests: XCTestCase {
                     defaults.removeObject(forKey: "zeroCorner")
                 }
             }
+        }
+
+        try test()
+    }
+
+    private func withRestoredRulerPreferences(_ test: () throws -> Void) rethrows {
+        let previousUnit = prefs.unit
+        let previousColor = prefs.rulerColor
+        let previousForegroundOpacity = prefs.foregroundOpacity
+        let previousBackgroundOpacity = prefs.backgroundOpacity
+        let previousFloatRulers = prefs.floatRulers
+        let previousRulerShadow = prefs.rulerShadow
+        let previousZeroCorner = prefs.zeroCorner
+
+        defer {
+            prefs.unit = previousUnit
+            prefs.rulerColor = previousColor
+            prefs.foregroundOpacity = previousForegroundOpacity
+            prefs.backgroundOpacity = previousBackgroundOpacity
+            prefs.floatRulers = previousFloatRulers
+            prefs.rulerShadow = previousRulerShadow
+            prefs.zeroCorner = previousZeroCorner
         }
 
         try test()
