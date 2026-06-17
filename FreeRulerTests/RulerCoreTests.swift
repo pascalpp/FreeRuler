@@ -293,15 +293,23 @@ final class RulerCoreTests: XCTestCase {
         }
     }
 
-    func testRulerSettingsControllerUpdatesRulerColorWithoutChangingDefaults() {
+    func testRulerSettingsControllerUpdatesRulerSettingsWithoutChangingDefaults() {
         withRestoredRulerPreferences {
             let defaultColor = NSColor(deviceRed: 0.15, green: 0.25, blue: 0.35, alpha: 1)
             prefs.rulerColor = defaultColor
+            prefs.foregroundOpacity = 90
+            prefs.backgroundOpacity = 50
+            prefs.floatRulers = true
+            prefs.rulerShadow = false
 
             let controller = GroupedRulerController(
                 state: RulerInstanceState(
                     settings: RulerSettings(
-                        rulerColor: NSColor(deviceRed: 0.4, green: 0.5, blue: 0.6, alpha: 1)
+                        rulerColor: NSColor(deviceRed: 0.4, green: 0.5, blue: 0.6, alpha: 1),
+                        foregroundOpacity: 80,
+                        backgroundOpacity: 45,
+                        floatRulers: false,
+                        rulerShadow: false
                     ),
                     layout: RulerLayoutState(
                         zeroPoint: NSPoint(x: 240, y: 320),
@@ -332,6 +340,38 @@ final class RulerCoreTests: XCTestCase {
             assertColor(prefs.rulerColor, equals: defaultColor)
             XCTAssertFalse(settingsController.resetRulerColorButton.isHidden)
 
+            settingsController.foregroundOpacitySlider.integerValue = 65
+            settingsController.setForegroundOpacity(settingsController.foregroundOpacitySlider)
+
+            XCTAssertEqual(controller.state.settings.foregroundOpacity, 65)
+            XCTAssertEqual(controller.groupedWindow.alphaValue, 0.65, accuracy: 0.0001)
+            XCTAssertEqual(settingsController.foregroundOpacityLabel.stringValue, "65%")
+            XCTAssertEqual(prefs.foregroundOpacity, 90)
+
+            settingsController.backgroundOpacitySlider.integerValue = 35
+            settingsController.setBackgroundOpacity(settingsController.backgroundOpacitySlider)
+
+            XCTAssertEqual(controller.state.settings.backgroundOpacity, 35)
+            XCTAssertEqual(controller.groupedWindow.alphaValue, 0.35, accuracy: 0.0001)
+            XCTAssertEqual(settingsController.backgroundOpacityLabel.stringValue, "35%")
+            XCTAssertEqual(prefs.backgroundOpacity, 50)
+
+            settingsController.floatRulersCheckbox.state = .on
+            settingsController.setFloatRulers(settingsController.floatRulersCheckbox)
+
+            XCTAssertTrue(controller.state.settings.floatRulers)
+            XCTAssertTrue(controller.groupedWindow.isFloatingPanel)
+            XCTAssertTrue(settingsController.floatRulersCheckbox.state == .on)
+            XCTAssertTrue(prefs.floatRulers)
+
+            settingsController.rulerShadowCheckbox.state = .on
+            settingsController.setRulerShadow(settingsController.rulerShadowCheckbox)
+
+            XCTAssertTrue(controller.state.settings.rulerShadow)
+            XCTAssertTrue(controller.groupedWindow.hasShadow)
+            XCTAssertTrue(settingsController.rulerShadowCheckbox.state == .on)
+            XCTAssertFalse(prefs.rulerShadow)
+
             settingsController.resetRulerColor(settingsController.resetRulerColorButton)
 
             assertColor(controller.state.settings.rulerColor, equals: Prefs.defaultRulerFillColor)
@@ -339,6 +379,29 @@ final class RulerCoreTests: XCTestCase {
             assertColor(prefs.rulerColor, equals: defaultColor)
             XCTAssertTrue(settingsController.resetRulerColorButton.isHidden)
         }
+    }
+
+    func testRulerSettingsControllerPresentsAsSheetOnRulerWindow() {
+        let controller = GroupedRulerController(
+            state: RulerInstanceState(
+                settings: RulerSettings(),
+                layout: RulerLayoutState(
+                    zeroPoint: NSPoint(x: 240, y: 320),
+                    horizontalLength: 260,
+                    verticalLength: 180
+                )
+            )
+        )
+        let settingsController = RulerSettingsController(rulerController: controller)
+        defer {
+            settingsController.close()
+            controller.hide()
+        }
+
+        controller.show()
+        settingsController.show(attachedTo: controller, sender: self)
+
+        XCTAssertTrue(settingsController.window?.sheetParent === controller.groupedWindow)
     }
 
     func testRulerManagerCopiesUpdatedDefaultsOnlyForNewRulers() {

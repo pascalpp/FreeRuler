@@ -297,11 +297,15 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
 
     private weak var rulerController: GroupedRulerController?
     private var colorPanelObserver: NSObjectProtocol?
-    private var hasCenteredWindow = false
 
-    private let colorLabel: NSTextField
     let rulerColorWell: RulerColorWell
     let resetRulerColorButton: NSButton
+    let foregroundOpacitySlider: NSSlider
+    let backgroundOpacitySlider: NSSlider
+    let foregroundOpacityLabel: NSTextField
+    let backgroundOpacityLabel: NSTextField
+    let floatRulersCheckbox: NSButton
+    let rulerShadowCheckbox: NSButton
 
     var currentRulerController: GroupedRulerController? {
         return rulerController
@@ -310,19 +314,38 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
     init(rulerController: GroupedRulerController) {
         self.rulerController = rulerController
 
-        colorLabel = NSTextField(
-            labelWithString: NSLocalizedString(
-                "Color",
-                comment: "Label for the active ruler color setting"
-            )
-        )
         rulerColorWell = RulerColorWell(frame: NSRect(x: 0, y: 0, width: 64, height: 30))
         resetRulerColorButton = NSButton(frame: .zero)
+        foregroundOpacitySlider = RulerSettingsController.makeOpacitySlider()
+        backgroundOpacitySlider = RulerSettingsController.makeOpacitySlider()
+        foregroundOpacityLabel = RulerSettingsController.makeValueLabel()
+        backgroundOpacityLabel = RulerSettingsController.makeValueLabel()
+        floatRulersCheckbox = NSButton(
+            checkboxWithTitle: NSLocalizedString(
+                "Float rulers above other applications",
+                comment: "Checkbox title for whether the active ruler floats above other apps"
+            ),
+            target: nil,
+            action: nil
+        )
+        rulerShadowCheckbox = NSButton(
+            checkboxWithTitle: NSLocalizedString(
+                "Show ruler shadow",
+                comment: "Checkbox title for whether the active ruler draws a window shadow"
+            ),
+            target: nil,
+            action: nil
+        )
 
         let window = RulerSettingsController.makeWindow(
-            colorLabel: colorLabel,
             rulerColorWell: rulerColorWell,
-            resetRulerColorButton: resetRulerColorButton
+            resetRulerColorButton: resetRulerColorButton,
+            foregroundOpacitySlider: foregroundOpacitySlider,
+            backgroundOpacitySlider: backgroundOpacitySlider,
+            foregroundOpacityLabel: foregroundOpacityLabel,
+            backgroundOpacityLabel: backgroundOpacityLabel,
+            floatRulersCheckbox: floatRulersCheckbox,
+            rulerShadowCheckbox: rulerShadowCheckbox
         )
 
         super.init(window: window)
@@ -345,24 +368,95 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
     }
 
     override func showWindow(_ sender: Any?) {
+        endSheetIfNeeded()
         configureOpaqueColorPicking()
         updateView()
         window?.makeKeyAndOrderFront(sender)
         window?.makeFirstResponder(rulerColorWell)
+        window?.center()
+    }
 
-        if !hasCenteredWindow {
-            window?.center()
-            hasCenteredWindow = true
+    func show(attachedTo controller: GroupedRulerController, sender: Any?) {
+        updateRulerController(controller)
+        guard let settingsWindow = window else { return }
+
+        configureOpaqueColorPicking()
+
+        if settingsWindow.sheetParent === controller.groupedWindow {
+            settingsWindow.makeFirstResponder(rulerColorWell)
+            return
         }
+
+        endSheetIfNeeded()
+
+        guard controller.groupedWindow.isVisible else {
+            showWindow(sender)
+            return
+        }
+
+        if settingsWindow.isVisible {
+            settingsWindow.orderOut(sender)
+        }
+
+        controller.groupedWindow.beginSheet(settingsWindow) { [weak self] _ in
+            self?.closeSheetColorControls()
+        }
+        settingsWindow.makeFirstResponder(rulerColorWell)
+    }
+
+    override func close() {
+        guard let settingsWindow = window,
+              settingsWindow.sheetParent != nil else {
+            super.close()
+            return
+        }
+
+        endSheetIfNeeded()
+    }
+
+    func windowShouldClose(_ sender: NSWindow) -> Bool {
+        guard sender.sheetParent != nil else { return true }
+
+        endSheetIfNeeded()
+        return false
     }
 
     func windowWillClose(_ notification: Notification) {
-        rulerColorWell.deactivate()
-        closeRulerColorPanel()
+        closeSheetColorControls()
     }
 
     func updateRulerController(_ controller: GroupedRulerController) {
         rulerController = controller
+        updateView()
+    }
+
+    @objc func setForegroundOpacity(_ sender: Any) {
+        applySettings { settings in
+            settings.foregroundOpacity = foregroundOpacitySlider.integerValue
+        }
+        rulerController?.opacity = foregroundOpacitySlider.integerValue
+        updateView()
+    }
+
+    @objc func setBackgroundOpacity(_ sender: Any) {
+        applySettings { settings in
+            settings.backgroundOpacity = backgroundOpacitySlider.integerValue
+        }
+        rulerController?.opacity = backgroundOpacitySlider.integerValue
+        updateView()
+    }
+
+    @objc func setFloatRulers(_ sender: Any) {
+        applySettings { settings in
+            settings.floatRulers = floatRulersCheckbox.state == .on
+        }
+        updateView()
+    }
+
+    @objc func setRulerShadow(_ sender: Any) {
+        applySettings { settings in
+            settings.rulerShadow = rulerShadowCheckbox.state == .on
+        }
         updateView()
     }
 
@@ -376,6 +470,7 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
 
     func updateView() {
         let currentColor = rulerController?.state.settings.rulerColor ?? Prefs.defaultRulerFillColor
+        let currentSettings = rulerController?.state.settings
         let hasRuler = rulerController != nil
 
         rulerColorWell.supportsAlpha = false
@@ -383,42 +478,109 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         rulerColorWell.isEnabled = hasRuler
         resetRulerColorButton.isEnabled = hasRuler
         resetRulerColorButton.isHidden = Prefs.colorsMatch(currentColor, Prefs.defaultRulerFillColor)
+        foregroundOpacitySlider.isEnabled = hasRuler
+        backgroundOpacitySlider.isEnabled = hasRuler
+        floatRulersCheckbox.isEnabled = hasRuler
+        rulerShadowCheckbox.isEnabled = hasRuler
+
+        foregroundOpacitySlider.integerValue = currentSettings?.foregroundOpacity ?? 90
+        backgroundOpacitySlider.integerValue = currentSettings?.backgroundOpacity ?? 50
+        foregroundOpacityLabel.stringValue = "\(foregroundOpacitySlider.integerValue)%"
+        backgroundOpacityLabel.stringValue = "\(backgroundOpacitySlider.integerValue)%"
+        floatRulersCheckbox.state = currentSettings?.floatRulers == true ? .on : .off
+        rulerShadowCheckbox.state = currentSettings?.rulerShadow == true ? .on : .off
     }
 
     private static func makeWindow(
-        colorLabel: NSTextField,
         rulerColorWell: RulerColorWell,
-        resetRulerColorButton: NSButton
+        resetRulerColorButton: NSButton,
+        foregroundOpacitySlider: NSSlider,
+        backgroundOpacitySlider: NSSlider,
+        foregroundOpacityLabel: NSTextField,
+        backgroundOpacityLabel: NSTextField,
+        floatRulersCheckbox: NSButton,
+        rulerShadowCheckbox: NSButton
     ) -> NSPanel {
         let contentView = NSView()
-        let row = NSStackView(views: [colorLabel, rulerColorWell, resetRulerColorButton])
-        row.orientation = .horizontal
-        row.alignment = .centerY
-        row.distribution = .fill
-        row.spacing = 12
-        row.translatesAutoresizingMaskIntoConstraints = false
+        let colorLabel = makeLabel(
+            NSLocalizedString(
+                "Ruler Color",
+                comment: "Label for the active ruler color setting"
+            )
+        )
+        let foregroundLabel = makeLabel(
+            NSLocalizedString(
+                "Foreground Opacity",
+                comment: "Label for the active ruler foreground opacity setting"
+            )
+        )
+        let backgroundLabel = makeLabel(
+            NSLocalizedString(
+                "Background Opacity",
+                comment: "Label for the active ruler background opacity setting"
+            )
+        )
+        let colorRow = NSStackView(views: [colorLabel, resetRulerColorButton, rulerColorWell])
+        let foregroundHeaderRow = NSStackView(views: [foregroundLabel, foregroundOpacityLabel])
+        let backgroundHeaderRow = NSStackView(views: [backgroundLabel, backgroundOpacityLabel])
+        let contentStack = NSStackView(views: [
+            colorRow,
+            foregroundHeaderRow,
+            foregroundOpacitySlider,
+            backgroundHeaderRow,
+            backgroundOpacitySlider,
+            floatRulersCheckbox,
+            rulerShadowCheckbox,
+        ])
 
-        colorLabel.alignment = .right
-        colorLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        for row in [colorRow, foregroundHeaderRow, backgroundHeaderRow] {
+            row.orientation = .horizontal
+            row.alignment = .centerY
+            row.distribution = .fill
+            row.spacing = 10
+            row.translatesAutoresizingMaskIntoConstraints = false
+        }
+
+        contentStack.orientation = .vertical
+        contentStack.alignment = .leading
+        contentStack.distribution = .fill
+        contentStack.spacing = 8
+        contentStack.translatesAutoresizingMaskIntoConstraints = false
+
+        colorLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        foregroundLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        backgroundLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        foregroundOpacityLabel.setContentHuggingPriority(.required, for: .horizontal)
+        backgroundOpacityLabel.setContentHuggingPriority(.required, for: .horizontal)
         rulerColorWell.translatesAutoresizingMaskIntoConstraints = false
         resetRulerColorButton.translatesAutoresizingMaskIntoConstraints = false
+        foregroundOpacitySlider.translatesAutoresizingMaskIntoConstraints = false
+        backgroundOpacitySlider.translatesAutoresizingMaskIntoConstraints = false
+        floatRulersCheckbox.translatesAutoresizingMaskIntoConstraints = false
+        rulerShadowCheckbox.translatesAutoresizingMaskIntoConstraints = false
 
-        contentView.addSubview(row)
+        contentView.addSubview(contentStack)
         NSLayoutConstraint.activate([
-            colorLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 68),
-            rulerColorWell.widthAnchor.constraint(equalToConstant: 64),
-            rulerColorWell.heightAnchor.constraint(equalToConstant: 30),
-            resetRulerColorButton.widthAnchor.constraint(equalToConstant: 24),
-            resetRulerColorButton.heightAnchor.constraint(equalToConstant: 24),
-            row.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            row.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            row.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 18),
-            row.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -18),
+            colorRow.widthAnchor.constraint(equalTo: contentStack.widthAnchor),
+            foregroundHeaderRow.widthAnchor.constraint(equalTo: contentStack.widthAnchor),
+            backgroundHeaderRow.widthAnchor.constraint(equalTo: contentStack.widthAnchor),
+            rulerColorWell.widthAnchor.constraint(equalToConstant: 60),
+            rulerColorWell.heightAnchor.constraint(equalToConstant: 24),
+            resetRulerColorButton.widthAnchor.constraint(equalToConstant: 28),
+            resetRulerColorButton.heightAnchor.constraint(equalToConstant: 28),
+            foregroundOpacitySlider.widthAnchor.constraint(equalTo: contentStack.widthAnchor),
+            backgroundOpacitySlider.widthAnchor.constraint(equalTo: contentStack.widthAnchor),
+            floatRulersCheckbox.widthAnchor.constraint(lessThanOrEqualTo: contentStack.widthAnchor),
+            rulerShadowCheckbox.widthAnchor.constraint(lessThanOrEqualTo: contentStack.widthAnchor),
+            contentStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            contentStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            contentStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 18),
+            contentStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -18),
         ])
 
         let window = NSPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 320, height: 72),
-            styleMask: [.titled, .closable, .utilityWindow],
+            contentRect: NSRect(x: 0, y: 0, width: 315, height: 232),
+            styleMask: [.titled, .closable],
             backing: .buffered,
             defer: false
         )
@@ -432,6 +594,30 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         window.isMovableByWindowBackground = true
         window.isReleasedWhenClosed = false
         return window
+    }
+
+    private static func makeLabel(_ title: String) -> NSTextField {
+        let label = NSTextField(labelWithString: title)
+        label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        return label
+    }
+
+    private static func makeValueLabel() -> NSTextField {
+        let label = NSTextField(labelWithString: "")
+        label.alignment = .right
+        return label
+    }
+
+    private static func makeOpacitySlider() -> NSSlider {
+        let slider = NSSlider(frame: .zero)
+        slider.minValue = 5
+        slider.maxValue = 100
+        slider.doubleValue = 50
+        slider.numberOfTickMarks = 20
+        slider.allowsTickMarkValuesOnly = true
+        slider.tickMarkPosition = .below
+        slider.isContinuous = true
+        return slider
     }
 
     private func configureControls() {
@@ -448,13 +634,41 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
             resetRulerColorButton,
             identifier: "reset-ruler-settings-color-button"
         )
+
+        foregroundOpacitySlider.target = self
+        foregroundOpacitySlider.action = #selector(setForegroundOpacity(_:))
+        foregroundOpacitySlider.identifier = NSUserInterfaceItemIdentifier("ruler-settings-foreground-opacity-slider")
+        foregroundOpacitySlider.setAccessibilityIdentifier("ruler-settings-foreground-opacity-slider")
+        foregroundOpacityLabel.identifier = NSUserInterfaceItemIdentifier("ruler-settings-foreground-opacity-label")
+        foregroundOpacityLabel.setAccessibilityIdentifier("ruler-settings-foreground-opacity-label")
+
+        backgroundOpacitySlider.target = self
+        backgroundOpacitySlider.action = #selector(setBackgroundOpacity(_:))
+        backgroundOpacitySlider.identifier = NSUserInterfaceItemIdentifier("ruler-settings-background-opacity-slider")
+        backgroundOpacitySlider.setAccessibilityIdentifier("ruler-settings-background-opacity-slider")
+        backgroundOpacityLabel.identifier = NSUserInterfaceItemIdentifier("ruler-settings-background-opacity-label")
+        backgroundOpacityLabel.setAccessibilityIdentifier("ruler-settings-background-opacity-label")
+
+        floatRulersCheckbox.target = self
+        floatRulersCheckbox.action = #selector(setFloatRulers(_:))
+        floatRulersCheckbox.identifier = NSUserInterfaceItemIdentifier("ruler-settings-float-rulers-checkbox")
+        floatRulersCheckbox.setAccessibilityIdentifier("ruler-settings-float-rulers-checkbox")
+
+        rulerShadowCheckbox.target = self
+        rulerShadowCheckbox.action = #selector(setRulerShadow(_:))
+        rulerShadowCheckbox.identifier = NSUserInterfaceItemIdentifier("ruler-settings-ruler-shadow-checkbox")
+        rulerShadowCheckbox.setAccessibilityIdentifier("ruler-settings-ruler-shadow-checkbox")
     }
 
     private func applyRulerColor(_ color: NSColor) {
-        rulerController?.updateSettings { settings in
+        applySettings { settings in
             settings.setRulerColor(color)
         }
         updateView()
+    }
+
+    private func applySettings(_ update: (inout RulerSettings) -> Void) {
+        rulerController?.updateSettings(update)
     }
 
     private func subscribeToColorPanel() {
@@ -474,6 +688,18 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
               activeRulerColorWell === rulerColorWell else { return }
 
         applyRulerColor(colorPanel.color)
+    }
+
+    private func endSheetIfNeeded() {
+        guard let settingsWindow = window,
+              let parentWindow = settingsWindow.sheetParent else { return }
+
+        parentWindow.endSheet(settingsWindow)
+    }
+
+    private func closeSheetColorControls() {
+        rulerColorWell.deactivate()
+        closeRulerColorPanel()
     }
 }
 

@@ -73,7 +73,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                   settingsController.window?.isVisible == true else { return }
 
             if let controller = controller {
-                settingsController.updateRulerController(controller)
+                settingsController.show(attachedTo: controller, sender: self)
             } else {
                 settingsController.close()
             }
@@ -682,8 +682,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             rulerSettingsController = RulerSettingsController(rulerController: controller)
         }
 
-        rulerSettingsController?.updateRulerController(controller)
-        rulerSettingsController?.showWindow(sender)
+        rulerSettingsController?.show(attachedTo: controller, sender: sender)
     }
 
     @IBAction func newRuler(_ sender: Any) {
