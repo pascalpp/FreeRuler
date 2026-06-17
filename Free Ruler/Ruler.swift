@@ -157,6 +157,10 @@ struct RulerSettings: Equatable, Codable {
         try container.encode(zeroCorner.rawValue, forKey: .zeroCorner)
     }
 
+    mutating func setRulerColor(_ color: NSColor) {
+        rulerColor = RulerSettings.normalizedColor(color)
+    }
+
     private static func normalizedColor(_ color: NSColor) -> NSColor {
         guard let rgbColor = color.usingColorSpace(.deviceRGB) else {
             return Prefs.defaultRulerFillColor

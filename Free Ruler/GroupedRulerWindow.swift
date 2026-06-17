@@ -1286,6 +1286,12 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
         groupedWindow.redrawForPreferenceChange()
     }
 
+    func updateSettings(_ update: (inout RulerSettings) -> Void) {
+        update(&state.settings)
+        applyStateToWindow(display: true)
+        notifyStateChanged()
+    }
+
     func drawMouseTick(at mouseLoc: NSPoint) {
         if groupedWindow.isRuleVisible(.horizontal) {
             groupedWindow.horizontalRule.drawMouseTick(at: mouseLoc)

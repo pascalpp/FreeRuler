@@ -3,6 +3,7 @@ import Cocoa
 private let colorPanelOpaqueConfigurationRetryDelays: [TimeInterval] = [0.1, 0.3]
 private let rulerColorPanelIdentifier = NSUserInterfaceItemIdentifier("ruler-color-panel")
 private let rulerColorPanelOpaqueAccessibilityValue = "ruler-color-panel-alpha-hidden"
+private weak var activeRulerColorWell: RulerColorWell?
 
 func configureOpaqueColorPicking() {
     let colorPanel = NSColorPanel.shared
@@ -57,6 +58,7 @@ class RulerColorWell: NSColorWell {
             return
         }
 
+        activeRulerColorWell = self
         colorPanel.animationBehavior = .none
         colorPanel.color = color
         colorPanel.setTarget(self)
@@ -86,6 +88,30 @@ class RulerColorWell: NSColorWell {
         configureOpaqueColorPicking()
     }
 
+}
+
+private func configureResetRulerColorButtonAppearance(_ button: NSButton, identifier: String) {
+    let resetRulerColorLabel = NSLocalizedString(
+        "Reset ruler color",
+        comment: "Tooltip and accessibility label for the button that restores the default ruler color"
+    )
+    let symbol = NSImage(
+        systemSymbolName: "arrow.counterclockwise",
+        accessibilityDescription: resetRulerColorLabel
+    )?.withSymbolConfiguration(
+        NSImage.SymbolConfiguration(pointSize: 14, weight: .regular)
+    ) ?? NSImage()
+    symbol.isTemplate = true
+
+    button.image = symbol
+    button.isBordered = false
+    button.imagePosition = .imageOnly
+    button.imageScaling = .scaleProportionallyDown
+    button.contentTintColor = .secondaryLabelColor
+    button.toolTip = resetRulerColorLabel
+    button.identifier = NSUserInterfaceItemIdentifier(identifier)
+    button.setAccessibilityIdentifier(identifier)
+    button.setAccessibilityLabel(resetRulerColorLabel)
 }
 
 class PreferencesController: NSWindowController, NSWindowDelegate, NotificationPoster {
@@ -243,27 +269,7 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
     }
 
     private func configureResetRulerColorButton() {
-        let resetRulerColorLabel = NSLocalizedString(
-            "Reset ruler color",
-            comment: "Tooltip and accessibility label for the button that restores the default ruler color"
-        )
-        let symbol = NSImage(
-            systemSymbolName: "arrow.counterclockwise",
-            accessibilityDescription: resetRulerColorLabel
-        )?.withSymbolConfiguration(
-            NSImage.SymbolConfiguration(pointSize: 14, weight: .regular)
-        ) ?? NSImage()
-        symbol.isTemplate = true
-
-        resetRulerColorButton.image = symbol
-        resetRulerColorButton.isBordered = false
-        resetRulerColorButton.imagePosition = .imageOnly
-        resetRulerColorButton.imageScaling = .scaleProportionallyDown
-        resetRulerColorButton.contentTintColor = .secondaryLabelColor
-        resetRulerColorButton.toolTip = resetRulerColorLabel
-        resetRulerColorButton.identifier = NSUserInterfaceItemIdentifier("reset-ruler-color-button")
-        resetRulerColorButton.setAccessibilityIdentifier("reset-ruler-color-button")
-        resetRulerColorButton.setAccessibilityLabel(resetRulerColorLabel)
+        configureResetRulerColorButtonAppearance(resetRulerColorButton, identifier: "reset-ruler-color-button")
     }
 
     private func subscribeToColorPanel() {
@@ -279,14 +285,200 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
     private func updateRulerColorFromColorPanel(_ notification: Notification) {
         guard window?.isVisible == true,
               let colorPanel = notification.object as? NSColorPanel,
-              colorPanel.isVisible else { return }
+              colorPanel.isVisible,
+              activeRulerColorWell === rulerColorWell else { return }
 
         prefs.rulerColor = colorPanel.color
     }
 
 }
 
+final class RulerSettingsController: NSWindowController, NSWindowDelegate {
+
+    private weak var rulerController: GroupedRulerController?
+    private var colorPanelObserver: NSObjectProtocol?
+    private var hasCenteredWindow = false
+
+    private let colorLabel: NSTextField
+    let rulerColorWell: RulerColorWell
+    let resetRulerColorButton: NSButton
+
+    var currentRulerController: GroupedRulerController? {
+        return rulerController
+    }
+
+    init(rulerController: GroupedRulerController) {
+        self.rulerController = rulerController
+
+        colorLabel = NSTextField(
+            labelWithString: NSLocalizedString(
+                "Color",
+                comment: "Label for the active ruler color setting"
+            )
+        )
+        rulerColorWell = RulerColorWell(frame: NSRect(x: 0, y: 0, width: 64, height: 30))
+        resetRulerColorButton = NSButton(frame: .zero)
+
+        let window = RulerSettingsController.makeWindow(
+            colorLabel: colorLabel,
+            rulerColorWell: rulerColorWell,
+            resetRulerColorButton: resetRulerColorButton
+        )
+
+        super.init(window: window)
+
+        window.delegate = self
+        window.initialFirstResponder = rulerColorWell
+        configureControls()
+        subscribeToColorPanel()
+        updateView()
+    }
+
+    required init?(coder: NSCoder) {
+        nil
+    }
+
+    deinit {
+        if let colorPanelObserver = colorPanelObserver {
+            NotificationCenter.default.removeObserver(colorPanelObserver)
+        }
+    }
+
+    override func showWindow(_ sender: Any?) {
+        configureOpaqueColorPicking()
+        updateView()
+        window?.makeKeyAndOrderFront(sender)
+        window?.makeFirstResponder(rulerColorWell)
+
+        if !hasCenteredWindow {
+            window?.center()
+            hasCenteredWindow = true
+        }
+    }
+
+    func windowWillClose(_ notification: Notification) {
+        rulerColorWell.deactivate()
+        closeRulerColorPanel()
+    }
+
+    func updateRulerController(_ controller: GroupedRulerController) {
+        rulerController = controller
+        updateView()
+    }
+
+    @objc func setRulerColor(_ sender: Any) {
+        applyRulerColor(rulerColorWell.color)
+    }
+
+    @objc func resetRulerColor(_ sender: Any) {
+        applyRulerColor(Prefs.defaultRulerFillColor)
+    }
+
+    func updateView() {
+        let currentColor = rulerController?.state.settings.rulerColor ?? Prefs.defaultRulerFillColor
+        let hasRuler = rulerController != nil
+
+        rulerColorWell.supportsAlpha = false
+        rulerColorWell.color = currentColor
+        rulerColorWell.isEnabled = hasRuler
+        resetRulerColorButton.isEnabled = hasRuler
+        resetRulerColorButton.isHidden = Prefs.colorsMatch(currentColor, Prefs.defaultRulerFillColor)
+    }
+
+    private static func makeWindow(
+        colorLabel: NSTextField,
+        rulerColorWell: RulerColorWell,
+        resetRulerColorButton: NSButton
+    ) -> NSPanel {
+        let contentView = NSView()
+        let row = NSStackView(views: [colorLabel, rulerColorWell, resetRulerColorButton])
+        row.orientation = .horizontal
+        row.alignment = .centerY
+        row.distribution = .fill
+        row.spacing = 12
+        row.translatesAutoresizingMaskIntoConstraints = false
+
+        colorLabel.alignment = .right
+        colorLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        rulerColorWell.translatesAutoresizingMaskIntoConstraints = false
+        resetRulerColorButton.translatesAutoresizingMaskIntoConstraints = false
+
+        contentView.addSubview(row)
+        NSLayoutConstraint.activate([
+            colorLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 68),
+            rulerColorWell.widthAnchor.constraint(equalToConstant: 64),
+            rulerColorWell.heightAnchor.constraint(equalToConstant: 30),
+            resetRulerColorButton.widthAnchor.constraint(equalToConstant: 24),
+            resetRulerColorButton.heightAnchor.constraint(equalToConstant: 24),
+            row.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            row.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            row.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 18),
+            row.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -18),
+        ])
+
+        let window = NSPanel(
+            contentRect: NSRect(x: 0, y: 0, width: 320, height: 72),
+            styleMask: [.titled, .closable, .utilityWindow],
+            backing: .buffered,
+            defer: false
+        )
+        window.title = NSLocalizedString(
+            "Ruler Settings",
+            comment: "Window title for the active ruler settings panel"
+        )
+        window.contentView = contentView
+        window.identifier = NSUserInterfaceItemIdentifier("ruler-settings-window")
+        window.setAccessibilityIdentifier("ruler-settings-window")
+        window.isMovableByWindowBackground = true
+        window.isReleasedWhenClosed = false
+        return window
+    }
+
+    private func configureControls() {
+        rulerColorWell.isContinuous = true
+        rulerColorWell.supportsAlpha = false
+        rulerColorWell.identifier = NSUserInterfaceItemIdentifier("ruler-settings-color-well")
+        rulerColorWell.setAccessibilityIdentifier("ruler-settings-color-well")
+        rulerColorWell.target = self
+        rulerColorWell.action = #selector(setRulerColor(_:))
+
+        resetRulerColorButton.target = self
+        resetRulerColorButton.action = #selector(resetRulerColor(_:))
+        configureResetRulerColorButtonAppearance(
+            resetRulerColorButton,
+            identifier: "reset-ruler-settings-color-button"
+        )
+    }
+
+    private func applyRulerColor(_ color: NSColor) {
+        rulerController?.updateSettings { settings in
+            settings.setRulerColor(color)
+        }
+        updateView()
+    }
+
+    private func subscribeToColorPanel() {
+        colorPanelObserver = NotificationCenter.default.addObserver(
+            forName: NSColorPanel.colorDidChangeNotification,
+            object: NSColorPanel.shared,
+            queue: .main
+        ) { [weak self] notification in
+            self?.updateRulerColorFromColorPanel(notification)
+        }
+    }
+
+    private func updateRulerColorFromColorPanel(_ notification: Notification) {
+        guard window?.isVisible == true,
+              let colorPanel = notification.object as? NSColorPanel,
+              colorPanel.isVisible,
+              activeRulerColorWell === rulerColorWell else { return }
+
+        applyRulerColor(colorPanel.color)
+    }
+}
+
 func closeRulerColorPanel() {
+    activeRulerColorWell = nil
     let colorPanel = NSColorPanel.shared
     colorPanel.animationBehavior = .none
     colorPanel.setTarget(nil)

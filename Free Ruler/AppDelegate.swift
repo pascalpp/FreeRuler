@@ -65,7 +65,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     lazy var rulerManager: RulerManager = {
         let manager = RulerManager()
         manager.onActiveControllerChanged = { [weak self] controller in
-            self?.groupedRulerController = controller
+            guard let self = self else { return }
+
+            self.groupedRulerController = controller
+
+            guard let settingsController = self.rulerSettingsController,
+                  settingsController.window?.isVisible == true else { return }
+
+            if let controller = controller {
+                settingsController.updateRulerController(controller)
+            } else {
+                settingsController.close()
+            }
         }
         return manager
     }()
@@ -93,6 +104,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBOutlet weak var alignRulersMenuItem: NSMenuItem!
 
     var preferencesController: PreferencesController? = nil
+    var rulerSettingsController: RulerSettingsController? = nil
     private let hotkeyBezel = HotkeyBezel()
     private var uiTestSupport: UITestSupport?
     private var interfaceStyleObserver: NSObjectProtocol?
@@ -663,6 +675,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    @IBAction func openRulerSettings(_ sender: Any) {
+        guard let controller = rulerManager.activeController else { return }
+
+        if rulerSettingsController == nil {
+            rulerSettingsController = RulerSettingsController(rulerController: controller)
+        }
+
+        rulerSettingsController?.updateRulerController(controller)
+        rulerSettingsController?.showWindow(sender)
+    }
+
     @IBAction func newRuler(_ sender: Any) {
         let controller = rulerManager.createRuler()
         controller.show()
@@ -984,6 +1007,8 @@ extension AppDelegate: NSMenuItemValidation {
         switch menuItem.action {
         case #selector(newRuler(_:)):
             return true
+        case #selector(openRulerSettings(_:)):
+            return rulerManager.activeController != nil
         case #selector(closeKeyWindow(_:)):
             return NSApp.keyWindow?.isVisible == true
         case #selector(toggleGroupRulers(_:)):

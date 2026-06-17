@@ -43,6 +43,18 @@
         }
       }
     },
+    "Color" : {
+      "comment" : "Label for the active ruler color setting",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color"
+          }
+        }
+      }
+    },
     "Ruler" : {
       "comment" : "Window title for a ruler window",
       "extractionState" : "manual",
@@ -51,6 +63,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ruler"
+          }
+        }
+      }
+    },
+    "Ruler Settings" : {
+      "comment" : "Window title for the active ruler settings panel",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ruler Settings"
           }
         }
       }

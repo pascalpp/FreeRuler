@@ -293,6 +293,54 @@ final class RulerCoreTests: XCTestCase {
         }
     }
 
+    func testRulerSettingsControllerUpdatesRulerColorWithoutChangingDefaults() {
+        withRestoredRulerPreferences {
+            let defaultColor = NSColor(deviceRed: 0.15, green: 0.25, blue: 0.35, alpha: 1)
+            prefs.rulerColor = defaultColor
+
+            let controller = GroupedRulerController(
+                state: RulerInstanceState(
+                    settings: RulerSettings(
+                        rulerColor: NSColor(deviceRed: 0.4, green: 0.5, blue: 0.6, alpha: 1)
+                    ),
+                    layout: RulerLayoutState(
+                        zeroPoint: NSPoint(x: 240, y: 320),
+                        horizontalLength: 260,
+                        verticalLength: 180
+                    )
+                )
+            )
+            let settingsController = RulerSettingsController(rulerController: controller)
+            defer {
+                settingsController.close()
+                controller.hide()
+            }
+
+            settingsController.rulerColorWell.color = NSColor(
+                deviceRed: 0.8,
+                green: 0.2,
+                blue: 0.4,
+                alpha: 0.35
+            )
+            settingsController.setRulerColor(settingsController.rulerColorWell)
+
+            let normalizedColor = NSColor(deviceRed: 0.8, green: 0.2, blue: 0.4, alpha: 1)
+            assertColor(controller.state.settings.rulerColor, equals: normalizedColor)
+            assertColor(controller.groupedWindow.horizontalRule.color.fill, equals: normalizedColor)
+            assertColor(controller.groupedWindow.verticalRule.color.fill, equals: normalizedColor)
+            assertColor(settingsController.rulerColorWell.color, equals: normalizedColor)
+            assertColor(prefs.rulerColor, equals: defaultColor)
+            XCTAssertFalse(settingsController.resetRulerColorButton.isHidden)
+
+            settingsController.resetRulerColor(settingsController.resetRulerColorButton)
+
+            assertColor(controller.state.settings.rulerColor, equals: Prefs.defaultRulerFillColor)
+            assertColor(controller.groupedWindow.horizontalRule.color.fill, equals: Prefs.defaultRulerFillColor)
+            assertColor(prefs.rulerColor, equals: defaultColor)
+            XCTAssertTrue(settingsController.resetRulerColorButton.isHidden)
+        }
+    }
+
     func testRulerManagerCopiesUpdatedDefaultsOnlyForNewRulers() {
         withRestoredRulerPreferences {
             prefs.unit = .pixels
