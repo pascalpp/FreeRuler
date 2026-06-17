@@ -79,6 +79,12 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Ruler" id="bib-Uj-vzu">
                         <items>
+                            <menuItem title="New Ruler" keyEquivalent="n" id="rWt-KM-qSf">
+                                <connections>
+                                    <action selector="newRuler:" target="Voe-Tx-rLC" id="yGQ-9l-C8Y"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="SXc-41-n3S"/>
                             <menuItem title="Hide Horizontal Ruler" keyEquivalent="h" id="fLB-gk-0Jy">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
