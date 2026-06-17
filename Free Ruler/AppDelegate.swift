@@ -14,12 +14,8 @@ private enum HotkeyBezelLocalizationKey: String {
     case rulersUngrouped = "HotkeyBezel.RulersUngrouped"
     case shadowEnabled = "HotkeyBezel.ShadowEnabled"
     case shadowDisabled = "HotkeyBezel.ShadowDisabled"
-    case horizontalOriginFormat = "HotkeyBezel.HorizontalOriginFormat"
-    case verticalOriginFormat = "HotkeyBezel.VerticalOriginFormat"
-    case originLeft = "HotkeyBezel.OriginLeft"
-    case originRight = "HotkeyBezel.OriginRight"
-    case originTop = "HotkeyBezel.OriginTop"
-    case originBottom = "HotkeyBezel.OriginBottom"
+    case flipHorizontal = "HotkeyBezel.FlipHorizontal"
+    case flipVertical = "HotkeyBezel.FlipVertical"
     case unitsFormat = "HotkeyBezel.UnitsFormat"
     case pixelsUnit = "Unit.Pixels.Abbreviation"
     case millimetersUnit = "Unit.Millimeters.Abbreviation"
@@ -43,18 +39,10 @@ private enum HotkeyBezelLocalizationKey: String {
             return "Hotkey status bezel text indicating ruler shadow is enabled"
         case .shadowDisabled:
             return "Hotkey status bezel text indicating ruler shadow is disabled"
-        case .horizontalOriginFormat:
-            return "Hotkey status bezel format for the horizontal ruler origin side"
-        case .verticalOriginFormat:
-            return "Hotkey status bezel format for the vertical ruler origin side"
-        case .originLeft:
-            return "Hotkey status bezel value for a ruler origin on the left"
-        case .originRight:
-            return "Hotkey status bezel value for a ruler origin on the right"
-        case .originTop:
-            return "Hotkey status bezel value for a ruler origin at the top"
-        case .originBottom:
-            return "Hotkey status bezel value for a ruler origin at the bottom"
+        case .flipHorizontal:
+            return "Hotkey status bezel text indicating the horizontal ruler was flipped"
+        case .flipVertical:
+            return "Hotkey status bezel text indicating the vertical ruler was flipped"
         case .unitsFormat:
             return "Hotkey status bezel format for the selected measurement unit"
         case .pixelsUnit:
@@ -73,9 +61,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var observers: [NSKeyValueObservation] = []
 
     var rulers: [RulerController] = []
+    var groupedRulerController: GroupedRulerController?
 
     var timer: Timer?
     private var timerInterval: TimeInterval?
+    private let mouseTickDrawingSuppressedOwners = NSHashTable<AnyObject>.weakObjects()
     let foregroundTimerInterval: TimeInterval = 1 / 60 // 60 fps
     let backgroundTimerInterval: TimeInterval = 1 / 30 // 30 fps
 
@@ -101,6 +91,54 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 #if SPARKLE
     private var updaterController: SPUStandardUpdaterController?
 #endif
+
+    private enum RulerWindowMode {
+        case grouped
+        case separate
+    }
+
+    private struct RulerVisibility {
+        var horizontal = true
+        var vertical = true
+
+        var hasVisibleRuler: Bool {
+            return horizontal || vertical
+        }
+
+        mutating func showAll() {
+            horizontal = true
+            vertical = true
+        }
+
+        mutating func hideAll() {
+            horizontal = false
+            vertical = false
+        }
+
+        mutating func toggle(_ orientation: Orientation) {
+            set(orientation, isVisible: !isVisible(orientation))
+        }
+
+        mutating func set(_ orientation: Orientation, isVisible: Bool) {
+            switch orientation {
+            case .horizontal:
+                horizontal = isVisible
+            case .vertical:
+                vertical = isVisible
+            }
+        }
+
+        func isVisible(_ orientation: Orientation) -> Bool {
+            switch orientation {
+            case .horizontal:
+                return horizontal
+            case .vertical:
+                return vertical
+            }
+        }
+    }
+
+    private var rulerVisibility = RulerVisibility()
 
     // MARK: - Lifecycle
 
@@ -207,14 +245,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             },
             prefs.observe(\Prefs.floatRulers, options: .new) { prefs, changed in
                 self.updateFloatRulersMenuItem()
+                self.groupedRulerController?.updateIsFloatingPanel()
                 self.uiTestSupport?.writePreferencesState()
             },
             prefs.observe(\Prefs.groupRulers, options: .new) { prefs, changed in
                 self.updateGroupRulersMenuItem()
+                self.applyRulerWindowMode()
                 self.uiTestSupport?.writePreferencesState()
             },
             prefs.observe(\Prefs.rulerShadow, options: .new) { prefs, changed in
                 self.updateRulerShadowMenuItem()
+                self.groupedRulerController?.updateHasShadow()
                 self.uiTestSupport?.writePreferencesState()
             },
             prefs.observe(\Prefs.rulerColor, options: .new) { prefs, changed in
@@ -243,6 +284,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         for ruler in rulers {
             ruler.rulerWindow.rule.redrawForPreferenceChange()
         }
+        groupedRulerController?.redrawForPreferenceChange()
     }
 
     func updateFloatRulersMenuItem() {
@@ -269,30 +311,32 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // TODO: provide each ruler with otherRulers: [RulerWindow]
         rulers[0].otherWindow = rulers[1].rulerWindow
         rulers[1].otherWindow = rulers[0].rulerWindow
+
+        let groupedFrame = GroupedRulerLayout.joined(
+            horizontalFrame: rulers[1].rulerWindow.frame,
+            verticalFrame: rulers[0].rulerWindow.frame,
+            zeroCorner: prefs.zeroCorner
+        ).groupFrame
+        groupedRulerController = GroupedRulerController(frame: groupedFrame)
     }
 
     func showRulers() {
         createRulersIfNeeded()
-
-        for ruler in rulers {
-            showRuler(ruler)
-        }
+        rulerVisibility.showAll()
+        applyRulerWindowMode(showRulersIfNeeded: true)
     }
 
     func toggleRuler(orientation: Orientation) {
         guard canToggleRulerVisibility else { return }
-        guard let ruler = rulerController(orientation: orientation) else { return }
+        guard rulerController(orientation: orientation) != nil else { return }
 
         if prefs.groupRulers {
-            prefs.groupRulers = false
-            detachRulerWindows()
+            syncGroupedRulerFramesToRulerWindows(persistAutosave: true)
         }
 
-        if ruler.rulerWindow.isVisible {
-            hideRuler(ruler)
-        } else {
-            showRuler(ruler)
-        }
+        let shouldShowRulersIfNeeded = !hasVisibleRuler
+        rulerVisibility.toggle(orientation)
+        applyRulerWindowMode(showRulersIfNeeded: shouldShowRulersIfNeeded)
     }
 
     private func detachRulerWindows() {
@@ -310,18 +354,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         return rulers.first { $0.ruler.orientation == orientation }
     }
 
-    private func showRuler(_ ruler: RulerController) {
+    private func showRuler(_ ruler: RulerController, updateMode: Bool = true) {
         ruler.showWindow(self)
         ruler.rulerWindow.orderFrontRegardless()
-        updateRulerGrouping()
-        updateMouseTickTimer()
-    }
-
-    private func hideRuler(_ ruler: RulerController) {
-        detachRulerWindow(ruler.rulerWindow)
-        ruler.rulerWindow.orderOut(self)
-        updateRulerGrouping()
-        updateMouseTickTimer()
+        if updateMode {
+            applyRulerWindowMode()
+        }
     }
 
     private func detachRulerWindow(_ window: RulerWindow) {
@@ -333,18 +371,120 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    private func updateRulerGrouping() {
+    private var rulerWindowMode: RulerWindowMode {
+        return prefs.groupRulers ? .grouped : .separate
+    }
+
+    private func applyRulerWindowMode(showRulersIfNeeded: Bool = false) {
+        createRulersIfNeeded()
+        detachRulerWindows()
+
+        switch rulerWindowMode {
+        case .grouped:
+            showGroupedRulerWindow(showRulersIfNeeded: showRulersIfNeeded)
+        case .separate:
+            showSeparateRulerWindows()
+        }
+
+        updateMouseTickTimer()
+    }
+
+    private func showGroupedRulerWindow(showRulersIfNeeded: Bool) {
+        guard let groupedRulerController = groupedRulerController,
+              let horizontalRuler = existingRulerController(orientation: .horizontal),
+              let verticalRuler = existingRulerController(orientation: .vertical) else {
+            return
+        }
+
+        guard rulerVisibility.hasVisibleRuler else {
+            groupedRulerController.hide()
+            horizontalRuler.rulerWindow.orderOut(self)
+            verticalRuler.rulerWindow.orderOut(self)
+            return
+        }
+
+        let shouldShowGroupedRuler = showRulersIfNeeded
+            || groupedRulerController.isVisible
+            || horizontalRuler.rulerWindow.isVisible
+            || verticalRuler.rulerWindow.isVisible
+
+        guard shouldShowGroupedRuler else { return }
+
+        let horizontalFrame = groupedRulerController.isVisible
+            && groupedRulerController.groupedWindow.isRuleVisible(.horizontal)
+            ? groupedRulerController.groupedWindow.screenFrame(for: .horizontal)
+            : horizontalRuler.rulerWindow.frame
+        let verticalFrame = groupedRulerController.isVisible
+            && groupedRulerController.groupedWindow.isRuleVisible(.vertical)
+            ? groupedRulerController.groupedWindow.screenFrame(for: .vertical)
+            : verticalRuler.rulerWindow.frame
+
+        groupedRulerController.show(
+            horizontalFrame: horizontalFrame,
+            verticalFrame: verticalFrame,
+            showsHorizontalRule: rulerVisibility.horizontal,
+            showsVerticalRule: rulerVisibility.vertical
+        )
+        horizontalRuler.rulerWindow.orderOut(self)
+        verticalRuler.rulerWindow.orderOut(self)
+    }
+
+    private func showSeparateRulerWindows() {
+        guard let groupedRulerController = groupedRulerController else {
+            return
+        }
+
+        if groupedRulerController.isVisible {
+            syncGroupedRulerFramesToRulerWindows(persistAutosave: true)
+            groupedRulerController.hide()
+        }
+
+        for ruler in rulers {
+            if rulerVisibility.isVisible(ruler.ruler.orientation) {
+                showRuler(ruler, updateMode: false)
+            } else {
+                ruler.rulerWindow.orderOut(self)
+            }
+        }
+
         for ruler in rulers {
             ruler.updateChildWindow()
         }
     }
 
+    func syncGroupedRulerFramesToRulerWindows(persistAutosave: Bool = false) {
+        guard let groupedRulerController = groupedRulerController,
+              let horizontalRuler = existingRulerController(orientation: .horizontal),
+              let verticalRuler = existingRulerController(orientation: .vertical) else {
+            return
+        }
+
+        groupedRulerController.syncFrames(
+            to: horizontalRuler.rulerWindow,
+            and: verticalRuler.rulerWindow,
+            persistAutosave: persistAutosave
+        )
+    }
+
+    private var isGroupedRulerVisible: Bool {
+        return groupedRulerController?.isVisible == true
+    }
+
+    private func isRulerVisible(_ ruler: RulerController?) -> Bool {
+        guard let ruler = ruler else { return false }
+        return rulerVisibility.isVisible(ruler.ruler.orientation)
+    }
+
     private var isRulerFrontmost: Bool {
+        if groupedRulerController?.groupedWindow.isKeyWindow == true {
+            return true
+        }
+
         return rulers.contains { $0.rulerWindow.isKeyWindow }
     }
 
     private var hasVisibleRuler: Bool {
-        return rulers.contains { $0.rulerWindow.isVisible }
+        return isGroupedRulerVisible || rulers.contains { $0.rulerWindow.isVisible }
     }
 
     private var canToggleRulerVisibility: Bool {
@@ -364,6 +504,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         for ruler in rulers {
             ruler.foreground()
         }
+        groupedRulerController?.foreground()
 
         mouseTickTimerPolicy.applicationDidBecomeActive()
         updateMouseTickTimer()
@@ -375,6 +516,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         for ruler in rulers {
             ruler.background()
         }
+        groupedRulerController?.background()
 
         mouseTickTimerPolicy.applicationDidResignActive()
         updateMouseTickTimer()
@@ -435,13 +577,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @IBAction func closeKeyWindow(_ sender: Any) {
-        if let ruler = rulers.first(where: { $0.rulerWindow.isKeyWindow }) {
-            if prefs.groupRulers {
-                prefs.groupRulers = false
-                detachRulerWindows()
-            }
+        if let groupedRulerController = groupedRulerController,
+           groupedRulerController.groupedWindow.isKeyWindow {
+            syncGroupedRulerFramesToRulerWindows(persistAutosave: true)
+            rulerVisibility.hideAll()
+            applyRulerWindowMode()
+            return
+        }
 
-            hideRuler(ruler)
+        if let ruler = rulers.first(where: { $0.rulerWindow.isKeyWindow }) {
+            rulerVisibility.set(ruler.ruler.orientation, isVisible: false)
+            applyRulerWindowMode()
             return
         }
 
@@ -452,6 +598,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         var mouseLoc = NSEvent.mouseLocation
         mouseLoc.x = mouseLoc.x.rounded()
         mouseLoc.y = mouseLoc.y.rounded()
+
+        if prefs.groupRulers,
+           let groupedRulerController = groupedRulerController,
+           groupedRulerController.isVisible {
+            groupedRulerController.align(at: mouseLoc)
+            syncGroupedRulerFramesToRulerWindows(persistAutosave: true)
+            return
+        }
+
         for ruler in rulers {
             ruler.alignRuler(at: mouseLoc)
         }
@@ -464,13 +619,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         // ungroup rulers during reset operation
         prefs.groupRulers = false
+        rulerVisibility.showAll()
         for ruler in rulers {
             ruler.resetPosition()
-            showRuler(ruler)
+            showRuler(ruler, updateMode: false)
         }
 
         prefs.groupRulers = Prefs.defaultGroupRulers
-        updateRulerGrouping()
+        applyRulerWindowMode()
     }
 
     @IBAction func showRulers(_ sender: Any) {
@@ -509,6 +665,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             geometry: oldGeometry
         )
 
+        if prefs.groupRulers,
+           let groupedRulerController = groupedRulerController,
+           groupedRulerController.isVisible {
+            groupedRulerController.prepareForZeroCornerChange(to: flippedCorner)
+            prefs.zeroCorner = flippedCorner
+            syncGroupedRulerFramesToRulerWindows(persistAutosave: true)
+            return
+        }
+
         prefs.zeroCorner = flippedCorner
 
         guard prefs.groupRulers,
@@ -531,7 +696,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         detachRulerWindows()
         otherWindow.setFrame(otherFrame, display: true)
-        updateRulerGrouping()
+        applyRulerWindowMode()
     }
 
     func isRulerWindowShown(_ window: RulerWindow) -> Bool {
@@ -622,42 +787,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func showHorizontalOriginHotkeyBezel(on screen: NSScreen?) {
-        switch prefs.zeroCorner {
-        case .topLeft, .bottomLeft:
-            showHotkeyBezel(
-                format: .horizontalOriginFormat,
-                HotkeyBezelLocalizationKey.originLeft.localizedString,
-                on: screen
-            )
-        case .topRight, .bottomRight:
-            showHotkeyBezel(
-                format: .horizontalOriginFormat,
-                HotkeyBezelLocalizationKey.originRight.localizedString,
-                on: screen
-            )
-        }
+        showHotkeyBezel(.flipHorizontal, on: screen)
     }
 
     private func showVerticalOriginHotkeyBezel(on screen: NSScreen?) {
-        switch prefs.zeroCorner {
-        case .topLeft, .topRight:
-            showHotkeyBezel(
-                format: .verticalOriginFormat,
-                HotkeyBezelLocalizationKey.originTop.localizedString,
-                on: screen
-            )
-        case .bottomLeft, .bottomRight:
-            showHotkeyBezel(
-                format: .verticalOriginFormat,
-                HotkeyBezelLocalizationKey.originBottom.localizedString,
-                on: screen
-            )
-        }
+        showHotkeyBezel(.flipVertical, on: screen)
     }
 
     private func bezelScreen(for sender: Any) -> NSScreen? {
         if let rulerController = sender as? RulerController {
             return rulerController.rulerWindow.screen
+        }
+
+        if let groupedRulerController = sender as? GroupedRulerController {
+            return groupedRulerController.groupedWindow.screen
+        }
+
+        if groupedRulerController?.groupedWindow.isKeyWindow == true {
+            return groupedRulerController?.groupedWindow.screen
         }
 
         return rulers.first { $0.rulerWindow.isKeyWindow }?.rulerWindow.screen
@@ -696,13 +843,13 @@ extension AppDelegate: NSMenuItemValidation {
             return NSApp.keyWindow?.isVisible == true
         case #selector(toggleHorizontalRuler(_:)):
             let ruler = existingRulerController(orientation: .horizontal)
-            menuItem.title = ruler?.rulerWindow.isVisible == true
+            menuItem.title = isRulerVisible(ruler)
                 ? NSLocalizedString("Hide Horizontal Ruler", comment: "Menu item title to hide the horizontal ruler")
                 : NSLocalizedString("Show Horizontal Ruler", comment: "Menu item title to show the horizontal ruler")
             return canToggleRulerVisibility
         case #selector(toggleVerticalRuler(_:)):
             let ruler = existingRulerController(orientation: .vertical)
-            menuItem.title = ruler?.rulerWindow.isVisible == true
+            menuItem.title = isRulerVisible(ruler)
                 ? NSLocalizedString("Hide Vertical Ruler", comment: "Menu item title to hide the vertical ruler")
                 : NSLocalizedString("Show Vertical Ruler", comment: "Menu item title to show the vertical ruler")
             return canToggleRulerVisibility
@@ -729,6 +876,37 @@ extension AppDelegate {
     func resumeMouseTickUpdates(owner: AnyObject) {
         mouseTickTimerPolicy.resume(owner: owner)
         updateMouseTickTimer()
+    }
+
+    func suppressMouseTickDrawing(owner: AnyObject) {
+        guard !mouseTickDrawingSuppressedOwners.contains(owner) else { return }
+
+        mouseTickDrawingSuppressedOwners.add(owner)
+        updateMouseTickDrawingVisibility()
+    }
+
+    func unsuppressMouseTickDrawing(owner: AnyObject) {
+        guard mouseTickDrawingSuppressedOwners.contains(owner) else { return }
+
+        mouseTickDrawingSuppressedOwners.remove(owner)
+        updateMouseTickDrawingVisibility()
+    }
+
+    private func updateMouseTickDrawingVisibility() {
+        setMouseTickDrawingEnabled(!hasMouseTickDrawingSuppressedOwners)
+    }
+
+    private var hasMouseTickDrawingSuppressedOwners: Bool {
+        guard mouseTickDrawingSuppressedOwners.count > 0 else { return false }
+        return mouseTickDrawingSuppressedOwners.anyObject != nil
+    }
+
+    private func setMouseTickDrawingEnabled(_ isEnabled: Bool) {
+        for ruler in rulers {
+            ruler.rulerWindow.rule.showMouseTick = isEnabled
+        }
+
+        groupedRulerController?.setMouseTickDrawingEnabled(isEnabled)
     }
 
     private func updateMouseTickTimer() {
@@ -771,6 +949,13 @@ extension AppDelegate {
         var mouseLoc = NSEvent.mouseLocation
         mouseLoc.x = mouseLoc.x.rounded()
         mouseLoc.y = mouseLoc.y.rounded()
+
+        if let groupedRulerController = groupedRulerController,
+           groupedRulerController.isVisible {
+            groupedRulerController.drawMouseTick(at: mouseLoc)
+            return
+        }
+
         for ruler in rulers {
             ruler.rulerWindow.rule.drawMouseTick(at: mouseLoc)
         }

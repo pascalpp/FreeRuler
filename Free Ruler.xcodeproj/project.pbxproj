@@ -240,8 +240,8 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				6F4102872260712F00F06A10 /* Free Ruler */,
 				50B5DB0C2FDF402A0056ECF4 /* FreeRulerUITestSupport */,
+				6F4102872260712F00F06A10 /* Free Ruler */,
 			);
 			name = "Free Ruler";
 			productName = "Free Ruler";
@@ -261,8 +261,8 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				6F4102872260712F00F06A10 /* Free Ruler */,
 				50B5DB0C2FDF402A0056ECF4 /* FreeRulerUITestSupport */,
+				6F4102872260712F00F06A10 /* Free Ruler */,
 			);
 			name = "Free Ruler GitHub";
 			packageProductDependencies = (

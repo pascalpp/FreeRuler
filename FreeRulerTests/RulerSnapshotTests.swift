@@ -24,6 +24,13 @@ final class RulerSnapshotTests: XCTestCase {
         )
     }
 
+    func testGroupedWindowLayoutRenderingMatchesSnapshot() throws {
+        try assertSnapshot(
+            named: "grouped-ruler-window-layout",
+            view: RulerSnapshotFactory.groupedWindowLayoutSnapshotView()
+        )
+    }
+
     private func assertSnapshot(
         named name: String,
         view: NSView,
@@ -215,12 +222,54 @@ enum RulerSnapshotFactory {
         return canvas
     }
 
+    static func groupedWindowLayoutSnapshotView() -> NSView {
+        let margin: CGFloat = 24
+        let groupedSize = NSSize(width: 620, height: 360)
+        let canvas = SnapshotCanvasView(
+            frame: NSRect(
+                x: 0,
+                y: 0,
+                width: groupedSize.width + (margin * 2),
+                height: groupedSize.height + (margin * 2)
+            )
+        )
+        canvas.backgroundColor = NSColor(deviceWhite: 0.18, alpha: 1)
+
+        let zeroCorner = ZeroCorner.topLeft
+        let horizontalRule = SnapshotHorizontalRule(
+            unit: .pixels,
+            zeroCorner: zeroCorner,
+            frame: NSRect(origin: .zero, size: NSSize(width: 300, height: Ruler.thickness))
+        )
+        let verticalRule = SnapshotVerticalRule(
+            unit: .pixels,
+            zeroCorner: zeroCorner,
+            frame: NSRect(origin: .zero, size: NSSize(width: Ruler.thickness, height: 300))
+        )
+        configure(horizontalRule, fill: SnapshotColors.lightRuler, showsMouseTick: false)
+        configure(verticalRule, fill: SnapshotColors.lightRuler, showsMouseTick: false)
+
+        let groupedView = GroupedRulerContentView(
+            frame: NSRect(origin: NSPoint(x: margin, y: margin), size: groupedSize),
+            horizontalRule: horizontalRule,
+            verticalRule: verticalRule
+        )
+        groupedView.zeroCorner = zeroCorner
+        groupedView.color = RulerColors(customFill: SnapshotColors.lightRuler)
+        groupedView.layoutSubtreeIfNeeded()
+        groupedView.needsDisplay = true
+
+        canvas.addSubview(groupedView)
+        return canvas
+    }
+
     static func writeSnapshots(to directory: URL) throws {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
 
         let snapshots: [(name: String, view: NSView)] = [
             ("ruler-zero-corners", zeroCornerSnapshotView()),
             ("ruler-mouse-tick-labels", mouseTickLabelSnapshotView()),
+            ("grouped-ruler-window-layout", groupedWindowLayoutSnapshotView()),
         ]
 
         for snapshot in snapshots {

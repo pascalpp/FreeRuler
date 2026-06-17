@@ -76,7 +76,8 @@ struct RulerCornerPlacement: Equatable {
 struct ZeroCornerGeometry {
     let zeroCorner: ZeroCorner
 
-    private let borderCompensation: CGFloat = 1.0
+    static let borderCompensation: CGFloat = 1.0
+    private let borderCompensation = ZeroCornerGeometry.borderCompensation
 
     init(zeroCorner: ZeroCorner) {
         self.zeroCorner = zeroCorner
@@ -195,7 +196,7 @@ struct ZeroCornerGeometry {
         }
     }
 
-    private var horizontalZeroSide: RulerHorizontalSide {
+    var horizontalZeroSide: RulerHorizontalSide {
         switch zeroCorner {
         case .topLeft, .bottomLeft:
             return .left
@@ -204,7 +205,7 @@ struct ZeroCornerGeometry {
         }
     }
 
-    private var verticalZeroSide: RulerVerticalSide {
+    var verticalZeroSide: RulerVerticalSide {
         switch zeroCorner {
         case .topLeft, .topRight:
             return .top

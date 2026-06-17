@@ -19,6 +19,7 @@ swiftc \
   "$ROOT_DIR/Free Ruler/RuleView.swift" \
   "$ROOT_DIR/Free Ruler/HorizontalRule.swift" \
   "$ROOT_DIR/Free Ruler/VerticalRule.swift" \
+  "$ROOT_DIR/Free Ruler/GroupedRulerWindow.swift" \
   "$ROOT_DIR/FreeRulerTests/RulerSnapshotTests.swift" \
   -o "$GENERATOR"
 

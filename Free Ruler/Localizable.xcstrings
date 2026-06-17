@@ -43,6 +43,18 @@
         }
       }
     },
+    "Grouped Rulers" : {
+      "comment" : "Window title for the grouped ruler window",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grouped Rulers"
+          }
+        }
+      }
+    },
     "Hide Horizontal Ruler" : {
       "comment" : "Menu item title to hide the horizontal ruler",
       "extractionState" : "manual",
@@ -169,212 +181,44 @@
         }
       }
     },
-    "HotkeyBezel.HorizontalOriginFormat" : {
-      "comment" : "Hotkey status bezel format for the horizontal ruler origin side",
+    "HotkeyBezel.FlipHorizontal" : {
+      "comment" : "Hotkey status bezel text indicating the horizontal ruler was flipped",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Horizontaler Ursprung: %@"
+            "value" : "Horizontal spiegeln"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Horizontal origin: %@"
+            "value" : "Flip Horizontal"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Origen horizontal: %@"
+            "value" : "Voltear horizontal"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vaaka-alkupiste: %@"
+            "value" : "Käännä vaakasuunnassa"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "水平原点: %@"
+            "value" : "水平反転"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "水平原点：%@"
-          }
-        }
-      }
-    },
-    "HotkeyBezel.OriginBottom" : {
-      "comment" : "Hotkey status bezel value for a ruler origin at the bottom",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "unten"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bottom"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "abajo"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "alas"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "下"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "底部"
-          }
-        }
-      }
-    },
-    "HotkeyBezel.OriginLeft" : {
-      "comment" : "Hotkey status bezel value for a ruler origin on the left",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "links"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Left"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "izquierda"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "vasen"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "左"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "左侧"
-          }
-        }
-      }
-    },
-    "HotkeyBezel.OriginRight" : {
-      "comment" : "Hotkey status bezel value for a ruler origin on the right",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "rechts"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Right"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "derecha"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "oikea"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "右"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "右侧"
-          }
-        }
-      }
-    },
-    "HotkeyBezel.OriginTop" : {
-      "comment" : "Hotkey status bezel value for a ruler origin at the top",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "oben"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Top"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "arriba"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ylös"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "上"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "顶部"
+            "value" : "水平翻转"
           }
         }
       }
@@ -673,44 +517,44 @@
         }
       }
     },
-    "HotkeyBezel.VerticalOriginFormat" : {
-      "comment" : "Hotkey status bezel format for the vertical ruler origin side",
+    "HotkeyBezel.FlipVertical" : {
+      "comment" : "Hotkey status bezel text indicating the vertical ruler was flipped",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vertikaler Ursprung: %@"
+            "value" : "Vertikal spiegeln"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vertical origin: %@"
+            "value" : "Flip Vertical"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Origen vertical: %@"
+            "value" : "Voltear vertical"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pystyalkupiste: %@"
+            "value" : "Käännä pystysuunnassa"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "垂直原点: %@"
+            "value" : "垂直反転"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "垂直原点：%@"
+            "value" : "垂直翻转"
           }
         }
       }

@@ -19,6 +19,7 @@ final class ResizeHandleView: NSView {
     private var dragInitialWindowFrame: NSRect?
     private var wasMovableByWindowBackgroundBeforeDrag: Bool?
     private var childWindowFramesBeforeDrag: [(window: NSWindow, frame: NSRect)] = []
+    private var mouseTicksSuspendedDuringResize = false
 
     private let length: CGFloat = 12
     private let lineCount = 4
@@ -46,8 +47,11 @@ final class ResizeHandleView: NSView {
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
 
+        NSGraphicsContext.saveGraphicsState()
+        NSBezierPath(rect: gripClipRect(in: bounds)).addClip()
         drawBackground()
         drawGripLines()
+        NSGraphicsContext.restoreGraphicsState()
     }
 
     override func updateTrackingAreas() {
@@ -99,6 +103,7 @@ final class ResizeHandleView: NSView {
     override func mouseDown(with event: NSEvent) {
         guard let window = window else { return }
 
+        suspendMouseTicksDuringResize()
         dragInitialMouseLocation = screenLocation(for: event, in: window)
         dragInitialWindowFrame = window.frame
         wasMovableByWindowBackgroundBeforeDrag = window.isMovableByWindowBackground
@@ -138,6 +143,10 @@ final class ResizeHandleView: NSView {
     }
 
     override func mouseUp(with event: NSEvent) {
+        defer {
+            resumeMouseTicksAfterResize(with: event)
+        }
+
         guard let window = window else {
             resetDragState()
             return
@@ -152,10 +161,9 @@ final class ResizeHandleView: NSView {
         }
 
         resetDragState()
+        restoreRulerCursor(with: event)
         if contains(event) {
             windowResizeCursor(for: orientation).set()
-        } else {
-            restoreRulerCursor(with: event)
         }
     }
 
@@ -240,22 +248,34 @@ final class ResizeHandleView: NSView {
         let width: CGFloat
         let height: CGFloat
 
-        switch placement.xSide {
-        case .left:
+        switch orientation {
+        case .horizontal:
+            switch placement.xSide {
+            case .left:
+                x = bounds.minX
+                width = gripFrame.maxX - bounds.minX
+            case .right:
+                x = gripFrame.minX
+                width = bounds.maxX - gripFrame.minX
+            }
+        case .vertical:
             x = bounds.minX
-            width = gripFrame.maxX - bounds.minX
-        case .right:
-            x = gripFrame.minX
-            width = bounds.maxX - gripFrame.minX
+            width = bounds.width
         }
 
-        switch placement.ySide {
-        case .top:
-            y = gripFrame.minY
-            height = bounds.maxY - gripFrame.minY
-        case .bottom:
+        switch orientation {
+        case .horizontal:
             y = bounds.minY
-            height = gripFrame.maxY - bounds.minY
+            height = bounds.height
+        case .vertical:
+            switch placement.ySide {
+            case .top:
+                y = gripFrame.minY
+                height = bounds.maxY - gripFrame.minY
+            case .bottom:
+                y = bounds.minY
+                height = gripFrame.maxY - bounds.minY
+            }
         }
 
         return NSRect(x: x, y: y, width: width, height: height)
@@ -315,21 +335,87 @@ final class ResizeHandleView: NSView {
         let x: CGFloat
         let y: CGFloat
 
-        switch placement.xSide {
-        case .left:
-            x = bounds.maxX - gripSize.width
-        case .right:
-            x = bounds.minX
-        }
+        switch orientation {
+        case .horizontal:
+            switch placement.xSide {
+            case .left:
+                x = bounds.maxX - gripSize.width
+            case .right:
+                x = bounds.minX
+            }
 
-        switch placement.ySide {
-        case .top:
-            y = bounds.minY
-        case .bottom:
-            y = bounds.maxY - gripSize.height
+            switch placement.ySide {
+            case .top:
+                y = bounds.maxY
+                    - horizontalYOffset
+                    - length
+                    - backgroundPadding
+            case .bottom:
+                y = bounds.minY + horizontalYOffset - backgroundPadding
+            }
+        case .vertical:
+            switch placement.xSide {
+            case .left:
+                x = bounds.minX + verticalXOffset - backgroundPadding
+            case .right:
+                x = bounds.maxX
+                    - verticalXOffset
+                    - length
+                    - backgroundPadding
+            }
+
+            switch placement.ySide {
+            case .top:
+                y = bounds.minY
+            case .bottom:
+                y = bounds.maxY - gripSize.height
+            }
         }
 
         return NSRect(origin: NSPoint(x: x, y: y), size: gripSize)
+    }
+
+    private func gripClipRect(in bounds: NSRect) -> NSRect {
+        let placement = ZeroCornerGeometry(zeroCorner: zeroCorner)
+            .resizeHandlePlacement(for: orientation)
+        let gripRect = self.gripRect(in: bounds)
+
+        switch orientation {
+        case .horizontal:
+            switch placement.ySide {
+            case .top:
+                return NSRect(
+                    x: bounds.minX,
+                    y: gripRect.minY,
+                    width: bounds.width,
+                    height: bounds.maxY - gripRect.minY
+                )
+            case .bottom:
+                return NSRect(
+                    x: bounds.minX,
+                    y: bounds.minY,
+                    width: bounds.width,
+                    height: gripRect.maxY - bounds.minY
+                )
+            }
+        case .vertical:
+            switch placement.xSide {
+            case .left:
+                return NSRect(
+                    x: bounds.minX,
+                    y: bounds.minY,
+                    width: gripRect.maxX - bounds.minX,
+                    height: bounds.height
+                )
+            case .right:
+                return NSRect(
+                    x: gripRect.minX,
+                    y: bounds.minY,
+                    width: bounds.maxX - gripRect.minX,
+                    height: bounds.height
+                )
+            }
+        }
     }
 
     private func gripSize() -> NSSize {
@@ -364,6 +450,26 @@ final class ResizeHandleView: NSView {
         childWindowFramesBeforeDrag = []
     }
 
+    private func suspendMouseTicksDuringResize() {
+        #if !SNAPSHOT_GENERATOR
+        guard !mouseTicksSuspendedDuringResize else { return }
+
+        appDelegate?.suppressMouseTickDrawing(owner: self)
+        appDelegate?.suspendMouseTickUpdates(owner: self)
+        mouseTicksSuspendedDuringResize = true
+        #endif
+    }
+
+    private func resumeMouseTicksAfterResize(with event: NSEvent) {
+        #if !SNAPSHOT_GENERATOR
+        guard mouseTicksSuspendedDuringResize else { return }
+
+        mouseTicksSuspendedDuringResize = false
+        appDelegate?.resumeMouseTickUpdates(owner: self)
+        appDelegate?.unsuppressMouseTickDrawing(owner: self)
+        #endif
+    }
+
     private func restoreRulerCursor(with event: NSEvent) {
         guard let superview = superview else { return }
 
@@ -379,6 +485,12 @@ final class ResizeHandleView: NSView {
         let locationInView = convert(event.locationInWindow, from: nil)
         return bounds.contains(locationInView)
     }
+
+#if !SNAPSHOT_GENERATOR
+    private var appDelegate: AppDelegate? {
+        return NSApp.delegate as? AppDelegate
+    }
+#endif
 
 }
 
