@@ -1612,6 +1612,7 @@ final class RulerManager {
     private(set) var controllers: [GroupedRulerController] = []
     private(set) var activeRulerID: UUID?
     var onActiveControllerChanged: ((GroupedRulerController?) -> Void)?
+    var onStateChanged: ((RulerManager) -> Void)?
 
     init(
         initialStates: [RulerInstanceState] = [],
@@ -1668,7 +1669,7 @@ final class RulerManager {
         return controller
     }
 
-    func restore(_ states: [RulerInstanceState]) {
+    func restore(_ states: [RulerInstanceState], activeRulerID restoredActiveRulerID: UUID? = nil) {
         for controller in controllers {
             controller.hide()
         }
@@ -1680,6 +1681,13 @@ final class RulerManager {
         for state in states where state.hasVisibleWing {
             addRuler(state: state)
         }
+
+        if let restoredActiveRulerID = restoredActiveRulerID,
+           let restoredActiveController = controller(id: restoredActiveRulerID) {
+            markActive(restoredActiveController)
+        }
+
+        notifyStateChanged()
     }
 
     func showAll() {
@@ -1708,6 +1716,8 @@ final class RulerManager {
             activeRulerID = controllers.last?.state.id
             onActiveControllerChanged?(activeController)
         }
+
+        notifyStateChanged()
     }
 
     func markActive(_ controller: GroupedRulerController) {
@@ -1715,12 +1725,17 @@ final class RulerManager {
 
         activeRulerID = controller.state.id
         onActiveControllerChanged?(controller)
+        notifyStateChanged()
     }
 
     func controller(containing window: NSWindow?) -> GroupedRulerController? {
         guard let window = window else { return nil }
 
         return controllers.first { $0.groupedWindow === window }
+    }
+
+    func controller(id: UUID) -> GroupedRulerController? {
+        return controllers.first { $0.state.id == id }
     }
 
     private func configure(_ controller: GroupedRulerController) {
@@ -1733,7 +1748,12 @@ final class RulerManager {
                   self?.activeRulerID == controller.state.id else { return }
 
             self?.activeRulerID = controller.state.id
+            self?.notifyStateChanged()
         }
+    }
+
+    private func notifyStateChanged() {
+        onStateChanged?(self)
     }
 }
 #endif

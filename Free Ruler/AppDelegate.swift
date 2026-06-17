@@ -79,6 +79,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 settingsController.close()
             }
         }
+        manager.onStateChanged = { [weak self] _ in
+            self?.saveRulerSetState()
+        }
         return manager
     }()
 
@@ -185,6 +188,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         configureUpdater()
 #endif
 
+        restoreSavedRulers()
         showRulers()
     }
 
@@ -398,6 +402,55 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         createRulersIfNeeded()
         rulerManager.showAll()
         updateMouseTickTimer()
+    }
+
+    func restoreSavedRulers() {
+        if let restoredState = prefs.loadRulerSetState() {
+            rulerManager.restore(
+                restoredState.rulers,
+                activeRulerID: restoredState.activeRulerID
+            )
+            return
+        }
+
+        if let migratedState = migratedLegacyRulerState() {
+            rulerManager.restore([migratedState], activeRulerID: migratedState.id)
+        }
+    }
+
+    private func saveRulerSetState() {
+        prefs.saveRulerSetState(
+            rulers: rulerManager.states,
+            activeRulerID: rulerManager.activeRulerID
+        )
+    }
+
+    private func migratedLegacyRulerState() -> RulerInstanceState? {
+        let defaults = UserDefaults.standard
+        let horizontalAutosaveName = "horizontal-ruler"
+        let verticalAutosaveName = "vertical-ruler"
+        let hasLegacyAutosave = defaults.object(forKey: "NSWindow Frame \(horizontalAutosaveName)") != nil
+            || defaults.object(forKey: "NSWindow Frame \(verticalAutosaveName)") != nil
+        guard hasLegacyAutosave else { return nil }
+
+        let settings = RulerSettings(defaults: prefs)
+        let horizontalWindow = RulerWindow(
+            ruler: Ruler(.horizontal, name: horizontalAutosaveName)
+        )
+        let verticalWindow = RulerWindow(
+            ruler: Ruler(.vertical, name: verticalAutosaveName)
+        )
+        _ = horizontalWindow.setFrameUsingName(NSWindow.FrameAutosaveName(horizontalAutosaveName))
+        _ = verticalWindow.setFrameUsingName(NSWindow.FrameAutosaveName(verticalAutosaveName))
+
+        return RulerInstanceState(
+            settings: settings,
+            layout: RulerLayoutState(
+                horizontalFrame: horizontalWindow.frame,
+                verticalFrame: verticalWindow.frame,
+                zeroCorner: settings.zeroCorner
+            )
+        )
     }
 
     func toggleRuler(orientation: Orientation) {
@@ -1046,6 +1099,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ aNotification: Notification) {
         closeRulerColorPanel()
+        saveRulerSetState()
         prefs.save()
     }
 

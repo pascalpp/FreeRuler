@@ -511,6 +511,145 @@ final class RulerCoreTests: XCTestCase {
         }
     }
 
+    func testSavedRulerSetStateRoundTripsThroughUserDefaults() {
+        withRestoredRulerSetState {
+            let firstID = UUID(uuidString: "8B425683-3E8E-4B2C-9F79-1B39FC70622D")!
+            let secondID = UUID(uuidString: "6B688B39-FC3E-454C-94C8-E77B3131F600")!
+            let states = [
+                RulerInstanceState(
+                    id: firstID,
+                    settings: RulerSettings(unit: .pixels),
+                    visibility: RulerWingVisibility(horizontal: true, vertical: false),
+                    layout: RulerLayoutState(
+                        zeroPoint: NSPoint(x: 200, y: 300),
+                        horizontalLength: 320,
+                        verticalLength: 180
+                    )
+                ),
+                RulerInstanceState(
+                    id: secondID,
+                    settings: RulerSettings(unit: .inches),
+                    visibility: RulerWingVisibility(horizontal: false, vertical: true),
+                    layout: RulerLayoutState(
+                        zeroPoint: NSPoint(x: 400, y: 500),
+                        horizontalLength: 220,
+                        verticalLength: 280
+                    )
+                ),
+            ]
+
+            prefs.saveRulerSetState(rulers: states, activeRulerID: secondID)
+            let restoredState = prefs.loadRulerSetState()
+
+            XCTAssertEqual(restoredState?.schemaVersion, StoredRulerSetState.currentSchemaVersion)
+            XCTAssertEqual(restoredState?.rulers, states)
+            XCTAssertEqual(restoredState?.activeRulerID, secondID)
+        }
+    }
+
+    func testSavedRulerSetStateFallsBackForCorruptOrUnknownSchemaData() throws {
+        try withRestoredRulerSetState {
+            UserDefaults.standard.set(Data("not-json".utf8), forKey: Prefs.rulerSetStateKey)
+
+            XCTAssertNil(prefs.loadRulerSetState())
+
+            let unknownSchemaState = StoredRulerSetState(
+                schemaVersion: StoredRulerSetState.currentSchemaVersion + 1,
+                rulers: [
+                    RulerInstanceState.createFromDefaults()
+                ],
+                activeRulerID: nil
+            )
+            let data = try JSONEncoder().encode(unknownSchemaState)
+            UserDefaults.standard.set(data, forKey: Prefs.rulerSetStateKey)
+
+            XCTAssertNil(prefs.loadRulerSetState())
+        }
+    }
+
+    func testRulerManagerRestoresSavedActiveRulerID() {
+        let firstID = UUID(uuidString: "CE2FB5D8-109F-4482-8F54-1381075EE8C8")!
+        let secondID = UUID(uuidString: "3BF78AE6-446F-4C43-82B4-F7D0CFEDDE83")!
+        let manager = RulerManager()
+        defer {
+            for controller in manager.controllers {
+                controller.hide()
+            }
+        }
+
+        manager.restore(
+            [
+                RulerInstanceState(
+                    id: firstID,
+                    settings: RulerSettings(unit: .pixels),
+                    layout: RulerLayoutState(
+                        zeroPoint: NSPoint(x: 200, y: 300),
+                        horizontalLength: 320,
+                        verticalLength: 180
+                    )
+                ),
+                RulerInstanceState(
+                    id: secondID,
+                    settings: RulerSettings(unit: .millimeters),
+                    layout: RulerLayoutState(
+                        zeroPoint: NSPoint(x: 400, y: 500),
+                        horizontalLength: 220,
+                        verticalLength: 280
+                    )
+                ),
+            ],
+            activeRulerID: firstID
+        )
+
+        XCTAssertEqual(manager.activeController?.state.id, firstID)
+    }
+
+    func testAppDelegateRestoresSavedRulerSetBeforeShowingDefaults() {
+        withRestoredRulerSetState {
+            let id = UUID(uuidString: "2D1A252A-E2AA-4BB8-9142-80F87802CFA3")!
+            let state = RulerInstanceState(
+                id: id,
+                settings: RulerSettings(unit: .inches, zeroCorner: .bottomRight),
+                visibility: RulerWingVisibility(horizontal: false, vertical: true),
+                layout: RulerLayoutState(
+                    zeroPoint: NSPoint(x: 500, y: 600),
+                    horizontalLength: 320,
+                    verticalLength: 240
+                )
+            )
+            prefs.saveRulerSetState(rulers: [state], activeRulerID: id)
+            let appDelegate = AppDelegate()
+            defer {
+                for controller in appDelegate.rulerManager.controllers {
+                    controller.hide()
+                }
+            }
+
+            appDelegate.restoreSavedRulers()
+
+            XCTAssertEqual(appDelegate.rulerManager.controllers.map(\.state.id), [id])
+            XCTAssertEqual(appDelegate.rulerManager.activeController?.state.id, id)
+            XCTAssertEqual(appDelegate.rulerManager.activeController?.state.settings.unit, .inches)
+            XCTAssertFalse(appDelegate.rulerManager.activeController?.state.isWingVisible(.horizontal) ?? true)
+            XCTAssertTrue(appDelegate.rulerManager.activeController?.state.isWingVisible(.vertical) ?? false)
+        }
+    }
+
+    func testUITestResetClearsSavedRulerSetState() {
+        withRestoredRulerPreferences {
+            withRestoredRulerSetState {
+                prefs.saveRulerSetState(
+                    rulers: [RulerInstanceState.createFromDefaults()],
+                    activeRulerID: nil
+                )
+
+                UITestSupport.prepareForLaunch().resetApplicationState()
+
+                XCTAssertNil(UserDefaults.standard.data(forKey: Prefs.rulerSetStateKey))
+            }
+        }
+    }
+
     func testZeroCornerRawValuesPreservePersistedOrder() {
         XCTAssertEqual(ZeroCorner.topLeft.rawValue, 0)
         XCTAssertEqual(ZeroCorner.topRight.rawValue, 1)
@@ -2944,6 +3083,21 @@ final class RulerCoreTests: XCTestCase {
             prefs.floatRulers = previousFloatRulers
             prefs.rulerShadow = previousRulerShadow
             prefs.zeroCorner = previousZeroCorner
+        }
+
+        try test()
+    }
+
+    private func withRestoredRulerSetState(_ test: () throws -> Void) rethrows {
+        let defaults = UserDefaults.standard
+        let previousState = defaults.object(forKey: Prefs.rulerSetStateKey)
+
+        defer {
+            if let previousState = previousState {
+                defaults.set(previousState, forKey: Prefs.rulerSetStateKey)
+            } else {
+                defaults.removeObject(forKey: Prefs.rulerSetStateKey)
+            }
         }
 
         try test()

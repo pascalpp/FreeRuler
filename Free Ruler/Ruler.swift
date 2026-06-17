@@ -377,6 +377,39 @@ struct RulerInstanceState: Identifiable, Equatable, Codable {
     }
 }
 
+struct StoredRulerSetState: Equatable, Codable {
+    static let currentSchemaVersion = 1
+
+    var schemaVersion: Int
+    var rulers: [RulerInstanceState]
+    var activeRulerID: UUID?
+
+    init(
+        schemaVersion: Int = StoredRulerSetState.currentSchemaVersion,
+        rulers: [RulerInstanceState],
+        activeRulerID: UUID?
+    ) {
+        self.schemaVersion = schemaVersion
+        self.rulers = rulers
+        self.activeRulerID = activeRulerID
+    }
+
+    func sanitizedForRestore() -> StoredRulerSetState? {
+        let visibleRulers = rulers.filter(\.hasVisibleWing)
+        guard !visibleRulers.isEmpty else { return nil }
+
+        let restoredActiveRulerID = activeRulerID.flatMap { activeRulerID in
+            visibleRulers.contains { $0.id == activeRulerID } ? activeRulerID : nil
+        }
+
+        return StoredRulerSetState(
+            schemaVersion: schemaVersion,
+            rulers: visibleRulers,
+            activeRulerID: restoredActiveRulerID
+        )
+    }
+}
+
 struct RulerCornerPlacement: Equatable {
     let xSide: RulerHorizontalSide
     let ySide: RulerVerticalSide

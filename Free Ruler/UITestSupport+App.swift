@@ -12,6 +12,7 @@ extension UITestSupport {
             "rulerColor",
             "unit",
             "zeroCorner",
+            Prefs.rulerSetStateKey,
             "NSWindow Frame horizontal-ruler",
             "NSWindow Frame vertical-ruler",
             "NSWindow Frame preferencesWindow",

@@ -129,6 +129,8 @@ class Prefs: NSObject {
 }
 
 extension Prefs {
+    static let rulerSetStateKey = "rulerSetState"
+
     static var defaultZeroCorner: ZeroCorner {
         return .topLeft
     }
@@ -188,5 +190,39 @@ extension Prefs {
             ofClass: NSColor.self,
             from: data
         )
+    }
+
+    func saveRulerSetState(rulers: [RulerInstanceState], activeRulerID: UUID?) {
+        let visibleRulers = rulers.filter(\.hasVisibleWing)
+        guard !visibleRulers.isEmpty else {
+            clearRulerSetState()
+            return
+        }
+
+        let activeRulerIDToSave = activeRulerID.flatMap { activeRulerID in
+            visibleRulers.contains { $0.id == activeRulerID } ? activeRulerID : nil
+        }
+        let state = StoredRulerSetState(
+            rulers: visibleRulers,
+            activeRulerID: activeRulerIDToSave
+        )
+
+        guard let data = try? JSONEncoder().encode(state) else { return }
+
+        UserDefaults.standard.set(data, forKey: Self.rulerSetStateKey)
+    }
+
+    func loadRulerSetState() -> StoredRulerSetState? {
+        guard let data = UserDefaults.standard.data(forKey: Self.rulerSetStateKey),
+              let state = try? JSONDecoder().decode(StoredRulerSetState.self, from: data),
+              state.schemaVersion == StoredRulerSetState.currentSchemaVersion else {
+            return nil
+        }
+
+        return state.sanitizedForRestore()
+    }
+
+    func clearRulerSetState() {
+        UserDefaults.standard.removeObject(forKey: Self.rulerSetStateKey)
     }
 }
