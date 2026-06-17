@@ -138,6 +138,78 @@ final class RulerCoreTests: XCTestCase {
         )
     }
 
+    func testRulerManagerCreatesTracksActivatesAndClosesRulers() {
+        let manager = RulerManager()
+        defer {
+            for controller in manager.controllers {
+                controller.hide()
+            }
+        }
+
+        let first = manager.createRuler(
+            defaults: RulerSettings(unit: .pixels),
+            screenFrame: NSRect(x: 0, y: 0, width: 1000, height: 800)
+        )
+        let second = manager.createRuler(
+            defaults: RulerSettings(unit: .inches),
+            screenFrame: NSRect(x: 0, y: 0, width: 1000, height: 800)
+        )
+
+        XCTAssertEqual(manager.controllers.count, 2)
+        XCTAssertTrue(manager.activeController === second)
+
+        manager.markActive(first)
+        XCTAssertTrue(manager.activeController === first)
+
+        XCTAssertTrue(manager.closeActiveRuler())
+        XCTAssertEqual(manager.controllers.count, 1)
+        XCTAssertTrue(manager.activeController === second)
+        XCTAssertEqual(manager.states.map(\.settings.unit), [.inches])
+    }
+
+    func testRulerManagerRestoresStatesAndShowsAllControllers() {
+        let firstID = UUID(uuidString: "F775A858-ED72-4242-B84B-E08B27EE1C9F")!
+        let secondID = UUID(uuidString: "D922071D-D02B-4DF7-8762-3497D9FD90B4")!
+        let manager = RulerManager(initialStates: [
+            RulerInstanceState(
+                id: firstID,
+                settings: RulerSettings(unit: .pixels),
+                visibility: RulerWingVisibility(horizontal: true, vertical: false),
+                layout: RulerLayoutState(
+                    zeroPoint: NSPoint(x: 200, y: 300),
+                    horizontalLength: 320,
+                    verticalLength: 180
+                )
+            ),
+            RulerInstanceState(
+                id: secondID,
+                settings: RulerSettings(unit: .millimeters),
+                visibility: RulerWingVisibility(horizontal: false, vertical: true),
+                layout: RulerLayoutState(
+                    zeroPoint: NSPoint(x: 400, y: 500),
+                    horizontalLength: 220,
+                    verticalLength: 280
+                )
+            ),
+        ])
+        defer {
+            for controller in manager.controllers {
+                controller.hide()
+            }
+        }
+
+        XCTAssertEqual(manager.controllers.map(\.state.id), [firstID, secondID])
+        XCTAssertTrue(manager.activeController === manager.controllers.last)
+
+        manager.showAll()
+
+        XCTAssertTrue(manager.hasVisibleRulers)
+        XCTAssertTrue(manager.controllers[0].groupedWindow.isRuleVisible(.horizontal))
+        XCTAssertFalse(manager.controllers[0].groupedWindow.isRuleVisible(.vertical))
+        XCTAssertFalse(manager.controllers[1].groupedWindow.isRuleVisible(.horizontal))
+        XCTAssertTrue(manager.controllers[1].groupedWindow.isRuleVisible(.vertical))
+    }
+
     func testZeroCornerRawValuesPreservePersistedOrder() {
         XCTAssertEqual(ZeroCorner.topLeft.rawValue, 0)
         XCTAssertEqual(ZeroCorner.topRight.rawValue, 1)

@@ -62,6 +62,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     var rulers: [RulerController] = []
     var groupedRulerController: GroupedRulerController?
+    lazy var rulerManager: RulerManager = {
+        let manager = RulerManager()
+        manager.onActiveControllerChanged = { [weak self] controller in
+            self?.groupedRulerController = controller
+        }
+        return manager
+    }()
 
     var timer: Timer?
     private var timerInterval: TimeInterval?
@@ -269,7 +276,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             },
             prefs.observe(\Prefs.floatRulers, options: .new) { prefs, changed in
                 self.updateFloatRulersMenuItem()
-                self.groupedRulerController?.updateIsFloatingPanel()
+                for controller in self.rulerManager.controllers {
+                    controller.updateIsFloatingPanel()
+                }
+                self.legacyGroupedRulerController?.updateIsFloatingPanel()
                 self.uiTestSupport?.writePreferencesState()
             },
             prefs.observe(\Prefs.groupRulers, options: .new) { prefs, changed in
@@ -279,7 +289,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             },
             prefs.observe(\Prefs.rulerShadow, options: .new) { prefs, changed in
                 self.updateRulerShadowMenuItem()
-                self.groupedRulerController?.updateHasShadow()
+                for controller in self.rulerManager.controllers {
+                    controller.updateHasShadow()
+                }
+                self.legacyGroupedRulerController?.updateHasShadow()
                 self.uiTestSupport?.writePreferencesState()
             },
             prefs.observe(\Prefs.rulerColor, options: .new) { prefs, changed in
@@ -308,7 +321,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         for ruler in rulers {
             ruler.rulerWindow.rule.redrawForPreferenceChange()
         }
-        groupedRulerController?.redrawForPreferenceChange()
+        for controller in rulerManager.controllers {
+            controller.redrawForPreferenceChange()
+        }
+        legacyGroupedRulerController?.redrawForPreferenceChange()
     }
 
     func updateFloatRulersMenuItem() {
@@ -324,6 +340,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func createRulersIfNeeded() {
+        guard !rulerManager.hasRulers else { return }
+
+        rulerManager.createRuler()
+    }
+
+    private func createLegacyRulersIfNeeded() {
         guard rulers.isEmpty else { return }
 
         rulers = [
@@ -346,11 +368,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func showRulers() {
         createRulersIfNeeded()
-        rulerVisibility.showAll()
-        applyRulerWindowMode(showRulersIfNeeded: true)
+        rulerManager.showAll()
+        updateMouseTickTimer()
     }
 
     func toggleRuler(orientation: Orientation) {
+        if rulerManager.hasRulers {
+            let controller = rulerManager.activeController ?? rulerManager.createRuler()
+            controller.toggleWing(orientation)
+            updateMouseTickTimer()
+            return
+        }
+
         guard canToggleRulerVisibility else { return }
         guard rulerController(orientation: orientation) != nil else { return }
 
@@ -370,7 +399,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func rulerController(orientation: Orientation) -> RulerController? {
-        createRulersIfNeeded()
+        createLegacyRulersIfNeeded()
         return existingRulerController(orientation: orientation)
     }
 
@@ -400,7 +429,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func applyRulerWindowMode(showRulersIfNeeded: Bool = false) {
-        createRulersIfNeeded()
+        if rulerManager.hasRulers {
+            rulerManager.showAll()
+            updateMouseTickTimer()
+            return
+        }
+
+        createLegacyRulersIfNeeded()
         detachRulerWindows()
 
         switch rulerWindowMode {
@@ -494,12 +529,25 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         return groupedRulerController?.isVisible == true
     }
 
+    private var legacyGroupedRulerController: GroupedRulerController? {
+        guard let groupedRulerController = groupedRulerController,
+              !rulerManager.controllers.contains(where: { $0 === groupedRulerController }) else {
+            return nil
+        }
+
+        return groupedRulerController
+    }
+
     private func isRulerVisible(_ ruler: RulerController?) -> Bool {
         guard let ruler = ruler else { return false }
         return rulerVisibility.isVisible(ruler.ruler.orientation)
     }
 
     private var isRulerFrontmost: Bool {
+        if rulerManager.controllers.contains(where: { $0.groupedWindow.isKeyWindow }) {
+            return true
+        }
+
         if groupedRulerController?.groupedWindow.isKeyWindow == true {
             return true
         }
@@ -508,7 +556,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private var hasVisibleRuler: Bool {
-        return isGroupedRulerVisible || rulers.contains { $0.rulerWindow.isVisible }
+        return rulerManager.hasVisibleRulers
+            || isGroupedRulerVisible
+            || rulers.contains { $0.rulerWindow.isVisible }
     }
 
     private var canToggleRulerVisibility: Bool {
@@ -528,7 +578,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         for ruler in rulers {
             ruler.foreground()
         }
-        groupedRulerController?.foreground()
+        for controller in rulerManager.controllers {
+            controller.foreground()
+        }
+        legacyGroupedRulerController?.foreground()
 
         mouseTickTimerPolicy.applicationDidBecomeActive()
         updateMouseTickTimer()
@@ -540,7 +593,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         for ruler in rulers {
             ruler.background()
         }
-        groupedRulerController?.background()
+        for controller in rulerManager.controllers {
+            controller.background()
+        }
+        legacyGroupedRulerController?.background()
 
         mouseTickTimerPolicy.applicationDidResignActive()
         updateMouseTickTimer()
@@ -600,7 +656,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    @IBAction func newRuler(_ sender: Any) {
+        let controller = rulerManager.createRuler()
+        controller.show()
+        updateMouseTickTimer()
+    }
+
     @IBAction func closeKeyWindow(_ sender: Any) {
+        if let controller = rulerManager.controller(containing: NSApp.keyWindow) {
+            rulerManager.close(controller)
+            updateMouseTickTimer()
+            return
+        }
+
+        if rulerManager.hasRulers,
+           NSApp.keyWindow == nil,
+           rulerManager.closeActiveRuler() {
+            updateMouseTickTimer()
+            return
+        }
+
         if let groupedRulerController = groupedRulerController,
            groupedRulerController.groupedWindow.isKeyWindow {
             syncGroupedRulerFramesToRulerWindows(persistAutosave: true)
@@ -623,6 +698,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         mouseLoc.x = mouseLoc.x.rounded()
         mouseLoc.y = mouseLoc.y.rounded()
 
+        if let controller = rulerManager.activeController {
+            controller.align(at: mouseLoc)
+            return
+        }
+
         if prefs.groupRulers,
            let groupedRulerController = groupedRulerController,
            groupedRulerController.isVisible {
@@ -637,7 +717,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @IBAction func resetRulerPositions(_ sender: Any) {
-        createRulersIfNeeded()
+        if rulerManager.hasRulers {
+            prefs.zeroCorner = Prefs.defaultZeroCorner
+            for controller in rulerManager.controllers {
+                controller.state.settings.zeroCorner = Prefs.defaultZeroCorner
+                controller.state.layout = RulerLayoutState.defaults(
+                    zeroCorner: Prefs.defaultZeroCorner
+                )
+                controller.state.visibility = RulerWingVisibility()
+                controller.show()
+            }
+            updateMouseTickTimer()
+            return
+        }
+
+        createLegacyRulersIfNeeded()
 
         prefs.zeroCorner = Prefs.defaultZeroCorner
 
@@ -676,7 +770,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func flipRulers(along orientation: Orientation) {
-        createRulersIfNeeded()
+        if let controller = rulerManager.activeController {
+            let flippedCorner = prefs.zeroCorner.flipped(along: orientation)
+            controller.prepareForZeroCornerChange(to: flippedCorner)
+            controller.state.settings.zeroCorner = flippedCorner
+            prefs.zeroCorner = flippedCorner
+            controller.redrawForPreferenceChange()
+            return
+        }
+
+        createLegacyRulersIfNeeded()
 
         let oldGeometry = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner)
         let flippedCorner = prefs.zeroCorner.flipped(along: orientation)
@@ -757,6 +860,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         modifierFlags: NSEvent.ModifierFlags,
         sender: Any
     ) -> Bool {
+        if let controller = sender as? GroupedRulerController {
+            rulerManager.markActive(controller)
+        }
+
         let keyboardModifiers = modifierFlags
             .intersection(.deviceIndependentFlagsMask)
             .subtracting(.capsLock)
@@ -827,8 +934,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return groupedRulerController.groupedWindow.screen
         }
 
-        if groupedRulerController?.groupedWindow.isKeyWindow == true {
-            return groupedRulerController?.groupedWindow.screen
+        if let activeController = rulerManager.activeController {
+            return activeController.groupedWindow.screen
         }
 
         return rulers.first { $0.rulerWindow.isKeyWindow }?.rulerWindow.screen
@@ -863,15 +970,31 @@ extension AppDelegate: NSMenuItemValidation {
 
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         switch menuItem.action {
+        case #selector(newRuler(_:)):
+            return true
         case #selector(closeKeyWindow(_:)):
             return NSApp.keyWindow?.isVisible == true
         case #selector(toggleHorizontalRuler(_:)):
+            if let controller = rulerManager.activeController {
+                menuItem.title = controller.state.isWingVisible(.horizontal)
+                    ? NSLocalizedString("Hide Horizontal Ruler", comment: "Menu item title to hide the horizontal ruler")
+                    : NSLocalizedString("Show Horizontal Ruler", comment: "Menu item title to show the horizontal ruler")
+                return true
+            }
+
             let ruler = existingRulerController(orientation: .horizontal)
             menuItem.title = isRulerVisible(ruler)
                 ? NSLocalizedString("Hide Horizontal Ruler", comment: "Menu item title to hide the horizontal ruler")
                 : NSLocalizedString("Show Horizontal Ruler", comment: "Menu item title to show the horizontal ruler")
             return canToggleRulerVisibility
         case #selector(toggleVerticalRuler(_:)):
+            if let controller = rulerManager.activeController {
+                menuItem.title = controller.state.isWingVisible(.vertical)
+                    ? NSLocalizedString("Hide Vertical Ruler", comment: "Menu item title to hide the vertical ruler")
+                    : NSLocalizedString("Show Vertical Ruler", comment: "Menu item title to show the vertical ruler")
+                return true
+            }
+
             let ruler = existingRulerController(orientation: .vertical)
             menuItem.title = isRulerVisible(ruler)
                 ? NSLocalizedString("Hide Vertical Ruler", comment: "Menu item title to hide the vertical ruler")
@@ -930,7 +1053,10 @@ extension AppDelegate {
             ruler.rulerWindow.rule.showMouseTick = isEnabled
         }
 
-        groupedRulerController?.setMouseTickDrawingEnabled(isEnabled)
+        for controller in rulerManager.controllers {
+            controller.setMouseTickDrawingEnabled(isEnabled)
+        }
+        legacyGroupedRulerController?.setMouseTickDrawingEnabled(isEnabled)
     }
 
     private func updateMouseTickTimer() {
@@ -973,6 +1099,13 @@ extension AppDelegate {
         var mouseLoc = NSEvent.mouseLocation
         mouseLoc.x = mouseLoc.x.rounded()
         mouseLoc.y = mouseLoc.y.rounded()
+
+        if rulerManager.hasRulers {
+            for controller in rulerManager.controllers where controller.isVisible {
+                controller.drawMouseTick(at: mouseLoc)
+            }
+            return
+        }
 
         if let groupedRulerController = groupedRulerController,
            groupedRulerController.isVisible {

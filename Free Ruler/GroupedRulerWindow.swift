@@ -1069,6 +1069,9 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
     var notificationObservers: [NSObjectProtocol] = []
 
     let groupedWindow: GroupedRulerWindow
+    var state: RulerInstanceState
+    var onBecameActive: ((GroupedRulerController) -> Void)?
+    var onStateChanged: ((GroupedRulerController) -> Void)?
 
     private var keyListener: Any?
     private var mouseInteraction: RulerMouseInteractionState!
@@ -1093,8 +1096,29 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
         }
     }
 
-    init(frame: NSRect) {
-        groupedWindow = GroupedRulerWindow(frame: frame)
+    convenience init(frame: NSRect) {
+        let layout = GroupedRulerLayout.layout(groupFrame: frame, zeroCorner: prefs.zeroCorner)
+        let state = RulerInstanceState(
+            settings: RulerSettings(defaults: prefs),
+            layout: RulerLayoutState(
+                horizontalFrame: layout.horizontalFrame,
+                verticalFrame: layout.verticalFrame,
+                zeroCorner: prefs.zeroCorner
+            )
+        )
+
+        self.init(state: state)
+    }
+
+    init(state: RulerInstanceState) {
+        self.state = state
+        let layout = state.layout.layout(zeroCorner: state.settings.zeroCorner)
+        groupedWindow = GroupedRulerWindow(
+            frame: layout.visibleFrame(
+                showsHorizontalRule: state.visibility.showsHorizontal,
+                showsVerticalRule: state.visibility.showsVertical
+            )
+        )
         super.init(window: groupedWindow)
 
         createObservers()
@@ -1105,6 +1129,7 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
         mouseInteraction = RulerMouseInteractionState(owner: self) { [weak self] event in
             return self?.mouseIsInsideRuler(with: event) ?? false
         }
+        applyStateToWindow(display: false)
     }
 
     required init?(coder: NSCoder) {
@@ -1121,36 +1146,51 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
         return groupedWindow.isVisible
     }
 
+    func show() {
+        applyStateToWindow(display: false)
+        showWindow(self)
+        groupedWindow.orderFrontRegardless()
+    }
+
     func show(
         horizontalFrame: NSRect,
         verticalFrame: NSRect,
         showsHorizontalRule: Bool,
         showsVerticalRule: Bool
     ) {
-        let layout = GroupedRulerLayout.joined(
+        state.layout = RulerLayoutState(
             horizontalFrame: horizontalFrame,
             verticalFrame: verticalFrame,
             zeroCorner: prefs.zeroCorner
         )
-        groupedWindow.setVisibleRules(
+        state.settings.zeroCorner = prefs.zeroCorner
+        state.visibility = RulerWingVisibility(
             horizontal: showsHorizontalRule,
             vertical: showsVerticalRule
         )
-        updateMouseTickDrawingVisibility()
-        groupedWindow.setFrame(
-            layout.visibleFrame(
-                showsHorizontalRule: showsHorizontalRule,
-                showsVerticalRule: showsVerticalRule
-            ),
-            display: false
-        )
-        groupedWindow.updateLayoutForCurrentZeroCorner()
-        showWindow(self)
-        groupedWindow.orderFrontRegardless()
+        show()
     }
 
     func hide() {
         groupedWindow.orderOut(self)
+    }
+
+    @discardableResult
+    func toggleWing(_ orientation: Orientation) -> Bool {
+        guard state.toggleWing(orientation) else { return false }
+
+        applyStateToWindow(display: true)
+        notifyStateChanged()
+        return true
+    }
+
+    @discardableResult
+    func setWing(_ orientation: Orientation, isVisible: Bool) -> Bool {
+        guard state.setWing(orientation, isVisible: isVisible) else { return false }
+
+        applyStateToWindow(display: true)
+        notifyStateChanged()
+        return true
     }
 
     func syncFrames(
@@ -1181,6 +1221,7 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
 
         groupedWindow.setFrame(groupedWindow.visibleFrame(in: layout), display: true)
         groupedWindow.updateLayoutForCurrentZeroCorner()
+        captureStateFromWindow()
     }
 
     func prepareForZeroCornerChange(to zeroCorner: ZeroCorner) {
@@ -1195,6 +1236,8 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
         )
 
         groupedWindow.setFrame(groupedWindow.visibleFrame(in: layout), display: true)
+        state.settings.zeroCorner = zeroCorner
+        captureStateFromWindow()
     }
 
     func foreground() {
@@ -1236,6 +1279,51 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
             && groupedWindow.isRuleVisible(.horizontal)
         groupedWindow.verticalRule.showMouseTick = isMouseTickDrawingEnabled
             && groupedWindow.isRuleVisible(.vertical)
+    }
+
+    private func applyStateToWindow(display: Bool) {
+        let zeroCorner = state.settings.zeroCorner
+        let layout = state.layout.layout(zeroCorner: zeroCorner)
+        groupedWindow.setVisibleRules(
+            horizontal: state.visibility.showsHorizontal,
+            vertical: state.visibility.showsVertical
+        )
+        updateMouseTickDrawingVisibility()
+        groupedWindow.setFrame(
+            layout.visibleFrame(
+                showsHorizontalRule: state.visibility.showsHorizontal,
+                showsVerticalRule: state.visibility.showsVertical
+            ),
+            display: display
+        )
+        groupedWindow.updateLayoutForCurrentZeroCorner()
+    }
+
+    private func captureStateFromWindow() {
+        var horizontalLength = state.layout.horizontalLength
+        var verticalLength = state.layout.verticalLength
+
+        if groupedWindow.isRuleVisible(.horizontal) {
+            horizontalLength = groupedWindow.screenFrame(for: .horizontal).width
+        }
+        if groupedWindow.isRuleVisible(.vertical) {
+            verticalLength = groupedWindow.screenFrame(for: .vertical).height
+        }
+
+        state.layout = RulerLayoutState(
+            zeroPoint: groupedWindow.zeroPoint(),
+            horizontalLength: horizontalLength,
+            verticalLength: verticalLength
+        )
+        state.visibility = RulerWingVisibility(
+            horizontal: groupedWindow.isRuleVisible(.horizontal),
+            vertical: groupedWindow.isRuleVisible(.vertical)
+        )
+        notifyStateChanged()
+    }
+
+    private func notifyStateChanged() {
+        onStateChanged?(self)
     }
 
     private func syncedRulerFrames(
@@ -1312,6 +1400,7 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
 
     func windowDidEndLiveResize(_ notification: Notification) {
         syncRulerWindowFrames(persistAutosave: true)
+        captureStateFromWindow()
         mouseInteraction.windowDidEndLiveResize()
     }
 
@@ -1326,10 +1415,12 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
                 isLeftMouseButtonPressed: isLeftMouseButtonPressed()
             )
         )
+        captureStateFromWindow()
         mouseInteraction.windowDidMove(isLeftMouseButtonPressed: isLeftMouseButtonPressed())
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
+        onBecameActive?(self)
         startKeyListener()
     }
 
@@ -1356,6 +1447,7 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
     func finishMouseDrag(with event: NSEvent) {
         if mouseInteraction.finishMouseDrag(with: event) {
             syncRulerWindowFrames(persistAutosave: true)
+            captureStateFromWindow()
         }
     }
 
@@ -1468,6 +1560,138 @@ extension GroupedRulerController {
             return nil
         default:
             return event
+        }
+    }
+}
+
+final class RulerManager {
+    typealias ControllerFactory = (RulerInstanceState) -> GroupedRulerController
+
+    private let controllerFactory: ControllerFactory
+    private(set) var controllers: [GroupedRulerController] = []
+    private(set) var activeRulerID: UUID?
+    var onActiveControllerChanged: ((GroupedRulerController?) -> Void)?
+
+    init(
+        initialStates: [RulerInstanceState] = [],
+        controllerFactory: @escaping ControllerFactory = { GroupedRulerController(state: $0) }
+    ) {
+        self.controllerFactory = controllerFactory
+        restore(initialStates)
+    }
+
+    var hasRulers: Bool {
+        return !controllers.isEmpty
+    }
+
+    var hasVisibleRulers: Bool {
+        return controllers.contains { $0.isVisible }
+    }
+
+    var activeController: GroupedRulerController? {
+        if let activeRulerID = activeRulerID,
+           let controller = controllers.first(where: { $0.state.id == activeRulerID }) {
+            return controller
+        }
+
+        if let keyController = controllers.first(where: { $0.groupedWindow.isKeyWindow }) {
+            return keyController
+        }
+
+        return controllers.last
+    }
+
+    var states: [RulerInstanceState] {
+        return controllers.map { $0.state }
+    }
+
+    @discardableResult
+    func createRuler(
+        defaults: RulerSettings = RulerSettings(defaults: prefs),
+        screenFrame: NSRect = defaultRulerScreenFrame()
+    ) -> GroupedRulerController {
+        let state = RulerInstanceState.createFromDefaults(
+            defaults: defaults,
+            screenFrame: screenFrame
+        )
+
+        return addRuler(state: state)
+    }
+
+    @discardableResult
+    func addRuler(state: RulerInstanceState) -> GroupedRulerController {
+        let controller = controllerFactory(state)
+        configure(controller)
+        controllers.append(controller)
+        markActive(controller)
+        return controller
+    }
+
+    func restore(_ states: [RulerInstanceState]) {
+        for controller in controllers {
+            controller.hide()
+        }
+
+        controllers = []
+        activeRulerID = nil
+        onActiveControllerChanged?(nil)
+
+        for state in states where state.hasVisibleWing {
+            addRuler(state: state)
+        }
+    }
+
+    func showAll() {
+        for controller in controllers {
+            controller.show()
+        }
+
+        if let activeController = activeController {
+            activeController.groupedWindow.makeKey()
+        }
+    }
+
+    @discardableResult
+    func closeActiveRuler() -> Bool {
+        guard let activeController = activeController else { return false }
+
+        close(activeController)
+        return true
+    }
+
+    func close(_ controller: GroupedRulerController) {
+        controller.hide()
+        controllers.removeAll { $0 === controller }
+
+        if activeRulerID == controller.state.id {
+            activeRulerID = controllers.last?.state.id
+            onActiveControllerChanged?(activeController)
+        }
+    }
+
+    func markActive(_ controller: GroupedRulerController) {
+        guard controllers.contains(where: { $0 === controller }) else { return }
+
+        activeRulerID = controller.state.id
+        onActiveControllerChanged?(controller)
+    }
+
+    func controller(containing window: NSWindow?) -> GroupedRulerController? {
+        guard let window = window else { return nil }
+
+        return controllers.first { $0.groupedWindow === window }
+    }
+
+    private func configure(_ controller: GroupedRulerController) {
+        controller.onBecameActive = { [weak self, weak controller] _ in
+            guard let controller = controller else { return }
+            self?.markActive(controller)
+        }
+        controller.onStateChanged = { [weak self, weak controller] _ in
+            guard let controller = controller,
+                  self?.activeRulerID == controller.state.id else { return }
+
+            self?.activeRulerID = controller.state.id
         }
     }
 }
