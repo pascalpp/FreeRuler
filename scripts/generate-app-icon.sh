@@ -4,6 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 output_dir="$PWD/Free Ruler/Images.xcassets/AppIcon.appiconset"
+dark_output_dir="$PWD/Free Ruler/Images.xcassets/AppIconDark.imageset"
 help_resource_dir="$PWD/Free Ruler/FreeRuler.help/Contents/Resources"
 help_shared_dir="$help_resource_dir/shrd"
 help_html="$help_resource_dir/English.lproj/FreeRuler.html"
@@ -18,7 +19,7 @@ xcrun swiftc \
   "Free Ruler/AppIconGenerator.swift" \
   -o "$binary"
 
-"$binary" "$output_dir"
+"$binary" "$output_dir" "$dark_output_dir"
 
 icon_hash="$(shasum -a 256 "$output_dir/icon_512x512.png" | awk '{ print substr($1, 1, 12) }')"
 help_cache_token="$icon_hash"

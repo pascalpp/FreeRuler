@@ -4,9 +4,84 @@ import SwiftUI
 #endif
 
 private struct AppIconPalette {
-    let fill = #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1)
-    let numbers = #colorLiteral(red: 0.4, green: 0.2637678268, blue: 0.05685021017, alpha: 1)
-    let ticks = #colorLiteral(red: 0.8, green: 0.5275675571, blue: 0.1081081074, alpha: 1)
+    let fill: NSColor
+    let numbers: NSColor
+    let ticks: NSColor
+    let border: NSColor
+
+    static let standard = AppIconPalette(
+        fill: #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1),
+        numbers: #colorLiteral(red: 0.4, green: 0.2637678268, blue: 0.05685021017, alpha: 1),
+        ticks: #colorLiteral(red: 0.8, green: 0.5275675571, blue: 0.1081081074, alpha: 1),
+        border: #colorLiteral(red: 0.8, green: 0.5275675571, blue: 0.1081081074, alpha: 1)
+    )
+
+    static let dark = AppIconPalette(
+        fill: #colorLiteral(red: 0.1192771084, green: 0.2277108433, blue: 0.6, alpha: 1),
+        numbers: #colorLiteral(red: 0.85, green: 0.88, blue: 1, alpha: 1),
+        ticks: #colorLiteral(red: 0.4893433073, green: 0.5829650408, blue: 0.9519448138, alpha: 1),
+        border: #colorLiteral(red: 0.4893433073, green: 0.5829650408, blue: 0.9519448138, alpha: 1)
+    )
+}
+
+private enum AppIconVariant: CaseIterable {
+    case standard
+    case dark
+
+    var palette: AppIconPalette {
+        switch self {
+        case .standard:
+            return .standard
+        case .dark:
+            return .dark
+        }
+    }
+}
+
+private struct AppIconSetImage {
+    let size: String
+    let scale: String
+    let pixels: Int
+
+    var filename: String {
+        let scaleSuffix = scale == "1x" ? "" : "@\(scale)"
+
+        return "icon_\(size)\(scaleSuffix).png"
+    }
+}
+
+private struct AppIconImageSetImage {
+    let filename: String
+    let scale: String
+    let pixels: Int
+}
+
+private struct AppIconSetContents: Encodable {
+    let images: [AppIconSetContentsImage]
+    let info = AppIconSetInfo()
+}
+
+private struct AppIconSetContentsImage: Encodable {
+    let size: String
+    let idiom = "mac"
+    let filename: String
+    let scale: String
+}
+
+private struct AppIconImageSetContents: Encodable {
+    let images: [AppIconImageSetContentsImage]
+    let info = AppIconSetInfo()
+}
+
+private struct AppIconImageSetContentsImage: Encodable {
+    let filename: String
+    let idiom = "universal"
+    let scale: String
+}
+
+private struct AppIconSetInfo: Encodable {
+    let version = 1
+    let author = "xcode"
 }
 
 private enum AppIconFontFamily {
@@ -52,25 +127,49 @@ private enum AppIconLayout {
 }
 
 enum AppIconRenderer {
-    static let appIconSetSizes: [(filename: String, pixels: Int)] = [
-        ("icon_16x16.png", 16),
-        ("icon_16x16@2x.png", 32),
-        ("icon_32x32.png", 32),
-        ("icon_32x32@2x.png", 64),
-        ("icon_128x128.png", 128),
-        ("icon_128x128@2x.png", 256),
-        ("icon_256x256.png", 256),
-        ("icon_256x256@2x.png", 512),
-        ("icon_512x512.png", 512),
-        ("icon_512x512@2x.png", 1024),
+    private static let darkImageSetName = "AppIconDark"
+
+    private static let appIconSetImages: [AppIconSetImage] = [
+        AppIconSetImage(size: "16x16", scale: "1x", pixels: 16),
+        AppIconSetImage(size: "16x16", scale: "2x", pixels: 32),
+        AppIconSetImage(size: "32x32", scale: "1x", pixels: 32),
+        AppIconSetImage(size: "32x32", scale: "2x", pixels: 64),
+        AppIconSetImage(size: "128x128", scale: "1x", pixels: 128),
+        AppIconSetImage(size: "128x128", scale: "2x", pixels: 256),
+        AppIconSetImage(size: "256x256", scale: "1x", pixels: 256),
+        AppIconSetImage(size: "256x256", scale: "2x", pixels: 512),
+        AppIconSetImage(size: "512x512", scale: "1x", pixels: 512),
+        AppIconSetImage(size: "512x512", scale: "2x", pixels: 1024),
+    ]
+
+    private static let darkImageSetImages: [AppIconImageSetImage] = [
+        AppIconImageSetImage(filename: "app-icon-dark.png", scale: "1x", pixels: 512),
+        AppIconImageSetImage(filename: "app-icon-dark@2x.png", scale: "2x", pixels: 1024),
     ]
 
     static func image(size: CGFloat) -> NSImage {
+        image(size: size, variant: .standard)
+    }
+
+    fileprivate static func image(size: CGFloat, variant: AppIconVariant) -> NSImage {
         let image = NSImage(size: NSSize(width: size, height: size))
         image.lockFocus()
-        draw(in: NSRect(x: 0, y: 0, width: size, height: size))
+        draw(in: NSRect(x: 0, y: 0, width: size, height: size), variant: variant)
         image.unlockFocus()
         return image
+    }
+
+    static func applicationIconImage(for appearance: NSAppearance) -> NSImage {
+        if usesDarkAppIcon(for: appearance),
+           let image = NSImage(named: darkImageSetName) {
+            return image
+        }
+
+        return image(size: AppIconLayout.canvasSize)
+    }
+
+    private static func usesDarkAppIcon(for appearance: NSAppearance) -> Bool {
+        appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
     }
 
     static func exportAppIconSet(to outputDirectory: URL) throws {
@@ -80,13 +179,32 @@ enum AppIconRenderer {
             attributes: nil
         )
 
-        for icon in appIconSetSizes {
-            let data = try pngData(pixels: icon.pixels)
+        for icon in appIconSetImages {
+            let data = try pngData(pixels: icon.pixels, variant: .standard)
             try data.write(to: outputDirectory.appendingPathComponent(icon.filename))
         }
+
+        let contents = try appIconSetContentsData()
+        try contents.write(to: outputDirectory.appendingPathComponent("Contents.json"))
     }
 
-    private static func pngData(pixels: Int) throws -> Data {
+    static func exportDarkAppIconImageSet(to outputDirectory: URL) throws {
+        try FileManager.default.createDirectory(
+            at: outputDirectory,
+            withIntermediateDirectories: true,
+            attributes: nil
+        )
+
+        for icon in darkImageSetImages {
+            let data = try pngData(pixels: icon.pixels, variant: .dark)
+            try data.write(to: outputDirectory.appendingPathComponent(icon.filename))
+        }
+
+        let contents = try darkImageSetContentsData()
+        try contents.write(to: outputDirectory.appendingPathComponent("Contents.json"))
+    }
+
+    private static func pngData(pixels: Int, variant: AppIconVariant) throws -> Data {
         guard let bitmap = NSBitmapImageRep(
             bitmapDataPlanes: nil,
             pixelsWide: pixels,
@@ -110,7 +228,7 @@ enum AppIconRenderer {
 
         NSGraphicsContext.saveGraphicsState()
         NSGraphicsContext.current = context
-        image(size: AppIconLayout.canvasSize).draw(
+        image(size: AppIconLayout.canvasSize, variant: variant).draw(
             in: NSRect(x: 0, y: 0, width: pixels, height: pixels),
             from: NSRect(x: 0, y: 0, width: AppIconLayout.canvasSize, height: AppIconLayout.canvasSize),
             operation: .sourceOver,
@@ -125,7 +243,37 @@ enum AppIconRenderer {
         return data
     }
 
-    private static func draw(in canvas: NSRect) {
+    private static func appIconSetContentsData() throws -> Data {
+        let images = appIconSetImages.map { icon in
+            AppIconSetContentsImage(
+                size: icon.size,
+                filename: icon.filename,
+                scale: icon.scale
+            )
+        }
+
+        return try encodedJSONData(AppIconSetContents(images: images))
+    }
+
+    private static func darkImageSetContentsData() throws -> Data {
+        let images = darkImageSetImages.map { icon in
+            AppIconImageSetContentsImage(filename: icon.filename, scale: icon.scale)
+        }
+
+        return try encodedJSONData(AppIconImageSetContents(images: images))
+    }
+
+    private static func encodedJSONData<T: Encodable>(_ value: T) throws -> Data {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+
+        var data = try encoder.encode(value)
+        data.append(0x0A)
+
+        return data
+    }
+
+    private static func draw(in canvas: NSRect, variant: AppIconVariant) {
         let scale = canvas.width / AppIconLayout.canvasSize
         let iconRect = canvas.insetBy(
             dx: AppIconLayout.iconInset * scale,
@@ -137,7 +285,7 @@ enum AppIconRenderer {
             xRadius: cornerRadius,
             yRadius: cornerRadius
         )
-        let colors = AppIconPalette()
+        let colors = variant.palette
 
         drawShadow(for: iconShape, scale: scale)
 
@@ -252,7 +400,7 @@ enum AppIconRenderer {
         )
         borderPath.lineWidth = lineWidth
 
-        colors.ticks.withAlphaComponent(opacity).setStroke()
+        colors.border.withAlphaComponent(opacity).setStroke()
         borderPath.stroke()
     }
 
@@ -375,25 +523,44 @@ enum AppIconRendererError: LocalizedError {
 }
 
 #if DEBUG
+private extension AppIconVariant {
+    var previewBackgroundColor: Color {
+        switch self {
+        case .standard:
+            return Color(nsColor: #colorLiteral(red: 0.9490196078, green: 0.9490196078, blue: 0.968627451, alpha: 1))
+        case .dark:
+            return Color(nsColor: #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1))
+        }
+    }
+}
+
 struct AppIconPreview: View {
     var body: some View {
         VStack(spacing: 24) {
-            previewIcon(size: 256)
+            HStack(spacing: 24) {
+                previewIcon(size: 256, variant: .standard)
+                previewIcon(size: 256, variant: .dark)
+            }
 
             HStack(spacing: 20) {
-                previewIcon(size: 128)
-                previewIcon(size: 64)
-                previewIcon(size: 32)
+                previewIcon(size: 128, variant: .standard)
+                previewIcon(size: 128, variant: .dark)
+                previewIcon(size: 64, variant: .standard)
+                previewIcon(size: 64, variant: .dark)
+                previewIcon(size: 32, variant: .standard)
+                previewIcon(size: 32, variant: .dark)
             }
         }
         .padding(32)
         .background(.regularMaterial)
     }
 
-    private func previewIcon(size: CGFloat) -> some View {
-        Image(nsImage: AppIconRenderer.image(size: size))
+    private func previewIcon(size: CGFloat, variant: AppIconVariant) -> some View {
+        Image(nsImage: AppIconRenderer.image(size: size, variant: variant))
             .resizable()
             .frame(width: size, height: size)
+            .padding(max(8, size * 0.08))
+            .background(variant.previewBackgroundColor)
     }
 }
 

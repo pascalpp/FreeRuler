@@ -88,6 +88,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var preferencesController: PreferencesController? = nil
     private let hotkeyBezel = HotkeyBezel()
     private var uiTestSupport: UITestSupport?
+    private var interfaceStyleObserver: NSObjectProtocol?
 #if SPARKLE
     private var updaterController: SPUStandardUpdaterController?
 #endif
@@ -144,6 +145,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         configureOpaqueColorPicking()
+        configureApplicationIconAppearance()
 
 #if DEBUG
         if let outputDirectory = appStoreScreenshotOutputDirectory() {
@@ -164,6 +166,28 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 #endif
 
         showRulers()
+    }
+
+    deinit {
+        if let interfaceStyleObserver = interfaceStyleObserver {
+            DistributedNotificationCenter.default().removeObserver(interfaceStyleObserver)
+        }
+    }
+
+    private func configureApplicationIconAppearance() {
+        interfaceStyleObserver = DistributedNotificationCenter.default().addObserver(
+            forName: NSNotification.Name("AppleInterfaceThemeChangedNotification"),
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.updateApplicationIconForCurrentAppearance()
+        }
+
+        updateApplicationIconForCurrentAppearance()
+    }
+
+    private func updateApplicationIconForCurrentAppearance() {
+        NSApp.applicationIconImage = AppIconRenderer.applicationIconImage(for: NSApp.effectiveAppearance)
     }
 
 #if DEBUG
