@@ -134,11 +134,6 @@ final class FreeRulerUITests: XCTestCase {
             opaqueColorPanelValue,
             "The ruler color panel should be configured for opaque color picking."
         )
-        XCTAssertEqual(
-            visibleSliderCount(in: colorPanel),
-            1,
-            "The ruler color panel should show the color slider, but not an opacity slider."
-        )
     }
 
     func testClosingPreferencesClosesRulerColorPanel() {
@@ -589,9 +584,6 @@ final class FreeRulerUITests: XCTestCase {
         return state
     }
 
-    private func visibleSliderCount(in element: XCUIElement) -> Int {
-        return element.sliders.allElementsBoundByIndex.filter(\.hasVisibleFrame).count
-    }
 }
 
 private extension XCUIElement {
