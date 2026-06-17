@@ -506,6 +506,13 @@ class RuleView: NSView {
         }
     }
 
+    var settingsOverride: RulerSettings? {
+        didSet {
+            color = RulerColors(customFill: settingsOverride?.rulerColor)
+            redrawForPreferenceChange()
+        }
+    }
+
     var screen: NSScreen? {
         guard let window = window else {
             return nil
@@ -514,11 +521,11 @@ class RuleView: NSView {
     }
 
     var unit: Unit {
-        prefs.unit
+        return settingsOverride?.unit ?? prefs.unit
     }
 
     var zeroCorner: ZeroCorner {
-        prefs.zeroCorner
+        return settingsOverride?.zeroCorner ?? prefs.zeroCorner
     }
 
     var resizeHandleExclusionFrame: NSRect? {

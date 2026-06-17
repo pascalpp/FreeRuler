@@ -210,6 +210,129 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertTrue(manager.controllers[1].groupedWindow.isRuleVisible(.vertical))
     }
 
+    func testManagedGroupedRulerAppliesPerRulerSettingsToWindowAndRules() {
+        let color = NSColor(deviceRed: 0.1, green: 0.4, blue: 0.8, alpha: 1)
+        let settings = RulerSettings(
+            unit: .inches,
+            rulerColor: color,
+            foregroundOpacity: 73,
+            backgroundOpacity: 31,
+            floatRulers: false,
+            rulerShadow: true,
+            zeroCorner: .bottomRight
+        )
+        let controller = GroupedRulerController(
+            state: RulerInstanceState(
+                settings: settings,
+                layout: RulerLayoutState(
+                    zeroPoint: NSPoint(x: 200, y: 300),
+                    horizontalLength: 260,
+                    verticalLength: 180
+                )
+            )
+        )
+        defer {
+            controller.hide()
+        }
+
+        XCTAssertEqual(controller.groupedWindow.horizontalRule.unit, .inches)
+        XCTAssertEqual(controller.groupedWindow.verticalRule.unit, .inches)
+        XCTAssertEqual(controller.groupedWindow.horizontalRule.zeroCorner, .bottomRight)
+        XCTAssertEqual(controller.groupedWindow.verticalRule.zeroCorner, .bottomRight)
+        assertColor(controller.groupedWindow.horizontalRule.color.fill, equals: color)
+        assertColor(controller.groupedWindow.verticalRule.color.fill, equals: color)
+        XCTAssertEqual(controller.groupedWindow.alphaValue, 0.73, accuracy: 0.0001)
+        XCTAssertFalse(controller.groupedWindow.isFloatingPanel)
+        XCTAssertTrue(controller.groupedWindow.hasShadow)
+
+        controller.background()
+
+        XCTAssertEqual(controller.groupedWindow.alphaValue, 0.31, accuracy: 0.0001)
+    }
+
+    func testManagedGroupedRulerIgnoresDefaultPreferenceChanges() {
+        withRestoredRulerPreferences {
+            let color = NSColor(deviceRed: 0.2, green: 0.3, blue: 0.7, alpha: 1)
+            let controller = GroupedRulerController(
+                state: RulerInstanceState(
+                    settings: RulerSettings(
+                        unit: .inches,
+                        rulerColor: color,
+                        foregroundOpacity: 64,
+                        backgroundOpacity: 28,
+                        floatRulers: false,
+                        rulerShadow: false,
+                        zeroCorner: .bottomLeft
+                    ),
+                    layout: RulerLayoutState(
+                        zeroPoint: NSPoint(x: 240, y: 320),
+                        horizontalLength: 260,
+                        verticalLength: 180
+                    )
+                )
+            )
+            defer {
+                controller.hide()
+            }
+
+            prefs.unit = .millimeters
+            prefs.rulerColor = NSColor(deviceRed: 0.9, green: 0.1, blue: 0.2, alpha: 1)
+            prefs.foregroundOpacity = 12
+            prefs.backgroundOpacity = 9
+            prefs.floatRulers = true
+            prefs.rulerShadow = true
+            prefs.zeroCorner = .topRight
+
+            XCTAssertEqual(controller.state.settings.unit, .inches)
+            XCTAssertEqual(controller.groupedWindow.horizontalRule.unit, .inches)
+            XCTAssertEqual(controller.groupedWindow.horizontalRule.zeroCorner, .bottomLeft)
+            assertColor(controller.groupedWindow.horizontalRule.color.fill, equals: color)
+            XCTAssertEqual(controller.groupedWindow.alphaValue, 0.64, accuracy: 0.0001)
+            XCTAssertFalse(controller.groupedWindow.isFloatingPanel)
+            XCTAssertFalse(controller.groupedWindow.hasShadow)
+        }
+    }
+
+    func testRulerManagerCopiesUpdatedDefaultsOnlyForNewRulers() {
+        withRestoredRulerPreferences {
+            prefs.unit = .pixels
+            prefs.rulerColor = NSColor(deviceRed: 0.1, green: 0.2, blue: 0.3, alpha: 1)
+            prefs.zeroCorner = .topLeft
+            let manager = RulerManager()
+            defer {
+                for controller in manager.controllers {
+                    controller.hide()
+                }
+            }
+
+            let existing = manager.createRuler(
+                screenFrame: NSRect(x: 0, y: 0, width: 1000, height: 800)
+            )
+
+            prefs.unit = .millimeters
+            prefs.rulerColor = NSColor(deviceRed: 0.8, green: 0.7, blue: 0.2, alpha: 1)
+            prefs.zeroCorner = .topRight
+            let createdAfterDefaultsChange = manager.createRuler(
+                screenFrame: NSRect(x: 0, y: 0, width: 1000, height: 800)
+            )
+
+            XCTAssertEqual(existing.state.settings.unit, .pixels)
+            XCTAssertEqual(existing.groupedWindow.horizontalRule.unit, .pixels)
+            XCTAssertEqual(existing.groupedWindow.horizontalRule.zeroCorner, .topLeft)
+            assertColor(
+                existing.groupedWindow.horizontalRule.color.fill,
+                equals: NSColor(deviceRed: 0.1, green: 0.2, blue: 0.3, alpha: 1)
+            )
+            XCTAssertEqual(createdAfterDefaultsChange.state.settings.unit, .millimeters)
+            XCTAssertEqual(createdAfterDefaultsChange.groupedWindow.horizontalRule.unit, .millimeters)
+            XCTAssertEqual(createdAfterDefaultsChange.groupedWindow.horizontalRule.zeroCorner, .topRight)
+            assertColor(
+                createdAfterDefaultsChange.groupedWindow.horizontalRule.color.fill,
+                equals: NSColor(deviceRed: 0.8, green: 0.7, blue: 0.2, alpha: 1)
+            )
+        }
+    }
+
     func testZeroCornerRawValuesPreservePersistedOrder() {
         XCTAssertEqual(ZeroCorner.topLeft.rawValue, 0)
         XCTAssertEqual(ZeroCorner.topRight.rawValue, 1)

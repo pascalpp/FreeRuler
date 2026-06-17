@@ -267,8 +267,10 @@ final class GroupedRulerWindow: NSPanel {
     let verticalRule: VerticalRule
 
     private let groupedContentView: GroupedRulerContentView
+    private(set) var settings: RulerSettings
 
-    init(frame: NSRect) {
+    init(frame: NSRect, settings: RulerSettings = RulerSettings(defaults: prefs)) {
+        self.settings = settings
         horizontalRule = GroupedHorizontalRule(
             frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness)
         )
@@ -294,22 +296,22 @@ final class GroupedRulerWindow: NSPanel {
             defer: false
         )
 
-        alphaValue = windowAlphaValue(prefs.foregroundOpacity)
+        alphaValue = windowAlphaValue(settings.foregroundOpacity)
         title = NSLocalizedString(
             "Ruler",
             comment: "Window title for a ruler window"
         )
         identifier = NSUserInterfaceItemIdentifier("grouped-ruler-window")
         setAccessibilityIdentifier("grouped-ruler-window")
-        minSize = GroupedRulerLayout.minSize(zeroCorner: prefs.zeroCorner)
-        maxSize = GroupedRulerLayout.maxSize(zeroCorner: prefs.zeroCorner)
+        minSize = GroupedRulerLayout.minSize(zeroCorner: settings.zeroCorner)
+        maxSize = GroupedRulerLayout.maxSize(zeroCorner: settings.zeroCorner)
 
         isOpaque = false
         backgroundColor = .clear
-        isFloatingPanel = prefs.floatRulers
+        isFloatingPanel = settings.floatRulers
         hidesOnDeactivate = false
         isMovableByWindowBackground = true
-        hasShadow = prefs.rulerShadow
+        hasShadow = settings.rulerShadow
 
         horizontalRule.setAccessibilityElement(true)
         verticalRule.setAccessibilityElement(true)
@@ -320,6 +322,7 @@ final class GroupedRulerWindow: NSPanel {
         groupedContentView.nextResponder = self
 
         contentView = groupedContentView
+        apply(settings: settings)
         updateLayoutForCurrentZeroCorner()
     }
 
@@ -371,10 +374,21 @@ final class GroupedRulerWindow: NSPanel {
     func updateLayoutForCurrentZeroCorner() {
         updateSizeConstraintsForVisibleRules()
         updateGroupedContentFrame()
-        groupedContentView.zeroCorner = prefs.zeroCorner
+        groupedContentView.zeroCorner = settings.zeroCorner
         groupedContentView.needsLayout = true
         groupedContentView.layoutSubtreeIfNeeded()
         groupedContentView.needsDisplay = true
+    }
+
+    func apply(settings: RulerSettings) {
+        self.settings = settings
+        alphaValue = windowAlphaValue(settings.foregroundOpacity)
+        isFloatingPanel = settings.floatRulers
+        hasShadow = settings.rulerShadow
+        horizontalRule.settingsOverride = settings
+        verticalRule.settingsOverride = settings
+        groupedContentView.color = RulerColors(customFill: settings.rulerColor)
+        updateLayoutForCurrentZeroCorner()
     }
 
     func redrawForPreferenceChange() {
@@ -417,7 +431,7 @@ final class GroupedRulerWindow: NSPanel {
     }
 
     func zeroPoint() -> NSPoint {
-        let geometry = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner)
+        let geometry = ZeroCornerGeometry(zeroCorner: settings.zeroCorner)
 
         if isRuleVisible(.horizontal) {
             return geometry.zeroPoint(
@@ -450,12 +464,12 @@ final class GroupedRulerWindow: NSPanel {
 
     private func updateSizeConstraintsForVisibleRules() {
         minSize = GroupedRulerLayout.minSize(
-            zeroCorner: prefs.zeroCorner,
+            zeroCorner: settings.zeroCorner,
             showsHorizontalRule: groupedContentView.showsHorizontalRule,
             showsVerticalRule: groupedContentView.showsVerticalRule
         )
         maxSize = GroupedRulerLayout.maxSize(
-            zeroCorner: prefs.zeroCorner,
+            zeroCorner: settings.zeroCorner,
             showsHorizontalRule: groupedContentView.showsHorizontalRule,
             showsVerticalRule: groupedContentView.showsVerticalRule
         )
@@ -1076,6 +1090,7 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
     private var keyListener: Any?
     private var mouseInteraction: RulerMouseInteractionState!
     private var isMouseTickDrawingEnabled = true
+    private let followsDefaultPreferences: Bool
 
     var isLeftMouseButtonPressed = {
         return NSEvent.pressedMouseButtons & 1 == 1
@@ -1085,12 +1100,12 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
         didSet {
             updateIsFloatingPanel()
             if !preferencesWindowOpen {
-                opacity = prefs.foregroundOpacity
+                opacity = state.settings.foregroundOpacity
             }
         }
     }
 
-    var opacity = prefs.foregroundOpacity {
+    var opacity = 0 {
         didSet {
             groupedWindow.alphaValue = windowAlphaValue(opacity)
         }
@@ -1107,20 +1122,27 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
             )
         )
 
-        self.init(state: state)
+        self.init(state: state, followsDefaultPreferences: true)
     }
 
-    init(state: RulerInstanceState) {
+    convenience init(state: RulerInstanceState) {
+        self.init(state: state, followsDefaultPreferences: false)
+    }
+
+    private init(state: RulerInstanceState, followsDefaultPreferences: Bool) {
         self.state = state
+        self.followsDefaultPreferences = followsDefaultPreferences
         let layout = state.layout.layout(zeroCorner: state.settings.zeroCorner)
         groupedWindow = GroupedRulerWindow(
             frame: layout.visibleFrame(
                 showsHorizontalRule: state.visibility.showsHorizontal,
                 showsVerticalRule: state.visibility.showsVertical
-            )
+            ),
+            settings: state.settings
         )
         super.init(window: groupedWindow)
 
+        opacity = state.settings.foregroundOpacity
         createObservers()
         subscribeToPrefs()
 
@@ -1216,7 +1238,7 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
             horizontalLength: horizontalLength,
             verticalLength: verticalLength,
             zeroPoint: point,
-            zeroCorner: prefs.zeroCorner
+            zeroCorner: state.settings.zeroCorner
         )
 
         groupedWindow.setFrame(groupedWindow.visibleFrame(in: layout), display: true)
@@ -1235,25 +1257,29 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
             zeroCorner: zeroCorner
         )
 
-        groupedWindow.setFrame(groupedWindow.visibleFrame(in: layout), display: true)
         state.settings.zeroCorner = zeroCorner
+        groupedWindow.apply(settings: state.settings)
+        groupedWindow.alphaValue = windowAlphaValue(opacity)
+        updateIsFloatingPanel()
+        updateHasShadow()
+        groupedWindow.setFrame(groupedWindow.visibleFrame(in: layout), display: true)
         captureStateFromWindow()
     }
 
     func foreground() {
-        opacity = prefs.foregroundOpacity
+        opacity = state.settings.foregroundOpacity
     }
 
     func background() {
-        opacity = prefs.backgroundOpacity
+        opacity = state.settings.backgroundOpacity
     }
 
     func updateIsFloatingPanel() {
-        groupedWindow.isFloatingPanel = preferencesWindowOpen ? false : prefs.floatRulers
+        groupedWindow.isFloatingPanel = preferencesWindowOpen ? false : state.settings.floatRulers
     }
 
     func updateHasShadow() {
-        groupedWindow.hasShadow = prefs.rulerShadow
+        groupedWindow.hasShadow = state.settings.rulerShadow
     }
 
     func redrawForPreferenceChange() {
@@ -1284,6 +1310,10 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
     private func applyStateToWindow(display: Bool) {
         let zeroCorner = state.settings.zeroCorner
         let layout = state.layout.layout(zeroCorner: zeroCorner)
+        groupedWindow.apply(settings: state.settings)
+        groupedWindow.alphaValue = windowAlphaValue(opacity)
+        updateIsFloatingPanel()
+        updateHasShadow()
         groupedWindow.setVisibleRules(
             horizontal: state.visibility.showsHorizontal,
             vertical: state.visibility.showsVertical
@@ -1341,7 +1371,7 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
             )
         case (true, false):
             let horizontalFrame = groupedWindow.screenFrame(for: .horizontal)
-            let zeroPoint = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner)
+            let zeroPoint = ZeroCornerGeometry(zeroCorner: state.settings.zeroCorner)
                 .zeroPoint(in: horizontalFrame, for: .horizontal)
             return (
                 horizontalFrame,
@@ -1353,7 +1383,7 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
             )
         case (false, true):
             let verticalFrame = groupedWindow.screenFrame(for: .vertical)
-            let zeroPoint = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner)
+            let zeroPoint = ZeroCornerGeometry(zeroCorner: state.settings.zeroCorner)
                 .zeroPoint(in: verticalFrame, for: .vertical)
             return (
                 hiddenRuleFrame(
@@ -1373,7 +1403,7 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
         zeroPoint: NSPoint,
         size: NSSize
     ) -> NSRect {
-        return ZeroCornerGeometry(zeroCorner: prefs.zeroCorner).frame(
+        return ZeroCornerGeometry(zeroCorner: state.settings.zeroCorner).frame(
             for: orientation,
             zeroPoint: zeroPoint,
             size: size
@@ -1497,6 +1527,11 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
     }
 
     private func subscribeToPrefs() {
+        guard followsDefaultPreferences else {
+            observers = []
+            return
+        }
+
         observers = [
             prefs.observe(\Prefs.foregroundOpacity, options: .new) { [weak self] prefs, changed in
                 self?.opacity = prefs.foregroundOpacity

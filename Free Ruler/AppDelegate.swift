@@ -271,14 +271,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         observers = [
             prefs.observe(\Prefs.unit, options: .new) { prefs, changed in
                 self.updateUnitMenu()
-                self.redrawRulers()
+                self.redrawDefaultBackedRulers()
                 self.uiTestSupport?.writePreferencesState()
             },
             prefs.observe(\Prefs.floatRulers, options: .new) { prefs, changed in
                 self.updateFloatRulersMenuItem()
-                for controller in self.rulerManager.controllers {
-                    controller.updateIsFloatingPanel()
-                }
                 self.legacyGroupedRulerController?.updateIsFloatingPanel()
                 self.uiTestSupport?.writePreferencesState()
             },
@@ -289,17 +286,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             },
             prefs.observe(\Prefs.rulerShadow, options: .new) { prefs, changed in
                 self.updateRulerShadowMenuItem()
-                for controller in self.rulerManager.controllers {
-                    controller.updateHasShadow()
-                }
                 self.legacyGroupedRulerController?.updateHasShadow()
                 self.uiTestSupport?.writePreferencesState()
             },
             prefs.observe(\Prefs.rulerColor, options: .new) { prefs, changed in
-                self.redrawRulers()
+                self.redrawDefaultBackedRulers()
             },
             prefs.observe(\Prefs.zeroCorner, options: .new) { prefs, changed in
-                self.redrawRulers()
+                self.redrawDefaultBackedRulers()
             },
         ]
     }
@@ -323,6 +317,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         for controller in rulerManager.controllers {
             controller.redrawForPreferenceChange()
+        }
+        legacyGroupedRulerController?.redrawForPreferenceChange()
+    }
+
+    func redrawDefaultBackedRulers() {
+        for ruler in rulers {
+            ruler.rulerWindow.rule.redrawForPreferenceChange()
         }
         legacyGroupedRulerController?.redrawForPreferenceChange()
     }
