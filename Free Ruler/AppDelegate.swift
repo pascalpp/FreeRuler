@@ -68,6 +68,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             guard let self = self else { return }
 
             self.groupedRulerController = controller
+            self.updateDisplay()
 
             guard let settingsController = self.rulerSettingsController,
                   settingsController.window?.isVisible == true else { return }
@@ -318,9 +319,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func updateUnitMenu() {
-        pixelsMenuItem?.state      = prefs.unit == .pixels ? .on : .off
-        millimetersMenuItem?.state = prefs.unit == .millimeters ? .on : .off
-        inchesMenuItem?.state      = prefs.unit == .inches ? .on : .off
+        let unit = activeRulerSettings.unit
+        pixelsMenuItem?.state      = unit == .pixels ? .on : .off
+        millimetersMenuItem?.state = unit == .millimeters ? .on : .off
+        inchesMenuItem?.state      = unit == .inches ? .on : .off
     }
 
     func redrawRulers() {
@@ -341,7 +343,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func updateFloatRulersMenuItem() {
-        floatRulersMenuItem?.state = prefs.floatRulers ? .on : .off
+        floatRulersMenuItem?.state = activeRulerSettings.floatRulers ? .on : .off
     }
 
     func updateGroupRulersMenuItem() {
@@ -349,7 +351,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func updateRulerShadowMenuItem() {
-        rulerShadowMenuItem?.state = prefs.rulerShadow ? .on : .off
+        rulerShadowMenuItem?.state = activeRulerSettings.rulerShadow ? .on : .off
+    }
+
+    private var activeRulerSettings: RulerSettings {
+        return rulerManager.activeController?.state.settings ?? RulerSettings(defaults: prefs)
+    }
+
+    @discardableResult
+    private func updateActiveRulerSettings(_ update: (inout RulerSettings) -> Void) -> Bool {
+        guard let controller = rulerManager.activeController else { return false }
+
+        controller.updateSettings(update)
+        updateDisplay()
+        return true
     }
 
     func createRulersIfNeeded() {
@@ -393,6 +408,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if rulerManager.hasRulers {
             let controller = rulerManager.activeController ?? rulerManager.createRuler()
             controller.toggleWing(orientation)
+            updateDisplay()
             updateMouseTickTimer()
             return
         }
@@ -622,28 +638,43 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     @IBAction func setUnitPixels(_ sender: Any) {
-        prefs.unit = .pixels
+        setUnit(.pixels)
     }
     @IBAction func setUnitMillimetres(_ sender: Any) {
-        prefs.unit = .millimeters
+        setUnit(.millimeters)
     }
     @IBAction func setUnitInches(_ sender: Any) {
-        prefs.unit = .inches
+        setUnit(.inches)
     }
     @IBAction func cycleUnits(_ sender: Any) {
-        switch prefs.unit {
+        let nextUnit: Unit
+        switch activeRulerSettings.unit {
         case .pixels:
-            prefs.unit = .millimeters
+            nextUnit = .millimeters
         case .millimeters:
-            prefs.unit = .inches
+            nextUnit = .inches
         case .inches:
-            prefs.unit = .pixels
+            nextUnit = .pixels
         }
 
-        showHotkeyBezel(format: .unitsFormat, unitLabel(prefs.unit), on: bezelScreen(for: sender))
+        setUnit(nextUnit)
+        showHotkeyBezel(format: .unitsFormat, unitLabel(nextUnit), on: bezelScreen(for: sender))
     }
 
     @IBAction func toggleFloatRulers(_ sender: Any) {
+        if let controller = rulerManager.activeController {
+            let shouldFloat = !controller.state.settings.floatRulers
+            controller.updateSettings { settings in
+                settings.floatRulers = shouldFloat
+            }
+            updateFloatRulersMenuItem()
+            showHotkeyBezel(
+                shouldFloat ? .rulersFloated : .rulersUnfloated,
+                on: bezelScreen(for: sender)
+            )
+            return
+        }
+
         prefs.floatRulers = !prefs.floatRulers
         showHotkeyBezel(
             prefs.floatRulers ? .rulersFloated : .rulersUnfloated,
@@ -658,6 +689,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         showGroupRulersHotkeyBezel(on: bezelScreen(for: sender))
     }
     @IBAction func toggleRulerShadow(_ sender: Any) {
+        if let controller = rulerManager.activeController {
+            let shouldShowShadow = !controller.state.settings.rulerShadow
+            controller.updateSettings { settings in
+                settings.rulerShadow = shouldShowShadow
+            }
+            updateRulerShadowMenuItem()
+            showHotkeyBezel(
+                shouldShowShadow ? .shadowEnabled : .shadowDisabled,
+                on: bezelScreen(for: sender)
+            )
+            return
+        }
+
         prefs.rulerShadow = !prefs.rulerShadow
         showHotkeyBezel(
             prefs.rulerShadow ? .shadowEnabled : .shadowDisabled,
@@ -746,16 +790,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @IBAction func resetRulerPositions(_ sender: Any) {
-        if rulerManager.hasRulers {
-            prefs.zeroCorner = Prefs.defaultZeroCorner
-            for controller in rulerManager.controllers {
-                controller.state.settings.zeroCorner = Prefs.defaultZeroCorner
-                controller.state.layout = RulerLayoutState.defaults(
-                    zeroCorner: Prefs.defaultZeroCorner
-                )
-                controller.state.visibility = RulerWingVisibility()
-                controller.show()
-            }
+        if let controller = rulerManager.activeController {
+            controller.state.settings.zeroCorner = Prefs.defaultZeroCorner
+            controller.state.layout = RulerLayoutState.defaults(
+                zeroCorner: Prefs.defaultZeroCorner
+            )
+            controller.state.visibility = RulerWingVisibility()
+            controller.show()
+            updateDisplay()
             updateMouseTickTimer()
             return
         }
@@ -804,11 +846,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         if let controller = rulerManager.activeController {
-            let flippedCorner = prefs.zeroCorner.flipped(along: orientation)
+            let flippedCorner = controller.state.settings.zeroCorner.flipped(along: orientation)
             controller.prepareForZeroCornerChange(to: flippedCorner)
-            controller.state.settings.zeroCorner = flippedCorner
-            prefs.zeroCorner = flippedCorner
             controller.redrawForPreferenceChange()
+            updateDisplay()
             return
         }
 
@@ -857,6 +898,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         detachRulerWindows()
         otherWindow.setFrame(otherFrame, display: true)
         applyRulerWindowMode()
+    }
+
+    private func setUnit(_ unit: Unit) {
+        if updateActiveRulerSettings({ settings in
+            settings.unit = unit
+        }) {
+            return
+        }
+
+        prefs.unit = unit
     }
 
     func isRulerWindowShown(_ window: RulerWindow) -> Bool {
@@ -1009,15 +1060,16 @@ extension AppDelegate: NSMenuItemValidation {
         case #selector(openRulerSettings(_:)):
             return rulerManager.activeController != nil
         case #selector(closeKeyWindow(_:)):
-            return NSApp.keyWindow?.isVisible == true
+            return rulerManager.activeController != nil || NSApp.keyWindow?.isVisible == true
         case #selector(toggleGroupRulers(_:)):
             return !rulerManager.hasRulers
         case #selector(toggleHorizontalRuler(_:)):
             if let controller = rulerManager.activeController {
-                menuItem.title = controller.state.isWingVisible(.horizontal)
+                let isVisible = controller.state.isWingVisible(.horizontal)
+                menuItem.title = isVisible
                     ? NSLocalizedString("Hide Horizontal Ruler", comment: "Menu item title to hide the horizontal ruler")
                     : NSLocalizedString("Show Horizontal Ruler", comment: "Menu item title to show the horizontal ruler")
-                return true
+                return !isVisible || controller.state.isWingVisible(.vertical)
             }
 
             let ruler = existingRulerController(orientation: .horizontal)
@@ -1027,10 +1079,11 @@ extension AppDelegate: NSMenuItemValidation {
             return canToggleRulerVisibility
         case #selector(toggleVerticalRuler(_:)):
             if let controller = rulerManager.activeController {
-                menuItem.title = controller.state.isWingVisible(.vertical)
+                let isVisible = controller.state.isWingVisible(.vertical)
+                menuItem.title = isVisible
                     ? NSLocalizedString("Hide Vertical Ruler", comment: "Menu item title to hide the vertical ruler")
                     : NSLocalizedString("Show Vertical Ruler", comment: "Menu item title to show the vertical ruler")
-                return true
+                return !isVisible || controller.state.isWingVisible(.horizontal)
             }
 
             let ruler = existingRulerController(orientation: .vertical)

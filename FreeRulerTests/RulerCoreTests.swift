@@ -2513,6 +2513,122 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertTrue(second.groupedWindow.isRuleVisible(.vertical))
     }
 
+    func testManagedCommandsApplySettingsToActiveRulerOnly() {
+        withRestoredRulerPreferences {
+            prefs.unit = .pixels
+            prefs.floatRulers = true
+            prefs.rulerShadow = false
+            let appDelegate = AppDelegate()
+            let first = appDelegate.rulerManager.createRuler(
+                defaults: RulerSettings(unit: .pixels, floatRulers: true, rulerShadow: false)
+            )
+            let second = appDelegate.rulerManager.createRuler(
+                defaults: RulerSettings(unit: .millimeters, floatRulers: true, rulerShadow: false)
+            )
+            defer {
+                first.hide()
+                second.hide()
+            }
+
+            appDelegate.rulerManager.markActive(first)
+            appDelegate.setUnitInches(self)
+            appDelegate.toggleFloatRulers(self)
+            appDelegate.toggleRulerShadow(self)
+
+            XCTAssertEqual(first.state.settings.unit, .inches)
+            XCTAssertFalse(first.state.settings.floatRulers)
+            XCTAssertTrue(first.state.settings.rulerShadow)
+            XCTAssertEqual(first.groupedWindow.horizontalRule.unit, .inches)
+            XCTAssertFalse(first.groupedWindow.isFloatingPanel)
+            XCTAssertTrue(first.groupedWindow.hasShadow)
+            XCTAssertEqual(second.state.settings.unit, .millimeters)
+            XCTAssertTrue(second.state.settings.floatRulers)
+            XCTAssertFalse(second.state.settings.rulerShadow)
+            XCTAssertEqual(prefs.unit, .pixels)
+            XCTAssertTrue(prefs.floatRulers)
+            XCTAssertFalse(prefs.rulerShadow)
+        }
+    }
+
+    func testManagedFlipAndResetUseActiveRulerWithoutChangingDefaults() {
+        withRestoredRulerPreferences {
+            prefs.zeroCorner = .topRight
+            let appDelegate = AppDelegate()
+            let first = appDelegate.rulerManager.createRuler(
+                defaults: RulerSettings(zeroCorner: .bottomLeft)
+            )
+            let second = appDelegate.rulerManager.createRuler(
+                defaults: RulerSettings(zeroCorner: .topLeft)
+            )
+            defer {
+                first.hide()
+                second.hide()
+            }
+
+            second.setWing(.vertical, isVisible: false)
+            appDelegate.rulerManager.markActive(second)
+            appDelegate.flipRulers(along: .horizontal)
+
+            XCTAssertEqual(second.state.settings.zeroCorner, .topRight)
+            XCTAssertEqual(second.groupedWindow.horizontalRule.zeroCorner, .topRight)
+            XCTAssertEqual(first.state.settings.zeroCorner, .bottomLeft)
+            XCTAssertEqual(prefs.zeroCorner, .topRight)
+
+            appDelegate.resetRulerPositions(self)
+
+            XCTAssertEqual(second.state.settings.zeroCorner, Prefs.defaultZeroCorner)
+            XCTAssertTrue(second.state.isWingVisible(.horizontal))
+            XCTAssertTrue(second.state.isWingVisible(.vertical))
+            XCTAssertEqual(first.state.settings.zeroCorner, .bottomLeft)
+            XCTAssertEqual(prefs.zeroCorner, .topRight)
+        }
+    }
+
+    func testManagedWingCommandsDoNotHideLastVisibleWing() {
+        let appDelegate = AppDelegate()
+        let controller = appDelegate.rulerManager.createRuler()
+        defer {
+            controller.hide()
+        }
+
+        appDelegate.rulerManager.markActive(controller)
+        controller.setWing(.vertical, isVisible: false)
+        appDelegate.toggleHorizontalRuler(self)
+
+        XCTAssertTrue(controller.state.isWingVisible(.horizontal))
+        XCTAssertFalse(controller.state.isWingVisible(.vertical))
+    }
+
+    func testManagedMenuValidationReflectsActiveRulerState() {
+        let appDelegate = AppDelegate()
+        let controller = appDelegate.rulerManager.createRuler()
+        defer {
+            controller.hide()
+        }
+        appDelegate.rulerManager.markActive(controller)
+        controller.setWing(.vertical, isVisible: false)
+
+        let closeItem = NSMenuItem(
+            title: "",
+            action: #selector(AppDelegate.closeKeyWindow(_:)),
+            keyEquivalent: ""
+        )
+        let horizontalItem = NSMenuItem(
+            title: "",
+            action: #selector(AppDelegate.toggleHorizontalRuler(_:)),
+            keyEquivalent: ""
+        )
+        let verticalItem = NSMenuItem(
+            title: "",
+            action: #selector(AppDelegate.toggleVerticalRuler(_:)),
+            keyEquivalent: ""
+        )
+
+        XCTAssertTrue(appDelegate.validateMenuItem(closeItem))
+        XCTAssertFalse(appDelegate.validateMenuItem(horizontalItem))
+        XCTAssertTrue(appDelegate.validateMenuItem(verticalItem))
+    }
+
     func testUngroupedHorizontalFlipDoesNotMoveRulerWindows() {
         withRestoredZeroCornerPreference {
             let previousGroupRulers = prefs.groupRulers
