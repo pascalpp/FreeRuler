@@ -296,8 +296,8 @@ final class GroupedRulerWindow: NSPanel {
 
         alphaValue = windowAlphaValue(prefs.foregroundOpacity)
         title = NSLocalizedString(
-            "Grouped Rulers",
-            comment: "Window title for the grouped ruler window"
+            "Ruler",
+            comment: "Window title for a ruler window"
         )
         identifier = NSUserInterfaceItemIdentifier("grouped-ruler-window")
         setAccessibilityIdentifier("grouped-ruler-window")

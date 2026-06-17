@@ -2138,7 +2138,7 @@ final class RulerCoreTests: XCTestCase {
         }
     }
 
-    func testGroupedRulerHotkeysToggleLegVisibilityWithoutUngrouping() {
+    func testPrimaryGroupedRulerHotkeysToggleLegVisibilityWithoutLegacyWindows() {
         withRestoredZeroCornerPreference {
             let previousGroupRulers = prefs.groupRulers
             defer { prefs.groupRulers = previousGroupRulers }
@@ -2159,10 +2159,57 @@ final class RulerCoreTests: XCTestCase {
             XCTAssertTrue(prefs.groupRulers)
             XCTAssertFalse(groupedWindow?.isRuleVisible(.horizontal) ?? true)
             XCTAssertTrue(groupedWindow?.isRuleVisible(.vertical) ?? false)
-            XCTAssertFalse(appDelegate.rulers.first { $0.ruler.orientation == .horizontal }?.rulerWindow.isVisible ?? true)
-            XCTAssertFalse(appDelegate.rulers.first { $0.ruler.orientation == .vertical }?.rulerWindow.isVisible ?? true)
+            XCTAssertTrue(appDelegate.rulers.isEmpty)
             groupedWindow?.orderOut(self)
         }
+    }
+
+    func testManagedGroupHotkeyDoesNotToggleRetiredGroupedMode() {
+        withRestoredZeroCornerPreference {
+            let previousGroupRulers = prefs.groupRulers
+            defer { prefs.groupRulers = previousGroupRulers }
+
+            prefs.groupRulers = true
+            let appDelegate = AppDelegate()
+            appDelegate.showRulers()
+
+            XCTAssertTrue(
+                appDelegate.performRulerHotkey(
+                    keyCode: kVK_ANSI_G,
+                    modifierFlags: [],
+                    sender: appDelegate.groupedRulerController!
+                )
+            )
+
+            XCTAssertTrue(prefs.groupRulers)
+            XCTAssertEqual(appDelegate.rulerManager.controllers.count, 1)
+            appDelegate.groupedRulerController?.hide()
+        }
+    }
+
+    func testManagedWingHotkeysAffectOnlyActiveRuler() {
+        let appDelegate = AppDelegate()
+        let first = appDelegate.rulerManager.createRuler()
+        let second = appDelegate.rulerManager.createRuler()
+        defer {
+            first.hide()
+            second.hide()
+        }
+
+        appDelegate.rulerManager.markActive(first)
+
+        XCTAssertTrue(
+            appDelegate.performRulerHotkey(
+                keyCode: kVK_ANSI_H,
+                modifierFlags: [],
+                sender: first
+            )
+        )
+
+        XCTAssertFalse(first.groupedWindow.isRuleVisible(.horizontal))
+        XCTAssertTrue(first.groupedWindow.isRuleVisible(.vertical))
+        XCTAssertTrue(second.groupedWindow.isRuleVisible(.horizontal))
+        XCTAssertTrue(second.groupedWindow.isRuleVisible(.vertical))
     }
 
     func testUngroupedHorizontalFlipDoesNotMoveRulerWindows() {

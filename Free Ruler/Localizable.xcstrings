@@ -43,14 +43,14 @@
         }
       }
     },
-    "Grouped Rulers" : {
-      "comment" : "Window title for the grouped ruler window",
+    "Ruler" : {
+      "comment" : "Window title for a ruler window",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Grouped Rulers"
+            "value" : "Ruler"
           }
         }
       }

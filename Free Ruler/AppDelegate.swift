@@ -373,6 +373,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func toggleRuler(orientation: Orientation) {
+        if !rulerManager.hasRulers && rulers.isEmpty {
+            createRulersIfNeeded()
+        }
+
         if rulerManager.hasRulers {
             let controller = rulerManager.activeController ?? rulerManager.createRuler()
             controller.toggleWing(orientation)
@@ -635,6 +639,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @IBAction func toggleGroupRulers(_ sender: Any) {
+        guard !rulerManager.hasRulers else { return }
+
         prefs.groupRulers = !prefs.groupRulers
         showGroupRulersHotkeyBezel(on: bezelScreen(for: sender))
     }
@@ -770,6 +776,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func flipRulers(along orientation: Orientation) {
+        if !rulerManager.hasRulers && rulers.isEmpty {
+            createRulersIfNeeded()
+        }
+
         if let controller = rulerManager.activeController {
             let flippedCorner = prefs.zeroCorner.flipped(along: orientation)
             controller.prepareForZeroCornerChange(to: flippedCorner)
@@ -893,6 +903,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         case kVK_ANSI_F:
             toggleFloatRulers(sender)
         case kVK_ANSI_G:
+            guard !rulerManager.hasRulers else { return true }
             toggleGroupRulers(sender)
         case kVK_ANSI_S:
             toggleRulerShadow(sender)
@@ -974,6 +985,8 @@ extension AppDelegate: NSMenuItemValidation {
             return true
         case #selector(closeKeyWindow(_:)):
             return NSApp.keyWindow?.isVisible == true
+        case #selector(toggleGroupRulers(_:)):
+            return !rulerManager.hasRulers
         case #selector(toggleHorizontalRuler(_:)):
             if let controller = rulerManager.activeController {
                 menuItem.title = controller.state.isWingVisible(.horizontal)
