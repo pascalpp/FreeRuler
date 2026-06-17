@@ -331,11 +331,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         guard rulerController(orientation: orientation) != nil else { return }
 
         if prefs.groupRulers {
-            syncGroupedRulerFramesToRulerWindows()
+            syncGroupedRulerFramesToRulerWindows(persistAutosave: true)
         }
 
+        let shouldShowRulersIfNeeded = !hasVisibleRuler
         rulerVisibility.toggle(orientation)
-        applyRulerWindowMode()
+        applyRulerWindowMode(showRulersIfNeeded: shouldShowRulersIfNeeded)
     }
 
     private func detachRulerWindows() {
@@ -382,7 +383,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         case .grouped:
             showGroupedRulerWindow(showRulersIfNeeded: showRulersIfNeeded)
         case .separate:
-            showSeparateRulerWindows(showRulersIfNeeded: showRulersIfNeeded)
+            showSeparateRulerWindows()
         }
 
         updateMouseTickTimer()
@@ -406,7 +407,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             || groupedRulerController.isVisible
             || horizontalRuler.rulerWindow.isVisible
             || verticalRuler.rulerWindow.isVisible
-            || rulerVisibility.hasVisibleRuler
 
         guard shouldShowGroupedRuler else { return }
 
@@ -429,13 +429,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         verticalRuler.rulerWindow.orderOut(self)
     }
 
-    private func showSeparateRulerWindows(showRulersIfNeeded: Bool) {
+    private func showSeparateRulerWindows() {
         guard let groupedRulerController = groupedRulerController else {
             return
         }
 
         if groupedRulerController.isVisible {
-            syncGroupedRulerFramesToRulerWindows()
+            syncGroupedRulerFramesToRulerWindows(persistAutosave: true)
             groupedRulerController.hide()
         }
 
@@ -452,7 +452,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    func syncGroupedRulerFramesToRulerWindows() {
+    func syncGroupedRulerFramesToRulerWindows(persistAutosave: Bool = false) {
         guard let groupedRulerController = groupedRulerController,
               let horizontalRuler = existingRulerController(orientation: .horizontal),
               let verticalRuler = existingRulerController(orientation: .vertical) else {
@@ -461,7 +461,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         groupedRulerController.syncFrames(
             to: horizontalRuler.rulerWindow,
-            and: verticalRuler.rulerWindow
+            and: verticalRuler.rulerWindow,
+            persistAutosave: persistAutosave
         )
     }
 
@@ -578,7 +579,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBAction func closeKeyWindow(_ sender: Any) {
         if let groupedRulerController = groupedRulerController,
            groupedRulerController.groupedWindow.isKeyWindow {
-            syncGroupedRulerFramesToRulerWindows()
+            syncGroupedRulerFramesToRulerWindows(persistAutosave: true)
             rulerVisibility.hideAll()
             applyRulerWindowMode()
             return
@@ -602,7 +603,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
            let groupedRulerController = groupedRulerController,
            groupedRulerController.isVisible {
             groupedRulerController.align(at: mouseLoc)
-            syncGroupedRulerFramesToRulerWindows()
+            syncGroupedRulerFramesToRulerWindows(persistAutosave: true)
             return
         }
 
@@ -669,7 +670,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
            groupedRulerController.isVisible {
             groupedRulerController.prepareForZeroCornerChange(to: flippedCorner)
             prefs.zeroCorner = flippedCorner
-            syncGroupedRulerFramesToRulerWindows()
+            syncGroupedRulerFramesToRulerWindows(persistAutosave: true)
             return
         }
 

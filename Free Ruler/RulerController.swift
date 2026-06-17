@@ -13,10 +13,7 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     var otherWindow: RulerWindow?
 
     var keyListener: Any?
-    private var mouseTickResumeTimer: Timer?
-    private let mouseTickResumeDelay: TimeInterval = 0.15
-    private var mouseIsDraggingRuler = false
-    private var mouseIsHoveringRuler = false
+    private var mouseInteraction: RulerMouseInteractionState!
     var isLeftMouseButtonPressed = {
         return NSEvent.pressedMouseButtons & 1 == 1
     }
@@ -52,6 +49,9 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
 
         rulerWindow.delegate = self
         rulerWindow.nextResponder = self
+        mouseInteraction = RulerMouseInteractionState(owner: self) { [weak self] event in
+            return self?.isMouseInsideRuler(with: event) ?? false
+        }
 
         if let windowFrameAutosaveName = ruler.name {
             self.windowFrameAutosaveName = windowFrameAutosaveName
@@ -64,7 +64,7 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     }
 
     deinit {
-        mouseTickResumeTimer?.invalidate()
+        mouseInteraction?.invalidate()
         removeObservers(&notificationObservers)
     }
 
@@ -80,21 +80,20 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     }
 
     func windowWillStartLiveResize(_ notification: Notification) {
-        disableMouseTicks()
+        mouseInteraction.windowWillStartLiveResize()
     }
 
     func windowDidEndLiveResize(_ notification: Notification) {
-        resumeMouseTicksUnlessHovering()
+        mouseInteraction.windowDidEndLiveResize()
     }
 
     func windowWillMove(_ notification: Notification) {
-        disableMouseTicks()
+        mouseInteraction.windowWillMove()
     }
 
     func windowDidMove(_ notification: Notification) {
         rulerWindow.invalidateShadow()
-        guard !mouseIsDraggingRuler && !isLeftMouseButtonPressed() else { return }
-        resumeMouseTicksUnlessHovering()
+        mouseInteraction.windowDidMove(isLeftMouseButtonPressed: isLeftMouseButtonPressed())
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
@@ -108,23 +107,15 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     }
 
     override func mouseEntered(with event: NSEvent) {
-        mouseIsHoveringRuler = true
-        hideMouseTicksForHover()
-        rulerCursorController?.mouseEnteredRuler()
+        mouseInteraction.mouseEntered(with: event)
     }
 
     override func mouseExited(with event: NSEvent) {
-        mouseIsHoveringRuler = false
-        if !mouseIsDraggingRuler {
-            enableMouseTicks()
-        }
-        rulerCursorController?.mouseExitedRuler()
+        mouseInteraction.mouseExited(with: event)
     }
 
     override func mouseDown(with event: NSEvent) {
-        mouseIsDraggingRuler = true
-        disableMouseTicks()
-        rulerCursorController?.mouseDownInRuler()
+        mouseInteraction.mouseDown(with: event)
     }
 
     override func mouseUp(with event: NSEvent) {
@@ -132,69 +123,19 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
     }
 
     func finishMouseDrag(with event: NSEvent) {
-        guard mouseIsDraggingRuler else { return }
-
-        mouseIsDraggingRuler = false
-        mouseIsHoveringRuler = isMouseInsideRuler(with: event)
-        resumeMouseTicksUnlessHovering()
-
-        rulerCursorController?.mouseUpInRuler(mouseIsInsideRuler: mouseIsHoveringRuler)
+        mouseInteraction.finishMouseDrag(with: event)
     }
 
     override func mouseMoved(with event: NSEvent) {
-        guard !mouseIsDraggingRuler else { return }
-        mouseIsHoveringRuler = isMouseInsideRuler(with: event)
-        if mouseIsHoveringRuler {
-            hideMouseTicksForHover()
-        } else {
-            enableMouseTicks()
-        }
+        mouseInteraction.mouseMoved(with: event)
     }
 
     func disableMouseTicks() {
-        mouseTickResumeTimer?.invalidate()
-        mouseTickResumeTimer = nil
-        appDelegate?.suppressMouseTickDrawing(owner: self)
-        appDelegate?.suspendMouseTickUpdates(owner: self)
+        mouseInteraction.disableMouseTicks()
     }
 
     func enableMouseTicks() {
-        appDelegate?.unsuppressMouseTickDrawing(owner: self)
-        appDelegate?.resumeMouseTickUpdates(owner: self)
-    }
-
-    private func scheduleMouseTickResume() {
-        mouseTickResumeTimer?.invalidate()
-        mouseTickResumeTimer = Timer.scheduledTimer(
-            withTimeInterval: mouseTickResumeDelay,
-            repeats: false
-        ) { [weak self] _ in
-            self?.enableMouseTicks()
-            self?.mouseTickResumeTimer = nil
-        }
-    }
-
-    private func resumeMouseTicksUnlessHovering() {
-        if mouseIsHoveringRuler {
-            hideMouseTicksForHover()
-            appDelegate?.resumeMouseTickUpdates(owner: self)
-        } else {
-            scheduleMouseTickResume()
-        }
-    }
-
-    private func hideMouseTicksForHover() {
-        mouseTickResumeTimer?.invalidate()
-        mouseTickResumeTimer = nil
-        appDelegate?.suppressMouseTickDrawing(owner: self)
-    }
-
-    private var rulerCursorController: RulerCursorController? {
-        return appDelegate?.rulerCursorController
-    }
-
-    private var appDelegate: AppDelegate? {
-        return NSApp.delegate as? AppDelegate
+        mouseInteraction.enableMouseTicks()
     }
 
     private func isMouseInsideRuler(with event: NSEvent) -> Bool {

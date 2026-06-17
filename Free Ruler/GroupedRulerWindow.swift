@@ -6,8 +6,6 @@ struct GroupedRulerLayout: Equatable {
     let horizontalFrame: NSRect
     let verticalFrame: NSRect
 
-    private static let borderCompensation: CGFloat = 1.0
-
     static func joined(
         horizontalFrame: NSRect,
         verticalFrame: NSRect,
@@ -160,21 +158,22 @@ struct GroupedRulerLayout: Equatable {
         in groupFrame: NSRect,
         zeroCorner: ZeroCorner
     ) -> NSPoint {
+        let geometry = ZeroCornerGeometry(zeroCorner: zeroCorner)
         let x: CGFloat
         let y: CGFloat
 
-        switch zeroCorner.horizontalZeroSide {
+        switch geometry.horizontalZeroSide {
         case .left:
-            x = groupFrame.minX + Ruler.thickness - borderCompensation
+            x = groupFrame.minX + Ruler.thickness - ZeroCornerGeometry.borderCompensation
         case .right:
             x = groupFrame.maxX - Ruler.thickness
         }
 
-        switch zeroCorner.verticalZeroSide {
+        switch geometry.verticalZeroSide {
         case .top:
-            y = groupFrame.maxY - Ruler.thickness + borderCompensation
+            y = groupFrame.maxY - Ruler.thickness + ZeroCornerGeometry.borderCompensation
         case .bottom:
-            y = groupFrame.minY + Ruler.thickness - borderCompensation
+            y = groupFrame.minY + Ruler.thickness - ZeroCornerGeometry.borderCompensation
         }
 
         return NSPoint(x: x, y: y)
@@ -186,16 +185,18 @@ struct GroupedRulerLayout: Equatable {
         along orientation: Orientation,
         zeroCorner: ZeroCorner
     ) -> CGFloat {
+        let geometry = ZeroCornerGeometry(zeroCorner: zeroCorner)
+
         switch orientation {
         case .horizontal:
-            switch zeroCorner.horizontalZeroSide {
+            switch geometry.horizontalZeroSide {
             case .left:
                 return max(0, groupFrame.maxX - zeroPoint.x)
             case .right:
                 return max(0, zeroPoint.x - groupFrame.minX)
             }
         case .vertical:
-            switch zeroCorner.verticalZeroSide {
+            switch geometry.verticalZeroSide {
             case .top:
                 return max(0, zeroPoint.y - groupFrame.minY)
             case .bottom:
@@ -225,34 +226,15 @@ struct GroupedRulerLayout: Equatable {
     }
 }
 
-private extension ZeroCorner {
-    var horizontalZeroSide: RulerHorizontalSide {
-        switch self {
-        case .topLeft, .bottomLeft:
-            return .left
-        case .topRight, .bottomRight:
-            return .right
-        }
-    }
-
-    var verticalZeroSide: RulerVerticalSide {
-        switch self {
-        case .topLeft, .topRight:
-            return .top
-        case .bottomLeft, .bottomRight:
-            return .bottom
-        }
-    }
-}
-
 private extension GroupedRulerLayout {
     func emptyCornerFrame(zeroCorner: ZeroCorner) -> NSRect {
+        let geometry = ZeroCornerGeometry(zeroCorner: zeroCorner)
         let x: CGFloat
         let width: CGFloat
         let y: CGFloat
         let height: CGFloat
 
-        switch zeroCorner.horizontalZeroSide {
+        switch geometry.horizontalZeroSide {
         case .left:
             x = groupFrame.minX
             width = horizontalFrame.minX - groupFrame.minX
@@ -261,7 +243,7 @@ private extension GroupedRulerLayout {
             width = groupFrame.maxX - horizontalFrame.maxX
         }
 
-        switch zeroCorner.verticalZeroSide {
+        switch geometry.verticalZeroSide {
         case .top:
             y = verticalFrame.maxY
             height = groupFrame.maxY - verticalFrame.maxY
@@ -1089,10 +1071,8 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
     let groupedWindow: GroupedRulerWindow
 
     private var keyListener: Any?
-    private var mouseTickResumeTimer: Timer?
-    private let mouseTickResumeDelay: TimeInterval = 0.15
-    private var mouseIsDraggingRuler = false
-    private var mouseIsHoveringRuler = false
+    private var mouseInteraction: RulerMouseInteractionState!
+    private var isMouseTickDrawingEnabled = true
 
     var isLeftMouseButtonPressed = {
         return NSEvent.pressedMouseButtons & 1 == 1
@@ -1122,6 +1102,9 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
 
         groupedWindow.delegate = self
         groupedWindow.nextResponder = self
+        mouseInteraction = RulerMouseInteractionState(owner: self) { [weak self] event in
+            return self?.mouseIsInsideRuler(with: event) ?? false
+        }
     }
 
     required init?(coder: NSCoder) {
@@ -1129,7 +1112,7 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
     }
 
     deinit {
-        mouseTickResumeTimer?.invalidate()
+        mouseInteraction?.invalidate()
         removeObservers(&notificationObservers)
         stopKeyListener()
     }
@@ -1153,6 +1136,7 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
             horizontal: showsHorizontalRule,
             vertical: showsVerticalRule
         )
+        updateMouseTickDrawingVisibility()
         groupedWindow.setFrame(
             layout.visibleFrame(
                 showsHorizontalRule: showsHorizontalRule,
@@ -1171,7 +1155,8 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
 
     func syncFrames(
         to horizontalWindow: RulerWindow,
-        and verticalWindow: RulerWindow
+        and verticalWindow: RulerWindow,
+        persistAutosave: Bool = false
     ) {
         guard isVisible else { return }
 
@@ -1180,8 +1165,8 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
             verticalWindow: verticalWindow
         )
 
-        syncFrame(frames.horizontal, to: horizontalWindow)
-        syncFrame(frames.vertical, to: verticalWindow)
+        syncFrame(frames.horizontal, to: horizontalWindow, persistAutosave: persistAutosave)
+        syncFrame(frames.vertical, to: verticalWindow, persistAutosave: persistAutosave)
     }
 
     func align(at point: NSPoint) {
@@ -1242,8 +1227,15 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
     }
 
     func setMouseTickDrawingEnabled(_ isEnabled: Bool) {
-        groupedWindow.horizontalRule.showMouseTick = isEnabled && groupedWindow.isRuleVisible(.horizontal)
-        groupedWindow.verticalRule.showMouseTick = isEnabled && groupedWindow.isRuleVisible(.vertical)
+        isMouseTickDrawingEnabled = isEnabled
+        updateMouseTickDrawingVisibility()
+    }
+
+    private func updateMouseTickDrawingVisibility() {
+        groupedWindow.horizontalRule.showMouseTick = isMouseTickDrawingEnabled
+            && groupedWindow.isRuleVisible(.horizontal)
+        groupedWindow.verticalRule.showMouseTick = isMouseTickDrawingEnabled
+            && groupedWindow.isRuleVisible(.vertical)
     }
 
     private func syncedRulerFrames(
@@ -1300,8 +1292,14 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
         )
     }
 
-    private func syncFrame(_ frame: NSRect, to window: RulerWindow) {
+    private func syncFrame(
+        _ frame: NSRect,
+        to window: RulerWindow,
+        persistAutosave: Bool
+    ) {
         window.setFrame(frame, display: false)
+
+        guard persistAutosave else { return }
 
         if let frameAutosaveName = window.ruler.name {
             window.saveFrame(usingName: NSWindow.FrameAutosaveName(frameAutosaveName))
@@ -1309,23 +1307,26 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
     }
 
     func windowWillStartLiveResize(_ notification: Notification) {
-        disableMouseTicks()
+        mouseInteraction.windowWillStartLiveResize()
     }
 
     func windowDidEndLiveResize(_ notification: Notification) {
-        syncRulerWindowFrames()
-        resumeMouseTicksUnlessHovering()
+        syncRulerWindowFrames(persistAutosave: true)
+        mouseInteraction.windowDidEndLiveResize()
     }
 
     func windowWillMove(_ notification: Notification) {
-        disableMouseTicks()
+        mouseInteraction.windowWillMove()
     }
 
     func windowDidMove(_ notification: Notification) {
         groupedWindow.invalidateShadow()
-        syncRulerWindowFrames()
-        guard !mouseIsDraggingRuler && !isLeftMouseButtonPressed() else { return }
-        resumeMouseTicksUnlessHovering()
+        syncRulerWindowFrames(
+            persistAutosave: mouseInteraction.shouldPersistFrameAutosaveOnWindowMove(
+                isLeftMouseButtonPressed: isLeftMouseButtonPressed()
+            )
+        )
+        mouseInteraction.windowDidMove(isLeftMouseButtonPressed: isLeftMouseButtonPressed())
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
@@ -1337,23 +1338,15 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
     }
 
     override func mouseEntered(with event: NSEvent) {
-        mouseIsHoveringRuler = true
-        hideMouseTicksForHover()
-        rulerCursorController?.mouseEnteredRuler()
+        mouseInteraction.mouseEntered(with: event)
     }
 
     override func mouseExited(with event: NSEvent) {
-        mouseIsHoveringRuler = false
-        if !mouseIsDraggingRuler {
-            enableMouseTicks()
-        }
-        rulerCursorController?.mouseExitedRuler()
+        mouseInteraction.mouseExited(with: event)
     }
 
     override func mouseDown(with event: NSEvent) {
-        mouseIsDraggingRuler = true
-        disableMouseTicks()
-        rulerCursorController?.mouseDownInRuler()
+        mouseInteraction.mouseDown(with: event)
     }
 
     override func mouseUp(with event: NSEvent) {
@@ -1361,73 +1354,21 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
     }
 
     func finishMouseDrag(with event: NSEvent) {
-        guard mouseIsDraggingRuler else { return }
-
-        mouseIsDraggingRuler = false
-        mouseIsHoveringRuler = mouseIsInsideRuler(with: event)
-        resumeMouseTicksUnlessHovering()
-
-        rulerCursorController?.mouseUpInRuler(mouseIsInsideRuler: mouseIsHoveringRuler)
+        if mouseInteraction.finishMouseDrag(with: event) {
+            syncRulerWindowFrames(persistAutosave: true)
+        }
     }
 
     override func mouseMoved(with event: NSEvent) {
-        guard !mouseIsDraggingRuler else { return }
-        mouseIsHoveringRuler = mouseIsInsideRuler(with: event)
-        if mouseIsHoveringRuler {
-            hideMouseTicksForHover()
-        } else {
-            enableMouseTicks()
-        }
-    }
-
-    private func disableMouseTicks() {
-        mouseTickResumeTimer?.invalidate()
-        mouseTickResumeTimer = nil
-        appDelegate?.suppressMouseTickDrawing(owner: self)
-        appDelegate?.suspendMouseTickUpdates(owner: self)
-    }
-
-    private func enableMouseTicks() {
-        appDelegate?.unsuppressMouseTickDrawing(owner: self)
-        appDelegate?.resumeMouseTickUpdates(owner: self)
-    }
-
-    private func scheduleMouseTickResume() {
-        mouseTickResumeTimer?.invalidate()
-        mouseTickResumeTimer = Timer.scheduledTimer(
-            withTimeInterval: mouseTickResumeDelay,
-            repeats: false
-        ) { [weak self] _ in
-            self?.enableMouseTicks()
-            self?.mouseTickResumeTimer = nil
-        }
-    }
-
-    private func resumeMouseTicksUnlessHovering() {
-        if mouseIsHoveringRuler {
-            hideMouseTicksForHover()
-            appDelegate?.resumeMouseTickUpdates(owner: self)
-        } else {
-            scheduleMouseTickResume()
-        }
-    }
-
-    private func hideMouseTicksForHover() {
-        mouseTickResumeTimer?.invalidate()
-        mouseTickResumeTimer = nil
-        appDelegate?.suppressMouseTickDrawing(owner: self)
-    }
-
-    private var rulerCursorController: RulerCursorController? {
-        return appDelegate?.rulerCursorController
+        mouseInteraction.mouseMoved(with: event)
     }
 
     private var appDelegate: AppDelegate? {
         return NSApp.delegate as? AppDelegate
     }
 
-    private func syncRulerWindowFrames() {
-        appDelegate?.syncGroupedRulerFramesToRulerWindows()
+    private func syncRulerWindowFrames(persistAutosave: Bool = false) {
+        appDelegate?.syncGroupedRulerFramesToRulerWindows(persistAutosave: persistAutosave)
     }
 
     private func mouseIsInsideRuler(with event: NSEvent) -> Bool {

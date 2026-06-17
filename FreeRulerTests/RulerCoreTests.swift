@@ -399,6 +399,44 @@ final class RulerCoreTests: XCTestCase {
         }
     }
 
+    func testGroupedRulerControllerRestoresMouseTicksWhenHiddenLegReappears() {
+        withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .topLeft
+            let horizontalFrame = NSRect(x: 200, y: 299, width: 320, height: Ruler.thickness)
+            let verticalFrame = NSRect(x: 161, y: 120, width: Ruler.thickness, height: 180)
+            let controller = GroupedRulerController(
+                frame: GroupedRulerLayout.joined(
+                    horizontalFrame: horizontalFrame,
+                    verticalFrame: verticalFrame,
+                    zeroCorner: .topLeft
+                ).groupFrame
+            )
+
+            controller.show(
+                horizontalFrame: horizontalFrame,
+                verticalFrame: verticalFrame,
+                showsHorizontalRule: true,
+                showsVerticalRule: false
+            )
+            controller.setMouseTickDrawingEnabled(false)
+            controller.setMouseTickDrawingEnabled(true)
+
+            XCTAssertTrue(controller.groupedWindow.horizontalRule.showMouseTick)
+            XCTAssertFalse(controller.groupedWindow.verticalRule.showMouseTick)
+
+            controller.show(
+                horizontalFrame: horizontalFrame,
+                verticalFrame: verticalFrame,
+                showsHorizontalRule: true,
+                showsVerticalRule: true
+            )
+
+            XCTAssertTrue(controller.groupedWindow.horizontalRule.showMouseTick)
+            XCTAssertTrue(controller.groupedWindow.verticalRule.showMouseTick)
+            controller.groupedWindow.orderOut(self)
+        }
+    }
+
     func testGroupedRulerControllerShrinksWindowToOnlyVisibleLeg() {
         withRestoredZeroCornerPreference {
             prefs.zeroCorner = .topLeft
