@@ -151,3 +151,6 @@
 
 /* Class = "NSMenuItem"; title = "Cycle Units"; ObjectID = "2nm-aL-kZd"; */
 "2nm-aL-kZd.title" = "循环单位";
+
+/* Class = "NSMenuItem"; title = "Ruler Settings…"; ObjectID = "rSt-Tg-232"; */
+"rSt-Tg-232.title" = "尺子设置…";

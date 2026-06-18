@@ -404,6 +404,38 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertTrue(settingsController.window?.sheetParent === controller.groupedWindow)
     }
 
+    func testRulerSettingsControllerRestoresForegroundOpacityWhenClosingSheet() {
+        let controller = GroupedRulerController(
+            state: RulerInstanceState(
+                settings: RulerSettings(
+                    foregroundOpacity: 80,
+                    backgroundOpacity: 45
+                ),
+                layout: RulerLayoutState(
+                    zeroPoint: NSPoint(x: 240, y: 320),
+                    horizontalLength: 260,
+                    verticalLength: 180
+                )
+            )
+        )
+        let settingsController = RulerSettingsController(rulerController: controller)
+        defer {
+            settingsController.close()
+            controller.hide()
+        }
+
+        controller.show()
+        settingsController.show(attachedTo: controller, sender: self)
+        settingsController.backgroundOpacitySlider.integerValue = 35
+        settingsController.setBackgroundOpacity(settingsController.backgroundOpacitySlider)
+
+        XCTAssertEqual(controller.groupedWindow.alphaValue, 0.35, accuracy: 0.0001)
+
+        settingsController.close()
+
+        XCTAssertEqual(controller.groupedWindow.alphaValue, 0.8, accuracy: 0.0001)
+    }
+
     func testRulerManagerCopiesUpdatedDefaultsOnlyForNewRulers() {
         withRestoredRulerPreferences {
             prefs.unit = .pixels

@@ -698,6 +698,9 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
     }
 
     private func closeSheetColorControls() {
+        if let foregroundOpacity = rulerController?.state.settings.foregroundOpacity {
+            rulerController?.opacity = foregroundOpacity
+        }
         rulerColorWell.deactivate()
         closeRulerColorPanel()
     }

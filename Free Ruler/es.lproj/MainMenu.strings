@@ -148,3 +148,6 @@
 
 /* Class = "NSMenuItem"; title = "Copy"; ObjectID = "x3v-GG-iWU"; */
 "x3v-GG-iWU.title" = "Copiar";
+
+/* Class = "NSMenuItem"; title = "Ruler Settings…"; ObjectID = "rSt-Tg-232"; */
+"rSt-Tg-232.title" = "Ajustes de regla…";
