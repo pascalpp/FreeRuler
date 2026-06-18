@@ -149,5 +149,8 @@
 /* Class = "NSMenu"; title = "Unit"; ObjectID = "z2p-dA-zcS"; */
 "z2p-dA-zcS.title" = "単位";
 
+/* Class = "NSMenuItem"; title = "New Ruler"; ObjectID = "rWt-KM-qSf"; */
+"rWt-KM-qSf.title" = "新規定規";
+
 /* Class = "NSMenuItem"; title = "Ruler Settings…"; ObjectID = "rSt-Tg-232"; */
 "rSt-Tg-232.title" = "定規設定…";

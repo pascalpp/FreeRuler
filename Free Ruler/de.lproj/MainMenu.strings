@@ -152,5 +152,8 @@
 /* Class = "NSMenuItem"; title = "Cycle Units"; ObjectID = "2nm-aL-kZd"; */
 "2nm-aL-kZd.title" = "Nächste Einheit auswählen";
 
+/* Class = "NSMenuItem"; title = "New Ruler"; ObjectID = "rWt-KM-qSf"; */
+"rWt-KM-qSf.title" = "Neues Lineal";
+
 /* Class = "NSMenuItem"; title = "Ruler Settings…"; ObjectID = "rSt-Tg-232"; */
 "rSt-Tg-232.title" = "Lineal-Einstellungen…";
