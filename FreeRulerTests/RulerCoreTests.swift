@@ -2691,35 +2691,44 @@ final class RulerCoreTests: XCTestCase {
 
     func testManagedFlipAndResetUseActiveRulerWithoutChangingDefaults() {
         withRestoredRulerPreferences {
-            prefs.zeroCorner = .topRight
-            let appDelegate = AppDelegate()
-            let first = appDelegate.rulerManager.createRuler(
-                defaults: RulerSettings(zeroCorner: .bottomLeft)
-            )
-            let second = appDelegate.rulerManager.createRuler(
-                defaults: RulerSettings(zeroCorner: .topLeft)
-            )
-            defer {
-                first.hide()
-                second.hide()
+            withRestoredRulerSetState {
+                prefs.zeroCorner = .topRight
+                let appDelegate = AppDelegate()
+                let first = appDelegate.rulerManager.createRuler(
+                    defaults: RulerSettings(zeroCorner: .bottomLeft)
+                )
+                let second = appDelegate.rulerManager.createRuler(
+                    defaults: RulerSettings(zeroCorner: .topLeft)
+                )
+                defer {
+                    first.hide()
+                    second.hide()
+                }
+
+                second.setWing(.vertical, isVisible: false)
+                appDelegate.rulerManager.markActive(second)
+                appDelegate.flipRulers(along: .horizontal)
+
+                XCTAssertEqual(second.state.settings.zeroCorner, .topRight)
+                XCTAssertEqual(second.groupedWindow.horizontalRule.zeroCorner, .topRight)
+                XCTAssertEqual(first.state.settings.zeroCorner, .bottomLeft)
+                XCTAssertEqual(prefs.zeroCorner, .topRight)
+
+                appDelegate.resetRulerPositions(self)
+
+                XCTAssertEqual(second.state.settings.zeroCorner, Prefs.defaultZeroCorner)
+                XCTAssertTrue(second.state.isWingVisible(.horizontal))
+                XCTAssertTrue(second.state.isWingVisible(.vertical))
+                XCTAssertEqual(first.state.settings.zeroCorner, .bottomLeft)
+                XCTAssertEqual(prefs.zeroCorner, .topRight)
+
+                let restoredState = prefs.loadRulerSetState()
+                let savedSecond = restoredState?.rulers.first { $0.id == second.state.id }
+                XCTAssertEqual(restoredState?.activeRulerID, second.state.id)
+                XCTAssertEqual(savedSecond?.settings.zeroCorner, Prefs.defaultZeroCorner)
+                XCTAssertTrue(savedSecond?.visibility.showsHorizontal ?? false)
+                XCTAssertTrue(savedSecond?.visibility.showsVertical ?? false)
             }
-
-            second.setWing(.vertical, isVisible: false)
-            appDelegate.rulerManager.markActive(second)
-            appDelegate.flipRulers(along: .horizontal)
-
-            XCTAssertEqual(second.state.settings.zeroCorner, .topRight)
-            XCTAssertEqual(second.groupedWindow.horizontalRule.zeroCorner, .topRight)
-            XCTAssertEqual(first.state.settings.zeroCorner, .bottomLeft)
-            XCTAssertEqual(prefs.zeroCorner, .topRight)
-
-            appDelegate.resetRulerPositions(self)
-
-            XCTAssertEqual(second.state.settings.zeroCorner, Prefs.defaultZeroCorner)
-            XCTAssertTrue(second.state.isWingVisible(.horizontal))
-            XCTAssertTrue(second.state.isWingVisible(.vertical))
-            XCTAssertEqual(first.state.settings.zeroCorner, .bottomLeft)
-            XCTAssertEqual(prefs.zeroCorner, .topRight)
         }
     }
 

@@ -1292,6 +1292,16 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
         notifyStateChanged()
     }
 
+    func resetPosition() {
+        state.settings.zeroCorner = Prefs.defaultZeroCorner
+        state.layout = RulerLayoutState.defaults(
+            zeroCorner: Prefs.defaultZeroCorner
+        )
+        state.visibility = RulerWingVisibility()
+        show()
+        notifyStateChanged()
+    }
+
     func drawMouseTick(at mouseLoc: NSPoint) {
         if groupedWindow.isRuleVisible(.horizontal) {
             groupedWindow.horizontalRule.drawMouseTick(at: mouseLoc)

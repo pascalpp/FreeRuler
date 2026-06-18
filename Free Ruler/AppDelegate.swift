@@ -844,12 +844,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @IBAction func resetRulerPositions(_ sender: Any) {
         if let controller = rulerManager.activeController {
-            controller.state.settings.zeroCorner = Prefs.defaultZeroCorner
-            controller.state.layout = RulerLayoutState.defaults(
-                zeroCorner: Prefs.defaultZeroCorner
-            )
-            controller.state.visibility = RulerWingVisibility()
-            controller.show()
+            controller.resetPosition()
             updateDisplay()
             updateMouseTickTimer()
             return
