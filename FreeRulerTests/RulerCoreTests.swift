@@ -846,7 +846,7 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertEqual(controlsView.selectedVerticalLength, 2.75 * NSScreen.defaultDpi, accuracy: 0.0001)
     }
 
-    func testRulerSettingsControlsLayoutUsesSharedInsetsAndRowSpacing() {
+    func testRulerSettingsControlsLayoutUsesSharedInsetsAndAlignedRows() {
         let controlsView = RulerSettingsControlsView(frame: NSRect(x: 0, y: 0, width: 315, height: 320))
         controlsView.configureForRulerSettings()
 
@@ -882,30 +882,38 @@ final class RulerCoreTests: XCTestCase {
             controlsView.foregroundOpacitySlider,
             controlsView.backgroundOpacityLabel,
             controlsView.backgroundOpacitySlider,
-            controlsView.floatRulersCheckbox,
-            controlsView.rulerShadowCheckbox,
         ]
         func alignmentRect(_ view: NSView) -> NSRect {
             return view.alignmentRect(forFrame: view.frame)
         }
+        func firstBaselineY(_ view: NSView) -> CGFloat {
+            return view.frame.maxY - view.firstBaselineOffsetFromTop
+        }
 
-        let expectedLeftInset = alignmentRect(controlsView.unitLabel).minX
-        let expectedRightEdge = alignmentRect(controlsView.unitSegmentedControl).maxX
-        let unitToDimensionsSpacing = alignmentRect(controlsView.unitLabel).minY
-            - alignmentRect(controlsView.dimensionsLabel).maxY
-        let dimensionsToColorSpacing = alignmentRect(controlsView.dimensionsLabel).minY
-            - alignmentRect(controlsView.rulerColorLabel).maxY
+        let expectedInset: CGFloat = 15
+        let baselineAccuracy: CGFloat = 1
+        let expectedLeftInset = controlsView.contentView.bounds.minX + expectedInset
+        let expectedRightEdge = controlsView.contentView.bounds.maxX - expectedInset
+        let unitTopInset = controlsView.contentView.bounds.maxY
+            - alignmentRect(controlsView.unitSegmentedControl).maxY
+        let unitToDimensionsSpacing = alignmentRect(controlsView.unitSegmentedControl).minY
+            - alignmentRect(controlsView.dimensionHeightField).maxY
 
-        XCTAssertEqual(expectedLeftInset, 15, accuracy: 0.5)
-        XCTAssertEqual(expectedRightEdge, controlsView.contentView.bounds.width - 21, accuracy: 0.5)
+        XCTAssertEqual(unitTopInset, expectedInset, accuracy: 0.5)
         for control in leftAlignedControls {
             XCTAssertEqual(alignmentRect(control).minX, expectedLeftInset, accuracy: 0.5)
         }
         for control in rightAlignedControls {
             XCTAssertEqual(alignmentRect(control).maxX, expectedRightEdge, accuracy: 0.5)
         }
-        XCTAssertEqual(unitToDimensionsSpacing, 20, accuracy: 0.5)
-        XCTAssertEqual(dimensionsToColorSpacing, unitToDimensionsSpacing, accuracy: 0.5)
+        XCTAssertEqual(unitToDimensionsSpacing, expectedInset, accuracy: 0.5)
+        XCTAssertEqual(firstBaselineY(controlsView.unitLabel), firstBaselineY(controlsView.unitSegmentedControl), accuracy: baselineAccuracy)
+        XCTAssertEqual(firstBaselineY(controlsView.dimensionsLabel), firstBaselineY(controlsView.dimensionWidthField), accuracy: baselineAccuracy)
+        XCTAssertEqual(firstBaselineY(controlsView.dimensionWidthField), firstBaselineY(controlsView.dimensionsSeparatorLabel), accuracy: baselineAccuracy)
+        XCTAssertEqual(firstBaselineY(controlsView.dimensionsSeparatorLabel), firstBaselineY(controlsView.dimensionHeightField), accuracy: baselineAccuracy)
+        XCTAssertEqual(alignmentRect(controlsView.rulerColorLabel).midY, alignmentRect(controlsView.rulerColorWell).midY, accuracy: 0.5)
+        XCTAssertEqual(firstBaselineY(controlsView.foregroundOpacityTitleLabel), firstBaselineY(controlsView.foregroundOpacityLabel), accuracy: baselineAccuracy)
+        XCTAssertEqual(firstBaselineY(controlsView.backgroundOpacityTitleLabel), firstBaselineY(controlsView.backgroundOpacityLabel), accuracy: baselineAccuracy)
     }
 
     func testRulerSettingsControlsKeyViewLoopFollowsVisibleControls() {
