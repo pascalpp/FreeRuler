@@ -1096,6 +1096,9 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
     let groupedWindow: GroupedRulerWindow
     var state: RulerInstanceState
     var onBecameActive: ((GroupedRulerController) -> Void)?
+    var onDragStarted: ((GroupedRulerController) -> Void)?
+    var onDragged: ((GroupedRulerController) -> Void)?
+    var onDragFinished: ((GroupedRulerController) -> Void)?
     var onStateChanged: ((GroupedRulerController) -> Void)?
 
     private var keyListener: Any?
@@ -1319,6 +1322,11 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
         notifyStateChanged()
     }
 
+    func move(to frame: NSRect) {
+        groupedWindow.setFrame(frame, display: false)
+        captureStateFromWindow()
+    }
+
     func resetPosition() {
         state.settings.zeroCorner = Prefs.defaultZeroCorner
         state.layout = RulerLayoutState.defaults(
@@ -1489,6 +1497,7 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
             )
         )
         captureStateFromWindow()
+        onDragged?(self)
         mouseInteraction.windowDidMove(isLeftMouseButtonPressed: isLeftMouseButtonPressed())
     }
 
@@ -1511,6 +1520,7 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
 
     override func mouseDown(with event: NSEvent) {
         mouseInteraction.mouseDown(with: event)
+        onDragStarted?(self)
     }
 
     override func mouseUp(with event: NSEvent) {
@@ -1521,6 +1531,7 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
         if mouseInteraction.finishMouseDrag(with: event) {
             syncRulerWindowFrames(persistAutosave: true)
             captureStateFromWindow()
+            onDragFinished?(self)
         }
     }
 
@@ -1649,11 +1660,18 @@ extension GroupedRulerController {
 final class RulerManager {
     typealias ControllerFactory = (RulerInstanceState) -> GroupedRulerController
 
+    private struct GroupedDragState {
+        let draggedRulerID: UUID
+        let framesByRulerID: [UUID: NSRect]
+    }
+
     private let controllerFactory: ControllerFactory
     private(set) var controllers: [GroupedRulerController] = []
     private(set) var activeRulerID: UUID?
     var onActiveControllerChanged: ((GroupedRulerController?) -> Void)?
     var onStateChanged: ((RulerManager) -> Void)?
+    private var groupedDragState: GroupedDragState?
+    private var isApplyingGroupedDrag = false
 
     init(
         initialStates: [RulerInstanceState] = [],
@@ -1770,6 +1788,59 @@ final class RulerManager {
         notifyStateChanged()
     }
 
+    func beginGroupedDrag(from controller: GroupedRulerController) {
+        guard prefs.groupRulers,
+              controllers.contains(where: { $0 === controller }) else {
+            groupedDragState = nil
+            return
+        }
+
+        groupedDragState = GroupedDragState(
+            draggedRulerID: controller.state.id,
+            framesByRulerID: Dictionary(
+                uniqueKeysWithValues: controllers
+                    .filter(\.isVisible)
+                    .map { ($0.state.id, $0.groupedWindow.frame) }
+            )
+        )
+    }
+
+    func syncGroupedDrag(from controller: GroupedRulerController) {
+        guard prefs.groupRulers,
+              !isApplyingGroupedDrag,
+              let groupedDragState = groupedDragState,
+              groupedDragState.draggedRulerID == controller.state.id,
+              let originalDraggedFrame = groupedDragState.framesByRulerID[controller.state.id] else {
+            return
+        }
+
+        let offset = NSSize(
+            width: controller.groupedWindow.frame.minX - originalDraggedFrame.minX,
+            height: controller.groupedWindow.frame.minY - originalDraggedFrame.minY
+        )
+        guard offset.width != 0 || offset.height != 0 else { return }
+
+        isApplyingGroupedDrag = true
+        defer {
+            isApplyingGroupedDrag = false
+        }
+
+        for otherController in controllers where otherController !== controller && otherController.isVisible {
+            guard var frame = groupedDragState.framesByRulerID[otherController.state.id] else { continue }
+
+            frame.origin.x += offset.width
+            frame.origin.y += offset.height
+            otherController.move(to: frame)
+        }
+
+        notifyStateChanged()
+    }
+
+    func finishGroupedDrag(from controller: GroupedRulerController) {
+        syncGroupedDrag(from: controller)
+        groupedDragState = nil
+    }
+
     func controller(containing window: NSWindow?) -> GroupedRulerController? {
         guard let window = window else { return nil }
 
@@ -1784,6 +1855,18 @@ final class RulerManager {
         controller.onBecameActive = { [weak self, weak controller] _ in
             guard let controller = controller else { return }
             self?.markActive(controller)
+        }
+        controller.onDragStarted = { [weak self, weak controller] _ in
+            guard let controller = controller else { return }
+            self?.beginGroupedDrag(from: controller)
+        }
+        controller.onDragged = { [weak self, weak controller] _ in
+            guard let controller = controller else { return }
+            self?.syncGroupedDrag(from: controller)
+        }
+        controller.onDragFinished = { [weak self, weak controller] _ in
+            guard let controller = controller else { return }
+            self?.finishGroupedDrag(from: controller)
         }
         controller.onStateChanged = { [weak self, weak controller] _ in
             guard let controller = controller,

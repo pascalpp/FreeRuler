@@ -17,8 +17,8 @@
 /* Class = "NSMenuItem"; title = "Redo"; ObjectID = "6dh-zS-Vam"; */
 "6dh-zS-Vam.title" = "Rehacer";
 
-/* Class = "NSMenuItem"; title = "Reset Rulers"; ObjectID = "6ph-5N-O9R"; */
-"6ph-5N-O9R.title" = "Restablecer reglas";
+/* Class = "NSMenuItem"; title = "Reset Ruler Position"; ObjectID = "6ph-5N-O9R"; */
+"6ph-5N-O9R.title" = "Restablecer posición de la regla";
 
 /* Class = "NSMenuItem"; title = "Group Rulers"; ObjectID = "7Ga-Fb-LLc"; */
 "7Ga-Fb-LLc.title" = "Agrupar reglas";
@@ -122,8 +122,8 @@
 /* Class = "NSMenuItem"; title = "Unit"; ObjectID = "iDP-2z-irv"; */
 "iDP-2z-irv.title" = "Unidad";
 
-/* Class = "NSMenuItem"; title = "Align Rulers at Mouse Location"; ObjectID = "iKV-uW-hwy"; */
-"iKV-uW-hwy.title" = "Alinear reglas con el ratón";
+/* Class = "NSMenuItem"; title = "Align Ruler at Mouse Location"; ObjectID = "iKV-uW-hwy"; */
+"iKV-uW-hwy.title" = "Alinear regla con el ratón";
 
 /* Class = "NSMenuItem"; title = "Inches"; ObjectID = "lt1-Hj-2TR"; */
 "lt1-Hj-2TR.title" = "Pulgadas";
