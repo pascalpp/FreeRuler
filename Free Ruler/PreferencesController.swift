@@ -663,6 +663,7 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
 
         window?.delegate = self
         window?.identifier = NSUserInterfaceItemIdentifier("preferences-window")
+        window?.setAccessibilityIdentifier("preferences-window")
         window?.isMovableByWindowBackground = true
         configureOpaqueColorPicking()
         settingsControlsView.delegate = self

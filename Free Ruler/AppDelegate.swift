@@ -316,6 +316,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         controller.updateSettings(update)
         updateDisplay()
+        uiTestSupport?.writePreferencesState(activeSettings: controller.state.settings)
         return true
     }
 
@@ -468,6 +469,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 settings.floatRulers = shouldFloat
             }
             updateFloatRulersMenuItem()
+            uiTestSupport?.writePreferencesState(activeSettings: controller.state.settings)
             showHotkeyBezel(
                 shouldFloat ? .rulersFloated : .rulersUnfloated,
                 on: bezelScreen(for: sender)
@@ -493,6 +495,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 settings.rulerShadow = shouldShowShadow
             }
             updateRulerShadowMenuItem()
+            uiTestSupport?.writePreferencesState(activeSettings: controller.state.settings)
             showHotkeyBezel(
                 shouldShowShadow ? .shadowEnabled : .shadowDisabled,
                 on: bezelScreen(for: sender)
