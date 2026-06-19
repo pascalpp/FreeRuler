@@ -206,14 +206,41 @@ final class RulerSettingsControlsView: NSView, NSTextFieldDelegate {
     weak var delegate: RulerSettingsControlsViewDelegate?
 
     @IBOutlet var contentView: NSView!
+    @IBOutlet weak var rulerColorLabel: NSTextField!
     @IBOutlet weak var rulerColorWell: RulerColorWell!
     @IBOutlet weak var resetRulerColorButton: NSButton!
+    @IBOutlet weak var foregroundOpacityTitleLabel: NSTextField!
     @IBOutlet weak var foregroundOpacitySlider: NSSlider!
+    @IBOutlet weak var backgroundOpacityTitleLabel: NSTextField!
     @IBOutlet weak var backgroundOpacitySlider: NSSlider!
     @IBOutlet weak var foregroundOpacityLabel: NSTextField!
     @IBOutlet weak var backgroundOpacityLabel: NSTextField!
     @IBOutlet weak var floatRulersCheckbox: NSButton!
     @IBOutlet weak var rulerShadowCheckbox: NSButton!
+
+    private enum ControlLayout {
+        static let leftInset: CGFloat = 15
+        static let rightInset: CGFloat = 21
+        static let topInset: CGFloat = 19
+        static let compactTopInset: CGFloat = 55
+        static let rowSpacing: CGFloat = 20
+        static let colorToOpacitySpacing: CGFloat = 18
+        static let labelToSliderSpacing: CGFloat = 6
+        static let sliderToLabelSpacing: CGFloat = 14
+        static let sliderToCheckboxSpacing: CGFloat = 6
+        static let checkboxSpacing: CGFloat = 10
+        static let minimumColumnSpacing: CGFloat = 8
+        static let colorButtonSpacing: CGFloat = 3
+        static let unitControlWidth: CGFloat = 108
+        static let dimensionFieldWidth: CGFloat = 56
+        static let dimensionSeparatorWidth: CGFloat = 18
+        static let colorButtonSize: CGFloat = 28
+        static let colorWellWidth: CGFloat = 60
+        static let colorWellHeight: CGFloat = 32
+        static let opacityValueWidth: CGFloat = 44
+        static let controlHeight: CGFloat = 24
+        static let sliderHeight: CGFloat = 28
+    }
 
     let unitLabel = NSTextField(labelWithString: NSLocalizedString(
         "RulerSettingsControls.Unit",
@@ -253,6 +280,9 @@ final class RulerSettingsControlsView: NSView, NSTextFieldDelegate {
 
     private var showsDimensions = true
     private var dimensionScreen: NSScreen?
+    private var unitTopConstraint: NSLayoutConstraint?
+    private var colorBelowDimensionsConstraint: NSLayoutConstraint?
+    private var colorBelowUnitConstraint: NSLayoutConstraint?
     private var dimensionControls: [NSView] {
         return [
             dimensionsLabel,
@@ -413,12 +443,6 @@ final class RulerSettingsControlsView: NSView, NSTextFieldDelegate {
         }
     }
 
-    override func layout() {
-        super.layout()
-
-        layoutTopControls()
-    }
-
     func performRulerSettingsKeyEquivalent(with event: NSEvent) -> Bool {
         guard event.type == .keyDown,
               event.modifierFlags
@@ -464,14 +488,168 @@ final class RulerSettingsControlsView: NSView, NSTextFieldDelegate {
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
         ])
         installTopControls()
+        installControlLayoutConstraints()
         configureBaseControls()
     }
 
     private func installTopControls() {
         for control in [unitLabel, unitSegmentedControl] + dimensionControls {
-            control.translatesAutoresizingMaskIntoConstraints = true
+            control.translatesAutoresizingMaskIntoConstraints = false
             contentView.addSubview(control)
         }
+        updateDimensionsVisibility()
+    }
+
+    private func installControlLayoutConstraints() {
+        let layoutControls: [NSView] = [
+            unitLabel,
+            unitSegmentedControl,
+            dimensionsLabel,
+            dimensionWidthField,
+            dimensionsSeparatorLabel,
+            dimensionHeightField,
+            rulerColorLabel,
+            resetRulerColorButton,
+            rulerColorWell,
+            foregroundOpacityTitleLabel,
+            foregroundOpacityLabel,
+            foregroundOpacitySlider,
+            backgroundOpacityTitleLabel,
+            backgroundOpacityLabel,
+            backgroundOpacitySlider,
+            floatRulersCheckbox,
+            rulerShadowCheckbox,
+        ]
+        layoutControls.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+
+        let unitTopConstraint = unitLabel.topAnchor.constraint(
+            equalTo: contentView.topAnchor,
+            constant: ControlLayout.topInset
+        )
+        self.unitTopConstraint = unitTopConstraint
+
+        let colorBelowDimensionsConstraint = rulerColorLabel.topAnchor.constraint(
+            equalTo: dimensionsLabel.bottomAnchor,
+            constant: ControlLayout.rowSpacing
+        )
+        let colorBelowUnitConstraint = rulerColorLabel.topAnchor.constraint(
+            equalTo: unitLabel.bottomAnchor,
+            constant: ControlLayout.rowSpacing
+        )
+        self.colorBelowDimensionsConstraint = colorBelowDimensionsConstraint
+        self.colorBelowUnitConstraint = colorBelowUnitConstraint
+
+        NSLayoutConstraint.activate([
+            unitTopConstraint,
+            unitLabel.leadingAnchor.constraint(
+                equalTo: contentView.leadingAnchor,
+                constant: ControlLayout.leftInset
+            ),
+            unitSegmentedControl.trailingAnchor.constraint(
+                equalTo: contentView.trailingAnchor,
+                constant: -ControlLayout.rightInset
+            ),
+            unitSegmentedControl.centerYAnchor.constraint(equalTo: unitLabel.centerYAnchor),
+            unitSegmentedControl.widthAnchor.constraint(equalToConstant: ControlLayout.unitControlWidth),
+            unitSegmentedControl.heightAnchor.constraint(equalToConstant: ControlLayout.controlHeight),
+            unitLabel.trailingAnchor.constraint(
+                lessThanOrEqualTo: unitSegmentedControl.leadingAnchor,
+                constant: -ControlLayout.minimumColumnSpacing
+            ),
+
+            dimensionsLabel.topAnchor.constraint(
+                equalTo: unitLabel.bottomAnchor,
+                constant: ControlLayout.rowSpacing
+            ),
+            dimensionsLabel.leadingAnchor.constraint(equalTo: unitLabel.leadingAnchor),
+            dimensionHeightField.trailingAnchor.constraint(equalTo: unitSegmentedControl.trailingAnchor),
+            dimensionHeightField.centerYAnchor.constraint(equalTo: dimensionsLabel.centerYAnchor),
+            dimensionHeightField.widthAnchor.constraint(equalToConstant: ControlLayout.dimensionFieldWidth),
+            dimensionHeightField.heightAnchor.constraint(equalToConstant: ControlLayout.controlHeight),
+            dimensionsSeparatorLabel.trailingAnchor.constraint(equalTo: dimensionHeightField.leadingAnchor),
+            dimensionsSeparatorLabel.centerYAnchor.constraint(equalTo: dimensionsLabel.centerYAnchor),
+            dimensionsSeparatorLabel.widthAnchor.constraint(equalToConstant: ControlLayout.dimensionSeparatorWidth),
+            dimensionWidthField.trailingAnchor.constraint(equalTo: dimensionsSeparatorLabel.leadingAnchor),
+            dimensionWidthField.centerYAnchor.constraint(equalTo: dimensionsLabel.centerYAnchor),
+            dimensionWidthField.widthAnchor.constraint(equalToConstant: ControlLayout.dimensionFieldWidth),
+            dimensionWidthField.heightAnchor.constraint(equalToConstant: ControlLayout.controlHeight),
+            dimensionsLabel.trailingAnchor.constraint(
+                lessThanOrEqualTo: dimensionWidthField.leadingAnchor,
+                constant: -ControlLayout.minimumColumnSpacing
+            ),
+
+            colorBelowDimensionsConstraint,
+            rulerColorLabel.leadingAnchor.constraint(equalTo: unitLabel.leadingAnchor),
+            rulerColorWell.trailingAnchor.constraint(equalTo: unitSegmentedControl.trailingAnchor),
+            rulerColorWell.centerYAnchor.constraint(equalTo: rulerColorLabel.centerYAnchor),
+            rulerColorWell.widthAnchor.constraint(equalToConstant: ControlLayout.colorWellWidth),
+            rulerColorWell.heightAnchor.constraint(equalToConstant: ControlLayout.colorWellHeight),
+            resetRulerColorButton.trailingAnchor.constraint(
+                equalTo: rulerColorWell.leadingAnchor,
+                constant: -ControlLayout.colorButtonSpacing
+            ),
+            resetRulerColorButton.centerYAnchor.constraint(equalTo: rulerColorWell.centerYAnchor),
+            resetRulerColorButton.widthAnchor.constraint(equalToConstant: ControlLayout.colorButtonSize),
+            resetRulerColorButton.heightAnchor.constraint(equalToConstant: ControlLayout.colorButtonSize),
+            rulerColorLabel.trailingAnchor.constraint(
+                lessThanOrEqualTo: resetRulerColorButton.leadingAnchor,
+                constant: -ControlLayout.minimumColumnSpacing
+            ),
+
+            foregroundOpacityTitleLabel.topAnchor.constraint(
+                equalTo: rulerColorWell.bottomAnchor,
+                constant: ControlLayout.colorToOpacitySpacing
+            ),
+            foregroundOpacityTitleLabel.leadingAnchor.constraint(equalTo: unitLabel.leadingAnchor),
+            foregroundOpacityLabel.trailingAnchor.constraint(equalTo: unitSegmentedControl.trailingAnchor),
+            foregroundOpacityLabel.centerYAnchor.constraint(equalTo: foregroundOpacityTitleLabel.centerYAnchor),
+            foregroundOpacityLabel.widthAnchor.constraint(equalToConstant: ControlLayout.opacityValueWidth),
+            foregroundOpacityTitleLabel.trailingAnchor.constraint(
+                lessThanOrEqualTo: foregroundOpacityLabel.leadingAnchor,
+                constant: -ControlLayout.minimumColumnSpacing
+            ),
+            foregroundOpacitySlider.topAnchor.constraint(
+                equalTo: foregroundOpacityTitleLabel.bottomAnchor,
+                constant: ControlLayout.labelToSliderSpacing
+            ),
+            foregroundOpacitySlider.leadingAnchor.constraint(equalTo: unitLabel.leadingAnchor),
+            foregroundOpacitySlider.trailingAnchor.constraint(equalTo: unitSegmentedControl.trailingAnchor),
+            foregroundOpacitySlider.heightAnchor.constraint(equalToConstant: ControlLayout.sliderHeight),
+
+            backgroundOpacityTitleLabel.topAnchor.constraint(
+                equalTo: foregroundOpacitySlider.bottomAnchor,
+                constant: ControlLayout.sliderToLabelSpacing
+            ),
+            backgroundOpacityTitleLabel.leadingAnchor.constraint(equalTo: unitLabel.leadingAnchor),
+            backgroundOpacityLabel.trailingAnchor.constraint(equalTo: unitSegmentedControl.trailingAnchor),
+            backgroundOpacityLabel.centerYAnchor.constraint(equalTo: backgroundOpacityTitleLabel.centerYAnchor),
+            backgroundOpacityLabel.widthAnchor.constraint(equalToConstant: ControlLayout.opacityValueWidth),
+            backgroundOpacityTitleLabel.trailingAnchor.constraint(
+                lessThanOrEqualTo: backgroundOpacityLabel.leadingAnchor,
+                constant: -ControlLayout.minimumColumnSpacing
+            ),
+            backgroundOpacitySlider.topAnchor.constraint(
+                equalTo: backgroundOpacityTitleLabel.bottomAnchor,
+                constant: ControlLayout.labelToSliderSpacing
+            ),
+            backgroundOpacitySlider.leadingAnchor.constraint(equalTo: unitLabel.leadingAnchor),
+            backgroundOpacitySlider.trailingAnchor.constraint(equalTo: unitSegmentedControl.trailingAnchor),
+            backgroundOpacitySlider.heightAnchor.constraint(equalToConstant: ControlLayout.sliderHeight),
+
+            floatRulersCheckbox.topAnchor.constraint(
+                equalTo: backgroundOpacitySlider.bottomAnchor,
+                constant: ControlLayout.sliderToCheckboxSpacing
+            ),
+            floatRulersCheckbox.leadingAnchor.constraint(equalTo: unitLabel.leadingAnchor),
+            floatRulersCheckbox.trailingAnchor.constraint(equalTo: unitSegmentedControl.trailingAnchor),
+            rulerShadowCheckbox.topAnchor.constraint(
+                equalTo: floatRulersCheckbox.bottomAnchor,
+                constant: ControlLayout.checkboxSpacing
+            ),
+            rulerShadowCheckbox.leadingAnchor.constraint(equalTo: unitLabel.leadingAnchor),
+            rulerShadowCheckbox.trailingAnchor.constraint(equalTo: unitSegmentedControl.trailingAnchor),
+        ])
+
         updateDimensionsVisibility()
     }
 
@@ -605,56 +783,13 @@ final class RulerSettingsControlsView: NSView, NSTextFieldDelegate {
         for control in dimensionControls {
             control.isHidden = !showsDimensions
         }
+        unitTopConstraint?.constant = showsDimensions
+            ? ControlLayout.topInset
+            : ControlLayout.compactTopInset
+        colorBelowDimensionsConstraint?.isActive = showsDimensions
+        colorBelowUnitConstraint?.isActive = !showsDimensions
         needsLayout = true
         configureKeyViewLoop()
-    }
-
-    private func layoutTopControls() {
-        guard contentView != nil else { return }
-
-        let labelX: CGFloat = 15
-        let labelWidth: CGFloat = 150
-        let labelHeight: CGFloat = 16
-        let rightMargin: CGFloat = 21
-        let contentWidth = contentView.bounds.width
-        let controlRight = contentWidth - rightMargin
-
-        let unitControlWidth: CGFloat = 108
-        let unitY: CGFloat = showsDimensions ? 285 : 249
-        unitLabel.frame = NSRect(x: labelX, y: unitY, width: labelWidth, height: labelHeight)
-        unitSegmentedControl.frame = NSRect(
-            x: controlRight - unitControlWidth,
-            y: unitY - 4,
-            width: unitControlWidth,
-            height: 24
-        )
-
-        let dimensionsY: CGFloat = 249
-        let fieldWidth: CGFloat = 56
-        let separatorWidth: CGFloat = 18
-        let heightFieldX = controlRight - fieldWidth
-        let separatorX = heightFieldX - separatorWidth
-        let widthFieldX = separatorX - fieldWidth
-
-        dimensionsLabel.frame = NSRect(x: labelX, y: dimensionsY, width: labelWidth, height: labelHeight)
-        dimensionWidthField.frame = NSRect(
-            x: widthFieldX,
-            y: dimensionsY - 4,
-            width: fieldWidth,
-            height: 24
-        )
-        dimensionsSeparatorLabel.frame = NSRect(
-            x: separatorX,
-            y: dimensionsY,
-            width: separatorWidth,
-            height: labelHeight
-        )
-        dimensionHeightField.frame = NSRect(
-            x: heightFieldX,
-            y: dimensionsY - 4,
-            width: fieldWidth,
-            height: 24
-        )
     }
 
     private func toggleFloatRulersFromKeyEquivalent() -> Bool {

@@ -10,11 +10,14 @@
             <connections>
                 <outlet property="backgroundOpacityLabel" destination="RSV-bg-value" id="RSV-bg-value-outlet"/>
                 <outlet property="backgroundOpacitySlider" destination="RSV-bg-slider" id="RSV-bg-slider-outlet"/>
+                <outlet property="backgroundOpacityTitleLabel" destination="RSV-bg-label" id="RSV-bg-title-outlet"/>
                 <outlet property="contentView" destination="RSV-content" id="RSV-content-outlet"/>
                 <outlet property="floatRulersCheckbox" destination="RSV-float-checkbox" id="RSV-float-outlet"/>
                 <outlet property="foregroundOpacityLabel" destination="RSV-fg-value" id="RSV-fg-value-outlet"/>
                 <outlet property="foregroundOpacitySlider" destination="RSV-fg-slider" id="RSV-fg-slider-outlet"/>
+                <outlet property="foregroundOpacityTitleLabel" destination="RSV-fg-label" id="RSV-fg-title-outlet"/>
                 <outlet property="resetRulerColorButton" destination="RSV-reset-button" id="RSV-reset-outlet"/>
+                <outlet property="rulerColorLabel" destination="RSV-color-label" id="RSV-color-title-outlet"/>
                 <outlet property="rulerColorWell" destination="RSV-color-well" id="RSV-color-outlet"/>
                 <outlet property="rulerShadowCheckbox" destination="RSV-shadow-checkbox" id="RSV-shadow-outlet"/>
             </connections>
