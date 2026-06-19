@@ -450,6 +450,11 @@ final class RulerWindow: NSPanel {
         return frame.origin
     }
 
+    var drawsActiveBorder: Bool {
+        get { return rulerContentView.drawsActiveBorder }
+        set { rulerContentView.drawsActiveBorder = newValue }
+    }
+
     private var leftMouseButtonIsPressed: Bool {
         return NSEvent.pressedMouseButtons & 1 == 1
     }
@@ -566,6 +571,9 @@ private final class RulerClipView: NSView {
 }
 
 private final class RulerWindowBorderView: RulerBorderView {
+    private static let activeBorderCenterInset = borderCenterInset + borderWidth
+    private static let activeBorderColor = NSColor(calibratedWhite: 0, alpha: 0.25)
+
     var zeroCorner = prefs.zeroCorner {
         didSet {
             needsDisplay = true
@@ -584,31 +592,58 @@ private final class RulerWindowBorderView: RulerBorderView {
         }
     }
 
+    var drawsActiveBorder = false {
+        didSet {
+            needsDisplay = true
+        }
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
+
+        guard drawsActiveBorder else { return }
+
+        let path = activeBorderPath(in: bounds)
+        path.lineWidth = Self.borderWidth
+        path.lineJoinStyle = .miter
+        path.lineCapStyle = .butt
+        Self.activeBorderColor.setStroke()
+        path.stroke()
+    }
+
     override func borderPath(in bounds: NSRect) -> NSBezierPath {
+        return panelBorderPath(in: bounds, inset: Self.borderCenterInset)
+    }
+
+    private func activeBorderPath(in bounds: NSRect) -> NSBezierPath {
+        return panelBorderPath(in: bounds, inset: Self.activeBorderCenterInset)
+    }
+
+    private func panelBorderPath(in bounds: NSRect, inset: CGFloat) -> NSBezierPath {
         switch (showsHorizontalRule, showsVerticalRule) {
         case (true, true):
-            return lShapedBorderPath()
+            return lShapedBorderPath(inset: inset)
         case (true, false):
-            return visibleBoundsBorderPath()
+            return visibleBoundsBorderPath(inset: inset)
         case (false, true):
-            return visibleBoundsBorderPath()
+            return visibleBoundsBorderPath(inset: inset)
         case (false, false):
             return NSBezierPath()
         }
     }
 
-    private func lShapedBorderPath() -> NSBezierPath {
+    private func lShapedBorderPath(inset: CGFloat) -> NSBezierPath {
         return rulerWindowLShapedPath(
             in: bounds,
             zeroCorner: zeroCorner,
-            inset: Self.borderCenterInset
+            inset: inset
         )
     }
 
-    private func visibleBoundsBorderPath() -> NSBezierPath {
+    private func visibleBoundsBorderPath(inset: CGFloat) -> NSBezierPath {
         return NSBezierPath(rect: bounds.insetBy(
-            dx: Self.borderCenterInset,
-            dy: Self.borderCenterInset
+            dx: inset,
+            dy: inset
         ))
     }
 }
@@ -805,6 +840,12 @@ final class RulerContentView: NSView {
             verticalRule.needsDisplay = true
             needsLayout = true
             needsDisplay = true
+        }
+    }
+
+    var drawsActiveBorder = false {
+        didSet {
+            borderView.drawsActiveBorder = drawsActiveBorder
         }
     }
 
@@ -1632,6 +1673,7 @@ final class RulerManager {
 
     func restore(_ states: [RulerInstanceState], activeRulerID restoredActiveRulerID: UUID? = nil) {
         for controller in controllers {
+            controller.rulerWindow.drawsActiveBorder = false
             controller.hide()
         }
 
@@ -1688,11 +1730,18 @@ final class RulerManager {
     }
 
     func close(_ controller: RulerController) {
+        let wasActiveController = activeRulerID == controller.state.id
+
         controller.hide()
         controllers.removeAll { $0 === controller }
 
-        if activeRulerID == controller.state.id {
+        if wasActiveController {
             activeRulerID = controllers.last?.state.id
+        }
+
+        updateActiveRulerBorders()
+
+        if wasActiveController {
             onActiveControllerChanged?(activeController)
         }
 
@@ -1703,6 +1752,7 @@ final class RulerManager {
         guard controllers.contains(where: { $0 === controller }) else { return }
 
         activeRulerID = controller.state.id
+        updateActiveRulerBorders()
         onActiveControllerChanged?(controller)
         notifyStateChanged()
     }
@@ -1810,6 +1860,12 @@ final class RulerManager {
 
     private func notifyStateChanged() {
         onStateChanged?(self)
+    }
+
+    private func updateActiveRulerBorders() {
+        for controller in controllers {
+            controller.rulerWindow.drawsActiveBorder = controller.state.id == activeRulerID
+        }
     }
 }
 #endif

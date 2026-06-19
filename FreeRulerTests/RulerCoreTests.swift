@@ -169,6 +169,36 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertEqual(manager.states.map(\.settings.unit), [.inches])
     }
 
+    func testRulerManagerDrawsActiveBorderOnlyOnActiveRuler() {
+        let manager = RulerManager()
+        defer {
+            for controller in manager.controllers {
+                controller.hide()
+            }
+        }
+
+        let first = manager.createRuler(
+            defaults: RulerSettings(unit: .pixels),
+            screenFrame: NSRect(x: 0, y: 0, width: 1000, height: 800)
+        )
+        let second = manager.createRuler(
+            defaults: RulerSettings(unit: .inches),
+            screenFrame: NSRect(x: 0, y: 0, width: 1000, height: 800)
+        )
+
+        XCTAssertFalse(first.rulerWindow.drawsActiveBorder)
+        XCTAssertTrue(second.rulerWindow.drawsActiveBorder)
+
+        manager.markActive(first)
+
+        XCTAssertTrue(first.rulerWindow.drawsActiveBorder)
+        XCTAssertFalse(second.rulerWindow.drawsActiveBorder)
+
+        XCTAssertTrue(manager.closeActiveRuler())
+
+        XCTAssertTrue(second.rulerWindow.drawsActiveBorder)
+    }
+
     func testRulerManagerStaggersNewRulersWhenDefaultPositionIsOccupied() {
         let manager = RulerManager()
         defer {
