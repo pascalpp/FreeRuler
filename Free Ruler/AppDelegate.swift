@@ -79,8 +79,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 settingsController.close()
             }
         }
-        manager.onStateChanged = { [weak self] _ in
-            self?.saveRulerSetState()
+        manager.onStateChanged = { [weak self] manager in
+            guard let self = self else { return }
+
+            self.saveRulerSetState()
+
+            let activeController = manager.activeController
+            guard let settingsController = self.rulerSettingsController,
+                  settingsController.currentRulerController === activeController,
+                  settingsController.window?.isVisible == true else { return }
+
+            settingsController.updateView()
         }
         return manager
     }()

@@ -1264,6 +1264,7 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
         updateHasShadow()
         groupedWindow.setFrame(groupedWindow.visibleFrame(in: layout), display: true)
         captureStateFromWindow()
+        notifyStateChanged()
     }
 
     func foreground() {

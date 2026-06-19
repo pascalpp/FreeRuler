@@ -39,6 +39,7 @@ private func setColorPickingIgnoresAlpha(_ ignoresAlpha: Bool) {
 class RulerColorWell: NSColorWell {
 
     var colorDidChange: ((RulerColorWell) -> Void)?
+    var colorPanelPresenter: ((RulerColorWell, NSColorPanel) -> Void)?
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -47,8 +48,18 @@ class RulerColorWell: NSColorWell {
 
     override func activate(_ exclusive: Bool) {
         configureForOpaqueColors()
-        super.activate(exclusive)
+        openColorPanel()
         configureForOpaqueColors()
+    }
+
+    override func keyDown(with event: NSEvent) {
+        guard event.charactersIgnoringModifiers == " " else {
+            super.keyDown(with: event)
+            return
+        }
+
+        configureForOpaqueColors()
+        openColorPanel()
     }
 
     override func takeColorFrom(_ sender: Any?) {
@@ -70,8 +81,12 @@ class RulerColorWell: NSColorWell {
 
     override func mouseDown(with event: NSEvent) {
         configureForOpaqueColors()
+        openColorPanel()
+    }
 
+    private func openColorPanel() {
         let colorPanel = NSColorPanel.shared
+
         guard !colorPanel.isVisible else {
             closeRulerColorPanel()
             return
@@ -82,7 +97,11 @@ class RulerColorWell: NSColorWell {
         colorPanel.color = color
         colorPanel.setTarget(self)
         colorPanel.setAction(#selector(takeColorFrom(_:)))
-        colorPanel.orderFront(self)
+        if let colorPanelPresenter = colorPanelPresenter {
+            colorPanelPresenter(self, colorPanel)
+        } else {
+            colorPanel.orderFront(self)
+        }
         configureForOpaqueColors()
         configureOpaqueColorPickingAfterPanelUpdates()
     }
@@ -186,6 +205,7 @@ final class RulerSettingsControlsView: NSView {
             shadowCheckboxIdentifier: "ruler-shadow-checkbox"
         )
         configureCheckboxKeyEquivalents(float: "", shadow: "")
+        rulerColorWell.colorPanelPresenter = nil
     }
 
     func configureForRulerSettings() {
@@ -719,6 +739,9 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         configureFloatingPanelWindow()
         settingsControlsView.delegate = self
         settingsControlsView.configureForRulerSettings()
+        rulerColorWell.colorPanelPresenter = { [weak self] colorWell, colorPanel in
+            self?.presentColorPanel(colorPanel, for: colorWell)
+        }
         rulerColorWell.target = self
         rulerColorWell.action = #selector(setRulerColor(_:))
         resetDefaultsButton.identifier = NSUserInterfaceItemIdentifier("reset-ruler-settings-to-default-button")
@@ -864,6 +887,7 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         )
         resetDefaultsButton.isEnabled = hasRuler
         setDefaultsButton.isEnabled = hasRuler
+        repositionAttachedWindowsIfNeeded()
     }
 
     func performSettingsKeyEquivalent(with event: NSEvent) -> Bool {
@@ -883,11 +907,105 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         panel.hidesOnDeactivate = false
     }
 
+    func presentColorPanel(_ colorPanel: NSColorPanel, for colorWell: RulerColorWell) {
+        guard let settingsWindow = window else {
+            colorPanel.orderFront(colorWell)
+            return
+        }
+
+        if let parentWindow = colorPanel.parent, parentWindow !== settingsWindow {
+            parentWindow.removeChildWindow(colorPanel)
+        }
+
+        position(colorPanel, attachedTo: settingsWindow)
+
+        if colorPanel.parent == nil {
+            settingsWindow.addChildWindow(colorPanel, ordered: .above)
+        }
+
+        colorPanel.orderFront(colorWell)
+    }
+
+    private func position(_ colorPanel: NSColorPanel, attachedTo settingsWindow: NSWindow) {
+        let margin: CGFloat = 8
+        let zeroCorner = rulerController?.state.settings.zeroCorner ?? Prefs.defaultZeroCorner
+        let colorPanelSize = colorPanel.frame.size
+        let defaultTopLeft = colorPanelTopLeftPoint(
+            for: colorPanelSize,
+            attachedTo: settingsWindow.frame,
+            zeroCorner: zeroCorner,
+            margin: margin
+        )
+        guard let visibleFrame = settingsWindow.screen?.visibleFrame ?? colorPanel.screen?.visibleFrame else {
+            colorPanel.setFrameTopLeftPoint(defaultTopLeft)
+            return
+        }
+
+        var topLeftPoint = defaultTopLeft
+        if topLeftPoint.x < visibleFrame.minX {
+            topLeftPoint.x = min(settingsWindow.frame.maxX + margin, visibleFrame.maxX - colorPanelSize.width)
+        } else if topLeftPoint.x + colorPanelSize.width > visibleFrame.maxX {
+            topLeftPoint.x = max(settingsWindow.frame.minX - colorPanelSize.width - margin, visibleFrame.minX)
+        }
+
+        if colorPanelSize.height <= visibleFrame.height {
+            topLeftPoint.y = clamp(
+                topLeftPoint.y,
+                lower: visibleFrame.minY + colorPanelSize.height,
+                upper: visibleFrame.maxY
+            )
+        } else {
+            topLeftPoint.y = visibleFrame.maxY
+        }
+
+        colorPanel.setFrameTopLeftPoint(topLeftPoint)
+    }
+
+    private func colorPanelTopLeftPoint(
+        for colorPanelSize: NSSize,
+        attachedTo settingsFrame: NSRect,
+        zeroCorner: ZeroCorner,
+        margin: CGFloat
+    ) -> NSPoint {
+        let x: CGFloat
+        let y: CGFloat
+
+        switch zeroCorner {
+        case .topLeft, .bottomLeft:
+            x = settingsFrame.maxX + margin
+        case .topRight, .bottomRight:
+            x = settingsFrame.minX - colorPanelSize.width - margin
+        }
+
+        switch zeroCorner {
+        case .topLeft, .topRight:
+            y = settingsFrame.maxY
+        case .bottomLeft, .bottomRight:
+            y = settingsFrame.minY + colorPanelSize.height
+        }
+
+        return NSPoint(x: x, y: y)
+    }
+
     private func applyRulerColor(_ color: NSColor) {
         applySettings { settings in
             settings.setRulerColor(color)
         }
         updateView()
+    }
+
+    private func repositionAttachedWindowsIfNeeded() {
+        guard let controller = rulerController,
+              let settingsWindow = window,
+              settingsWindow.isVisible,
+              settingsWindow.parent === controller.groupedWindow else { return }
+
+        position(settingsWindow, attachedTo: controller)
+
+        let colorPanel = NSColorPanel.shared
+        if colorPanel.parent === settingsWindow {
+            position(colorPanel, attachedTo: settingsWindow)
+        }
     }
 
     private func applySettings(_ update: (inout RulerSettings) -> Void) {
@@ -914,40 +1032,31 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
     }
 
     private func position(_ settingsWindow: NSWindow, attachedTo controller: GroupedRulerController) {
-        let parentFrame = controller.groupedWindow.frame
         let settingsSize = settingsWindow.frame.size
-        let margin: CGFloat = 12
-        let frame: NSRect
-
-        if controller.state.visibility.showsHorizontal {
-            let horizontalFrame = controller.groupedWindow.screenFrame(for: .horizontal)
-            let x = clamp(
-                horizontalFrame.midX - settingsSize.width / 2,
-                lower: parentFrame.minX + margin,
-                upper: parentFrame.maxX - settingsSize.width - margin
-            )
-            let belowY = horizontalFrame.minY - settingsSize.height - margin
-            let aboveY = horizontalFrame.maxY + margin
-            let y = belowY >= parentFrame.minY + margin
-                ? belowY
-                : min(aboveY, parentFrame.maxY - settingsSize.height - margin)
-            frame = NSRect(origin: NSPoint(x: x, y: y), size: settingsSize)
-        } else {
-            let verticalFrame = controller.groupedWindow.screenFrame(for: .vertical)
-            let y = clamp(
-                verticalFrame.midY - settingsSize.height / 2,
-                lower: parentFrame.minY + margin,
-                upper: parentFrame.maxY - settingsSize.height - margin
-            )
-            let rightX = verticalFrame.maxX + margin
-            let leftX = verticalFrame.minX - settingsSize.width - margin
-            let x = rightX + settingsSize.width <= parentFrame.maxX - margin
-                ? rightX
-                : max(leftX, parentFrame.minX + margin)
-            frame = NSRect(origin: NSPoint(x: x, y: y), size: settingsSize)
-        }
+        let frame = settingsFrame(
+            size: settingsSize,
+            zeroPoint: controller.groupedWindow.zeroPoint(),
+            zeroCorner: controller.state.settings.zeroCorner
+        )
 
         settingsWindow.setFrame(frame, display: true)
+    }
+
+    private func settingsFrame(size: NSSize, zeroPoint: NSPoint, zeroCorner: ZeroCorner) -> NSRect {
+        let origin: NSPoint
+
+        switch zeroCorner {
+        case .topLeft:
+            origin = NSPoint(x: zeroPoint.x, y: zeroPoint.y - size.height)
+        case .topRight:
+            origin = NSPoint(x: zeroPoint.x - size.width, y: zeroPoint.y - size.height)
+        case .bottomLeft:
+            origin = zeroPoint
+        case .bottomRight:
+            origin = NSPoint(x: zeroPoint.x - size.width, y: zeroPoint.y)
+        }
+
+        return NSRect(origin: origin, size: size)
     }
 
     private func clamp(_ value: CGFloat, lower: CGFloat, upper: CGFloat) -> CGFloat {
@@ -1005,6 +1114,9 @@ extension RulerSettingsController: RulerSettingsControlsViewDelegate {
 func closeRulerColorPanel() {
     activeRulerColorWell = nil
     let colorPanel = NSColorPanel.shared
+    if let parentWindow = colorPanel.parent {
+        parentWindow.removeChildWindow(colorPanel)
+    }
     colorPanel.animationBehavior = .none
     colorPanel.setTarget(nil)
     colorPanel.setAction(nil)

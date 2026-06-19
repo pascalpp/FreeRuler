@@ -633,6 +633,53 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertNil(settingsWindow.sheetParent)
     }
 
+    func testRulerSettingsControllerAnchorsPanelCornerToRulerZeroPoint() {
+        let visibleFrame = NSScreen.main?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1200, height: 900)
+        let zeroPoint = NSPoint(x: visibleFrame.midX, y: visibleFrame.midY)
+
+        for zeroCorner in [ZeroCorner.topLeft, .topRight, .bottomLeft, .bottomRight] {
+            let controller = GroupedRulerController(
+                state: RulerInstanceState(
+                    settings: RulerSettings(zeroCorner: zeroCorner),
+                    layout: RulerLayoutState(
+                        zeroPoint: zeroPoint,
+                        horizontalLength: 260,
+                        verticalLength: 180
+                    )
+                )
+            )
+            let settingsController = RulerSettingsController(rulerController: controller)
+            defer {
+                settingsController.close()
+                controller.hide()
+            }
+
+            controller.show()
+            settingsController.show(attachedTo: controller, sender: self)
+
+            guard let settingsWindow = settingsController.window else {
+                XCTFail("Expected settings window")
+                return
+            }
+
+            let rulerZeroPoint = controller.groupedWindow.zeroPoint()
+            switch zeroCorner {
+            case .topLeft:
+                XCTAssertEqual(settingsWindow.frame.minX, rulerZeroPoint.x, accuracy: 1)
+                XCTAssertEqual(settingsWindow.frame.maxY, rulerZeroPoint.y, accuracy: 1)
+            case .topRight:
+                XCTAssertEqual(settingsWindow.frame.maxX, rulerZeroPoint.x, accuracy: 1)
+                XCTAssertEqual(settingsWindow.frame.maxY, rulerZeroPoint.y, accuracy: 1)
+            case .bottomLeft:
+                XCTAssertEqual(settingsWindow.frame.minX, rulerZeroPoint.x, accuracy: 1)
+                XCTAssertEqual(settingsWindow.frame.minY, rulerZeroPoint.y, accuracy: 1)
+            case .bottomRight:
+                XCTAssertEqual(settingsWindow.frame.maxX, rulerZeroPoint.x, accuracy: 1)
+                XCTAssertEqual(settingsWindow.frame.minY, rulerZeroPoint.y, accuracy: 1)
+            }
+        }
+    }
+
     func testRulerSettingsControllerUsesFloatingUtilityPanelStyle() {
         let controller = GroupedRulerController(
             state: RulerInstanceState(
@@ -662,6 +709,32 @@ final class RulerCoreTests: XCTestCase {
         let settingsPanel = settingsWindow as? NSPanel
         XCTAssertTrue(settingsPanel?.isFloatingPanel ?? false)
         XCTAssertFalse(settingsPanel?.hidesOnDeactivate ?? true)
+    }
+
+    func testRulerSettingsColorPanelAttachesOnRightForLeftZeroCorner() {
+        assertRulerSettingsColorPanelAttachesToSettingsPanel(zeroCorner: .topLeft) { settingsController, settingsWindow in
+            settingsController.rulerColorWell.mouseDown(
+                with: mouseDownEvent(windowNumber: settingsWindow.windowNumber)
+            )
+        }
+    }
+
+    func testRulerSettingsColorPanelActivatedByKeyboardUsesAnchoredPlacement() {
+        assertRulerSettingsColorPanelAttachesToSettingsPanel(zeroCorner: .topLeft) { settingsController, _ in
+            settingsController.rulerColorWell.keyDown(
+                with: keyDownEvent(characters: " ", keyCode: UInt16(kVK_Space))
+            )
+        }
+    }
+
+    func testRulerSettingsColorPanelAttachesOnLeftForRightZeroCorners() {
+        for zeroCorner in [ZeroCorner.topRight, .bottomRight] {
+            assertRulerSettingsColorPanelAttachesToSettingsPanel(zeroCorner: zeroCorner) { settingsController, settingsWindow in
+                settingsController.rulerColorWell.mouseDown(
+                    with: mouseDownEvent(windowNumber: settingsWindow.windowNumber)
+                )
+            }
+        }
     }
 
     func testRulerSettingsControllerRestoresForegroundOpacityWhenClosingSheet() {
@@ -726,6 +799,49 @@ final class RulerCoreTests: XCTestCase {
 
         XCTAssertFalse(controller.groupedWindow.childWindows?.contains(settingsWindow) ?? false)
         XCTAssertFalse(settingsWindow.isVisible)
+    }
+
+    func testRulerSettingsControllerReanchorsWhenRulerZeroCornerChanges() {
+        withRestoredRulerPreferences {
+            withRestoredRulerSetState {
+                let visibleFrame = NSScreen.main?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1200, height: 900)
+                let zeroPoint = NSPoint(x: visibleFrame.midX, y: visibleFrame.midY)
+                let appDelegate = AppDelegate()
+                let controller = appDelegate.rulerManager.addRuler(
+                    state: RulerInstanceState(
+                        settings: RulerSettings(zeroCorner: .topLeft),
+                        layout: RulerLayoutState(
+                            zeroPoint: zeroPoint,
+                            horizontalLength: 260,
+                            verticalLength: 180
+                        )
+                    )
+                )
+                defer {
+                    appDelegate.rulerSettingsController?.close()
+                    controller.hide()
+                }
+
+                controller.show()
+                appDelegate.openRulerSettings(self)
+
+                guard let settingsWindow = appDelegate.rulerSettingsController?.window else {
+                    XCTFail("Expected settings window")
+                    return
+                }
+
+                let initialZeroPoint = controller.groupedWindow.zeroPoint()
+                XCTAssertEqual(settingsWindow.frame.minX, initialZeroPoint.x, accuracy: 1)
+                XCTAssertEqual(settingsWindow.frame.maxY, initialZeroPoint.y, accuracy: 1)
+
+                appDelegate.flipRulers(along: .horizontal)
+
+                let flippedZeroPoint = controller.groupedWindow.zeroPoint()
+                XCTAssertEqual(controller.state.settings.zeroCorner, .topRight)
+                XCTAssertEqual(settingsWindow.frame.maxX, flippedZeroPoint.x, accuracy: 1)
+                XCTAssertEqual(settingsWindow.frame.maxY, flippedZeroPoint.y, accuracy: 1)
+            }
+        }
     }
 
     func testRulerManagerCopiesUpdatedDefaultsOnlyForNewRulers() {
@@ -3368,6 +3484,132 @@ final class RulerCoreTests: XCTestCase {
             charactersIgnoringModifiers: characters,
             isARepeat: false,
             keyCode: keyCode
+        )!
+    }
+
+    private func assertRulerSettingsColorPanelAttachesToSettingsPanel(
+        zeroCorner: ZeroCorner,
+        openingColorPanel: (RulerSettingsController, NSWindow) -> Void,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        let controller = GroupedRulerController(
+            state: RulerInstanceState(
+                settings: RulerSettings(zeroCorner: zeroCorner),
+                layout: RulerLayoutState(
+                    zeroPoint: NSPoint(x: 240, y: 320),
+                    horizontalLength: 260,
+                    verticalLength: 180
+                )
+            )
+        )
+        let settingsController = RulerSettingsController(rulerController: controller)
+        let colorPanel = NSColorPanel.shared
+        closeRulerColorPanel()
+        let originalColorPanelFrame = colorPanel.frame
+        defer {
+            settingsController.close()
+            controller.hide()
+            closeRulerColorPanel()
+            colorPanel.setFrame(originalColorPanelFrame, display: false)
+        }
+
+        guard let settingsWindow = settingsController.window else {
+            XCTFail("Expected settings window", file: file, line: line)
+            return
+        }
+
+        let visibleFrame = NSScreen.main?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1200, height: 900)
+        settingsWindow.setFrame(
+            NSRect(
+                x: visibleFrame.minX + 60,
+                y: visibleFrame.maxY - 340,
+                width: 320,
+                height: 300
+            ),
+            display: false
+        )
+        settingsWindow.orderFront(self)
+
+        let colorPanelSize = colorPanel.frame.size
+        let expectedFrame = settingsWindow.screen?.visibleFrame ?? colorPanel.screen?.visibleFrame
+        let expectedX: CGFloat
+        let expectedMaxY: CGFloat
+        if let expectedFrame = expectedFrame {
+            var expectedTopLeft = expectedColorPanelTopLeftPoint(
+                colorPanelSize: colorPanelSize,
+                settingsFrame: settingsWindow.frame,
+                zeroCorner: zeroCorner
+            )
+            if expectedTopLeft.x < expectedFrame.minX {
+                expectedTopLeft.x = min(settingsWindow.frame.maxX + 8, expectedFrame.maxX - colorPanelSize.width)
+            } else if expectedTopLeft.x + colorPanelSize.width > expectedFrame.maxX {
+                expectedTopLeft.x = max(settingsWindow.frame.minX - colorPanelSize.width - 8, expectedFrame.minX)
+            }
+            if colorPanelSize.height <= expectedFrame.height {
+                expectedTopLeft.y = min(
+                    max(expectedTopLeft.y, expectedFrame.minY + colorPanelSize.height),
+                    expectedFrame.maxY
+                )
+            } else {
+                expectedTopLeft.y = expectedFrame.maxY
+            }
+            expectedX = expectedTopLeft.x
+            expectedMaxY = expectedTopLeft.y
+        } else {
+            let expectedTopLeft = expectedColorPanelTopLeftPoint(
+                colorPanelSize: colorPanelSize,
+                settingsFrame: settingsWindow.frame,
+                zeroCorner: zeroCorner
+            )
+            expectedX = expectedTopLeft.x
+            expectedMaxY = expectedTopLeft.y
+        }
+
+        openingColorPanel(settingsController, settingsWindow)
+
+        XCTAssertTrue(colorPanel.parent === settingsWindow, file: file, line: line)
+        XCTAssertTrue(settingsWindow.childWindows?.contains(colorPanel) ?? false, file: file, line: line)
+        XCTAssertEqual(colorPanel.frame.minX, expectedX, accuracy: 1, file: file, line: line)
+        XCTAssertEqual(colorPanel.frame.maxY, expectedMaxY, accuracy: 1, file: file, line: line)
+    }
+
+    private func expectedColorPanelTopLeftPoint(
+        colorPanelSize: NSSize,
+        settingsFrame: NSRect,
+        zeroCorner: ZeroCorner
+    ) -> NSPoint {
+        let x: CGFloat
+        let y: CGFloat
+
+        switch zeroCorner {
+        case .topLeft, .bottomLeft:
+            x = settingsFrame.maxX + 8
+        case .topRight, .bottomRight:
+            x = settingsFrame.minX - colorPanelSize.width - 8
+        }
+
+        switch zeroCorner {
+        case .topLeft, .topRight:
+            y = settingsFrame.maxY
+        case .bottomLeft, .bottomRight:
+            y = settingsFrame.minY + colorPanelSize.height
+        }
+
+        return NSPoint(x: x, y: y)
+    }
+
+    private func mouseDownEvent(windowNumber: Int) -> NSEvent {
+        return NSEvent.mouseEvent(
+            with: .leftMouseDown,
+            location: .zero,
+            modifierFlags: [],
+            timestamp: 0,
+            windowNumber: windowNumber,
+            context: nil,
+            eventNumber: 0,
+            clickCount: 1,
+            pressure: 1
         )!
     }
 
