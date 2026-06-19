@@ -378,19 +378,23 @@ final class RulerCoreTests: XCTestCase {
             XCTAssertEqual(settingsController.unitSegmentedControl.selectedSegment, Unit.millimeters.rawValue)
             XCTAssertEqual(prefs.unit, .pixels)
 
+            let enteredWidthMillimeters: CGFloat = 100
+            let enteredHeightMillimeters: CGFloat = 80
             let zeroPointBeforeDimensionChange = controller.groupedWindow.zeroPoint()
-            settingsController.dimensionWidthField.integerValue = 320
-            settingsController.dimensionHeightField.integerValue = 240
+            settingsController.dimensionWidthField.stringValue = "\(enteredWidthMillimeters)"
+            settingsController.dimensionHeightField.stringValue = "\(enteredHeightMillimeters)"
+            let expectedHorizontalLength = settingsController.settingsControlsView.selectedHorizontalLength
+            let expectedVerticalLength = settingsController.settingsControlsView.selectedVerticalLength
             settingsController.setDimensions(settingsController.dimensionWidthField)
 
-            XCTAssertEqual(controller.state.layout.horizontalLength, 320)
-            XCTAssertEqual(controller.state.layout.verticalLength, 240)
-            XCTAssertEqual(controller.groupedWindow.screenFrame(for: .horizontal).width, 320)
-            XCTAssertEqual(controller.groupedWindow.screenFrame(for: .vertical).height, 240)
+            XCTAssertEqual(controller.state.layout.horizontalLength, expectedHorizontalLength, accuracy: 0.0001)
+            XCTAssertEqual(controller.state.layout.verticalLength, expectedVerticalLength, accuracy: 0.0001)
+            XCTAssertEqual(controller.groupedWindow.screenFrame(for: .horizontal).width, expectedHorizontalLength, accuracy: 0.0001)
+            XCTAssertEqual(controller.groupedWindow.screenFrame(for: .vertical).height, expectedVerticalLength, accuracy: 0.0001)
             XCTAssertEqual(controller.groupedWindow.zeroPoint().x, zeroPointBeforeDimensionChange.x, accuracy: 0.0001)
             XCTAssertEqual(controller.groupedWindow.zeroPoint().y, zeroPointBeforeDimensionChange.y, accuracy: 0.0001)
-            XCTAssertEqual(settingsController.dimensionWidthField.integerValue, 320)
-            XCTAssertEqual(settingsController.dimensionHeightField.integerValue, 240)
+            XCTAssertEqual(settingsController.dimensionWidthField.doubleValue, Double(enteredWidthMillimeters), accuracy: 0.15)
+            XCTAssertEqual(settingsController.dimensionHeightField.doubleValue, Double(enteredHeightMillimeters), accuracy: 0.15)
             XCTAssertEqual(prefs.defaultHorizontalLength, 640)
             XCTAssertEqual(prefs.defaultVerticalLength, 280)
 
@@ -550,8 +554,8 @@ final class RulerCoreTests: XCTestCase {
             XCTAssertEqual(controller.state.settings.zeroCorner, .topRight)
             XCTAssertEqual(controller.state.layout.horizontalLength, 320)
             XCTAssertEqual(controller.state.layout.verticalLength, 220)
-            XCTAssertEqual(settingsController.dimensionWidthField.integerValue, 320)
-            XCTAssertEqual(settingsController.dimensionHeightField.integerValue, 220)
+            XCTAssertEqual(settingsController.settingsControlsView.selectedHorizontalLength, 320, accuracy: 0.1)
+            XCTAssertEqual(settingsController.settingsControlsView.selectedVerticalLength, 220, accuracy: 0.1)
             XCTAssertEqual(settingsController.foregroundOpacityLabel.stringValue, "88%")
             XCTAssertEqual(settingsController.backgroundOpacityLabel.stringValue, "44%")
             XCTAssertEqual(controller.opacity, 88)
@@ -683,14 +687,71 @@ final class RulerCoreTests: XCTestCase {
 
             preferencesController.unitSegmentedControl.selectedSegment = Unit.inches.rawValue
             preferencesController.setUnit(preferencesController.unitSegmentedControl)
-            preferencesController.dimensionWidthField.integerValue = 360
-            preferencesController.dimensionHeightField.integerValue = 240
+            preferencesController.dimensionWidthField.stringValue = "6"
+            preferencesController.dimensionHeightField.stringValue = "4"
+            let expectedHorizontalLength = preferencesController.settingsControlsView.selectedHorizontalLength
+            let expectedVerticalLength = preferencesController.settingsControlsView.selectedVerticalLength
             preferencesController.setDimensions(preferencesController.dimensionWidthField)
 
             XCTAssertEqual(prefs.unit, .inches)
-            XCTAssertEqual(prefs.defaultHorizontalLength, 360)
-            XCTAssertEqual(prefs.defaultVerticalLength, 240)
+            XCTAssertEqual(prefs.defaultHorizontalLength, Double(expectedHorizontalLength), accuracy: 0.0001)
+            XCTAssertEqual(prefs.defaultVerticalLength, Double(expectedVerticalLength), accuracy: 0.0001)
         }
+    }
+
+    func testRulerSettingsControlsConvertDimensionsForSelectedUnit() {
+        let controlsView = RulerSettingsControlsView(frame: NSRect(x: 0, y: 0, width: 315, height: 320))
+        controlsView.configureForRulerSettings()
+
+        controlsView.update(
+            unit: .millimeters,
+            horizontalLength: 100 * NSScreen.defaultDpmm,
+            verticalLength: 80 * NSScreen.defaultDpmm,
+            dimensionScreen: nil,
+            rulerColor: Prefs.defaultRulerFillColor,
+            foregroundOpacity: 90,
+            backgroundOpacity: 50,
+            floatRulers: true,
+            rulerShadow: false
+        )
+
+        XCTAssertEqual(controlsView.dimensionWidthField.doubleValue, 100, accuracy: 0.0001)
+        XCTAssertEqual(controlsView.dimensionHeightField.doubleValue, 80, accuracy: 0.0001)
+
+        controlsView.dimensionWidthField.stringValue = "25.5"
+        controlsView.dimensionHeightField.stringValue = "12.5"
+
+        XCTAssertEqual(
+            controlsView.selectedHorizontalLength,
+            (25.5 * NSScreen.defaultDpmm).rounded(),
+            accuracy: 0.0001
+        )
+        XCTAssertEqual(
+            controlsView.selectedVerticalLength,
+            (12.5 * NSScreen.defaultDpmm).rounded(),
+            accuracy: 0.0001
+        )
+
+        controlsView.update(
+            unit: .inches,
+            horizontalLength: 6 * NSScreen.defaultDpi,
+            verticalLength: 4.25 * NSScreen.defaultDpi,
+            dimensionScreen: nil,
+            rulerColor: Prefs.defaultRulerFillColor,
+            foregroundOpacity: 90,
+            backgroundOpacity: 50,
+            floatRulers: true,
+            rulerShadow: false
+        )
+
+        XCTAssertEqual(controlsView.dimensionWidthField.doubleValue, 6, accuracy: 0.0001)
+        XCTAssertEqual(controlsView.dimensionHeightField.doubleValue, 4.25, accuracy: 0.0001)
+
+        controlsView.dimensionWidthField.stringValue = "3.5"
+        controlsView.dimensionHeightField.stringValue = "2.75"
+
+        XCTAssertEqual(controlsView.selectedHorizontalLength, 3.5 * NSScreen.defaultDpi, accuracy: 0.0001)
+        XCTAssertEqual(controlsView.selectedVerticalLength, 2.75 * NSScreen.defaultDpi, accuracy: 0.0001)
     }
 
     func testRulerSettingsControlsKeyViewLoopFollowsVisibleControls() {

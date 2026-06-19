@@ -152,6 +152,44 @@ private func configureResetRulerColorButtonAppearance(_ button: NSButton, identi
     button.setAccessibilityLabel(resetRulerColorLabel)
 }
 
+private func rulerDimensionValue(fromPixelLength pixelLength: CGFloat, unit: Unit, screen: NSScreen?) -> CGFloat {
+    switch unit {
+    case .pixels:
+        return pixelLength
+    case .millimeters:
+        return pixelLength / (screen?.dpmm.width ?? NSScreen.defaultDpmm)
+    case .inches:
+        return pixelLength / (screen?.dpi.width ?? NSScreen.defaultDpi)
+    }
+}
+
+private func rulerPixelLength(fromDimensionValue dimensionValue: CGFloat, unit: Unit, screen: NSScreen?) -> CGFloat {
+    let pixelLength: CGFloat
+    switch unit {
+    case .pixels:
+        pixelLength = dimensionValue
+    case .millimeters:
+        pixelLength = dimensionValue * (screen?.dpmm.width ?? NSScreen.defaultDpmm)
+    case .inches:
+        pixelLength = dimensionValue * (screen?.dpi.width ?? NSScreen.defaultDpi)
+    }
+
+    return pixelLength.rounded()
+}
+
+private func rulerDimensionString(fromPixelLength pixelLength: CGFloat, unit: Unit, screen: NSScreen?) -> String {
+    let value = rulerDimensionValue(fromPixelLength: pixelLength, unit: unit, screen: screen)
+
+    switch unit {
+    case .pixels:
+        return "\(Int(value.rounded()))"
+    case .millimeters:
+        return String(format: "%.1f", value)
+    case .inches:
+        return String(format: "%.3f", value)
+    }
+}
+
 protocol RulerSettingsControlsViewDelegate: AnyObject {
     func rulerSettingsControlsDidChangeUnit(_ controlsView: RulerSettingsControlsView)
     func rulerSettingsControlsDidChangeDimensions(_ controlsView: RulerSettingsControlsView)
@@ -214,6 +252,7 @@ final class RulerSettingsControlsView: NSView, NSTextFieldDelegate {
     let dimensionHeightField = NSTextField()
 
     private var showsDimensions = true
+    private var dimensionScreen: NSScreen?
     private var dimensionControls: [NSView] {
         return [
             dimensionsLabel,
@@ -228,11 +267,19 @@ final class RulerSettingsControlsView: NSView, NSTextFieldDelegate {
     }
 
     var selectedHorizontalLength: CGFloat {
-        return CGFloat(dimensionWidthField.doubleValue)
+        return rulerPixelLength(
+            fromDimensionValue: CGFloat(dimensionWidthField.doubleValue),
+            unit: selectedUnit,
+            screen: dimensionScreen
+        )
     }
 
     var selectedVerticalLength: CGFloat {
-        return CGFloat(dimensionHeightField.doubleValue)
+        return rulerPixelLength(
+            fromDimensionValue: CGFloat(dimensionHeightField.doubleValue),
+            unit: selectedUnit,
+            screen: dimensionScreen
+        )
     }
 
     override init(frame frameRect: NSRect) {
@@ -296,6 +343,7 @@ final class RulerSettingsControlsView: NSView, NSTextFieldDelegate {
         unit: Unit,
         horizontalLength: CGFloat? = nil,
         verticalLength: CGFloat? = nil,
+        dimensionScreen: NSScreen? = nil,
         rulerColor: NSColor,
         foregroundOpacity: Int,
         backgroundOpacity: Int,
@@ -303,15 +351,16 @@ final class RulerSettingsControlsView: NSView, NSTextFieldDelegate {
         rulerShadow: Bool,
         isEnabled: Bool = true
     ) {
+        self.dimensionScreen = dimensionScreen
         unitSegmentedControl.selectedSegment = unit.rawValue
         unitSegmentedControl.isEnabled = isEnabled
 
-        if let horizontalLength = horizontalLength {
-            dimensionWidthField.integerValue = Int(horizontalLength.rounded())
-        }
-        if let verticalLength = verticalLength {
-            dimensionHeightField.integerValue = Int(verticalLength.rounded())
-        }
+        updateDimensions(
+            unit: unit,
+            horizontalLength: horizontalLength,
+            verticalLength: verticalLength,
+            dimensionScreen: dimensionScreen
+        )
         dimensionWidthField.isEnabled = isEnabled
         dimensionHeightField.isEnabled = isEnabled
 
@@ -337,6 +386,31 @@ final class RulerSettingsControlsView: NSView, NSTextFieldDelegate {
         rulerShadowCheckbox.isEnabled = isEnabled
 
         configureKeyViewLoop()
+    }
+
+    func updateDimensions(
+        unit: Unit,
+        horizontalLength: CGFloat? = nil,
+        verticalLength: CGFloat? = nil,
+        dimensionScreen: NSScreen? = nil
+    ) {
+        self.dimensionScreen = dimensionScreen
+        unitSegmentedControl.selectedSegment = unit.rawValue
+
+        if let horizontalLength = horizontalLength {
+            dimensionWidthField.stringValue = rulerDimensionString(
+                fromPixelLength: horizontalLength,
+                unit: unit,
+                screen: dimensionScreen
+            )
+        }
+        if let verticalLength = verticalLength {
+            dimensionHeightField.stringValue = rulerDimensionString(
+                fromPixelLength: verticalLength,
+                unit: unit,
+                screen: dimensionScreen
+            )
+        }
     }
 
     override func layout() {
@@ -512,10 +586,12 @@ final class RulerSettingsControlsView: NSView, NSTextFieldDelegate {
 
     private func configureDimensionField(_ field: NSTextField) {
         let formatter = NumberFormatter()
-        formatter.allowsFloats = false
+        formatter.allowsFloats = true
         formatter.minimum = 0
         formatter.maximum = 4000
-        formatter.numberStyle = .none
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 3
+        formatter.numberStyle = .decimal
 
         field.formatter = formatter
         field.alignment = .right
@@ -740,6 +816,7 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
         observers = [
             prefs.observe(\Prefs.unit, options: .new) { prefs, changed in
                 self.updateUnitSegmentedControl()
+                self.updateDimensionFields()
             },
             prefs.observe(\Prefs.defaultHorizontalLength, options: .new) { prefs, changed in
                 self.updateDimensionFields()
@@ -770,8 +847,11 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
     }
 
     @IBAction func setDimensions(_ sender: Any) {
-        prefs.defaultHorizontalLength = Double(settingsControlsView.selectedHorizontalLength)
-        prefs.defaultVerticalLength = Double(settingsControlsView.selectedVerticalLength)
+        let horizontalLength = settingsControlsView.selectedHorizontalLength
+        let verticalLength = settingsControlsView.selectedVerticalLength
+
+        prefs.defaultHorizontalLength = Double(horizontalLength)
+        prefs.defaultVerticalLength = Double(verticalLength)
     }
 
     @IBAction func setForegroundOpacity(_ sender: Any) {
@@ -802,6 +882,7 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
             unit: prefs.unit,
             horizontalLength: prefs.effectiveDefaultHorizontalLength(),
             verticalLength: prefs.effectiveDefaultVerticalLength(),
+            dimensionScreen: window?.screen ?? NSScreen.main,
             rulerColor: prefs.rulerColor,
             foregroundOpacity: prefs.foregroundOpacity,
             backgroundOpacity: prefs.backgroundOpacity,
@@ -815,8 +896,12 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
     }
 
     func updateDimensionFields() {
-        dimensionWidthField.integerValue = Int(prefs.effectiveDefaultHorizontalLength().rounded())
-        dimensionHeightField.integerValue = Int(prefs.effectiveDefaultVerticalLength().rounded())
+        settingsControlsView.updateDimensions(
+            unit: prefs.unit,
+            horizontalLength: prefs.effectiveDefaultHorizontalLength(),
+            verticalLength: prefs.effectiveDefaultVerticalLength(),
+            dimensionScreen: window?.screen ?? NSScreen.main
+        )
     }
 
     func updateForegroundSlider() {
@@ -1095,9 +1180,12 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
     }
 
     @objc func setDimensions(_ sender: Any) {
+        let horizontalLength = settingsControlsView.selectedHorizontalLength
+        let verticalLength = settingsControlsView.selectedVerticalLength
+
         rulerController?.updateDimensions(
-            horizontalLength: settingsControlsView.selectedHorizontalLength,
-            verticalLength: settingsControlsView.selectedVerticalLength
+            horizontalLength: horizontalLength,
+            verticalLength: verticalLength
         )
         updateView()
     }
@@ -1171,6 +1259,7 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
             unit: currentSettings?.unit ?? Prefs.defaultUnit,
             horizontalLength: rulerController?.state.layout.horizontalLength,
             verticalLength: rulerController?.state.layout.verticalLength,
+            dimensionScreen: rulerController?.groupedWindow.screen ?? window?.screen ?? NSScreen.main,
             rulerColor: currentSettings?.rulerColor ?? Prefs.defaultRulerFillColor,
             foregroundOpacity: currentSettings?.foregroundOpacity ?? Prefs.defaultForegroundOpacity,
             backgroundOpacity: currentSettings?.backgroundOpacity ?? Prefs.defaultBackgroundOpacity,
