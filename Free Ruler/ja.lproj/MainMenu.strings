@@ -29,8 +29,8 @@
 /* Class = "NSMenuItem"; title = "Millimeters"; ObjectID = "B6Y-Hi-AkN"; */
 "B6Y-Hi-AkN.title" = "ミリメートル";
 
-/* Class = "NSMenuItem"; title = "Preferences…"; ObjectID = "BOF-NM-1cW"; */
-"BOF-NM-1cW.title" = "環境設定...";
+/* Class = "NSMenuItem"; title = "Settings…"; ObjectID = "BOF-NM-1cW"; */
+"BOF-NM-1cW.title" = "設定...";
 
 /* Class = "NSMenuItem"; title = "Close"; ObjectID = "DVo-aG-piG"; */
 "DVo-aG-piG.title" = "閉じる";

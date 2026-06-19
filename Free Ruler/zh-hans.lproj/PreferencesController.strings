@@ -1,6 +1,6 @@
 
-/* Class = "NSWindow"; title = "Free Ruler Preferences"; ObjectID = "F0z-JX-Cv5"; */
-"F0z-JX-Cv5.title" = "Free Ruler 偏好设置";
+/* Class = "NSWindow"; title = "Free Ruler Settings"; ObjectID = "F0z-JX-Cv5"; */
+"F0z-JX-Cv5.title" = "Free Ruler 设置";
 
 /* Class = "NSTextFieldCell"; title = "Default settings for new rulers"; ObjectID = "PREF-defaults-header-cell"; */
 "PREF-defaults-header-cell.title" = "新尺子的默认设置";

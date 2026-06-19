@@ -1,6 +1,6 @@
 
-/* Class = "NSWindow"; title = "Free Ruler Preferences"; ObjectID = "F0z-JX-Cv5"; */
-"F0z-JX-Cv5.title" = "Preferencias de Free Ruler";
+/* Class = "NSWindow"; title = "Free Ruler Settings"; ObjectID = "F0z-JX-Cv5"; */
+"F0z-JX-Cv5.title" = "Ajustes de Free Ruler";
 
 /* Class = "NSTextFieldCell"; title = "Default settings for new rulers"; ObjectID = "PREF-defaults-header-cell"; */
 "PREF-defaults-header-cell.title" = "Ajustes predeterminados para reglas nuevas";
