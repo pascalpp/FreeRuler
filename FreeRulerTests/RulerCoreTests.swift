@@ -183,9 +183,9 @@ final class RulerCoreTests: XCTestCase {
         let third = manager.createRuler(screenFrame: screenFrame)
         let staggerOffset = Ruler.thickness / 2
 
-        XCTAssertEqual(second.state.layout.zeroPoint.x, first.state.layout.zeroPoint.x - staggerOffset)
+        XCTAssertEqual(second.state.layout.zeroPoint.x, first.state.layout.zeroPoint.x + staggerOffset)
         XCTAssertEqual(second.state.layout.zeroPoint.y, first.state.layout.zeroPoint.y - staggerOffset)
-        XCTAssertEqual(third.state.layout.zeroPoint.x, first.state.layout.zeroPoint.x - (staggerOffset * 2))
+        XCTAssertEqual(third.state.layout.zeroPoint.x, first.state.layout.zeroPoint.x + (staggerOffset * 2))
         XCTAssertEqual(third.state.layout.zeroPoint.y, first.state.layout.zeroPoint.y - (staggerOffset * 2))
     }
 

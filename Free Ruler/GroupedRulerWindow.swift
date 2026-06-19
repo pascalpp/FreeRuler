@@ -1799,7 +1799,7 @@ final class RulerManager {
         let offset = Ruler.thickness / 2
 
         while controllers.contains(where: { $0.state.layout.zeroPoint == state.layout.zeroPoint }) {
-            state.layout.zeroPoint.x -= offset
+            state.layout.zeroPoint.x += offset
             state.layout.zeroPoint.y -= offset
         }
 
