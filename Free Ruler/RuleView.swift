@@ -4,6 +4,35 @@ import Cocoa
 import SwiftUI
 #endif
 
+let rulerSettingsContextMenuItemIdentifier = NSUserInterfaceItemIdentifier("ruler-settings-context-menu-item")
+
+protocol RulerContextMenuActivating: AnyObject {
+    func activateForRulerContextMenu()
+}
+
+func rulerSettingsContextMenuTitle() -> String {
+    return NSLocalizedString(
+        "ContextMenu.RulerSettings",
+        value: "Ruler Settings…",
+        comment: "Context menu item title to open the active ruler settings panel"
+    )
+}
+
+func rulerContextMenu(for view: NSView) -> NSMenu {
+    (view.window as? RulerContextMenuActivating)?.activateForRulerContextMenu()
+
+    let menu = NSMenu()
+    let item = NSMenuItem(
+        title: rulerSettingsContextMenuTitle(),
+        action: #selector(AppDelegate.openRulerSettings(_:)),
+        keyEquivalent: ""
+    )
+    item.identifier = rulerSettingsContextMenuItemIdentifier
+    item.target = NSApp.delegate
+    menu.addItem(item)
+    return menu
+}
+
 struct RulerColors {
     var customFill: NSColor? = nil
 
@@ -416,6 +445,10 @@ class RuleView: NSView {
 
     override func mouseMoved(with event: NSEvent) {
         nextResponder?.mouseMoved(with: event)
+    }
+
+    override func menu(for event: NSEvent) -> NSMenu? {
+        return rulerContextMenu(for: self)
     }
 
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool {

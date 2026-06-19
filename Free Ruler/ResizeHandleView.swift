@@ -92,6 +92,10 @@ final class ResizeHandleView: NSView {
         restoreRulerCursor(with: event)
     }
 
+    override func menu(for event: NSEvent) -> NSMenu? {
+        return rulerContextMenu(for: self)
+    }
+
     override var mouseDownCanMoveWindow: Bool {
         return false
     }

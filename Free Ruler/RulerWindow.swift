@@ -75,6 +75,12 @@ class RulerWindow: NSPanel {
 
 }
 
+extension RulerWindow: RulerContextMenuActivating {
+    func activateForRulerContextMenu() {
+        makeKey()
+    }
+}
+
 private func getTitle(for orientation: Orientation) -> String {
     switch orientation {
     case .horizontal:

@@ -167,6 +167,45 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertEqual(manager.states.map(\.settings.unit), [.inches])
     }
 
+    func testRulerContextMenuActivatesClickedRulerAndShowsSettingsCommand() {
+        withInstalledAppDelegate { appDelegate in
+            let manager = appDelegate.rulerManager
+            defer {
+                appDelegate.rulerSettingsController?.close()
+                for controller in manager.controllers {
+                    controller.hide()
+                }
+            }
+
+            let first = manager.createRuler(
+                defaults: RulerSettings(unit: .pixels),
+                screenFrame: NSRect(x: 0, y: 0, width: 1000, height: 800)
+            )
+            let second = manager.createRuler(
+                defaults: RulerSettings(unit: .inches),
+                screenFrame: NSRect(x: 0, y: 0, width: 1000, height: 800)
+            )
+            manager.markActive(second)
+
+            let menu = first.groupedWindow.horizontalRule.menu(for: mouseEvent(
+                type: .rightMouseDown,
+                location: .zero,
+                windowNumber: first.groupedWindow.windowNumber,
+                timestamp: 0
+            ))
+
+            XCTAssertTrue(manager.activeController === first)
+            XCTAssertEqual(menu?.items.count, 1)
+
+            let item = menu?.items.first
+            XCTAssertEqual(item?.identifier, rulerSettingsContextMenuItemIdentifier)
+            XCTAssertEqual(item?.title, rulerSettingsContextMenuTitle())
+            XCTAssertEqual(item?.action, #selector(AppDelegate.openRulerSettings(_:)))
+            XCTAssertEqual(item?.keyEquivalent, "")
+            XCTAssertTrue(item?.target === appDelegate)
+        }
+    }
+
     func testRulerManagerRestoresStatesAndShowsAllControllers() {
         let firstID = UUID(uuidString: "F775A858-ED72-4242-B84B-E08B27EE1C9F")!
         let secondID = UUID(uuidString: "D922071D-D02B-4DF7-8762-3497D9FD90B4")!

@@ -79,6 +79,48 @@
         }
       }
     },
+    "ContextMenu.RulerSettings" : {
+      "comment" : "Context menu item title to open the active ruler settings panel",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lineal-Einstellungen…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ruler Settings…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes de regla…"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Viivaimen asetukset…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定規設定…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尺子设置…"
+          }
+        }
+      }
+    },
     "Ruler Color" : {
       "comment" : "Label for the active ruler color setting",
       "extractionState" : "manual",

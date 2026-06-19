@@ -476,6 +476,13 @@ final class GroupedRulerWindow: NSPanel {
     }
 }
 
+extension GroupedRulerWindow: RulerContextMenuActivating {
+    func activateForRulerContextMenu() {
+        makeKey()
+        (nextResponder as? GroupedRulerController)?.activateForRulerContextMenu()
+    }
+}
+
 private final class GroupedHorizontalRule: HorizontalRule {
     override func setFrameSize(_ newSize: NSSize) {
         super.setFrameSize(NSSize(width: newSize.width, height: Ruler.thickness))
@@ -929,6 +936,10 @@ final class GroupedRulerContentView: NSView {
 
     override func mouseMoved(with event: NSEvent) {
         nextResponder?.mouseMoved(with: event)
+    }
+
+    override func menu(for event: NSEvent) -> NSMenu? {
+        return rulerContextMenu(for: self)
     }
 
     func containsEmptyCorner(_ point: NSPoint) -> Bool {
@@ -1496,6 +1507,10 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
             syncRulerWindowFrames(persistAutosave: true)
             captureStateFromWindow()
         }
+    }
+
+    func activateForRulerContextMenu() {
+        onBecameActive?(self)
     }
 
     override func mouseMoved(with event: NSEvent) {
