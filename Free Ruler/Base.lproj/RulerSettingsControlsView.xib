@@ -58,7 +58,7 @@
                     </textFieldCell>
                 </textField>
                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="RSV-fg-value">
-                    <rect key="frame" x="254" y="172" width="37" height="16"/>
+                    <rect key="frame" x="247" y="172" width="44" height="16"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="100%" id="RSV-fg-value-cell">
                         <font key="font" metaFont="system"/>
@@ -81,7 +81,7 @@
                     </textFieldCell>
                 </textField>
                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="RSV-bg-value">
-                    <rect key="frame" x="254" y="108" width="37" height="16"/>
+                    <rect key="frame" x="247" y="108" width="44" height="16"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="50%" id="RSV-bg-value-cell">
                         <font key="font" metaFont="system"/>

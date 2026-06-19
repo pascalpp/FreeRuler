@@ -857,9 +857,11 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
     }
 
     @IBAction func resetToDefault(_ sender: Any) {
+        let defaultSettings = RulerSettings(defaults: prefs)
         applySettings { settings in
-            settings = RulerSettings(defaults: prefs)
+            settings = defaultSettings
         }
+        rulerController?.opacity = defaultSettings.foregroundOpacity
         updateView()
     }
 

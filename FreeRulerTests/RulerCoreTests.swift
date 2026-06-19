@@ -513,6 +513,8 @@ final class RulerCoreTests: XCTestCase {
             XCTAssertEqual(controller.state.settings.zeroCorner, .topRight)
             XCTAssertEqual(settingsController.foregroundOpacityLabel.stringValue, "88%")
             XCTAssertEqual(settingsController.backgroundOpacityLabel.stringValue, "44%")
+            XCTAssertEqual(controller.opacity, 88)
+            XCTAssertEqual(controller.groupedWindow.alphaValue, windowAlphaValue(88), accuracy: 0.0001)
             XCTAssertEqual(prefs.foregroundOpacity, 88)
         }
     }
