@@ -6,7 +6,7 @@ A ruler application for macOS
 
 ### Features
 
-- Horizontal and vertical rulers.
+- Multiple rulers, with horizontal and vertical arms.
 - Choose from units: pixels, millimeters, or inches (press U to cycle).
 - Float rulers above other applications (press F to toggle).
 - Move rulers independently or as a group (press G to toggle).
