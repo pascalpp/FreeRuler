@@ -1,0 +1,15 @@
+
+/* Class = "NSTextFieldCell"; title = "Background Opacity"; ObjectID = "RSV-bg-cell"; */
+"RSV-bg-cell.title" = "Opacidad del fondo";
+
+/* Class = "NSTextFieldCell"; title = "Ruler Color"; ObjectID = "RSV-color-cell"; */
+"RSV-color-cell.title" = "Color de la regla";
+
+/* Class = "NSTextFieldCell"; title = "Foreground Opacity"; ObjectID = "RSV-fg-cell"; */
+"RSV-fg-cell.title" = "Opacidad del primer plano";
+
+/* Class = "NSButtonCell"; title = "Float rulers above other applications"; ObjectID = "RSV-float-cell"; */
+"RSV-float-cell.title" = "Reglas flotantes sobre otras aplicaciones";
+
+/* Class = "NSButtonCell"; title = "Show ruler shadow"; ObjectID = "RSV-shadow-cell"; */
+"RSV-shadow-cell.title" = "Mostrar sombra de la regla";

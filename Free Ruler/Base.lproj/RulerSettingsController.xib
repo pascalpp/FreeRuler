@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24506" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24506"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="RulerSettingsController" customModule="Free_Ruler" customModuleProvider="target">
+            <connections>
+                <outlet property="resetDefaultsButton" destination="RSET-reset-defaults-button" id="RSET-reset-defaults-outlet"/>
+                <outlet property="setDefaultsButton" destination="RSET-save-defaults-button" id="RSET-save-defaults-outlet"/>
+                <outlet property="settingsControlsView" destination="RSET-controls" id="RSET-controls-outlet"/>
+                <outlet property="window" destination="RSET-window" id="RSET-window-outlet"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <window title="Ruler Settings" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" animationBehavior="default" id="RSET-window">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
+            <rect key="contentRect" x="602" y="400" width="320" height="300"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1512" height="944"/>
+            <view key="contentView" id="RSET-content">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="300"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="RSET-controls" customClass="RulerSettingsControlsView" customModule="Free_Ruler" customModuleProvider="target">
+                        <rect key="frame" x="0.0" y="50" width="320" height="250"/>
+                    </customView>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RSET-reset-defaults-button">
+                        <rect key="frame" x="11" y="11" width="130" height="32"/>
+                        <buttonCell key="cell" type="push" title="Reset to default" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="RSET-reset-defaults-cell">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="resetToDefault:" target="-2" id="RSET-reset-defaults-action"/>
+                        </connections>
+                    </button>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RSET-save-defaults-button">
+                        <rect key="frame" x="139" y="11" width="127" height="32"/>
+                        <buttonCell key="cell" type="push" title="Save as default" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="RSET-save-defaults-cell">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="setDefaultsForNewRulers:" target="-2" id="RSET-save-defaults-action"/>
+                        </connections>
+                    </button>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="RSET-controls" firstAttribute="leading" secondItem="RSET-content" secondAttribute="leading" id="RSET-controls-leading"/>
+                    <constraint firstItem="RSET-controls" firstAttribute="top" secondItem="RSET-content" secondAttribute="top" id="RSET-controls-top"/>
+                    <constraint firstAttribute="trailing" secondItem="RSET-controls" secondAttribute="trailing" id="RSET-controls-trailing"/>
+                    <constraint firstItem="RSET-reset-defaults-button" firstAttribute="top" secondItem="RSET-controls" secondAttribute="bottom" constant="12" id="RSET-reset-below-controls"/>
+                    <constraint firstAttribute="bottom" secondItem="RSET-reset-defaults-button" secondAttribute="bottom" constant="18" id="RSET-reset-bottom"/>
+                    <constraint firstItem="RSET-reset-defaults-button" firstAttribute="leading" secondItem="RSET-content" secondAttribute="leading" constant="18" id="RSET-reset-leading"/>
+                    <constraint firstItem="RSET-save-defaults-button" firstAttribute="leading" secondItem="RSET-reset-defaults-button" secondAttribute="trailing" constant="12" id="RSET-save-after-reset"/>
+                    <constraint firstItem="RSET-save-defaults-button" firstAttribute="centerY" secondItem="RSET-reset-defaults-button" secondAttribute="centerY" id="RSET-save-center-y"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="RSET-save-defaults-button" secondAttribute="trailing" constant="20" id="RSET-save-trailing-min"/>
+                </constraints>
+            </view>
+            <connections>
+                <outlet property="delegate" destination="-2" id="RSET-delegate-outlet"/>
+            </connections>
+            <point key="canvasLocation" x="121.5" y="228.5"/>
+        </window>
+    </objects>
+</document>

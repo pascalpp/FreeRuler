@@ -54,12 +54,12 @@ class Prefs: NSObject {
 
     private static var defaultValues: [String: Any] {
         var values: [String: Any] = [
-            "groupRulers":       true,
-            "floatRulers":       true,
-            "rulerShadow":       false,
-            "foregroundOpacity": 90,
-            "backgroundOpacity": 50,
-            "unit":              Unit.pixels.rawValue,
+            "groupRulers":       defaultGroupRulers,
+            "floatRulers":       defaultFloatRulers,
+            "rulerShadow":       defaultRulerShadow,
+            "foregroundOpacity": defaultForegroundOpacity,
+            "backgroundOpacity": defaultBackgroundOpacity,
+            "unit":              defaultUnit.rawValue,
             "zeroCorner":        defaultZeroCorner.rawValue
         ]
 
@@ -131,6 +131,10 @@ class Prefs: NSObject {
 extension Prefs {
     static let rulerSetStateKey = "rulerSetState"
 
+    static var defaultUnit: Unit {
+        return .pixels
+    }
+
     static var defaultZeroCorner: ZeroCorner {
         return .topLeft
     }
@@ -138,9 +142,46 @@ extension Prefs {
     static var defaultRulerFillColor: NSColor {
         return defaultRulerColor
     }
+
+    static var defaultForegroundOpacity: Int {
+        return 90
+    }
+
+    static var defaultBackgroundOpacity: Int {
+        return 50
+    }
+
+    static var defaultFloatRulers: Bool {
+        return true
+    }
+
+    static var defaultRulerShadow: Bool {
+        return false
+    }
   
     static var defaultGroupRulers: Bool {
         return true
+    }
+
+    func applyDefaults(from settings: RulerSettings) {
+        unit = settings.unit
+        rulerColor = settings.rulerColor
+        foregroundOpacity = settings.foregroundOpacity
+        backgroundOpacity = settings.backgroundOpacity
+        floatRulers = settings.floatRulers
+        rulerShadow = settings.rulerShadow
+        zeroCorner = settings.zeroCorner
+    }
+
+    func resetRulerDefaultsToFactoryDefaults() {
+        unit = Self.defaultUnit
+        rulerColor = Self.defaultRulerFillColor
+        foregroundOpacity = Self.defaultForegroundOpacity
+        backgroundOpacity = Self.defaultBackgroundOpacity
+        floatRulers = Self.defaultFloatRulers
+        rulerShadow = Self.defaultRulerShadow
+        groupRulers = Self.defaultGroupRulers
+        zeroCorner = Self.defaultZeroCorner
     }
 
     static func rulerFillColor(fromArchivedData data: Data?) -> NSColor {

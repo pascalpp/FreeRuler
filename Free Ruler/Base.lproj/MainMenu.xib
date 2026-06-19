@@ -104,8 +104,8 @@
                                     <action selector="showRulers:" target="Voe-Tx-rLC" id="NLA-hk-Wbc"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Ruler Settings…" id="rSt-Tg-232">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                            <menuItem title="Ruler Settings…" keyEquivalent="," id="rSt-Tg-232">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                 <connections>
                                     <action selector="openRulerSettings:" target="Voe-Tx-rLC" id="RSa-Tg-232"/>
                                 </connections>
