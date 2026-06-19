@@ -281,9 +281,9 @@ class HorizontalRule: RuleView {
 
         switch growthDirection {
         case .positive:
-            return mouseTickX
+            return max(0, mouseTickX - 1)
         case .negative:
-            return max(0, rulerWidth - mouseTickX - 1)
+            return max(0, rulerWidth - mouseTickX)
         }
     }
 

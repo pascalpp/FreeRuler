@@ -323,9 +323,9 @@ class VerticalRule: RuleView {
 
         switch growthDirection {
         case .positive:
-            return max(0, mouseTickY - 1)
+            return mouseTickY
         case .negative:
-            return rulerHeight - mouseTickY
+            return max(0, rulerHeight - mouseTickY - 1)
         }
     }
 

@@ -1644,42 +1644,46 @@ final class RulerCoreTests: XCTestCase {
     }
 
     func testHorizontalRuleDrawingHelpersFollowZeroCornerGeometry() {
-        let rule = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
+        withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .topLeft
+            let rule = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
 
-        XCTAssertEqual(
-            rule.tickX(forOffset: 50, rulerWidth: 300, growthDirection: .positive),
-            50
-        )
-        XCTAssertEqual(
-            rule.tickX(forOffset: 50, rulerWidth: 300, growthDirection: .negative),
-            249
-        )
-        XCTAssertEqual(
-            rule.mouseTickLineX(forTickX: 1, growthDirection: .positive),
-            1
-        )
-        XCTAssertEqual(
-            rule.mouseTickLineX(forTickX: 299, growthDirection: .negative),
-            299
-        )
+            XCTAssertEqual(rule.mouseNumber(forTickX: 51, rulerWidth: 300), 50)
+            XCTAssertEqual(
+                rule.tickX(forOffset: 50, rulerWidth: 300, growthDirection: .positive),
+                50
+            )
+            XCTAssertEqual(
+                rule.tickX(forOffset: 50, rulerWidth: 300, growthDirection: .negative),
+                249
+            )
+            XCTAssertEqual(
+                rule.mouseTickLineX(forTickX: 1, growthDirection: .positive),
+                1
+            )
+            XCTAssertEqual(
+                rule.mouseTickLineX(forTickX: 299, growthDirection: .negative),
+                299
+            )
 
-        let bottomTick = rule.tickLine(forX: 50, length: 10, rulerHeight: 40, tickSide: .bottom)
-        XCTAssertEqual(bottomTick.start, CGPoint(x: 50, y: 1))
-        XCTAssertEqual(bottomTick.end, CGPoint(x: 50, y: 10))
+            let bottomTick = rule.tickLine(forX: 50, length: 10, rulerHeight: 40, tickSide: .bottom)
+            XCTAssertEqual(bottomTick.start, CGPoint(x: 50, y: 1))
+            XCTAssertEqual(bottomTick.end, CGPoint(x: 50, y: 10))
 
-        let topTick = rule.tickLine(forX: 250, length: 10, rulerHeight: 40, tickSide: .top)
-        XCTAssertEqual(topTick.start, CGPoint(x: 250, y: 39))
-        XCTAssertEqual(topTick.end, CGPoint(x: 250, y: 30))
+            let topTick = rule.tickLine(forX: 250, length: 10, rulerHeight: 40, tickSide: .top)
+            XCTAssertEqual(topTick.start, CGPoint(x: 250, y: 39))
+            XCTAssertEqual(topTick.end, CGPoint(x: 250, y: 30))
 
-        XCTAssertEqual(
-            rule.tickLabelRect(
-                forX: 250,
-                labelSize: NSSize(width: 50, height: 20),
-                rulerHeight: 40,
-                tickSide: .top
-            ),
-            CGRect(x: 225.5, y: 19, width: 50, height: 20)
-        )
+            XCTAssertEqual(
+                rule.tickLabelRect(
+                    forX: 250,
+                    labelSize: NSSize(width: 50, height: 20),
+                    rulerHeight: 40,
+                    tickSide: .top
+                ),
+                CGRect(x: 225.5, y: 19, width: 50, height: 20)
+            )
+        }
     }
 
     func testHorizontalRuleMouseAndUnitLabelsMirrorForRightZeroCorner() {
@@ -1687,10 +1691,10 @@ final class RulerCoreTests: XCTestCase {
             prefs.zeroCorner = .bottomRight
             let rule = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
 
-            XCTAssertEqual(rule.mouseNumber(forTickX: 259, rulerWidth: 300), 40)
+            XCTAssertEqual(rule.mouseNumber(forTickX: 260, rulerWidth: 300), 40)
             XCTAssertEqual(
                 rule.mouseNumber(
-                    forTickX: rule.tickX(forOffset: 50, rulerWidth: 300, growthDirection: .negative),
+                    forTickX: rule.tickX(forOffset: 50, rulerWidth: 300, growthDirection: .negative) + 1,
                     rulerWidth: 300
                 ),
                 50
@@ -1743,13 +1747,23 @@ final class RulerCoreTests: XCTestCase {
 
     func testVerticalRuleMouseAndUnitLabelsMirrorForBottomZeroCorner() {
         withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .topRight
+            let topZeroRule = VerticalRule(frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
+            XCTAssertEqual(
+                topZeroRule.mouseNumber(
+                    forTickY: topZeroRule.tickY(forOffset: 50, rulerHeight: 300, growthDirection: .negative) - 1,
+                    rulerHeight: 300
+                ),
+                50
+            )
+
             prefs.zeroCorner = .bottomRight
             let rule = VerticalRule(frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
 
-            XCTAssertEqual(rule.mouseNumber(forTickY: 41, rulerHeight: 300), 40)
+            XCTAssertEqual(rule.mouseNumber(forTickY: 40, rulerHeight: 300), 40)
             XCTAssertEqual(
                 rule.mouseNumber(
-                    forTickY: rule.tickY(forOffset: 50, rulerHeight: 300, growthDirection: .positive),
+                    forTickY: rule.tickY(forOffset: 50, rulerHeight: 300, growthDirection: .positive) - 1,
                     rulerHeight: 300
                 ),
                 50
@@ -1968,8 +1982,8 @@ final class RulerCoreTests: XCTestCase {
             let verticalRule = VerticalRule(
                 frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300)
             )
-            let horizontalNumber = horizontalRule.mouseNumber(forTickX: 259, rulerWidth: 300)
-            let verticalNumber = verticalRule.mouseNumber(forTickY: 41, rulerHeight: 300)
+            let horizontalNumber = horizontalRule.mouseNumber(forTickX: 260, rulerWidth: 300)
+            let verticalNumber = verticalRule.mouseNumber(forTickY: 40, rulerHeight: 300)
             let horizontalDpmm = horizontalRule.screen?.dpmm.width ?? NSScreen.defaultDpmm
             let verticalDpmm = verticalRule.screen?.dpmm.width ?? NSScreen.defaultDpmm
             let horizontalDpi = horizontalRule.screen?.dpi.width ?? NSScreen.defaultDpi
@@ -2178,6 +2192,37 @@ final class RulerCoreTests: XCTestCase {
         assertCursor(after: "mouse out after release", {
             controller.mouseExitedRuler()
         }, is: .crosshair)
+    }
+
+    func testRulerCrosshairCursorUsesAliasedBitmapImage() throws {
+        let cursor = RulerCursorController.CursorStyle.crosshair.nsCursor
+
+        XCTAssertEqual(cursor.image.size, NSSize(width: 17, height: 17))
+        XCTAssertEqual(cursor.hotSpot, NSPoint(x: 8.5, y: 8.5))
+        XCTAssertFalse(cursor.image.isTemplate)
+
+        let bitmap = try XCTUnwrap(
+            cursor.image.representations.compactMap { $0 as? NSBitmapImageRep }.first
+        )
+        XCTAssertEqual(bitmap.pixelsWide, 34)
+        XCTAssertEqual(bitmap.pixelsHigh, 34)
+        assertPixel(atX: 16, y: 16, in: bitmap, equals: .black)
+        assertPixel(atX: 17, y: 17, in: bitmap, equals: .black)
+        assertPixel(atX: 2, y: 14, in: bitmap, equals: .white)
+        assertPixel(atX: 14, y: 14, in: bitmap, equals: .white)
+        assertPixel(atX: 0, y: 0, in: bitmap, equals: .clear)
+
+        for y in 0..<bitmap.pixelsHigh {
+            for x in 0..<bitmap.pixelsWide {
+                let color = try XCTUnwrap(bitmap.colorAt(x: x, y: y)?.usingColorSpace(.deviceRGB))
+                guard color.alphaComponent > 0 else { continue }
+
+                XCTAssertEqual(color.alphaComponent, 1, accuracy: 0.0001)
+                XCTAssertEqual(color.redComponent, color.redComponent.rounded(), accuracy: 0.0001)
+                XCTAssertEqual(color.greenComponent, color.greenComponent.rounded(), accuracy: 0.0001)
+                XCTAssertEqual(color.blueComponent, color.blueComponent.rounded(), accuracy: 0.0001)
+            }
+        }
     }
 
     func testMouseTickTimerPolicyRunsOnlyWhenRulersAreVisible() {
@@ -3752,6 +3797,22 @@ private func assertColor(
     XCTAssertEqual(actual.greenComponent, expected.greenComponent, accuracy: 0.0001, file: file, line: line)
     XCTAssertEqual(actual.blueComponent, expected.blueComponent, accuracy: 0.0001, file: file, line: line)
     XCTAssertEqual(actual.alphaComponent, expected.alphaComponent, accuracy: 0.0001, file: file, line: line)
+}
+
+private func assertPixel(
+    atX x: Int,
+    y: Int,
+    in bitmap: NSBitmapImageRep,
+    equals expectedColor: NSColor,
+    file: StaticString = #filePath,
+    line: UInt = #line
+) {
+    guard let actualColor = bitmap.colorAt(x: x, y: y) else {
+        XCTFail("Missing pixel at \(x), \(y)", file: file, line: line)
+        return
+    }
+
+    assertColor(actualColor, equals: expectedColor, file: file, line: line)
 }
 
 private func relativeLuminance(
