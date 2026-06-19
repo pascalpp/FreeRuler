@@ -1693,10 +1693,11 @@ final class RulerManager {
         defaults: RulerSettings = RulerSettings(defaults: prefs),
         screenFrame: NSRect = defaultRulerScreenFrame()
     ) -> GroupedRulerController {
-        let state = RulerInstanceState.createFromDefaults(
+        let defaultState = RulerInstanceState.createFromDefaults(
             defaults: defaults,
             screenFrame: screenFrame
         )
+        let state = staggeredState(from: defaultState)
 
         return addRuler(state: state)
     }
@@ -1791,6 +1792,18 @@ final class RulerManager {
             self?.activeRulerID = controller.state.id
             self?.notifyStateChanged()
         }
+    }
+
+    private func staggeredState(from defaultState: RulerInstanceState) -> RulerInstanceState {
+        var state = defaultState
+        let offset = Ruler.thickness / 2
+
+        while controllers.contains(where: { $0.state.layout.zeroPoint == state.layout.zeroPoint }) {
+            state.layout.zeroPoint.x -= offset
+            state.layout.zeroPoint.y -= offset
+        }
+
+        return state
     }
 
     private func notifyStateChanged() {
