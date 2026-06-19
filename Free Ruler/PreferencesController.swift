@@ -38,6 +38,8 @@ private func setColorPickingIgnoresAlpha(_ ignoresAlpha: Bool) {
 
 class RulerColorWell: NSColorWell {
 
+    var colorDidChange: ((RulerColorWell) -> Void)?
+
     override func awakeFromNib() {
         super.awakeFromNib()
         configureForOpaqueColors()
@@ -47,6 +49,23 @@ class RulerColorWell: NSColorWell {
         configureForOpaqueColors()
         super.activate(exclusive)
         configureForOpaqueColors()
+    }
+
+    override func takeColorFrom(_ sender: Any?) {
+        if let colorPanel = sender as? NSColorPanel {
+            color = colorPanel.color
+        } else if let colorWell = sender as? NSColorWell {
+            color = colorWell.color
+        } else {
+            super.takeColorFrom(sender)
+        }
+        configureForOpaqueColors()
+        needsDisplay = true
+        if let colorDidChange = colorDidChange {
+            colorDidChange(self)
+        } else {
+            sendAction(action, to: target)
+        }
     }
 
     override func mouseDown(with event: NSEvent) {
@@ -147,6 +166,14 @@ final class RulerSettingsControlsView: NSView {
         loadContentView()
     }
 
+    override func performKeyEquivalent(with event: NSEvent) -> Bool {
+        if performRulerSettingsKeyEquivalent(with: event) {
+            return true
+        }
+
+        return super.performKeyEquivalent(with: event)
+    }
+
     func configureForPreferences() {
         configureControls(
             colorWellIdentifier: "ruler-color-well",
@@ -158,6 +185,7 @@ final class RulerSettingsControlsView: NSView {
             floatCheckboxIdentifier: "float-rulers-checkbox",
             shadowCheckboxIdentifier: "ruler-shadow-checkbox"
         )
+        configureCheckboxKeyEquivalents(float: "", shadow: "")
     }
 
     func configureForRulerSettings() {
@@ -171,6 +199,7 @@ final class RulerSettingsControlsView: NSView {
             floatCheckboxIdentifier: "ruler-settings-float-rulers-checkbox",
             shadowCheckboxIdentifier: "ruler-settings-ruler-shadow-checkbox"
         )
+        configureCheckboxKeyEquivalents(float: "f", shadow: "s")
     }
 
     func update(
@@ -205,6 +234,26 @@ final class RulerSettingsControlsView: NSView {
         configureKeyViewLoop()
     }
 
+    func performRulerSettingsKeyEquivalent(with event: NSEvent) -> Bool {
+        guard event.type == .keyDown,
+              event.modifierFlags
+                  .intersection(.deviceIndependentFlagsMask)
+                  .subtracting([.shift, .capsLock, .function])
+                  .isEmpty,
+              let character = event.charactersIgnoringModifiers?.lowercased() else {
+            return false
+        }
+
+        switch character {
+        case floatRulersCheckbox.keyEquivalent.lowercased() where !floatRulersCheckbox.keyEquivalent.isEmpty:
+            return toggleFloatRulersFromKeyEquivalent()
+        case rulerShadowCheckbox.keyEquivalent.lowercased() where !rulerShadowCheckbox.keyEquivalent.isEmpty:
+            return toggleRulerShadowFromKeyEquivalent()
+        default:
+            return false
+        }
+    }
+
     func deactivateColorWell() {
         rulerColorWell.deactivate()
     }
@@ -235,6 +284,10 @@ final class RulerSettingsControlsView: NSView {
     private func configureBaseControls() {
         rulerColorWell.isContinuous = true
         rulerColorWell.supportsAlpha = false
+        rulerColorWell.colorDidChange = { [weak self] _ in
+            guard let self = self else { return }
+            self.setRulerColor(self.rulerColorWell as Any)
+        }
         rulerColorWell.target = self
         rulerColorWell.action = #selector(setRulerColor(_:))
 
@@ -298,6 +351,13 @@ final class RulerSettingsControlsView: NSView {
         rulerShadowCheckbox.setAccessibilityIdentifier(shadowCheckboxIdentifier)
     }
 
+    private func configureCheckboxKeyEquivalents(float: String, shadow: String) {
+        floatRulersCheckbox.keyEquivalent = float
+        floatRulersCheckbox.keyEquivalentModifierMask = []
+        rulerShadowCheckbox.keyEquivalent = shadow
+        rulerShadowCheckbox.keyEquivalentModifierMask = []
+    }
+
     private func configureKeyViewLoop() {
         rulerColorWell.nextKeyView = resetRulerColorButton.isHidden
             ? foregroundOpacitySlider
@@ -307,6 +367,22 @@ final class RulerSettingsControlsView: NSView {
         backgroundOpacitySlider.nextKeyView = floatRulersCheckbox
         floatRulersCheckbox.nextKeyView = rulerShadowCheckbox
         rulerShadowCheckbox.nextKeyView = rulerColorWell
+    }
+
+    private func toggleFloatRulersFromKeyEquivalent() -> Bool {
+        guard floatRulersCheckbox.isEnabled else { return false }
+
+        floatRulersCheckbox.state = floatRulersCheckbox.state == .on ? .off : .on
+        setFloatRulers(floatRulersCheckbox as Any)
+        return true
+    }
+
+    private func toggleRulerShadowFromKeyEquivalent() -> Bool {
+        guard rulerShadowCheckbox.isEnabled else { return false }
+
+        rulerShadowCheckbox.state = rulerShadowCheckbox.state == .on ? .off : .on
+        setRulerShadow(rulerShadowCheckbox as Any)
+        return true
     }
 
     @objc private func setRulerColor(_ sender: Any) {
@@ -545,10 +621,27 @@ extension PreferencesController: RulerSettingsControlsViewDelegate {
     }
 }
 
+final class RulerSettingsWindow: NSPanel {
+    weak var settingsController: RulerSettingsController?
+
+    override var canBecomeKey: Bool {
+        return true
+    }
+
+    override func performKeyEquivalent(with event: NSEvent) -> Bool {
+        if settingsController?.performSettingsKeyEquivalent(with: event) == true {
+            return true
+        }
+
+        return super.performKeyEquivalent(with: event)
+    }
+}
+
 final class RulerSettingsController: NSWindowController, NSWindowDelegate {
 
     private weak var rulerController: GroupedRulerController?
     private var colorPanelObserver: NSObjectProtocol?
+    private var didConfigureWindow = false
 
     @IBOutlet weak var settingsControlsView: RulerSettingsControlsView!
     @IBOutlet weak var resetDefaultsButton: NSButton!
@@ -598,6 +691,7 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         self.rulerController = rulerController
         super.init(window: nil)
         loadWindow()
+        configureWindowIfNeeded()
     }
 
     required init?(coder: NSCoder) {
@@ -607,14 +701,26 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
     override func windowDidLoad() {
         super.windowDidLoad()
 
+        configureWindowIfNeeded()
+    }
+
+    private func configureWindowIfNeeded() {
+        guard !didConfigureWindow,
+              isWindowLoaded,
+              settingsControlsView != nil else { return }
+
+        didConfigureWindow = true
         window?.delegate = self
         window?.identifier = NSUserInterfaceItemIdentifier("ruler-settings-window")
         window?.setAccessibilityIdentifier("ruler-settings-window")
         window?.isMovableByWindowBackground = true
         window?.isReleasedWhenClosed = false
         window?.initialFirstResponder = rulerColorWell
+        configureFloatingPanelWindow()
         settingsControlsView.delegate = self
         settingsControlsView.configureForRulerSettings()
+        rulerColorWell.target = self
+        rulerColorWell.action = #selector(setRulerColor(_:))
         resetDefaultsButton.identifier = NSUserInterfaceItemIdentifier("reset-ruler-settings-to-default-button")
         resetDefaultsButton.setAccessibilityIdentifier("reset-ruler-settings-to-default-button")
         setDefaultsButton.identifier = NSUserInterfaceItemIdentifier("save-ruler-settings-as-default-button")
@@ -741,6 +847,10 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
     }
 
     func updateView() {
+        configureWindowIfNeeded()
+        guard isWindowLoaded,
+              settingsControlsView != nil else { return }
+
         let currentSettings = rulerController?.state.settings
         let hasRuler = rulerController != nil
 
@@ -754,6 +864,23 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         )
         resetDefaultsButton.isEnabled = hasRuler
         setDefaultsButton.isEnabled = hasRuler
+    }
+
+    func performSettingsKeyEquivalent(with event: NSEvent) -> Bool {
+        return settingsControlsView.performRulerSettingsKeyEquivalent(with: event)
+    }
+
+    private func configureFloatingPanelWindow() {
+        guard let settingsWindow = window else { return }
+
+        settingsWindow.styleMask.insert(.utilityWindow)
+        settingsWindow.animationBehavior = .utilityWindow
+
+        guard let panel = settingsWindow as? RulerSettingsWindow else { return }
+
+        panel.settingsController = self
+        panel.isFloatingPanel = true
+        panel.hidesOnDeactivate = false
     }
 
     private func applyRulerColor(_ color: NSColor) {

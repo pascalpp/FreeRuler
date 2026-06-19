@@ -44,7 +44,7 @@
                     <color key="bezelColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                 </button>
                 <colorWell id="RSV-color-well" customClass="RulerColorWell" customModule="Free_Ruler" customModuleProvider="target">
-                    <rect key="frame" x="237" y="205" width="60" height="32"/>
+                    <rect key="frame" x="235" y="205" width="60" height="32"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                     <color key="color" name="systemYellowColor" catalog="System" colorSpace="catalog"/>
                 </colorWell>

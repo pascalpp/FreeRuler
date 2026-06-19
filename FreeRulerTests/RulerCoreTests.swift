@@ -478,6 +478,69 @@ final class RulerCoreTests: XCTestCase {
         }
     }
 
+    func testRulerSettingsControllerAppliesColorPanelChangesToActiveRuler() {
+        let controller = GroupedRulerController(
+            state: RulerInstanceState(
+                settings: RulerSettings(
+                    rulerColor: NSColor(deviceRed: 0.2, green: 0.3, blue: 0.4, alpha: 1)
+                ),
+                layout: RulerLayoutState(
+                    zeroPoint: NSPoint(x: 240, y: 320),
+                    horizontalLength: 260,
+                    verticalLength: 180
+                )
+            )
+        )
+        let settingsController = RulerSettingsController(rulerController: controller)
+        defer {
+            settingsController.close()
+            controller.hide()
+            closeRulerColorPanel()
+        }
+
+        let selectedColor = NSColor(deviceRed: 0.7, green: 0.1, blue: 0.5, alpha: 0.35)
+        NSColorPanel.shared.color = selectedColor
+        settingsController.rulerColorWell.takeColorFrom(NSColorPanel.shared)
+
+        let normalizedColor = NSColor(deviceRed: 0.7, green: 0.1, blue: 0.5, alpha: 1)
+        assertColor(controller.state.settings.rulerColor, equals: normalizedColor)
+        assertColor(controller.groupedWindow.horizontalRule.color.fill, equals: normalizedColor)
+        assertColor(settingsController.rulerColorWell.color, equals: normalizedColor)
+    }
+
+    func testRulerSettingsControllerCheckboxKeyEquivalentsToggleFloatAndShadow() {
+        let controller = GroupedRulerController(
+            state: RulerInstanceState(
+                settings: RulerSettings(floatRulers: false, rulerShadow: false),
+                layout: RulerLayoutState(
+                    zeroPoint: NSPoint(x: 240, y: 320),
+                    horizontalLength: 260,
+                    verticalLength: 180
+                )
+            )
+        )
+        let settingsController = RulerSettingsController(rulerController: controller)
+        defer {
+            settingsController.close()
+            controller.hide()
+        }
+
+        let floatEvent = keyDownEvent(characters: "f", keyCode: 3)
+        let shadowEvent = keyDownEvent(characters: "s", keyCode: 1)
+        guard let settingsWindow = settingsController.window else {
+            XCTFail("Expected settings window")
+            return
+        }
+
+        XCTAssertTrue(settingsWindow.performKeyEquivalent(with: floatEvent))
+        XCTAssertTrue(controller.state.settings.floatRulers)
+        XCTAssertTrue(settingsController.floatRulersCheckbox.state == .on)
+
+        XCTAssertTrue(settingsWindow.performKeyEquivalent(with: shadowEvent))
+        XCTAssertTrue(controller.state.settings.rulerShadow)
+        XCTAssertTrue(settingsController.rulerShadowCheckbox.state == .on)
+    }
+
     func testPreferencesControllerResetsDefaultsToFactoryDefaults() {
         withRestoredRulerPreferences {
             prefs.unit = .inches
@@ -568,6 +631,37 @@ final class RulerCoreTests: XCTestCase {
         }
         XCTAssertTrue(controller.groupedWindow.childWindows?.contains(settingsWindow) ?? false)
         XCTAssertNil(settingsWindow.sheetParent)
+    }
+
+    func testRulerSettingsControllerUsesFloatingUtilityPanelStyle() {
+        let controller = GroupedRulerController(
+            state: RulerInstanceState(
+                settings: RulerSettings(),
+                layout: RulerLayoutState(
+                    zeroPoint: NSPoint(x: 240, y: 320),
+                    horizontalLength: 260,
+                    verticalLength: 180
+                )
+            )
+        )
+        let settingsController = RulerSettingsController(rulerController: controller)
+        defer {
+            settingsController.close()
+            controller.hide()
+        }
+
+        guard let settingsWindow = settingsController.window else {
+            XCTFail("Expected settings window")
+            return
+        }
+
+        XCTAssertTrue(settingsWindow is NSPanel)
+        XCTAssertTrue(settingsWindow.styleMask.contains(.utilityWindow))
+        XCTAssertEqual(settingsWindow.animationBehavior, .utilityWindow)
+
+        let settingsPanel = settingsWindow as? NSPanel
+        XCTAssertTrue(settingsPanel?.isFloatingPanel ?? false)
+        XCTAssertFalse(settingsPanel?.hidesOnDeactivate ?? true)
     }
 
     func testRulerSettingsControllerRestoresForegroundOpacityWhenClosingSheet() {
@@ -3260,6 +3354,21 @@ final class RulerCoreTests: XCTestCase {
         }
 
         try test()
+    }
+
+    private func keyDownEvent(characters: String, keyCode: UInt16) -> NSEvent {
+        return NSEvent.keyEvent(
+            with: .keyDown,
+            location: .zero,
+            modifierFlags: [],
+            timestamp: 0,
+            windowNumber: 0,
+            context: nil,
+            characters: characters,
+            charactersIgnoringModifiers: characters,
+            isARepeat: false,
+            keyCode: keyCode
+        )!
     }
 
     private func withRestoredRulerSetState(_ test: () throws -> Void) rethrows {
