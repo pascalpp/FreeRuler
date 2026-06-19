@@ -129,7 +129,7 @@ final class ResizeHandleView: NSView {
         )
         let nextFrame = resizedRulerFrame(
             orientation: orientation,
-            zeroCorner: prefs.zeroCorner,
+            zeroCorner: zeroCorner,
             initialFrame: dragInitialWindowFrame,
             delta: delta,
             minSize: window.minSize,

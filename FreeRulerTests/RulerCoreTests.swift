@@ -2882,6 +2882,86 @@ final class RulerCoreTests: XCTestCase {
         }
     }
 
+    func testResizeHandleDragUsesRuleZeroCornerOverride() {
+        withRestoredZeroCornerPreference {
+            prefs.zeroCorner = .topLeft
+
+            let horizontalInitialFrame = NSRect(x: 100, y: 200, width: 300, height: Ruler.thickness)
+            let horizontalWindow = RulerWindow(Ruler(.horizontal, frame: horizontalInitialFrame))
+            defer { horizontalWindow.close() }
+            horizontalWindow.rule.settingsOverride = RulerSettings(zeroCorner: .topRight)
+            guard let horizontalResizeHandle = horizontalWindow.rule.subviews
+                .first(where: { $0 is ResizeHandleView }) as? ResizeHandleView else {
+                return XCTFail("Expected horizontal ruler to install a resize handle")
+            }
+
+            let horizontalStartLocation = horizontalResizeHandle.convert(
+                NSPoint(x: horizontalResizeHandle.bounds.minX + 1, y: horizontalResizeHandle.bounds.midY),
+                to: nil
+            )
+            horizontalResizeHandle.mouseDown(with: mouseEvent(
+                type: .leftMouseDown,
+                location: horizontalStartLocation,
+                windowNumber: horizontalWindow.windowNumber,
+                timestamp: 0
+            ))
+            horizontalResizeHandle.mouseDragged(with: mouseEvent(
+                type: .leftMouseDragged,
+                location: NSPoint(x: horizontalStartLocation.x + 50, y: horizontalStartLocation.y),
+                windowNumber: horizontalWindow.windowNumber,
+                timestamp: 0.1
+            ))
+
+            XCTAssertEqual(horizontalWindow.frame.maxX, horizontalInitialFrame.maxX)
+            XCTAssertEqual(horizontalWindow.frame.minX, horizontalInitialFrame.minX + 50)
+            XCTAssertEqual(horizontalWindow.frame.width, horizontalInitialFrame.width - 50)
+
+            horizontalResizeHandle.mouseUp(with: mouseEvent(
+                type: .leftMouseUp,
+                location: horizontalStartLocation,
+                windowNumber: horizontalWindow.windowNumber,
+                timestamp: 0.2
+            ))
+
+            let verticalInitialFrame = NSRect(x: 300, y: 200, width: Ruler.thickness, height: 300)
+            let verticalWindow = RulerWindow(Ruler(.vertical, frame: verticalInitialFrame))
+            defer { verticalWindow.close() }
+            verticalWindow.rule.settingsOverride = RulerSettings(zeroCorner: .bottomLeft)
+            guard let verticalResizeHandle = verticalWindow.rule.subviews
+                .first(where: { $0 is ResizeHandleView }) as? ResizeHandleView else {
+                return XCTFail("Expected vertical ruler to install a resize handle")
+            }
+
+            let verticalStartLocation = verticalResizeHandle.convert(
+                NSPoint(x: verticalResizeHandle.bounds.midX, y: verticalResizeHandle.bounds.midY),
+                to: nil
+            )
+            verticalResizeHandle.mouseDown(with: mouseEvent(
+                type: .leftMouseDown,
+                location: verticalStartLocation,
+                windowNumber: verticalWindow.windowNumber,
+                timestamp: 0.3
+            ))
+            verticalResizeHandle.mouseDragged(with: mouseEvent(
+                type: .leftMouseDragged,
+                location: NSPoint(x: verticalStartLocation.x, y: verticalStartLocation.y - 50),
+                windowNumber: verticalWindow.windowNumber,
+                timestamp: 0.4
+            ))
+
+            XCTAssertEqual(verticalWindow.frame.minY, verticalInitialFrame.minY)
+            XCTAssertEqual(verticalWindow.frame.maxY, verticalInitialFrame.maxY - 50)
+            XCTAssertEqual(verticalWindow.frame.height, verticalInitialFrame.height - 50)
+
+            verticalResizeHandle.mouseUp(with: mouseEvent(
+                type: .leftMouseUp,
+                location: verticalStartLocation,
+                windowNumber: verticalWindow.windowNumber,
+                timestamp: 0.5
+            ))
+        }
+    }
+
     func testRulerControllerKeepsMouseTicksHiddenWhileDragging() {
         withInstalledAppDelegate { appDelegate in
             let ruler = Ruler(.horizontal, frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
