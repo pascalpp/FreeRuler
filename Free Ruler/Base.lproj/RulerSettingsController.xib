@@ -19,7 +19,7 @@
         <window title="Ruler Settings" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" animationBehavior="default" titlebarAppearsTransparent="YES" id="RSET-window" customClass="RulerSettingsWindow" customModule="Free_Ruler" customModuleProvider="target">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <rect key="contentRect" x="602" y="400" width="280" height="370"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1512" height="944"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
             <view key="contentView" id="RSET-content">
                 <rect key="frame" x="0.0" y="0.0" width="280" height="370"/>
                 <autoresizingMask key="autoresizingMask"/>
