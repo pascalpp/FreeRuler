@@ -1761,6 +1761,24 @@ final class RulerManager {
     }
 
     @discardableResult
+    func cycleActiveRuler() -> GroupedRulerController? {
+        let visibleControllers = controllers.filter(\.isVisible)
+        guard !visibleControllers.isEmpty else { return nil }
+
+        let activeID = activeController?.state.id
+        let activeIndex = activeID.flatMap { activeID in
+            visibleControllers.firstIndex { $0.state.id == activeID }
+        }
+        let nextIndex = activeIndex.map { ($0 + 1) % visibleControllers.count } ?? 0
+        let nextController = visibleControllers[nextIndex]
+
+        markActive(nextController)
+        nextController.groupedWindow.orderFrontRegardless()
+        nextController.groupedWindow.makeKey()
+        return nextController
+    }
+
+    @discardableResult
     func closeActiveRuler() -> Bool {
         guard let activeController = activeController else { return false }
 
