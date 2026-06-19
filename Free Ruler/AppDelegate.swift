@@ -794,6 +794,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         updateMouseTickTimer()
     }
 
+    @IBAction func cycleRulers(_ sender: Any) {
+        guard rulerManager.cycleActiveRuler() != nil else { return }
+
+        updateDisplay()
+    }
+
     @IBAction func closeKeyWindow(_ sender: Any) {
         if let controller = rulerManager.controller(containing: NSApp.keyWindow) {
             rulerManager.close(controller)
@@ -870,10 +876,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         prefs.groupRulers = Prefs.defaultGroupRulers
         applyRulerWindowMode()
-    }
-
-    @IBAction func showRulers(_ sender: Any) {
-        showRulers()
     }
 
     @IBAction func toggleHorizontalRuler(_ sender: Any) {
@@ -1019,6 +1021,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return true
         }
 
+        if keyboardModifiers == .command {
+            switch keyCode {
+            case kVK_ANSI_Grave:
+                cycleRulers(sender)
+            default:
+                return false
+            }
+
+            return true
+        }
+
         guard keyboardModifiers.isEmpty else { return false }
 
         switch keyCode {
@@ -1145,9 +1158,6 @@ extension AppDelegate: NSMenuItemValidation {
                 ? NSLocalizedString("Hide Vertical Ruler", comment: "Menu item title to hide the vertical ruler")
                 : NSLocalizedString("Show Vertical Ruler", comment: "Menu item title to show the vertical ruler")
             return canToggleRulerVisibility
-        case #selector(showRulers(_:)):
-            menuItem.title = NSLocalizedString("Show All Rulers", comment: "Menu item title to show all ruler windows")
-            return true
         default:
             return true
         }

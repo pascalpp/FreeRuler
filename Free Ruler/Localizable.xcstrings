@@ -887,48 +887,6 @@
         }
       }
     },
-    "Show All Rulers" : {
-      "comment" : "Menu item title to show all ruler windows",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle Lineale anzeigen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show All Rulers"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostrar todas las reglas"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Näytä kaikki viivaimet"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべての定規を表示"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "显示所有标尺"
-          }
-        }
-      }
-    },
     "Show Horizontal Ruler" : {
       "comment" : "Menu item title to show the horizontal ruler",
       "extractionState" : "manual",

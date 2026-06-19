@@ -240,6 +240,27 @@ final class RulerCoreTests: XCTestCase {
         }
     }
 
+    func testRulerManagerCyclesVisibleRulers() {
+        let manager = RulerManager()
+        let first = manager.createRuler()
+        let second = manager.createRuler()
+        let hidden = manager.createRuler()
+        defer {
+            first.hide()
+            second.hide()
+            hidden.hide()
+        }
+        first.show()
+        second.show()
+        manager.markActive(first)
+
+        XCTAssertTrue(manager.cycleActiveRuler() === second)
+        XCTAssertTrue(manager.activeController === second)
+
+        XCTAssertTrue(manager.cycleActiveRuler() === first)
+        XCTAssertTrue(manager.activeController === first)
+    }
+
     func testRulerContextMenuActivatesClickedRulerAndShowsSettingsCommand() {
         withInstalledAppDelegate { appDelegate in
             let manager = appDelegate.rulerManager
@@ -3410,6 +3431,29 @@ final class RulerCoreTests: XCTestCase {
             )
             XCTAssertFalse(prefs.groupRulers)
         }
+    }
+
+    func testCommandGraveCyclesManagedRulers() {
+        let appDelegate = AppDelegate()
+        let first = appDelegate.rulerManager.createRuler()
+        let second = appDelegate.rulerManager.createRuler()
+        defer {
+            first.hide()
+            second.hide()
+        }
+        first.show()
+        second.show()
+        appDelegate.rulerManager.markActive(first)
+
+        XCTAssertTrue(
+            appDelegate.performRulerHotkey(
+                keyCode: kVK_ANSI_Grave,
+                modifierFlags: .command,
+                sender: first
+            )
+        )
+
+        XCTAssertTrue(appDelegate.rulerManager.activeController === second)
     }
 
     func testManagedWingHotkeysAffectOnlyActiveRuler() {

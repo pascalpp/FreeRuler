@@ -98,12 +98,6 @@
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="mwO-GY-nrW"/>
-                            <menuItem title="Show All Rulers" id="qVa-aF-DQ8">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="showRulers:" target="Voe-Tx-rLC" id="NLA-hk-Wbc"/>
-                                </connections>
-                            </menuItem>
                             <menuItem title="Ruler Settings…" keyEquivalent="," id="rSt-Tg-232">
                                 <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                 <connections>
