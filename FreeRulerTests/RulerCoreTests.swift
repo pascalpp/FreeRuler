@@ -1775,10 +1775,10 @@ final class RulerCoreTests: XCTestCase {
     func testGroupedRulerControllerSyncsHiddenLegToVisibleZeroPoint() {
         withRestoredZeroCornerPreference {
             prefs.zeroCorner = .topLeft
-            let horizontalWindow = RulerWindow(
+            let horizontalWindow = LegacyRulerWindow(
                 Ruler(.horizontal, frame: NSRect(x: 200, y: 299, width: 320, height: Ruler.thickness))
             )
-            let verticalWindow = RulerWindow(
+            let verticalWindow = LegacyRulerWindow(
                 Ruler(.vertical, frame: NSRect(x: 161, y: 120, width: Ruler.thickness, height: 180))
             )
             let controller = GroupedRulerController(
@@ -3046,7 +3046,7 @@ final class RulerCoreTests: XCTestCase {
 
     func testResizeHandleDisablesWindowBackgroundDraggingDuringResizeDrag() {
         let ruler = Ruler(.horizontal, frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
-        let window = RulerWindow(ruler)
+        let window = LegacyRulerWindow(ruler)
         guard let resizeHandle = window.rule.subviews.first(where: { $0 is ResizeHandleView }) as? ResizeHandleView else {
             return XCTFail("Expected horizontal ruler to install a resize handle")
         }
@@ -3084,7 +3084,7 @@ final class RulerCoreTests: XCTestCase {
     }
 
     func testResizeHandleDetachesChildWindowsAttachedWhileBecomingKey() {
-        let childWindow = RulerWindow(
+        let childWindow = LegacyRulerWindow(
             Ruler(.vertical, frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
         )
         let window = ChildAttachingRulerWindow(
@@ -3121,7 +3121,7 @@ final class RulerCoreTests: XCTestCase {
 
             let initialFrame = NSRect(x: 100, y: 200, width: 300, height: Ruler.thickness)
             let ruler = Ruler(.horizontal, frame: initialFrame)
-            let window = RulerWindow(ruler)
+            let window = LegacyRulerWindow(ruler)
             guard let resizeHandle = window.rule.subviews.first(where: { $0 is ResizeHandleView }) as? ResizeHandleView else {
                 return XCTFail("Expected horizontal ruler to install a resize handle")
             }
@@ -3175,7 +3175,7 @@ final class RulerCoreTests: XCTestCase {
             prefs.zeroCorner = .topLeft
 
             let horizontalInitialFrame = NSRect(x: 100, y: 200, width: 300, height: Ruler.thickness)
-            let horizontalWindow = RulerWindow(Ruler(.horizontal, frame: horizontalInitialFrame))
+            let horizontalWindow = LegacyRulerWindow(Ruler(.horizontal, frame: horizontalInitialFrame))
             defer { horizontalWindow.close() }
             horizontalWindow.rule.settingsOverride = RulerSettings(zeroCorner: .topRight)
             guard let horizontalResizeHandle = horizontalWindow.rule.subviews
@@ -3212,7 +3212,7 @@ final class RulerCoreTests: XCTestCase {
             ))
 
             let verticalInitialFrame = NSRect(x: 300, y: 200, width: Ruler.thickness, height: 300)
-            let verticalWindow = RulerWindow(Ruler(.vertical, frame: verticalInitialFrame))
+            let verticalWindow = LegacyRulerWindow(Ruler(.vertical, frame: verticalInitialFrame))
             defer { verticalWindow.close() }
             verticalWindow.rule.settingsOverride = RulerSettings(zeroCorner: .bottomLeft)
             guard let verticalResizeHandle = verticalWindow.rule.subviews
@@ -4095,7 +4095,7 @@ final class RulerCoreTests: XCTestCase {
     }
 }
 
-private final class ChildAttachingRulerWindow: RulerWindow {
+private final class ChildAttachingRulerWindow: LegacyRulerWindow {
     private let childWindowToAttach: NSWindow
 
     init(ruler: Ruler, childWindow: NSWindow) {
@@ -4110,7 +4110,7 @@ private final class ChildAttachingRulerWindow: RulerWindow {
 }
 
 private final class TestableFlipAppDelegate: AppDelegate {
-    override func isRulerWindowShown(_ window: RulerWindow) -> Bool {
+    override func isRulerWindowShown(_ window: LegacyRulerWindow) -> Bool {
         return true
     }
 }

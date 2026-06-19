@@ -395,7 +395,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         ]
 
         // let rulers know about each other
-        // TODO: provide each ruler with otherRulers: [RulerWindow]
+        // TODO: provide each ruler with otherRulers: [LegacyRulerWindow]
         rulers[0].otherWindow = rulers[1].rulerWindow
         rulers[1].otherWindow = rulers[0].rulerWindow
 
@@ -443,10 +443,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         guard hasLegacyAutosave else { return nil }
 
         let settings = RulerSettings(defaults: prefs)
-        let horizontalWindow = RulerWindow(
+        let horizontalWindow = LegacyRulerWindow(
             ruler: Ruler(.horizontal, name: horizontalAutosaveName)
         )
-        let verticalWindow = RulerWindow(
+        let verticalWindow = LegacyRulerWindow(
             ruler: Ruler(.vertical, name: verticalAutosaveName)
         )
         _ = horizontalWindow.setFrameUsingName(NSWindow.FrameAutosaveName(horizontalAutosaveName))
@@ -510,7 +510,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    private func detachRulerWindow(_ window: RulerWindow) {
+    private func detachRulerWindow(_ window: LegacyRulerWindow) {
         for ruler in rulers {
             guard ruler.rulerWindow != window else { continue }
 
@@ -966,15 +966,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         prefs.unit = unit
     }
 
-    func isRulerWindowShown(_ window: RulerWindow) -> Bool {
+    func isRulerWindowShown(_ window: LegacyRulerWindow) -> Bool {
         return window.isVisible || window.parent != nil || rulers.contains {
             $0.rulerWindow.childWindows?.contains(window) == true
         }
     }
 
     private func zeroPointOffset(
-        from sourceWindow: RulerWindow?,
-        to targetWindow: RulerWindow?,
+        from sourceWindow: LegacyRulerWindow?,
+        to targetWindow: LegacyRulerWindow?,
         geometry: ZeroCornerGeometry
     ) -> NSSize? {
         guard let sourceWindow = sourceWindow,

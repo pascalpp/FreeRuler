@@ -9,8 +9,8 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
 
     let ruler: Ruler
 
-    let rulerWindow: RulerWindow
-    var otherWindow: RulerWindow?
+    let rulerWindow: LegacyRulerWindow
+    var otherWindow: LegacyRulerWindow?
 
     var keyListener: Any?
     private var mouseInteraction: RulerMouseInteractionState!
@@ -40,7 +40,7 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
 
     init(ruler: Ruler) {
         self.ruler = ruler
-        self.rulerWindow = RulerWindow(ruler)
+        self.rulerWindow = LegacyRulerWindow(ruler)
 
         super.init(window: self.rulerWindow)
 
@@ -209,7 +209,7 @@ class RulerController: NSWindowController, NSWindowDelegate, NotificationObserve
         }
     }
 
-    private func alignRuler(window: RulerWindow?, at point: NSPoint) {
+    private func alignRuler(window: LegacyRulerWindow?, at point: NSPoint) {
         guard let window = window else { return }
 
         let frame = window.frame
