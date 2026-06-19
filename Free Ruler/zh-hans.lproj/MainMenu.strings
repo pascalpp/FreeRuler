@@ -14,8 +14,8 @@
 /* Class = "NSMenuItem"; title = "Redo"; ObjectID = "6dh-zS-Vam"; */
 "6dh-zS-Vam.title" = "重做";
 
-/* Class = "NSMenuItem"; title = "Reset Rulers"; ObjectID = "6ph-5N-O9R"; */
-"6ph-5N-O9R.title" = "重置尺子";
+/* Class = "NSMenuItem"; title = "Reset Ruler Position"; ObjectID = "6ph-5N-O9R"; */
+"6ph-5N-O9R.title" = "重置尺子位置";
 
 /* Class = "NSMenuItem"; title = "Group Rulers"; ObjectID = "7Ga-Fb-LLc"; */
 "7Ga-Fb-LLc.title" = "组合尺子";
@@ -116,7 +116,7 @@
 /* Class = "NSMenu"; title = "Services"; ObjectID = "hz9-B4-Xy5"; */
 "hz9-B4-Xy5.title" = "服务";
 
-/* Class = "NSMenuItem"; title = "Align Rulers at Mouse Location"; ObjectID = "iKV-uW-hwy"; */
+/* Class = "NSMenuItem"; title = "Align Ruler at Mouse Location"; ObjectID = "iKV-uW-hwy"; */
 "iKV-uW-hwy.title" = "将尺子与鼠标位置对齐";
 
 /* Class = "NSMenuItem"; title = "Delete"; ObjectID = "pa3-QI-u2k"; */

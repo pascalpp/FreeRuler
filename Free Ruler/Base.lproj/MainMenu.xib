@@ -218,16 +218,16 @@
                                     </items>
                                 </menu>
                             </menuItem>
-                            <menuItem title="Float Rulers" keyEquivalent="f" id="GDK-AC-uC8">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="toggleFloatRulers:" target="Voe-Tx-rLC" id="MFv-BV-ZRR"/>
-                                </connections>
-                            </menuItem>
                             <menuItem title="Group Rulers" keyEquivalent="g" id="7Ga-Fb-LLc">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="toggleGroupRulers:" target="Voe-Tx-rLC" id="0Dt-8h-7ed"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Float Rulers" keyEquivalent="f" id="GDK-AC-uC8">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="toggleFloatRulers:" target="Voe-Tx-rLC" id="MFv-BV-ZRR"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Show Ruler Shadow" keyEquivalent="s" id="a8D-hN-A59">
@@ -237,13 +237,13 @@
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="hB3-LF-h0Y"/>
-                            <menuItem title="Align Rulers at Mouse Location" keyEquivalent="o" id="iKV-uW-hwy">
+                            <menuItem title="Align Ruler at Mouse Location" keyEquivalent="o" id="iKV-uW-hwy">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="alignRulersAtMouseLocation:" target="Voe-Tx-rLC" id="sGx-h4-she"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Reset Rulers" keyEquivalent="r" id="6ph-5N-O9R">
+                            <menuItem title="Reset Ruler Position" keyEquivalent="r" id="6ph-5N-O9R">
                                 <connections>
                                     <action selector="resetRulerPositions:" target="Voe-Tx-rLC" id="fZ7-JH-EKI"/>
                                 </connections>

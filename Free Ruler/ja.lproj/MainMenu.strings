@@ -17,8 +17,8 @@
 /* Class = "NSMenuItem"; title = "Redo"; ObjectID = "6dh-zS-Vam"; */
 "6dh-zS-Vam.title" = "やり直し";
 
-/* Class = "NSMenuItem"; title = "Reset Rulers"; ObjectID = "6ph-5N-O9R"; */
-"6ph-5N-O9R.title" = "定規をリセット";
+/* Class = "NSMenuItem"; title = "Reset Ruler Position"; ObjectID = "6ph-5N-O9R"; */
+"6ph-5N-O9R.title" = "定規の位置をリセット";
 
 /* Class = "NSMenuItem"; title = "Group Rulers"; ObjectID = "7Ga-Fb-LLc"; */
 "7Ga-Fb-LLc.title" = "定規をグループ化";
@@ -122,7 +122,7 @@
 /* Class = "NSMenuItem"; title = "Unit"; ObjectID = "iDP-2z-irv"; */
 "iDP-2z-irv.title" = "単位";
 
-/* Class = "NSMenuItem"; title = "Align Rulers at Mouse Location"; ObjectID = "iKV-uW-hwy"; */
+/* Class = "NSMenuItem"; title = "Align Ruler at Mouse Location"; ObjectID = "iKV-uW-hwy"; */
 "iKV-uW-hwy.title" = "マウスの位置に定規を移動";
 
 /* Class = "NSMenuItem"; title = "Inches"; ObjectID = "lt1-Hj-2TR"; */
