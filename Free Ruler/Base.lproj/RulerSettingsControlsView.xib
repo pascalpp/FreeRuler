@@ -10,108 +10,211 @@
             <connections>
                 <outlet property="backgroundOpacityLabel" destination="RSV-bg-value" id="RSV-bg-value-outlet"/>
                 <outlet property="backgroundOpacitySlider" destination="RSV-bg-slider" id="RSV-bg-slider-outlet"/>
+                <outlet property="backgroundOpacityTitleLabel" destination="RSV-bg-label" id="RSV-bg-title-outlet"/>
                 <outlet property="contentView" destination="RSV-content" id="RSV-content-outlet"/>
+                <outlet property="dimensionHeightField" destination="RSV-dimension-height" id="RSV-dimension-height-outlet"/>
+                <outlet property="dimensionWidthField" destination="RSV-dimension-width" id="RSV-dimension-width-outlet"/>
+                <outlet property="dimensionsLabel" destination="RSV-dimensions-label" id="RSV-dimensions-label-outlet"/>
+                <outlet property="dimensionsSeparatorLabel" destination="RSV-dimensions-separator" id="RSV-dimensions-separator-outlet"/>
                 <outlet property="floatRulersCheckbox" destination="RSV-float-checkbox" id="RSV-float-outlet"/>
                 <outlet property="foregroundOpacityLabel" destination="RSV-fg-value" id="RSV-fg-value-outlet"/>
                 <outlet property="foregroundOpacitySlider" destination="RSV-fg-slider" id="RSV-fg-slider-outlet"/>
+                <outlet property="foregroundOpacityTitleLabel" destination="RSV-fg-label" id="RSV-fg-title-outlet"/>
                 <outlet property="resetRulerColorButton" destination="RSV-reset-button" id="RSV-reset-outlet"/>
+                <outlet property="rulerColorLabel" destination="RSV-color-label" id="RSV-color-title-outlet"/>
                 <outlet property="rulerColorWell" destination="RSV-color-well" id="RSV-color-outlet"/>
                 <outlet property="rulerShadowCheckbox" destination="RSV-shadow-checkbox" id="RSV-shadow-outlet"/>
+                <outlet property="unitLabel" destination="RSV-unit-label" id="RSV-unit-label-outlet"/>
+                <outlet property="unitSegmentedControl" destination="RSV-unit-control" id="RSV-unit-control-outlet"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customView id="RSV-content">
-            <rect key="frame" x="0.0" y="0.0" width="312" height="320"/>
+            <rect key="frame" x="0.0" y="0.0" width="312" height="316"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
-                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="RSV-color-label">
-                    <rect key="frame" x="15" y="213" width="160" height="16"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RSV-unit-label">
+                    <rect key="frame" x="13" y="283" width="29" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Unit" id="RSV-unit-cell">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RSV-unit-control">
+                    <rect key="frame" x="167" y="278" width="132" height="24"/>
+                    <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="RSV-unit-control-cell">
+                        <font key="font" metaFont="system"/>
+                        <segments>
+                            <segment label="px" width="40"/>
+                            <segment label="mm" width="40"/>
+                            <segment label="in" width="40"/>
+                        </segments>
+                    </segmentedCell>
+                </segmentedControl>
+                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RSV-dimensions-label">
+                    <rect key="frame" x="13" y="246" width="75" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Dimensions" id="RSV-dimensions-cell">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RSV-dimension-width">
+                    <rect key="frame" x="166" y="240" width="56" height="24"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="56" id="8ky-LW-7YX"/>
+                        <constraint firstAttribute="height" constant="24" id="PLE-rg-IGq"/>
+                    </constraints>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" alignment="right" drawsBackground="YES" id="RSV-dimension-width-cell">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RSV-dimensions-separator">
+                    <rect key="frame" x="223" y="246" width="17" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="×" id="RSV-dimensions-separator-cell">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RSV-dimension-height">
+                    <rect key="frame" x="241" y="240" width="56" height="24"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="56" id="Vqe-VX-SWf"/>
+                        <constraint firstAttribute="height" constant="24" id="lu1-IP-lwT"/>
+                    </constraints>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" alignment="right" drawsBackground="YES" id="RSV-dimension-height-cell">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RSV-color-label">
+                    <rect key="frame" x="13" y="207" width="72" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Ruler Color" id="RSV-color-cell">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <button verticalHuggingPriority="750" id="RSV-reset-button">
-                    <rect key="frame" x="204" y="207" width="28" height="28"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RSV-reset-button">
+                    <rect key="frame" x="199" y="201" width="28" height="28"/>
                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" imagePosition="only" alignment="center" imageScaling="proportionallyDown" id="RSV-reset-cell">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <color key="bezelColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="28" id="fY4-Hn-tKu"/>
+                        <constraint firstAttribute="height" constant="28" id="n5Q-yd-KRm"/>
+                    </constraints>
                 </button>
-                <colorWell id="RSV-color-well" customClass="RulerColorWell" customModule="Free_Ruler" customModuleProvider="target">
-                    <rect key="frame" x="235" y="206" width="60" height="32"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                <colorWell translatesAutoresizingMaskIntoConstraints="NO" id="RSV-color-well" customClass="RulerColorWell" customModule="Free_Ruler" customModuleProvider="target">
+                    <rect key="frame" x="234" y="198" width="66" height="34"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="60" id="1hx-IU-36s"/>
+                        <constraint firstAttribute="height" constant="30" id="I4W-ZX-Rms"/>
+                    </constraints>
                     <color key="color" name="systemYellowColor" catalog="System" colorSpace="catalog"/>
                 </colorWell>
-                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="RSV-fg-label">
-                    <rect key="frame" x="15" y="172" width="210" height="16"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RSV-fg-label">
+                    <rect key="frame" x="13" y="169" width="125" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Foreground Opacity" id="RSV-fg-cell">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="RSV-fg-value">
-                    <rect key="frame" x="247" y="172" width="44" height="16"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RSV-fg-value">
+                    <rect key="frame" x="260" y="169" width="39" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="100%" id="RSV-fg-value-cell">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <slider verticalHuggingPriority="750" id="RSV-fg-slider">
-                    <rect key="frame" x="15" y="138" width="276" height="28"/>
-                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RSV-fg-slider">
+                    <rect key="frame" x="13" y="135" width="286" height="28"/>
                     <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="5" maxValue="100" doubleValue="90" tickMarkPosition="below" numberOfTickMarks="20" allowsTickMarkValuesOnly="YES" sliderType="linear" id="RSV-fg-slider-cell"/>
                 </slider>
-                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="RSV-bg-label">
-                    <rect key="frame" x="15" y="108" width="210" height="16"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RSV-bg-label">
+                    <rect key="frame" x="13" y="110" width="127" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Background Opacity" id="RSV-bg-cell">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="RSV-bg-value">
-                    <rect key="frame" x="247" y="108" width="44" height="16"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RSV-bg-value">
+                    <rect key="frame" x="266" y="110" width="33" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="50%" id="RSV-bg-value-cell">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <slider verticalHuggingPriority="750" id="RSV-bg-slider">
-                    <rect key="frame" x="15" y="74" width="276" height="28"/>
-                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RSV-bg-slider">
+                    <rect key="frame" x="13" y="76" width="286" height="28"/>
                     <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="5" maxValue="100" doubleValue="50" tickMarkPosition="below" numberOfTickMarks="20" allowsTickMarkValuesOnly="YES" sliderType="linear" id="RSV-bg-slider-cell"/>
                 </slider>
-                <button verticalHuggingPriority="750" id="RSV-float-checkbox">
-                    <rect key="frame" x="15" y="50" width="277" height="18"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RSV-float-checkbox">
+                    <rect key="frame" x="13" y="50" width="247" height="18"/>
                     <buttonCell key="cell" type="check" title="Float rulers above other applications" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="RSV-float-cell">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                 </button>
-                <button verticalHuggingPriority="750" id="RSV-shadow-checkbox">
-                    <rect key="frame" x="15" y="22" width="277" height="18"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RSV-shadow-checkbox">
+                    <rect key="frame" x="13" y="19" width="141" height="18"/>
                     <buttonCell key="cell" type="check" title="Show ruler shadow" bezelStyle="regularSquare" imagePosition="left" inset="2" id="RSV-shadow-cell">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                 </button>
             </subviews>
-            <point key="canvasLocation" x="141" y="244.5"/>
+            <constraints>
+                <constraint firstItem="RSV-float-checkbox" firstAttribute="top" secondItem="RSV-bg-slider" secondAttribute="bottom" constant="15" id="0Yp-gV-jve"/>
+                <constraint firstAttribute="trailing" secondItem="RSV-fg-slider" secondAttribute="trailing" constant="15" id="1sZ-2V-6QT"/>
+                <constraint firstItem="RSV-color-well" firstAttribute="top" secondItem="RSV-dimension-height" secondAttribute="bottom" constant="10" id="5iU-Ad-O6e"/>
+                <constraint firstItem="RSV-bg-slider" firstAttribute="top" secondItem="RSV-bg-label" secondAttribute="bottom" constant="8" id="6jA-xw-OUw"/>
+                <constraint firstItem="RSV-shadow-checkbox" firstAttribute="leading" secondItem="RSV-content" secondAttribute="leading" constant="15" id="B29-FT-E0I"/>
+                <constraint firstItem="RSV-dimensions-separator" firstAttribute="firstBaseline" secondItem="RSV-dimension-height" secondAttribute="firstBaseline" id="CRX-Gx-84L"/>
+                <constraint firstItem="RSV-color-well" firstAttribute="leading" secondItem="RSV-reset-button" secondAttribute="trailing" constant="10" id="EQr-mB-ZAV"/>
+                <constraint firstItem="RSV-reset-button" firstAttribute="centerY" secondItem="RSV-color-well" secondAttribute="centerY" id="Ghc-N8-u4j"/>
+                <constraint firstAttribute="trailing" secondItem="RSV-unit-control" secondAttribute="trailing" constant="15" id="KS6-fK-eyF"/>
+                <constraint firstItem="RSV-unit-label" firstAttribute="firstBaseline" secondItem="RSV-unit-control" secondAttribute="firstBaseline" id="L3G-1a-rdA"/>
+                <constraint firstItem="RSV-float-checkbox" firstAttribute="leading" secondItem="RSV-content" secondAttribute="leading" constant="15" id="MLK-TI-Q4f"/>
+                <constraint firstItem="RSV-unit-label" firstAttribute="leading" secondItem="RSV-content" secondAttribute="leading" constant="15" id="MTR-xd-Ufw"/>
+                <constraint firstItem="RSV-fg-value" firstAttribute="top" secondItem="RSV-color-well" secondAttribute="bottom" constant="15" id="NDm-S4-nFp"/>
+                <constraint firstItem="RSV-bg-value" firstAttribute="top" secondItem="RSV-fg-slider" secondAttribute="bottom" constant="15" id="Qtd-hg-6KU"/>
+                <constraint firstItem="RSV-dimension-height" firstAttribute="leading" secondItem="RSV-dimensions-separator" secondAttribute="trailing" constant="3" id="QzC-xL-k60"/>
+                <constraint firstItem="RSV-bg-label" firstAttribute="leading" secondItem="RSV-content" secondAttribute="leading" constant="15" id="R9J-66-XNq"/>
+                <constraint firstItem="RSV-dimension-height" firstAttribute="top" secondItem="RSV-unit-control" secondAttribute="bottom" constant="15" id="RYt-HU-sqV"/>
+                <constraint firstItem="RSV-fg-label" firstAttribute="firstBaseline" secondItem="RSV-fg-value" secondAttribute="firstBaseline" id="VgK-Zd-R6u"/>
+                <constraint firstItem="RSV-color-label" firstAttribute="centerY" secondItem="RSV-color-well" secondAttribute="centerY" id="X6M-Id-hrC"/>
+                <constraint firstItem="RSV-fg-label" firstAttribute="leading" secondItem="RSV-content" secondAttribute="leading" constant="15" id="ZRz-FR-agr"/>
+                <constraint firstAttribute="trailing" secondItem="RSV-color-well" secondAttribute="trailing" constant="15" id="aMP-87-lMV"/>
+                <constraint firstItem="RSV-bg-label" firstAttribute="firstBaseline" secondItem="RSV-bg-value" secondAttribute="firstBaseline" id="awj-ai-MbN"/>
+                <constraint firstAttribute="trailing" secondItem="RSV-bg-slider" secondAttribute="trailing" constant="15" id="d8I-st-jtF"/>
+                <constraint firstItem="RSV-shadow-checkbox" firstAttribute="top" secondItem="RSV-float-checkbox" secondAttribute="bottom" constant="15" id="hYw-tK-kkd"/>
+                <constraint firstItem="RSV-bg-slider" firstAttribute="leading" secondItem="RSV-content" secondAttribute="leading" constant="15" id="hvQ-33-eNo"/>
+                <constraint firstItem="RSV-color-label" firstAttribute="leading" secondItem="RSV-content" secondAttribute="leading" constant="15" id="iD1-OL-8XP"/>
+                <constraint firstItem="RSV-unit-control" firstAttribute="top" secondItem="RSV-content" secondAttribute="top" constant="15" id="k2K-7H-j76"/>
+                <constraint firstItem="RSV-dimensions-label" firstAttribute="leading" secondItem="RSV-content" secondAttribute="leading" constant="15" id="kkw-C1-goW"/>
+                <constraint firstItem="RSV-dimensions-separator" firstAttribute="leading" secondItem="RSV-dimension-width" secondAttribute="trailing" constant="3" id="m4b-xD-qMz"/>
+                <constraint firstItem="RSV-fg-slider" firstAttribute="leading" secondItem="RSV-content" secondAttribute="leading" constant="15" id="mbW-dU-JrP"/>
+                <constraint firstAttribute="trailing" secondItem="RSV-bg-value" secondAttribute="trailing" constant="15" id="okc-Rv-1GD"/>
+                <constraint firstItem="RSV-fg-slider" firstAttribute="top" secondItem="RSV-fg-label" secondAttribute="bottom" constant="8" id="pS7-Cs-dT3"/>
+                <constraint firstItem="RSV-dimension-width" firstAttribute="firstBaseline" secondItem="RSV-dimensions-separator" secondAttribute="firstBaseline" id="pe6-Hc-vDS"/>
+                <constraint firstItem="RSV-dimensions-label" firstAttribute="firstBaseline" secondItem="RSV-dimension-width" secondAttribute="firstBaseline" id="sLw-73-6ox"/>
+                <constraint firstAttribute="trailing" secondItem="RSV-dimension-height" secondAttribute="trailing" constant="15" id="uWc-1K-GnS"/>
+                <constraint firstAttribute="trailing" secondItem="RSV-fg-value" secondAttribute="trailing" constant="15" id="wS5-k0-CDr"/>
+            </constraints>
+            <point key="canvasLocation" x="141" y="177"/>
         </customView>
     </objects>
 </document>

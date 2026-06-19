@@ -846,6 +846,76 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertEqual(controlsView.selectedVerticalLength, 2.75 * NSScreen.defaultDpi, accuracy: 0.0001)
     }
 
+    func testRulerSettingsControlsLayoutUsesSharedInsetsAndAlignedRows() {
+        let controlsView = RulerSettingsControlsView(frame: NSRect(x: 0, y: 0, width: 315, height: 320))
+        controlsView.configureForRulerSettings()
+
+        controlsView.update(
+            unit: .pixels,
+            horizontalLength: 260,
+            verticalLength: 180,
+            rulerColor: Prefs.defaultRulerFillColor,
+            foregroundOpacity: 90,
+            backgroundOpacity: 50,
+            floatRulers: true,
+            rulerShadow: false
+        )
+        controlsView.layoutSubtreeIfNeeded()
+        controlsView.contentView.layoutSubtreeIfNeeded()
+
+        let leftAlignedControls: [NSView] = [
+            controlsView.unitLabel,
+            controlsView.dimensionsLabel,
+            controlsView.rulerColorLabel,
+            controlsView.foregroundOpacityTitleLabel,
+            controlsView.foregroundOpacitySlider,
+            controlsView.backgroundOpacityTitleLabel,
+            controlsView.backgroundOpacitySlider,
+            controlsView.floatRulersCheckbox,
+            controlsView.rulerShadowCheckbox,
+        ]
+        let rightAlignedControls: [NSView] = [
+            controlsView.unitSegmentedControl,
+            controlsView.dimensionHeightField,
+            controlsView.rulerColorWell,
+            controlsView.foregroundOpacityLabel,
+            controlsView.foregroundOpacitySlider,
+            controlsView.backgroundOpacityLabel,
+            controlsView.backgroundOpacitySlider,
+        ]
+        func alignmentRect(_ view: NSView) -> NSRect {
+            return view.alignmentRect(forFrame: view.frame)
+        }
+        func firstBaselineY(_ view: NSView) -> CGFloat {
+            return view.frame.maxY - view.firstBaselineOffsetFromTop
+        }
+
+        let expectedInset: CGFloat = 15
+        let baselineAccuracy: CGFloat = 1
+        let expectedLeftInset = controlsView.contentView.bounds.minX + expectedInset
+        let expectedRightEdge = controlsView.contentView.bounds.maxX - expectedInset
+        let unitTopInset = controlsView.contentView.bounds.maxY
+            - alignmentRect(controlsView.unitSegmentedControl).maxY
+        let unitToDimensionsSpacing = alignmentRect(controlsView.unitSegmentedControl).minY
+            - alignmentRect(controlsView.dimensionHeightField).maxY
+
+        XCTAssertEqual(unitTopInset, expectedInset, accuracy: 0.5)
+        for control in leftAlignedControls {
+            XCTAssertEqual(alignmentRect(control).minX, expectedLeftInset, accuracy: 0.5)
+        }
+        for control in rightAlignedControls {
+            XCTAssertEqual(alignmentRect(control).maxX, expectedRightEdge, accuracy: 0.5)
+        }
+        XCTAssertEqual(unitToDimensionsSpacing, expectedInset, accuracy: 0.5)
+        XCTAssertEqual(firstBaselineY(controlsView.unitLabel), firstBaselineY(controlsView.unitSegmentedControl), accuracy: baselineAccuracy)
+        XCTAssertEqual(firstBaselineY(controlsView.dimensionsLabel), firstBaselineY(controlsView.dimensionWidthField), accuracy: baselineAccuracy)
+        XCTAssertEqual(firstBaselineY(controlsView.dimensionWidthField), firstBaselineY(controlsView.dimensionsSeparatorLabel), accuracy: baselineAccuracy)
+        XCTAssertEqual(firstBaselineY(controlsView.dimensionsSeparatorLabel), firstBaselineY(controlsView.dimensionHeightField), accuracy: baselineAccuracy)
+        XCTAssertEqual(alignmentRect(controlsView.rulerColorLabel).midY, alignmentRect(controlsView.rulerColorWell).midY, accuracy: 0.5)
+        XCTAssertEqual(firstBaselineY(controlsView.foregroundOpacityTitleLabel), firstBaselineY(controlsView.foregroundOpacityLabel), accuracy: baselineAccuracy)
+        XCTAssertEqual(firstBaselineY(controlsView.backgroundOpacityTitleLabel), firstBaselineY(controlsView.backgroundOpacityLabel), accuracy: baselineAccuracy)
+    }
+
     func testRulerSettingsControlsKeyViewLoopFollowsVisibleControls() {
         let controlsView = RulerSettingsControlsView(frame: NSRect(x: 0, y: 0, width: 315, height: 320))
         controlsView.configureForRulerSettings()

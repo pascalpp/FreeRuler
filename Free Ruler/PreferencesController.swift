@@ -206,61 +206,25 @@ final class RulerSettingsControlsView: NSView, NSTextFieldDelegate {
     weak var delegate: RulerSettingsControlsViewDelegate?
 
     @IBOutlet var contentView: NSView!
+    @IBOutlet weak var unitLabel: NSTextField!
+    @IBOutlet weak var unitSegmentedControl: NSSegmentedControl!
+    @IBOutlet weak var dimensionsLabel: NSTextField!
+    @IBOutlet weak var dimensionWidthField: NSTextField!
+    @IBOutlet weak var dimensionsSeparatorLabel: NSTextField!
+    @IBOutlet weak var dimensionHeightField: NSTextField!
+    @IBOutlet weak var rulerColorLabel: NSTextField!
     @IBOutlet weak var rulerColorWell: RulerColorWell!
     @IBOutlet weak var resetRulerColorButton: NSButton!
+    @IBOutlet weak var foregroundOpacityTitleLabel: NSTextField!
     @IBOutlet weak var foregroundOpacitySlider: NSSlider!
+    @IBOutlet weak var backgroundOpacityTitleLabel: NSTextField!
     @IBOutlet weak var backgroundOpacitySlider: NSSlider!
     @IBOutlet weak var foregroundOpacityLabel: NSTextField!
     @IBOutlet weak var backgroundOpacityLabel: NSTextField!
     @IBOutlet weak var floatRulersCheckbox: NSButton!
     @IBOutlet weak var rulerShadowCheckbox: NSButton!
 
-    let unitLabel = NSTextField(labelWithString: NSLocalizedString(
-        "RulerSettingsControls.Unit",
-        value: "Unit",
-        comment: "Label for the active ruler measurement unit setting"
-    ))
-    let unitSegmentedControl = NSSegmentedControl(
-        labels: [
-            NSLocalizedString(
-                "Unit.Pixels.Abbreviation",
-                value: "px",
-                comment: "Pixels unit abbreviation"
-            ),
-            NSLocalizedString(
-                "Unit.Millimeters.Abbreviation",
-                value: "mm",
-                comment: "Millimeters unit abbreviation"
-            ),
-            NSLocalizedString(
-                "Unit.Inches.Abbreviation",
-                value: "in",
-                comment: "Inches unit abbreviation"
-            ),
-        ],
-        trackingMode: .selectOne,
-        target: nil,
-        action: nil
-    )
-    let dimensionsLabel = NSTextField(labelWithString: NSLocalizedString(
-        "RulerSettingsControls.Dimensions",
-        value: "Dimensions",
-        comment: "Label for active ruler width and height fields"
-    ))
-    let dimensionWidthField = NSTextField()
-    let dimensionsSeparatorLabel = NSTextField(labelWithString: "x")
-    let dimensionHeightField = NSTextField()
-
-    private var showsDimensions = true
     private var dimensionScreen: NSScreen?
-    private var dimensionControls: [NSView] {
-        return [
-            dimensionsLabel,
-            dimensionWidthField,
-            dimensionsSeparatorLabel,
-            dimensionHeightField,
-        ]
-    }
 
     var selectedUnit: Unit {
         return Unit(rawValue: unitSegmentedControl.selectedSegment) ?? .pixels
@@ -301,8 +265,6 @@ final class RulerSettingsControlsView: NSView, NSTextFieldDelegate {
     }
 
     func configureForPreferences() {
-        showsDimensions = true
-        updateDimensionsVisibility()
         configureControls(
             unitSegmentedControlIdentifier: "ruler-unit-segmented-control",
             widthFieldIdentifier: "ruler-width-field",
@@ -321,8 +283,6 @@ final class RulerSettingsControlsView: NSView, NSTextFieldDelegate {
     }
 
     func configureForRulerSettings() {
-        showsDimensions = true
-        updateDimensionsVisibility()
         configureControls(
             unitSegmentedControlIdentifier: "ruler-settings-unit-segmented-control",
             widthFieldIdentifier: "ruler-settings-width-field",
@@ -413,12 +373,6 @@ final class RulerSettingsControlsView: NSView, NSTextFieldDelegate {
         }
     }
 
-    override func layout() {
-        super.layout()
-
-        layoutTopControls()
-    }
-
     func performRulerSettingsKeyEquivalent(with event: NSEvent) -> Bool {
         guard event.type == .keyDown,
               event.modifierFlags
@@ -463,16 +417,7 @@ final class RulerSettingsControlsView: NSView, NSTextFieldDelegate {
             contentView.topAnchor.constraint(equalTo: topAnchor),
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
         ])
-        installTopControls()
         configureBaseControls()
-    }
-
-    private func installTopControls() {
-        for control in [unitLabel, unitSegmentedControl] + dimensionControls {
-            control.translatesAutoresizingMaskIntoConstraints = true
-            contentView.addSubview(control)
-        }
-        updateDimensionsVisibility()
     }
 
     private func configureBaseControls() {
@@ -571,7 +516,7 @@ final class RulerSettingsControlsView: NSView, NSTextFieldDelegate {
     }
 
     private func configureKeyViewLoop() {
-        unitSegmentedControl.nextKeyView = showsDimensions ? dimensionWidthField : rulerColorWell
+        unitSegmentedControl.nextKeyView = dimensionWidthField
         dimensionWidthField.nextKeyView = dimensionHeightField
         dimensionHeightField.nextKeyView = rulerColorWell
         rulerColorWell.nextKeyView = resetRulerColorButton.isHidden
@@ -599,62 +544,6 @@ final class RulerSettingsControlsView: NSView, NSTextFieldDelegate {
         field.delegate = self
         field.target = self
         field.action = #selector(setDimensions(_:))
-    }
-
-    private func updateDimensionsVisibility() {
-        for control in dimensionControls {
-            control.isHidden = !showsDimensions
-        }
-        needsLayout = true
-        configureKeyViewLoop()
-    }
-
-    private func layoutTopControls() {
-        guard contentView != nil else { return }
-
-        let labelX: CGFloat = 15
-        let labelWidth: CGFloat = 150
-        let labelHeight: CGFloat = 16
-        let rightMargin: CGFloat = 21
-        let contentWidth = contentView.bounds.width
-        let controlRight = contentWidth - rightMargin
-
-        let unitControlWidth: CGFloat = 108
-        let unitY: CGFloat = showsDimensions ? 285 : 249
-        unitLabel.frame = NSRect(x: labelX, y: unitY, width: labelWidth, height: labelHeight)
-        unitSegmentedControl.frame = NSRect(
-            x: controlRight - unitControlWidth,
-            y: unitY - 4,
-            width: unitControlWidth,
-            height: 24
-        )
-
-        let dimensionsY: CGFloat = 249
-        let fieldWidth: CGFloat = 56
-        let separatorWidth: CGFloat = 18
-        let heightFieldX = controlRight - fieldWidth
-        let separatorX = heightFieldX - separatorWidth
-        let widthFieldX = separatorX - fieldWidth
-
-        dimensionsLabel.frame = NSRect(x: labelX, y: dimensionsY, width: labelWidth, height: labelHeight)
-        dimensionWidthField.frame = NSRect(
-            x: widthFieldX,
-            y: dimensionsY - 4,
-            width: fieldWidth,
-            height: 24
-        )
-        dimensionsSeparatorLabel.frame = NSRect(
-            x: separatorX,
-            y: dimensionsY,
-            width: separatorWidth,
-            height: labelHeight
-        )
-        dimensionHeightField.frame = NSRect(
-            x: heightFieldX,
-            y: dimensionsY - 4,
-            width: fieldWidth,
-            height: 24
-        )
     }
 
     private func toggleFloatRulersFromKeyEquivalent() -> Bool {
