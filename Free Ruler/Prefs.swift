@@ -32,6 +32,8 @@ class Prefs: NSObject {
     @objc dynamic var backgroundOpacity : Int
     @objc dynamic var rulerColor        : NSColor
     @objc dynamic var unit              : Unit
+    @objc dynamic var defaultHorizontalLength: Double
+    @objc dynamic var defaultVerticalLength: Double
     @objc dynamic var zeroCorner        : ZeroCorner
 
     // MARK: - public save method
@@ -60,6 +62,8 @@ class Prefs: NSObject {
             "foregroundOpacity": defaultForegroundOpacity,
             "backgroundOpacity": defaultBackgroundOpacity,
             "unit":              defaultUnit.rawValue,
+            "defaultHorizontalLength": unsetDefaultRulerLength,
+            "defaultVerticalLength": unsetDefaultRulerLength,
             "zeroCorner":        defaultZeroCorner.rawValue
         ]
 
@@ -80,6 +84,8 @@ class Prefs: NSObject {
         backgroundOpacity = defaults.integer(forKey: "backgroundOpacity")
         rulerColor        = Prefs.rulerFillColor(fromArchivedData: defaults.data(forKey: "rulerColor"))
         unit              = Unit(rawValue: defaults.integer(forKey: "unit")) ?? .pixels
+        defaultHorizontalLength = defaults.double(forKey: "defaultHorizontalLength")
+        defaultVerticalLength = defaults.double(forKey: "defaultVerticalLength")
         zeroCorner        = Prefs.zeroCorner(fromRawValue: defaults.integer(forKey: "zeroCorner"))
 
         super.init()
@@ -120,6 +126,12 @@ class Prefs: NSObject {
             observe(\Prefs.unit, options: .new) { prefs, changed in
                 self.defaults.set(prefs.unit.rawValue, forKey: "unit")
             },
+            observe(\Prefs.defaultHorizontalLength, options: .new) { prefs, changed in
+                self.defaults.set(prefs.defaultHorizontalLength, forKey: "defaultHorizontalLength")
+            },
+            observe(\Prefs.defaultVerticalLength, options: .new) { prefs, changed in
+                self.defaults.set(prefs.defaultVerticalLength, forKey: "defaultVerticalLength")
+            },
             observe(\Prefs.zeroCorner, options: .new) { prefs, changed in
                 self.defaults.set(prefs.zeroCorner.rawValue, forKey: "zeroCorner")
             },
@@ -133,6 +145,10 @@ extension Prefs {
 
     static var defaultUnit: Unit {
         return .pixels
+    }
+
+    static var unsetDefaultRulerLength: Double {
+        return 0
     }
 
     static var defaultZeroCorner: ZeroCorner {
@@ -163,7 +179,7 @@ extension Prefs {
         return true
     }
 
-    func applyDefaults(from settings: RulerSettings) {
+    func applyDefaults(from settings: RulerSettings, layout: RulerLayoutState? = nil) {
         unit = settings.unit
         rulerColor = settings.rulerColor
         foregroundOpacity = settings.foregroundOpacity
@@ -171,6 +187,11 @@ extension Prefs {
         floatRulers = settings.floatRulers
         rulerShadow = settings.rulerShadow
         zeroCorner = settings.zeroCorner
+
+        if let layout = layout {
+            defaultHorizontalLength = Double(layout.horizontalLength)
+            defaultVerticalLength = Double(layout.verticalLength)
+        }
     }
 
     func resetRulerDefaultsToFactoryDefaults() {
@@ -181,7 +202,33 @@ extension Prefs {
         floatRulers = Self.defaultFloatRulers
         rulerShadow = Self.defaultRulerShadow
         groupRulers = Self.defaultGroupRulers
+        defaultHorizontalLength = Self.unsetDefaultRulerLength
+        defaultVerticalLength = Self.unsetDefaultRulerLength
         zeroCorner = Self.defaultZeroCorner
+    }
+
+    func effectiveDefaultHorizontalLength(screenFrame: NSRect = defaultRulerScreenFrame()) -> CGFloat {
+        guard defaultHorizontalLength > Self.unsetDefaultRulerLength else {
+            return RulerLayoutState.defaultLengths(screenFrame: screenFrame).horizontal
+        }
+
+        return CGFloat(defaultHorizontalLength)
+    }
+
+    func effectiveDefaultVerticalLength(screenFrame: NSRect = defaultRulerScreenFrame()) -> CGFloat {
+        guard defaultVerticalLength > Self.unsetDefaultRulerLength else {
+            return RulerLayoutState.defaultLengths(screenFrame: screenFrame).vertical
+        }
+
+        return CGFloat(defaultVerticalLength)
+    }
+
+    var customDefaultHorizontalLength: CGFloat? {
+        return defaultHorizontalLength > Self.unsetDefaultRulerLength ? CGFloat(defaultHorizontalLength) : nil
+    }
+
+    var customDefaultVerticalLength: CGFloat? {
+        return defaultVerticalLength > Self.unsetDefaultRulerLength ? CGFloat(defaultVerticalLength) : nil
     }
 
     static func rulerFillColor(fromArchivedData data: Data?) -> NSColor {

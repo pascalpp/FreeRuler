@@ -304,15 +304,38 @@ struct RulerLayoutState: Equatable, Codable {
 
     static func defaults(
         zeroCorner: ZeroCorner,
-        screenFrame: NSRect = defaultRulerScreenFrame()
+        screenFrame: NSRect = defaultRulerScreenFrame(),
+        horizontalLength: CGFloat? = nil,
+        verticalLength: CGFloat? = nil
     ) -> RulerLayoutState {
         let geometry = ZeroCornerGeometry(zeroCorner: zeroCorner)
 
         return RulerLayoutState(
-            horizontalFrame: geometry.defaultFrame(for: .horizontal, screenFrame: screenFrame),
-            verticalFrame: geometry.defaultFrame(for: .vertical, screenFrame: screenFrame),
+            horizontalFrame: geometry.defaultFrame(
+                for: .horizontal,
+                screenFrame: screenFrame,
+                horizontalLength: horizontalLength,
+                verticalLength: verticalLength
+            ),
+            verticalFrame: geometry.defaultFrame(
+                for: .vertical,
+                screenFrame: screenFrame,
+                horizontalLength: horizontalLength,
+                verticalLength: verticalLength
+            ),
             zeroCorner: zeroCorner
         )
+    }
+
+    static func defaultLengths(screenFrame: NSRect = defaultRulerScreenFrame()) -> (
+        horizontal: CGFloat,
+        vertical: CGFloat
+    ) {
+        let horizontalLength = screenFrame.width / 2
+        let aspectRatio = screenFrame.width / screenFrame.height
+        let verticalLength = horizontalLength / aspectRatio
+
+        return (horizontalLength, verticalLength)
     }
 
     func layout(zeroCorner: ZeroCorner) -> GroupedRulerLayout {
@@ -353,7 +376,9 @@ struct RulerInstanceState: Identifiable, Equatable, Codable {
             settings: defaults,
             layout: RulerLayoutState.defaults(
                 zeroCorner: defaults.zeroCorner,
-                screenFrame: screenFrame
+                screenFrame: screenFrame,
+                horizontalLength: prefs.customDefaultHorizontalLength,
+                verticalLength: prefs.customDefaultVerticalLength
             )
         )
     }
@@ -506,12 +531,17 @@ struct ZeroCornerGeometry {
         }
     }
 
-    func defaultFrame(for orientation: Orientation, screenFrame: NSRect) -> NSRect {
+    func defaultFrame(
+        for orientation: Orientation,
+        screenFrame: NSRect,
+        horizontalLength customHorizontalLength: CGFloat? = nil,
+        verticalLength customVerticalLength: CGFloat? = nil
+    ) -> NSRect {
         let xOffset: CGFloat = 30
         let yOffset: CGFloat = 50
-        let horizontalLength = screenFrame.width / 2
-        let aspectRatio = screenFrame.width / screenFrame.height
-        let verticalLength = horizontalLength / aspectRatio
+        let defaultLengths = RulerLayoutState.defaultLengths(screenFrame: screenFrame)
+        let horizontalLength = customHorizontalLength ?? defaultLengths.horizontal
+        let verticalLength = customVerticalLength ?? defaultLengths.vertical
         let topLeftZeroPoint = NSPoint(
             x: screenFrame.minX + xOffset + Ruler.thickness - borderCompensation,
             y: screenFrame.maxY - yOffset - Ruler.thickness + borderCompensation

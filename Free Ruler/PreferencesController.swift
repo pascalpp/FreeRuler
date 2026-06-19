@@ -153,6 +153,8 @@ private func configureResetRulerColorButtonAppearance(_ button: NSButton, identi
 }
 
 protocol RulerSettingsControlsViewDelegate: AnyObject {
+    func rulerSettingsControlsDidChangeUnit(_ controlsView: RulerSettingsControlsView)
+    func rulerSettingsControlsDidChangeDimensions(_ controlsView: RulerSettingsControlsView)
     func rulerSettingsControlsDidChangeRulerColor(_ controlsView: RulerSettingsControlsView)
     func rulerSettingsControlsDidResetRulerColor(_ controlsView: RulerSettingsControlsView)
     func rulerSettingsControlsDidChangeForegroundOpacity(_ controlsView: RulerSettingsControlsView)
@@ -161,7 +163,7 @@ protocol RulerSettingsControlsViewDelegate: AnyObject {
     func rulerSettingsControlsDidChangeRulerShadow(_ controlsView: RulerSettingsControlsView)
 }
 
-final class RulerSettingsControlsView: NSView {
+final class RulerSettingsControlsView: NSView, NSTextFieldDelegate {
 
     weak var delegate: RulerSettingsControlsViewDelegate?
 
@@ -174,6 +176,64 @@ final class RulerSettingsControlsView: NSView {
     @IBOutlet weak var backgroundOpacityLabel: NSTextField!
     @IBOutlet weak var floatRulersCheckbox: NSButton!
     @IBOutlet weak var rulerShadowCheckbox: NSButton!
+
+    let unitLabel = NSTextField(labelWithString: NSLocalizedString(
+        "RulerSettingsControls.Unit",
+        value: "Unit",
+        comment: "Label for the active ruler measurement unit setting"
+    ))
+    let unitSegmentedControl = NSSegmentedControl(
+        labels: [
+            NSLocalizedString(
+                "Unit.Pixels.Abbreviation",
+                value: "px",
+                comment: "Pixels unit abbreviation"
+            ),
+            NSLocalizedString(
+                "Unit.Millimeters.Abbreviation",
+                value: "mm",
+                comment: "Millimeters unit abbreviation"
+            ),
+            NSLocalizedString(
+                "Unit.Inches.Abbreviation",
+                value: "in",
+                comment: "Inches unit abbreviation"
+            ),
+        ],
+        trackingMode: .selectOne,
+        target: nil,
+        action: nil
+    )
+    let dimensionsLabel = NSTextField(labelWithString: NSLocalizedString(
+        "RulerSettingsControls.Dimensions",
+        value: "Dimensions",
+        comment: "Label for active ruler width and height fields"
+    ))
+    let dimensionWidthField = NSTextField()
+    let dimensionsSeparatorLabel = NSTextField(labelWithString: "x")
+    let dimensionHeightField = NSTextField()
+
+    private var showsDimensions = true
+    private var dimensionControls: [NSView] {
+        return [
+            dimensionsLabel,
+            dimensionWidthField,
+            dimensionsSeparatorLabel,
+            dimensionHeightField,
+        ]
+    }
+
+    var selectedUnit: Unit {
+        return Unit(rawValue: unitSegmentedControl.selectedSegment) ?? .pixels
+    }
+
+    var selectedHorizontalLength: CGFloat {
+        return CGFloat(dimensionWidthField.doubleValue)
+    }
+
+    var selectedVerticalLength: CGFloat {
+        return CGFloat(dimensionHeightField.doubleValue)
+    }
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
@@ -194,7 +254,12 @@ final class RulerSettingsControlsView: NSView {
     }
 
     func configureForPreferences() {
+        showsDimensions = true
+        updateDimensionsVisibility()
         configureControls(
+            unitSegmentedControlIdentifier: "ruler-unit-segmented-control",
+            widthFieldIdentifier: "ruler-width-field",
+            heightFieldIdentifier: "ruler-height-field",
             colorWellIdentifier: "ruler-color-well",
             resetButtonIdentifier: "reset-ruler-color-button",
             foregroundSliderIdentifier: "ruler-foreground-opacity-slider",
@@ -209,7 +274,12 @@ final class RulerSettingsControlsView: NSView {
     }
 
     func configureForRulerSettings() {
+        showsDimensions = true
+        updateDimensionsVisibility()
         configureControls(
+            unitSegmentedControlIdentifier: "ruler-settings-unit-segmented-control",
+            widthFieldIdentifier: "ruler-settings-width-field",
+            heightFieldIdentifier: "ruler-settings-height-field",
             colorWellIdentifier: "ruler-settings-color-well",
             resetButtonIdentifier: "reset-ruler-settings-color-button",
             foregroundSliderIdentifier: "ruler-settings-foreground-opacity-slider",
@@ -223,6 +293,9 @@ final class RulerSettingsControlsView: NSView {
     }
 
     func update(
+        unit: Unit,
+        horizontalLength: CGFloat? = nil,
+        verticalLength: CGFloat? = nil,
         rulerColor: NSColor,
         foregroundOpacity: Int,
         backgroundOpacity: Int,
@@ -230,6 +303,18 @@ final class RulerSettingsControlsView: NSView {
         rulerShadow: Bool,
         isEnabled: Bool = true
     ) {
+        unitSegmentedControl.selectedSegment = unit.rawValue
+        unitSegmentedControl.isEnabled = isEnabled
+
+        if let horizontalLength = horizontalLength {
+            dimensionWidthField.integerValue = Int(horizontalLength.rounded())
+        }
+        if let verticalLength = verticalLength {
+            dimensionHeightField.integerValue = Int(verticalLength.rounded())
+        }
+        dimensionWidthField.isEnabled = isEnabled
+        dimensionHeightField.isEnabled = isEnabled
+
         rulerColorWell.supportsAlpha = false
         rulerColorWell.color = rulerColor
         rulerColorWell.isEnabled = isEnabled
@@ -252,6 +337,12 @@ final class RulerSettingsControlsView: NSView {
         rulerShadowCheckbox.isEnabled = isEnabled
 
         configureKeyViewLoop()
+    }
+
+    override func layout() {
+        super.layout()
+
+        layoutTopControls()
     }
 
     func performRulerSettingsKeyEquivalent(with event: NSEvent) -> Bool {
@@ -298,10 +389,27 @@ final class RulerSettingsControlsView: NSView {
             contentView.topAnchor.constraint(equalTo: topAnchor),
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
         ])
+        installTopControls()
         configureBaseControls()
     }
 
+    private func installTopControls() {
+        for control in [unitLabel, unitSegmentedControl] + dimensionControls {
+            control.translatesAutoresizingMaskIntoConstraints = true
+            contentView.addSubview(control)
+        }
+        updateDimensionsVisibility()
+    }
+
     private func configureBaseControls() {
+        unitSegmentedControl.target = self
+        unitSegmentedControl.action = #selector(setUnit(_:))
+        unitSegmentedControl.segmentStyle = .rounded
+
+        dimensionsSeparatorLabel.alignment = .center
+        configureDimensionField(dimensionWidthField)
+        configureDimensionField(dimensionHeightField)
+
         rulerColorWell.isContinuous = true
         rulerColorWell.supportsAlpha = false
         rulerColorWell.colorDidChange = { [weak self] _ in
@@ -342,6 +450,9 @@ final class RulerSettingsControlsView: NSView {
     }
 
     private func configureControls(
+        unitSegmentedControlIdentifier: String,
+        widthFieldIdentifier: String,
+        heightFieldIdentifier: String,
         colorWellIdentifier: String,
         resetButtonIdentifier: String,
         foregroundSliderIdentifier: String,
@@ -351,6 +462,13 @@ final class RulerSettingsControlsView: NSView {
         floatCheckboxIdentifier: String,
         shadowCheckboxIdentifier: String
     ) {
+        unitSegmentedControl.identifier = NSUserInterfaceItemIdentifier(unitSegmentedControlIdentifier)
+        unitSegmentedControl.setAccessibilityIdentifier(unitSegmentedControlIdentifier)
+        dimensionWidthField.identifier = NSUserInterfaceItemIdentifier(widthFieldIdentifier)
+        dimensionWidthField.setAccessibilityIdentifier(widthFieldIdentifier)
+        dimensionHeightField.identifier = NSUserInterfaceItemIdentifier(heightFieldIdentifier)
+        dimensionHeightField.setAccessibilityIdentifier(heightFieldIdentifier)
+
         rulerColorWell.identifier = NSUserInterfaceItemIdentifier(colorWellIdentifier)
         rulerColorWell.setAccessibilityIdentifier(colorWellIdentifier)
         configureResetRulerColorButtonAppearance(resetRulerColorButton, identifier: resetButtonIdentifier)
@@ -379,6 +497,9 @@ final class RulerSettingsControlsView: NSView {
     }
 
     private func configureKeyViewLoop() {
+        unitSegmentedControl.nextKeyView = showsDimensions ? dimensionWidthField : rulerColorWell
+        dimensionWidthField.nextKeyView = dimensionHeightField
+        dimensionHeightField.nextKeyView = rulerColorWell
         rulerColorWell.nextKeyView = resetRulerColorButton.isHidden
             ? foregroundOpacitySlider
             : resetRulerColorButton
@@ -386,7 +507,78 @@ final class RulerSettingsControlsView: NSView {
         foregroundOpacitySlider.nextKeyView = backgroundOpacitySlider
         backgroundOpacitySlider.nextKeyView = floatRulersCheckbox
         floatRulersCheckbox.nextKeyView = rulerShadowCheckbox
-        rulerShadowCheckbox.nextKeyView = rulerColorWell
+        rulerShadowCheckbox.nextKeyView = unitSegmentedControl
+    }
+
+    private func configureDimensionField(_ field: NSTextField) {
+        let formatter = NumberFormatter()
+        formatter.allowsFloats = false
+        formatter.minimum = 0
+        formatter.maximum = 4000
+        formatter.numberStyle = .none
+
+        field.formatter = formatter
+        field.alignment = .right
+        field.bezelStyle = .roundedBezel
+        field.delegate = self
+        field.target = self
+        field.action = #selector(setDimensions(_:))
+    }
+
+    private func updateDimensionsVisibility() {
+        for control in dimensionControls {
+            control.isHidden = !showsDimensions
+        }
+        needsLayout = true
+        configureKeyViewLoop()
+    }
+
+    private func layoutTopControls() {
+        guard contentView != nil else { return }
+
+        let labelX: CGFloat = 15
+        let labelWidth: CGFloat = 150
+        let labelHeight: CGFloat = 16
+        let rightMargin: CGFloat = 21
+        let contentWidth = contentView.bounds.width
+        let controlRight = contentWidth - rightMargin
+
+        let unitControlWidth: CGFloat = 108
+        let unitY: CGFloat = showsDimensions ? 285 : 249
+        unitLabel.frame = NSRect(x: labelX, y: unitY, width: labelWidth, height: labelHeight)
+        unitSegmentedControl.frame = NSRect(
+            x: controlRight - unitControlWidth,
+            y: unitY - 4,
+            width: unitControlWidth,
+            height: 24
+        )
+
+        let dimensionsY: CGFloat = 249
+        let fieldWidth: CGFloat = 56
+        let separatorWidth: CGFloat = 18
+        let heightFieldX = controlRight - fieldWidth
+        let separatorX = heightFieldX - separatorWidth
+        let widthFieldX = separatorX - fieldWidth
+
+        dimensionsLabel.frame = NSRect(x: labelX, y: dimensionsY, width: labelWidth, height: labelHeight)
+        dimensionWidthField.frame = NSRect(
+            x: widthFieldX,
+            y: dimensionsY - 4,
+            width: fieldWidth,
+            height: 24
+        )
+        dimensionsSeparatorLabel.frame = NSRect(
+            x: separatorX,
+            y: dimensionsY,
+            width: separatorWidth,
+            height: labelHeight
+        )
+        dimensionHeightField.frame = NSRect(
+            x: heightFieldX,
+            y: dimensionsY - 4,
+            width: fieldWidth,
+            height: 24
+        )
     }
 
     private func toggleFloatRulersFromKeyEquivalent() -> Bool {
@@ -403,6 +595,21 @@ final class RulerSettingsControlsView: NSView {
         rulerShadowCheckbox.state = rulerShadowCheckbox.state == .on ? .off : .on
         setRulerShadow(rulerShadowCheckbox as Any)
         return true
+    }
+
+    @objc private func setUnit(_ sender: Any) {
+        delegate?.rulerSettingsControlsDidChangeUnit(self)
+    }
+
+    @objc private func setDimensions(_ sender: Any) {
+        delegate?.rulerSettingsControlsDidChangeDimensions(self)
+    }
+
+    func controlTextDidEndEditing(_ notification: Notification) {
+        guard let field = notification.object as? NSTextField,
+              field === dimensionWidthField || field === dimensionHeightField else { return }
+
+        setDimensions(field as Any)
     }
 
     @objc private func setRulerColor(_ sender: Any) {
@@ -440,6 +647,18 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
 
     var foregroundOpacitySlider: NSSlider {
         return settingsControlsView.foregroundOpacitySlider
+    }
+
+    var unitSegmentedControl: NSSegmentedControl {
+        return settingsControlsView.unitSegmentedControl
+    }
+
+    var dimensionWidthField: NSTextField {
+        return settingsControlsView.dimensionWidthField
+    }
+
+    var dimensionHeightField: NSTextField {
+        return settingsControlsView.dimensionHeightField
     }
 
     var backgroundOpacitySlider: NSSlider {
@@ -483,7 +702,7 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
         configureOpaqueColorPicking()
         settingsControlsView.delegate = self
         settingsControlsView.configureForPreferences()
-        window?.initialFirstResponder = rulerColorWell
+        window?.initialFirstResponder = unitSegmentedControl
         resetFactoryDefaultsButton.identifier = NSUserInterfaceItemIdentifier("reset-factory-defaults-button")
         resetFactoryDefaultsButton.setAccessibilityIdentifier("reset-factory-defaults-button")
 
@@ -505,7 +724,7 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
 
         configureOpaqueColorPicking()
         window?.makeKeyAndOrderFront(sender)
-        window?.makeFirstResponder(rulerColorWell)
+        window?.makeFirstResponder(unitSegmentedControl)
         window?.center()
     }
 
@@ -519,6 +738,15 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
 
     func subscribeToPrefs() {
         observers = [
+            prefs.observe(\Prefs.unit, options: .new) { prefs, changed in
+                self.updateUnitSegmentedControl()
+            },
+            prefs.observe(\Prefs.defaultHorizontalLength, options: .new) { prefs, changed in
+                self.updateDimensionFields()
+            },
+            prefs.observe(\Prefs.defaultVerticalLength, options: .new) { prefs, changed in
+                self.updateDimensionFields()
+            },
             prefs.observe(\Prefs.foregroundOpacity, options: .new) { prefs, changed in
                 self.updateForegroundSlider()
             },
@@ -535,6 +763,15 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
                 self.updateRulerColorWell()
             },
         ]
+    }
+
+    @IBAction func setUnit(_ sender: Any) {
+        prefs.unit = settingsControlsView.selectedUnit
+    }
+
+    @IBAction func setDimensions(_ sender: Any) {
+        prefs.defaultHorizontalLength = Double(settingsControlsView.selectedHorizontalLength)
+        prefs.defaultVerticalLength = Double(settingsControlsView.selectedVerticalLength)
     }
 
     @IBAction func setForegroundOpacity(_ sender: Any) {
@@ -562,12 +799,24 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
 
     func updateView() {
         settingsControlsView.update(
+            unit: prefs.unit,
+            horizontalLength: prefs.effectiveDefaultHorizontalLength(),
+            verticalLength: prefs.effectiveDefaultVerticalLength(),
             rulerColor: prefs.rulerColor,
             foregroundOpacity: prefs.foregroundOpacity,
             backgroundOpacity: prefs.backgroundOpacity,
             floatRulers: prefs.floatRulers,
             rulerShadow: prefs.rulerShadow
         )
+    }
+
+    func updateUnitSegmentedControl() {
+        unitSegmentedControl.selectedSegment = prefs.unit.rawValue
+    }
+
+    func updateDimensionFields() {
+        dimensionWidthField.integerValue = Int(prefs.effectiveDefaultHorizontalLength().rounded())
+        dimensionHeightField.integerValue = Int(prefs.effectiveDefaultVerticalLength().rounded())
     }
 
     func updateForegroundSlider() {
@@ -616,6 +865,14 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
 }
 
 extension PreferencesController: RulerSettingsControlsViewDelegate {
+    func rulerSettingsControlsDidChangeUnit(_ controlsView: RulerSettingsControlsView) {
+        setUnit(controlsView.unitSegmentedControl as Any)
+    }
+
+    func rulerSettingsControlsDidChangeDimensions(_ controlsView: RulerSettingsControlsView) {
+        setDimensions(controlsView.dimensionWidthField as Any)
+    }
+
     func rulerSettingsControlsDidChangeRulerColor(_ controlsView: RulerSettingsControlsView) {
         setRulerColor(controlsView.rulerColorWell as Any)
     }
@@ -669,6 +926,18 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
 
     var rulerColorWell: RulerColorWell {
         return settingsControlsView.rulerColorWell
+    }
+
+    var unitSegmentedControl: NSSegmentedControl {
+        return settingsControlsView.unitSegmentedControl
+    }
+
+    var dimensionWidthField: NSTextField {
+        return settingsControlsView.dimensionWidthField
+    }
+
+    var dimensionHeightField: NSTextField {
+        return settingsControlsView.dimensionHeightField
     }
 
     var resetRulerColorButton: NSButton {
@@ -735,7 +1004,7 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         window?.setAccessibilityIdentifier("ruler-settings-window")
         window?.isMovableByWindowBackground = true
         window?.isReleasedWhenClosed = false
-        window?.initialFirstResponder = rulerColorWell
+        window?.initialFirstResponder = unitSegmentedControl
         configureFloatingPanelWindow()
         settingsControlsView.delegate = self
         settingsControlsView.configureForRulerSettings()
@@ -763,7 +1032,7 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         configureOpaqueColorPicking()
         updateView()
         window?.makeKeyAndOrderFront(sender)
-        window?.makeFirstResponder(rulerColorWell)
+        window?.makeFirstResponder(unitSegmentedControl)
         window?.center()
     }
 
@@ -777,7 +1046,7 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
             position(settingsWindow, attachedTo: controller)
             settingsWindow.orderFront(sender)
             settingsWindow.makeKey()
-            settingsWindow.makeFirstResponder(rulerColorWell)
+            settingsWindow.makeFirstResponder(unitSegmentedControl)
             return
         }
 
@@ -796,7 +1065,7 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         controller.groupedWindow.addChildWindow(settingsWindow, ordered: .above)
         settingsWindow.orderFront(sender)
         settingsWindow.makeKey()
-        settingsWindow.makeFirstResponder(rulerColorWell)
+        settingsWindow.makeFirstResponder(unitSegmentedControl)
     }
 
     override func close() {
@@ -815,6 +1084,21 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
 
     func updateRulerController(_ controller: GroupedRulerController) {
         rulerController = controller
+        updateView()
+    }
+
+    @objc func setUnit(_ sender: Any) {
+        applySettings { settings in
+            settings.unit = settingsControlsView.selectedUnit
+        }
+        updateView()
+    }
+
+    @objc func setDimensions(_ sender: Any) {
+        rulerController?.updateDimensions(
+            horizontalLength: settingsControlsView.selectedHorizontalLength,
+            verticalLength: settingsControlsView.selectedVerticalLength
+        )
         updateView()
     }
 
@@ -861,14 +1145,18 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         applySettings { settings in
             settings = defaultSettings
         }
+        rulerController?.updateDimensions(
+            horizontalLength: prefs.effectiveDefaultHorizontalLength(),
+            verticalLength: prefs.effectiveDefaultVerticalLength()
+        )
         rulerController?.opacity = defaultSettings.foregroundOpacity
         updateView()
     }
 
     @IBAction func setDefaultsForNewRulers(_ sender: Any) {
-        guard let settings = rulerController?.state.settings else { return }
+        guard let controller = rulerController else { return }
 
-        prefs.applyDefaults(from: settings)
+        prefs.applyDefaults(from: controller.state.settings, layout: controller.state.layout)
     }
 
     func updateView() {
@@ -880,6 +1168,9 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         let hasRuler = rulerController != nil
 
         settingsControlsView.update(
+            unit: currentSettings?.unit ?? Prefs.defaultUnit,
+            horizontalLength: rulerController?.state.layout.horizontalLength,
+            verticalLength: rulerController?.state.layout.verticalLength,
             rulerColor: currentSettings?.rulerColor ?? Prefs.defaultRulerFillColor,
             foregroundOpacity: currentSettings?.foregroundOpacity ?? Prefs.defaultForegroundOpacity,
             backgroundOpacity: currentSettings?.backgroundOpacity ?? Prefs.defaultBackgroundOpacity,
@@ -1088,6 +1379,14 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
 }
 
 extension RulerSettingsController: RulerSettingsControlsViewDelegate {
+    func rulerSettingsControlsDidChangeUnit(_ controlsView: RulerSettingsControlsView) {
+        setUnit(controlsView.unitSegmentedControl as Any)
+    }
+
+    func rulerSettingsControlsDidChangeDimensions(_ controlsView: RulerSettingsControlsView) {
+        setDimensions(controlsView.dimensionWidthField as Any)
+    }
+
     func rulerSettingsControlsDidChangeRulerColor(_ controlsView: RulerSettingsControlsView) {
         setRulerColor(controlsView.rulerColorWell as Any)
     }

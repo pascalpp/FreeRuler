@@ -17,14 +17,14 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <window title="Free Ruler Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" frameAutosaveName="preferencesWindow" animationBehavior="default" id="F0z-JX-Cv5">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
-            <rect key="contentRect" x="602" y="400" width="360" height="348"/>
+            <rect key="contentRect" x="602" y="400" width="360" height="426"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1512" height="944"/>
             <view key="contentView" id="se5-gp-TjO">
-                <rect key="frame" x="0.0" y="0.0" width="360" height="348"/>
+                <rect key="frame" x="0.0" y="0.0" width="360" height="426"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="PREF-defaults-header">
-                        <rect key="frame" x="22" y="320" width="290" height="16"/>
+                        <rect key="frame" x="22" y="398" width="290" height="16"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="Default settings for new rulers" id="PREF-defaults-header-cell">
                             <font key="font" textStyle="headline" name=".SFNS-Bold"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -32,13 +32,13 @@
                         </textFieldCell>
                     </textField>
                     <box borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="PREF-defaults-box">
-                        <rect key="frame" x="9" y="58" width="342" height="252"/>
+                        <rect key="frame" x="9" y="58" width="342" height="330"/>
                         <view key="contentView" id="PREF-defaults-box-content">
-                            <rect key="frame" x="4" y="5" width="334" height="244"/>
+                            <rect key="frame" x="4" y="5" width="334" height="322"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <customView id="PREF-controls" customClass="RulerSettingsControlsView" customModule="Free_Ruler" customModuleProvider="target">
-                                    <rect key="frame" x="-4" y="-12" width="340" height="258"/>
+                                    <rect key="frame" x="-4" y="0.0" width="340" height="320"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 </customView>
                             </subviews>

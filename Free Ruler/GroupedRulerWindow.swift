@@ -1304,6 +1304,21 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
         notifyStateChanged()
     }
 
+    func updateDimensions(horizontalLength: CGFloat, verticalLength: CGFloat) {
+        let minHorizontalLength = getMinSize(ruler: Ruler(.horizontal)).width
+        let maxHorizontalLength = getMaxSize(ruler: Ruler(.horizontal)).width
+        let minVerticalLength = getMinSize(ruler: Ruler(.vertical)).height
+        let maxVerticalLength = getMaxSize(ruler: Ruler(.vertical)).height
+
+        state.layout = RulerLayoutState(
+            zeroPoint: groupedWindow.zeroPoint(),
+            horizontalLength: min(max(horizontalLength, minHorizontalLength), maxHorizontalLength),
+            verticalLength: min(max(verticalLength, minVerticalLength), maxVerticalLength)
+        )
+        applyStateToWindow(display: true)
+        notifyStateChanged()
+    }
+
     func resetPosition() {
         state.settings.zeroCorner = Prefs.defaultZeroCorner
         state.layout = RulerLayoutState.defaults(

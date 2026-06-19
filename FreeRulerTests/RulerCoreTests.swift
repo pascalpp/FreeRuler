@@ -29,6 +29,8 @@ final class RulerCoreTests: XCTestCase {
             prefs.floatRulers = false
             prefs.rulerShadow = true
             prefs.zeroCorner = .bottomRight
+            prefs.defaultHorizontalLength = Prefs.unsetDefaultRulerLength
+            prefs.defaultVerticalLength = Prefs.unsetDefaultRulerLength
 
             let id = UUID(uuidString: "B74A48A7-235A-43DB-8C01-A7D8F44B1976")!
             let screenFrame = NSRect(x: 0, y: 0, width: 1000, height: 800)
@@ -335,15 +337,19 @@ final class RulerCoreTests: XCTestCase {
     func testRulerSettingsControllerUpdatesRulerSettingsWithoutChangingDefaults() {
         withRestoredRulerPreferences {
             let defaultColor = NSColor(deviceRed: 0.15, green: 0.25, blue: 0.35, alpha: 1)
+            prefs.unit = .pixels
             prefs.rulerColor = defaultColor
             prefs.foregroundOpacity = 90
             prefs.backgroundOpacity = 50
             prefs.floatRulers = true
             prefs.rulerShadow = false
+            prefs.defaultHorizontalLength = 640
+            prefs.defaultVerticalLength = 280
 
             let controller = GroupedRulerController(
                 state: RulerInstanceState(
                     settings: RulerSettings(
+                        unit: .inches,
                         rulerColor: NSColor(deviceRed: 0.4, green: 0.5, blue: 0.6, alpha: 1),
                         foregroundOpacity: 80,
                         backgroundOpacity: 45,
@@ -362,6 +368,31 @@ final class RulerCoreTests: XCTestCase {
                 settingsController.close()
                 controller.hide()
             }
+
+            settingsController.unitSegmentedControl.selectedSegment = Unit.millimeters.rawValue
+            settingsController.setUnit(settingsController.unitSegmentedControl)
+
+            XCTAssertEqual(controller.state.settings.unit, .millimeters)
+            XCTAssertEqual(controller.groupedWindow.horizontalRule.unit, .millimeters)
+            XCTAssertEqual(controller.groupedWindow.verticalRule.unit, .millimeters)
+            XCTAssertEqual(settingsController.unitSegmentedControl.selectedSegment, Unit.millimeters.rawValue)
+            XCTAssertEqual(prefs.unit, .pixels)
+
+            let zeroPointBeforeDimensionChange = controller.groupedWindow.zeroPoint()
+            settingsController.dimensionWidthField.integerValue = 320
+            settingsController.dimensionHeightField.integerValue = 240
+            settingsController.setDimensions(settingsController.dimensionWidthField)
+
+            XCTAssertEqual(controller.state.layout.horizontalLength, 320)
+            XCTAssertEqual(controller.state.layout.verticalLength, 240)
+            XCTAssertEqual(controller.groupedWindow.screenFrame(for: .horizontal).width, 320)
+            XCTAssertEqual(controller.groupedWindow.screenFrame(for: .vertical).height, 240)
+            XCTAssertEqual(controller.groupedWindow.zeroPoint().x, zeroPointBeforeDimensionChange.x, accuracy: 0.0001)
+            XCTAssertEqual(controller.groupedWindow.zeroPoint().y, zeroPointBeforeDimensionChange.y, accuracy: 0.0001)
+            XCTAssertEqual(settingsController.dimensionWidthField.integerValue, 320)
+            XCTAssertEqual(settingsController.dimensionHeightField.integerValue, 240)
+            XCTAssertEqual(prefs.defaultHorizontalLength, 640)
+            XCTAssertEqual(prefs.defaultVerticalLength, 280)
 
             settingsController.rulerColorWell.color = NSColor(
                 deviceRed: 0.8,
@@ -429,6 +460,8 @@ final class RulerCoreTests: XCTestCase {
             prefs.floatRulers = true
             prefs.rulerShadow = false
             prefs.zeroCorner = .topLeft
+            prefs.defaultHorizontalLength = 500
+            prefs.defaultVerticalLength = 400
 
             let rulerColor = NSColor(deviceRed: 0.72, green: 0.24, blue: 0.44, alpha: 1)
             let controller = GroupedRulerController(
@@ -464,6 +497,8 @@ final class RulerCoreTests: XCTestCase {
             XCTAssertFalse(prefs.floatRulers)
             XCTAssertTrue(prefs.rulerShadow)
             XCTAssertEqual(prefs.zeroCorner, .bottomRight)
+            XCTAssertEqual(prefs.defaultHorizontalLength, 260)
+            XCTAssertEqual(prefs.defaultVerticalLength, 180)
         }
     }
 
@@ -477,6 +512,8 @@ final class RulerCoreTests: XCTestCase {
             prefs.floatRulers = true
             prefs.rulerShadow = false
             prefs.zeroCorner = .topRight
+            prefs.defaultHorizontalLength = 320
+            prefs.defaultVerticalLength = 220
 
             let controller = GroupedRulerController(
                 state: RulerInstanceState(
@@ -511,6 +548,10 @@ final class RulerCoreTests: XCTestCase {
             XCTAssertTrue(controller.state.settings.floatRulers)
             XCTAssertFalse(controller.state.settings.rulerShadow)
             XCTAssertEqual(controller.state.settings.zeroCorner, .topRight)
+            XCTAssertEqual(controller.state.layout.horizontalLength, 320)
+            XCTAssertEqual(controller.state.layout.verticalLength, 220)
+            XCTAssertEqual(settingsController.dimensionWidthField.integerValue, 320)
+            XCTAssertEqual(settingsController.dimensionHeightField.integerValue, 220)
             XCTAssertEqual(settingsController.foregroundOpacityLabel.stringValue, "88%")
             XCTAssertEqual(settingsController.backgroundOpacityLabel.stringValue, "44%")
             XCTAssertEqual(controller.opacity, 88)
@@ -592,6 +633,8 @@ final class RulerCoreTests: XCTestCase {
             prefs.groupRulers = false
             prefs.rulerShadow = true
             prefs.zeroCorner = .bottomRight
+            prefs.defaultHorizontalLength = 333
+            prefs.defaultVerticalLength = 222
 
             let preferencesController = PreferencesController()
             preferencesController.loadWindow()
@@ -609,18 +652,55 @@ final class RulerCoreTests: XCTestCase {
             XCTAssertEqual(prefs.groupRulers, Prefs.defaultGroupRulers)
             XCTAssertEqual(prefs.rulerShadow, Prefs.defaultRulerShadow)
             XCTAssertEqual(prefs.zeroCorner, Prefs.defaultZeroCorner)
+            XCTAssertEqual(prefs.defaultHorizontalLength, Prefs.unsetDefaultRulerLength)
+            XCTAssertEqual(prefs.defaultVerticalLength, Prefs.unsetDefaultRulerLength)
             XCTAssertEqual(preferencesController.foregroundOpacityLabel.stringValue, "\(Prefs.defaultForegroundOpacity)%")
             XCTAssertEqual(preferencesController.backgroundOpacityLabel.stringValue, "\(Prefs.defaultBackgroundOpacity)%")
+            XCTAssertEqual(
+                preferencesController.dimensionWidthField.integerValue,
+                Int(RulerLayoutState.defaultLengths().horizontal.rounded())
+            )
+            XCTAssertEqual(
+                preferencesController.dimensionHeightField.integerValue,
+                Int(RulerLayoutState.defaultLengths().vertical.rounded())
+            )
             XCTAssertEqual(preferencesController.floatRulersCheckbox.state, .on)
             XCTAssertEqual(preferencesController.rulerShadowCheckbox.state, .off)
         }
     }
 
+    func testPreferencesControllerUpdatesDefaultUnitAndDimensions() {
+        withRestoredRulerPreferences {
+            prefs.unit = .pixels
+            prefs.defaultHorizontalLength = 500
+            prefs.defaultVerticalLength = 400
+
+            let preferencesController = PreferencesController()
+            preferencesController.loadWindow()
+            defer {
+                preferencesController.close()
+            }
+
+            preferencesController.unitSegmentedControl.selectedSegment = Unit.inches.rawValue
+            preferencesController.setUnit(preferencesController.unitSegmentedControl)
+            preferencesController.dimensionWidthField.integerValue = 360
+            preferencesController.dimensionHeightField.integerValue = 240
+            preferencesController.setDimensions(preferencesController.dimensionWidthField)
+
+            XCTAssertEqual(prefs.unit, .inches)
+            XCTAssertEqual(prefs.defaultHorizontalLength, 360)
+            XCTAssertEqual(prefs.defaultVerticalLength, 240)
+        }
+    }
+
     func testRulerSettingsControlsKeyViewLoopFollowsVisibleControls() {
-        let controlsView = RulerSettingsControlsView(frame: NSRect(x: 0, y: 0, width: 315, height: 224))
+        let controlsView = RulerSettingsControlsView(frame: NSRect(x: 0, y: 0, width: 315, height: 320))
         controlsView.configureForRulerSettings()
 
         controlsView.update(
+            unit: .pixels,
+            horizontalLength: 260,
+            verticalLength: 180,
             rulerColor: Prefs.defaultRulerFillColor,
             foregroundOpacity: 90,
             backgroundOpacity: 50,
@@ -628,13 +708,19 @@ final class RulerCoreTests: XCTestCase {
             rulerShadow: false
         )
 
+        XCTAssertTrue(controlsView.unitSegmentedControl.nextKeyView === controlsView.dimensionWidthField)
+        XCTAssertTrue(controlsView.dimensionWidthField.nextKeyView === controlsView.dimensionHeightField)
+        XCTAssertTrue(controlsView.dimensionHeightField.nextKeyView === controlsView.rulerColorWell)
         XCTAssertTrue(controlsView.rulerColorWell.nextKeyView === controlsView.foregroundOpacitySlider)
         XCTAssertTrue(controlsView.foregroundOpacitySlider.nextKeyView === controlsView.backgroundOpacitySlider)
         XCTAssertTrue(controlsView.backgroundOpacitySlider.nextKeyView === controlsView.floatRulersCheckbox)
         XCTAssertTrue(controlsView.floatRulersCheckbox.nextKeyView === controlsView.rulerShadowCheckbox)
-        XCTAssertTrue(controlsView.rulerShadowCheckbox.nextKeyView === controlsView.rulerColorWell)
+        XCTAssertTrue(controlsView.rulerShadowCheckbox.nextKeyView === controlsView.unitSegmentedControl)
 
         controlsView.update(
+            unit: .pixels,
+            horizontalLength: 260,
+            verticalLength: 180,
             rulerColor: NSColor(deviceRed: 0.6, green: 0.3, blue: 0.2, alpha: 1),
             foregroundOpacity: 90,
             backgroundOpacity: 50,
@@ -890,6 +976,8 @@ final class RulerCoreTests: XCTestCase {
             prefs.unit = .pixels
             prefs.rulerColor = NSColor(deviceRed: 0.1, green: 0.2, blue: 0.3, alpha: 1)
             prefs.zeroCorner = .topLeft
+            prefs.defaultHorizontalLength = 260
+            prefs.defaultVerticalLength = 180
             let manager = RulerManager()
             defer {
                 for controller in manager.controllers {
@@ -904,11 +992,15 @@ final class RulerCoreTests: XCTestCase {
             prefs.unit = .millimeters
             prefs.rulerColor = NSColor(deviceRed: 0.8, green: 0.7, blue: 0.2, alpha: 1)
             prefs.zeroCorner = .topRight
+            prefs.defaultHorizontalLength = 320
+            prefs.defaultVerticalLength = 240
             let createdAfterDefaultsChange = manager.createRuler(
                 screenFrame: NSRect(x: 0, y: 0, width: 1000, height: 800)
             )
 
             XCTAssertEqual(existing.state.settings.unit, .pixels)
+            XCTAssertEqual(existing.state.layout.horizontalLength, 260)
+            XCTAssertEqual(existing.state.layout.verticalLength, 180)
             XCTAssertEqual(existing.groupedWindow.horizontalRule.unit, .pixels)
             XCTAssertEqual(existing.groupedWindow.horizontalRule.zeroCorner, .topLeft)
             assertColor(
@@ -916,6 +1008,8 @@ final class RulerCoreTests: XCTestCase {
                 equals: NSColor(deviceRed: 0.1, green: 0.2, blue: 0.3, alpha: 1)
             )
             XCTAssertEqual(createdAfterDefaultsChange.state.settings.unit, .millimeters)
+            XCTAssertEqual(createdAfterDefaultsChange.state.layout.horizontalLength, 320)
+            XCTAssertEqual(createdAfterDefaultsChange.state.layout.verticalLength, 240)
             XCTAssertEqual(createdAfterDefaultsChange.groupedWindow.horizontalRule.unit, .millimeters)
             XCTAssertEqual(createdAfterDefaultsChange.groupedWindow.horizontalRule.zeroCorner, .topRight)
             assertColor(
@@ -3637,6 +3731,8 @@ final class RulerCoreTests: XCTestCase {
         let previousGroupRulers = prefs.groupRulers
         let previousRulerShadow = prefs.rulerShadow
         let previousZeroCorner = prefs.zeroCorner
+        let previousDefaultHorizontalLength = prefs.defaultHorizontalLength
+        let previousDefaultVerticalLength = prefs.defaultVerticalLength
 
         defer {
             prefs.unit = previousUnit
@@ -3647,6 +3743,8 @@ final class RulerCoreTests: XCTestCase {
             prefs.groupRulers = previousGroupRulers
             prefs.rulerShadow = previousRulerShadow
             prefs.zeroCorner = previousZeroCorner
+            prefs.defaultHorizontalLength = previousDefaultHorizontalLength
+            prefs.defaultVerticalLength = previousDefaultVerticalLength
         }
 
         try test()
