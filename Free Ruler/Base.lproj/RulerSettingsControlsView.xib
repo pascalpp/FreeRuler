@@ -101,14 +101,17 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="RSV-reset-button">
-                    <rect key="frame" x="200" y="203" width="28" height="28"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RSV-reset-button">
+                    <rect key="frame" x="199" y="201" width="28" height="28"/>
                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" imagePosition="only" alignment="center" imageScaling="proportionallyDown" id="RSV-reset-cell">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <color key="bezelColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="28" id="fY4-Hn-tKu"/>
+                        <constraint firstAttribute="height" constant="28" id="n5Q-yd-KRm"/>
+                    </constraints>
                 </button>
                 <colorWell translatesAutoresizingMaskIntoConstraints="NO" id="RSV-color-well" customClass="RulerColorWell" customModule="Free_Ruler" customModuleProvider="target">
                     <rect key="frame" x="234" y="198" width="66" height="34"/>
@@ -180,6 +183,8 @@
                 <constraint firstItem="RSV-bg-slider" firstAttribute="top" secondItem="RSV-bg-label" secondAttribute="bottom" constant="8" id="6jA-xw-OUw"/>
                 <constraint firstItem="RSV-shadow-checkbox" firstAttribute="leading" secondItem="RSV-content" secondAttribute="leading" constant="15" id="B29-FT-E0I"/>
                 <constraint firstItem="RSV-dimensions-separator" firstAttribute="firstBaseline" secondItem="RSV-dimension-height" secondAttribute="firstBaseline" id="CRX-Gx-84L"/>
+                <constraint firstItem="RSV-color-well" firstAttribute="leading" secondItem="RSV-reset-button" secondAttribute="trailing" constant="10" id="EQr-mB-ZAV"/>
+                <constraint firstItem="RSV-reset-button" firstAttribute="centerY" secondItem="RSV-color-well" secondAttribute="centerY" id="Ghc-N8-u4j"/>
                 <constraint firstAttribute="trailing" secondItem="RSV-unit-control" secondAttribute="trailing" constant="15" id="KS6-fK-eyF"/>
                 <constraint firstItem="RSV-unit-label" firstAttribute="firstBaseline" secondItem="RSV-unit-control" secondAttribute="firstBaseline" id="L3G-1a-rdA"/>
                 <constraint firstItem="RSV-float-checkbox" firstAttribute="leading" secondItem="RSV-content" secondAttribute="leading" constant="15" id="MLK-TI-Q4f"/>
