@@ -525,7 +525,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func applyRulerWindowMode(showRulersIfNeeded: Bool = false) {
         if rulerManager.hasRulers {
-            rulerManager.showAll()
             updateMouseTickTimer()
             return
         }
@@ -745,8 +744,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @IBAction func toggleGroupRulers(_ sender: Any) {
-        guard !rulerManager.hasRulers else { return }
-
         prefs.groupRulers = !prefs.groupRulers
         showGroupRulersHotkeyBezel(on: bezelScreen(for: sender))
     }
@@ -1034,7 +1031,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         case kVK_ANSI_F:
             toggleFloatRulers(sender)
         case kVK_ANSI_G:
-            guard !rulerManager.hasRulers else { return true }
             toggleGroupRulers(sender)
         case kVK_ANSI_S:
             toggleRulerShadow(sender)
@@ -1120,7 +1116,7 @@ extension AppDelegate: NSMenuItemValidation {
         case #selector(closeKeyWindow(_:)):
             return rulerManager.activeController != nil || NSApp.keyWindow?.isVisible == true
         case #selector(toggleGroupRulers(_:)):
-            return !rulerManager.hasRulers
+            return true
         case #selector(toggleHorizontalRuler(_:)):
             if let controller = rulerManager.activeController {
                 let isVisible = controller.state.isWingVisible(.horizontal)

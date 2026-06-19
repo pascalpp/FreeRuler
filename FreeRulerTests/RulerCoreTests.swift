@@ -189,6 +189,57 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertEqual(third.state.layout.zeroPoint.y, first.state.layout.zeroPoint.y - (staggerOffset * 2))
     }
 
+    func testRulerManagerMovesVisibleRulersTogetherDuringGroupedDrag() {
+        withRestoredRulerPreferences {
+            withRestoredRulerSetState {
+                prefs.groupRulers = true
+                prefs.zeroCorner = .topLeft
+                let appDelegate = AppDelegate()
+                let first = appDelegate.rulerManager.createRuler(
+                    screenFrame: NSRect(x: 0, y: 0, width: 1000, height: 800)
+                )
+                let second = appDelegate.rulerManager.createRuler(
+                    screenFrame: NSRect(x: 0, y: 0, width: 1000, height: 800)
+                )
+                let hidden = appDelegate.rulerManager.createRuler(
+                    screenFrame: NSRect(x: 0, y: 0, width: 1000, height: 800)
+                )
+                defer {
+                    first.hide()
+                    second.hide()
+                    hidden.hide()
+                }
+                first.show()
+                second.show()
+
+                let firstFrame = first.groupedWindow.frame
+                let secondFrame = second.groupedWindow.frame
+                let hiddenFrame = hidden.groupedWindow.frame
+                let dragOffset = NSSize(width: 37, height: -24)
+                var movedFirstFrame = firstFrame
+                movedFirstFrame.origin.x += dragOffset.width
+                movedFirstFrame.origin.y += dragOffset.height
+
+                appDelegate.rulerManager.beginGroupedDrag(from: first)
+                first.move(to: movedFirstFrame)
+                appDelegate.rulerManager.syncGroupedDrag(from: first)
+                appDelegate.rulerManager.finishGroupedDrag(from: first)
+
+                XCTAssertEqual(first.groupedWindow.frame, movedFirstFrame)
+                XCTAssertEqual(second.groupedWindow.frame.minX, secondFrame.minX + dragOffset.width)
+                XCTAssertEqual(second.groupedWindow.frame.minY, secondFrame.minY + dragOffset.height)
+                XCTAssertEqual(hidden.groupedWindow.frame, hiddenFrame)
+                XCTAssertEqual(
+                    second.state.layout.zeroPoint,
+                    ZeroCornerGeometry(zeroCorner: second.state.settings.zeroCorner).zeroPoint(
+                        in: second.groupedWindow.screenFrame(for: .horizontal),
+                        for: .horizontal
+                    )
+                )
+            }
+        }
+    }
+
     func testRulerContextMenuActivatesClickedRulerAndShowsSettingsCommand() {
         withInstalledAppDelegate { appDelegate in
             let manager = appDelegate.rulerManager
@@ -3332,26 +3383,32 @@ final class RulerCoreTests: XCTestCase {
         }
     }
 
-    func testManagedGroupHotkeyDoesNotToggleRetiredGroupedMode() {
-        withRestoredZeroCornerPreference {
-            let previousGroupRulers = prefs.groupRulers
-            defer { prefs.groupRulers = previousGroupRulers }
-
-            prefs.groupRulers = true
+    func testManagedGroupHotkeyTogglesGroupedDraggingMode() {
+        withRestoredRulerPreferences {
+            prefs.groupRulers = false
             let appDelegate = AppDelegate()
-            appDelegate.showRulers()
+            let controller = appDelegate.rulerManager.createRuler()
+            defer {
+                controller.hide()
+            }
 
             XCTAssertTrue(
                 appDelegate.performRulerHotkey(
                     keyCode: kVK_ANSI_G,
                     modifierFlags: [],
-                    sender: appDelegate.groupedRulerController!
+                    sender: controller
                 )
             )
-
             XCTAssertTrue(prefs.groupRulers)
-            XCTAssertEqual(appDelegate.rulerManager.controllers.count, 1)
-            appDelegate.groupedRulerController?.hide()
+
+            XCTAssertTrue(
+                appDelegate.performRulerHotkey(
+                    keyCode: kVK_ANSI_G,
+                    modifierFlags: [],
+                    sender: controller
+                )
+            )
+            XCTAssertFalse(prefs.groupRulers)
         }
     }
 
@@ -3499,10 +3556,16 @@ final class RulerCoreTests: XCTestCase {
             action: #selector(AppDelegate.toggleVerticalRuler(_:)),
             keyEquivalent: ""
         )
+        let groupItem = NSMenuItem(
+            title: "",
+            action: #selector(AppDelegate.toggleGroupRulers(_:)),
+            keyEquivalent: ""
+        )
 
         XCTAssertTrue(appDelegate.validateMenuItem(closeItem))
         XCTAssertFalse(appDelegate.validateMenuItem(horizontalItem))
         XCTAssertTrue(appDelegate.validateMenuItem(verticalItem))
+        XCTAssertTrue(appDelegate.validateMenuItem(groupItem))
     }
 
     func testUngroupedHorizontalFlipDoesNotMoveRulerWindows() {
