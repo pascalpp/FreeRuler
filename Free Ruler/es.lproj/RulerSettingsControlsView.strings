@@ -5,6 +5,9 @@
 /* Class = "NSTextFieldCell"; title = "Ruler Color"; ObjectID = "RSV-color-cell"; */
 "RSV-color-cell.title" = "Color de la regla";
 
+/* Class = "NSTextFieldCell"; title = "Dimensions"; ObjectID = "RSV-dimensions-cell"; */
+"RSV-dimensions-cell.title" = "Dimensiones";
+
 /* Class = "NSTextFieldCell"; title = "Foreground Opacity"; ObjectID = "RSV-fg-cell"; */
 "RSV-fg-cell.title" = "Opacidad del primer plano";
 
@@ -13,3 +16,6 @@
 
 /* Class = "NSButtonCell"; title = "Show ruler shadow"; ObjectID = "RSV-shadow-cell"; */
 "RSV-shadow-cell.title" = "Mostrar sombra de la regla";
+
+/* Class = "NSTextFieldCell"; title = "Unit"; ObjectID = "RSV-unit-cell"; */
+"RSV-unit-cell.title" = "Unidad";
