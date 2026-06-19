@@ -60,14 +60,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     var observers: [NSKeyValueObservation] = []
 
-    var rulers: [RulerController] = []
-    var groupedRulerController: GroupedRulerController?
     lazy var rulerManager: RulerManager = {
         let manager = RulerManager()
         manager.onActiveControllerChanged = { [weak self] controller in
             guard let self = self else { return }
 
-            self.groupedRulerController = controller
             self.updateDisplay()
 
             guard let settingsController = self.rulerSettingsController,
@@ -124,54 +121,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 #if SPARKLE
     private var updaterController: SPUStandardUpdaterController?
 #endif
-
-    private enum RulerWindowMode {
-        case grouped
-        case separate
-    }
-
-    private struct RulerVisibility {
-        var horizontal = true
-        var vertical = true
-
-        var hasVisibleRuler: Bool {
-            return horizontal || vertical
-        }
-
-        mutating func showAll() {
-            horizontal = true
-            vertical = true
-        }
-
-        mutating func hideAll() {
-            horizontal = false
-            vertical = false
-        }
-
-        mutating func toggle(_ orientation: Orientation) {
-            set(orientation, isVisible: !isVisible(orientation))
-        }
-
-        mutating func set(_ orientation: Orientation, isVisible: Bool) {
-            switch orientation {
-            case .horizontal:
-                horizontal = isVisible
-            case .vertical:
-                vertical = isVisible
-            }
-        }
-
-        func isVisible(_ orientation: Orientation) -> Bool {
-            switch orientation {
-            case .horizontal:
-                return horizontal
-            case .vertical:
-                return vertical
-            }
-        }
-    }
-
-    private var rulerVisibility = RulerVisibility()
 
     // MARK: - Lifecycle
 
@@ -302,17 +251,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             },
             prefs.observe(\Prefs.floatRulers, options: .new) { prefs, changed in
                 self.updateFloatRulersMenuItem()
-                self.legacyGroupedRulerController?.updateIsFloatingPanel()
                 self.uiTestSupport?.writePreferencesState()
             },
             prefs.observe(\Prefs.groupRulers, options: .new) { prefs, changed in
                 self.updateGroupRulersMenuItem()
-                self.applyRulerWindowMode()
                 self.uiTestSupport?.writePreferencesState()
             },
             prefs.observe(\Prefs.rulerShadow, options: .new) { prefs, changed in
                 self.updateRulerShadowMenuItem()
-                self.legacyGroupedRulerController?.updateHasShadow()
                 self.uiTestSupport?.writePreferencesState()
             },
             prefs.observe(\Prefs.rulerColor, options: .new) { prefs, changed in
@@ -339,20 +285,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func redrawRulers() {
-        for ruler in rulers {
-            ruler.rulerWindow.rule.redrawForPreferenceChange()
-        }
         for controller in rulerManager.controllers {
             controller.redrawForPreferenceChange()
         }
-        legacyGroupedRulerController?.redrawForPreferenceChange()
     }
 
     func redrawDefaultBackedRulers() {
-        for ruler in rulers {
-            ruler.rulerWindow.rule.redrawForPreferenceChange()
-        }
-        legacyGroupedRulerController?.redrawForPreferenceChange()
+        redrawRulers()
     }
 
     func updateFloatRulersMenuItem() {
@@ -384,27 +323,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         guard !rulerManager.hasRulers else { return }
 
         rulerManager.createRuler()
-    }
-
-    private func createLegacyRulersIfNeeded() {
-        guard rulers.isEmpty else { return }
-
-        rulers = [
-            RulerController(Ruler(.vertical, name: "vertical-ruler")),
-            RulerController(Ruler(.horizontal, name: "horizontal-ruler")),
-        ]
-
-        // let rulers know about each other
-        // TODO: provide each ruler with otherRulers: [LegacyRulerWindow]
-        rulers[0].otherWindow = rulers[1].rulerWindow
-        rulers[1].otherWindow = rulers[0].rulerWindow
-
-        let groupedFrame = GroupedRulerLayout.joined(
-            horizontalFrame: rulers[1].rulerWindow.frame,
-            verticalFrame: rulers[0].rulerWindow.frame,
-            zeroCorner: prefs.zeroCorner
-        ).groupFrame
-        groupedRulerController = GroupedRulerController(frame: groupedFrame)
     }
 
     func showRulers() {
@@ -443,220 +361,49 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         guard hasLegacyAutosave else { return nil }
 
         let settings = RulerSettings(defaults: prefs)
-        let horizontalWindow = LegacyRulerWindow(
-            ruler: Ruler(.horizontal, name: horizontalAutosaveName)
+        let horizontalFrame = legacyAutosavedFrame(
+            name: horizontalAutosaveName,
+            fallback: getDefaultContentRect(orientation: .horizontal, zeroCorner: settings.zeroCorner)
         )
-        let verticalWindow = LegacyRulerWindow(
-            ruler: Ruler(.vertical, name: verticalAutosaveName)
+        let verticalFrame = legacyAutosavedFrame(
+            name: verticalAutosaveName,
+            fallback: getDefaultContentRect(orientation: .vertical, zeroCorner: settings.zeroCorner)
         )
-        _ = horizontalWindow.setFrameUsingName(NSWindow.FrameAutosaveName(horizontalAutosaveName))
-        _ = verticalWindow.setFrameUsingName(NSWindow.FrameAutosaveName(verticalAutosaveName))
 
         return RulerInstanceState(
             settings: settings,
             layout: RulerLayoutState(
-                horizontalFrame: horizontalWindow.frame,
-                verticalFrame: verticalWindow.frame,
+                horizontalFrame: horizontalFrame,
+                verticalFrame: verticalFrame,
                 zeroCorner: settings.zeroCorner
             )
         )
     }
 
+    private func legacyAutosavedFrame(name: String, fallback: NSRect) -> NSRect {
+        let window = NSWindow(
+            contentRect: fallback,
+            styleMask: [.borderless, .resizable, .fullSizeContentView],
+            backing: .buffered,
+            defer: false
+        )
+        _ = window.setFrameUsingName(NSWindow.FrameAutosaveName(name))
+        let frame = window.frame
+        window.close()
+        return frame
+    }
+
     func toggleRuler(orientation: Orientation) {
-        if !rulerManager.hasRulers && rulers.isEmpty {
-            createRulersIfNeeded()
-        }
+        createRulersIfNeeded()
 
-        if rulerManager.hasRulers {
-            let controller = rulerManager.activeController ?? rulerManager.createRuler()
-            controller.toggleWing(orientation)
-            updateDisplay()
-            updateMouseTickTimer()
-            return
-        }
-
-        guard canToggleRulerVisibility else { return }
-        guard rulerController(orientation: orientation) != nil else { return }
-
-        if prefs.groupRulers {
-            syncGroupedRulerFramesToRulerWindows(persistAutosave: true)
-        }
-
-        let shouldShowRulersIfNeeded = !hasVisibleRuler
-        rulerVisibility.toggle(orientation)
-        applyRulerWindowMode(showRulersIfNeeded: shouldShowRulersIfNeeded)
-    }
-
-    private func detachRulerWindows() {
-        for ruler in rulers {
-            detachRulerWindow(ruler.rulerWindow)
-        }
-    }
-
-    private func rulerController(orientation: Orientation) -> RulerController? {
-        createLegacyRulersIfNeeded()
-        return existingRulerController(orientation: orientation)
-    }
-
-    private func existingRulerController(orientation: Orientation) -> RulerController? {
-        return rulers.first { $0.ruler.orientation == orientation }
-    }
-
-    private func showRuler(_ ruler: RulerController, updateMode: Bool = true) {
-        ruler.showWindow(self)
-        ruler.rulerWindow.orderFrontRegardless()
-        if updateMode {
-            applyRulerWindowMode()
-        }
-    }
-
-    private func detachRulerWindow(_ window: LegacyRulerWindow) {
-        for ruler in rulers {
-            guard ruler.rulerWindow != window else { continue }
-
-            ruler.rulerWindow.removeChildWindow(window)
-            window.removeChildWindow(ruler.rulerWindow)
-        }
-    }
-
-    private var rulerWindowMode: RulerWindowMode {
-        return prefs.groupRulers ? .grouped : .separate
-    }
-
-    private func applyRulerWindowMode(showRulersIfNeeded: Bool = false) {
-        if rulerManager.hasRulers {
-            updateMouseTickTimer()
-            return
-        }
-
-        createLegacyRulersIfNeeded()
-        detachRulerWindows()
-
-        switch rulerWindowMode {
-        case .grouped:
-            showGroupedRulerWindow(showRulersIfNeeded: showRulersIfNeeded)
-        case .separate:
-            showSeparateRulerWindows()
-        }
-
+        let controller = rulerManager.activeController ?? rulerManager.createRuler()
+        controller.toggleWing(orientation)
+        updateDisplay()
         updateMouseTickTimer()
-    }
-
-    private func showGroupedRulerWindow(showRulersIfNeeded: Bool) {
-        guard let groupedRulerController = groupedRulerController,
-              let horizontalRuler = existingRulerController(orientation: .horizontal),
-              let verticalRuler = existingRulerController(orientation: .vertical) else {
-            return
-        }
-
-        guard rulerVisibility.hasVisibleRuler else {
-            groupedRulerController.hide()
-            horizontalRuler.rulerWindow.orderOut(self)
-            verticalRuler.rulerWindow.orderOut(self)
-            return
-        }
-
-        let shouldShowGroupedRuler = showRulersIfNeeded
-            || groupedRulerController.isVisible
-            || horizontalRuler.rulerWindow.isVisible
-            || verticalRuler.rulerWindow.isVisible
-
-        guard shouldShowGroupedRuler else { return }
-
-        let horizontalFrame = groupedRulerController.isVisible
-            && groupedRulerController.groupedWindow.isRuleVisible(.horizontal)
-            ? groupedRulerController.groupedWindow.screenFrame(for: .horizontal)
-            : horizontalRuler.rulerWindow.frame
-        let verticalFrame = groupedRulerController.isVisible
-            && groupedRulerController.groupedWindow.isRuleVisible(.vertical)
-            ? groupedRulerController.groupedWindow.screenFrame(for: .vertical)
-            : verticalRuler.rulerWindow.frame
-
-        groupedRulerController.show(
-            horizontalFrame: horizontalFrame,
-            verticalFrame: verticalFrame,
-            showsHorizontalRule: rulerVisibility.horizontal,
-            showsVerticalRule: rulerVisibility.vertical
-        )
-        horizontalRuler.rulerWindow.orderOut(self)
-        verticalRuler.rulerWindow.orderOut(self)
-    }
-
-    private func showSeparateRulerWindows() {
-        guard let groupedRulerController = groupedRulerController else {
-            return
-        }
-
-        if groupedRulerController.isVisible {
-            syncGroupedRulerFramesToRulerWindows(persistAutosave: true)
-            groupedRulerController.hide()
-        }
-
-        for ruler in rulers {
-            if rulerVisibility.isVisible(ruler.ruler.orientation) {
-                showRuler(ruler, updateMode: false)
-            } else {
-                ruler.rulerWindow.orderOut(self)
-            }
-        }
-
-        for ruler in rulers {
-            ruler.updateChildWindow()
-        }
-    }
-
-    func syncGroupedRulerFramesToRulerWindows(persistAutosave: Bool = false) {
-        guard let groupedRulerController = groupedRulerController,
-              let horizontalRuler = existingRulerController(orientation: .horizontal),
-              let verticalRuler = existingRulerController(orientation: .vertical) else {
-            return
-        }
-
-        groupedRulerController.syncFrames(
-            to: horizontalRuler.rulerWindow,
-            and: verticalRuler.rulerWindow,
-            persistAutosave: persistAutosave
-        )
-    }
-
-    private var isGroupedRulerVisible: Bool {
-        return groupedRulerController?.isVisible == true
-    }
-
-    private var legacyGroupedRulerController: GroupedRulerController? {
-        guard let groupedRulerController = groupedRulerController,
-              !rulerManager.controllers.contains(where: { $0 === groupedRulerController }) else {
-            return nil
-        }
-
-        return groupedRulerController
-    }
-
-    private func isRulerVisible(_ ruler: RulerController?) -> Bool {
-        guard let ruler = ruler else { return false }
-        return rulerVisibility.isVisible(ruler.ruler.orientation)
-    }
-
-    private var isRulerFrontmost: Bool {
-        if rulerManager.controllers.contains(where: { $0.groupedWindow.isKeyWindow }) {
-            return true
-        }
-
-        if groupedRulerController?.groupedWindow.isKeyWindow == true {
-            return true
-        }
-
-        return rulers.contains { $0.rulerWindow.isKeyWindow }
     }
 
     private var hasVisibleRuler: Bool {
         return rulerManager.hasVisibleRulers
-            || isGroupedRulerVisible
-            || rulers.contains { $0.rulerWindow.isVisible }
-    }
-
-    private var canToggleRulerVisibility: Bool {
-        return isRulerFrontmost || !hasVisibleRuler
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
@@ -669,13 +416,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
-        for ruler in rulers {
-            ruler.foreground()
-        }
         for controller in rulerManager.controllers {
             controller.foreground()
         }
-        legacyGroupedRulerController?.foreground()
 
         mouseTickTimerPolicy.applicationDidBecomeActive()
         updateMouseTickTimer()
@@ -684,13 +427,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidResignActive(_ notification: Notification) {
-        for ruler in rulers {
-            ruler.background()
-        }
         for controller in rulerManager.controllers {
             controller.background()
         }
-        legacyGroupedRulerController?.background()
 
         mouseTickTimerPolicy.applicationDidResignActive()
         updateMouseTickTimer()
@@ -814,20 +553,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        if let groupedRulerController = groupedRulerController,
-           groupedRulerController.groupedWindow.isKeyWindow {
-            syncGroupedRulerFramesToRulerWindows(persistAutosave: true)
-            rulerVisibility.hideAll()
-            applyRulerWindowMode()
-            return
-        }
-
-        if let ruler = rulers.first(where: { $0.rulerWindow.isKeyWindow }) {
-            rulerVisibility.set(ruler.ruler.orientation, isVisible: false)
-            applyRulerWindowMode()
-            return
-        }
-
         NSApp.keyWindow?.performClose(sender)
     }
 
@@ -836,46 +561,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         mouseLoc.x = mouseLoc.x.rounded()
         mouseLoc.y = mouseLoc.y.rounded()
 
+        createRulersIfNeeded()
+
         if let controller = rulerManager.activeController {
             controller.align(at: mouseLoc)
-            return
-        }
-
-        if prefs.groupRulers,
-           let groupedRulerController = groupedRulerController,
-           groupedRulerController.isVisible {
-            groupedRulerController.align(at: mouseLoc)
-            syncGroupedRulerFramesToRulerWindows(persistAutosave: true)
-            return
-        }
-
-        for ruler in rulers {
-            ruler.alignRuler(at: mouseLoc)
         }
     }
 
     @IBAction func resetRulerPositions(_ sender: Any) {
+        createRulersIfNeeded()
+
         if let controller = rulerManager.activeController {
             controller.resetPosition()
             updateDisplay()
             updateMouseTickTimer()
-            return
         }
-
-        createLegacyRulersIfNeeded()
-
-        prefs.zeroCorner = Prefs.defaultZeroCorner
-
-        // ungroup rulers during reset operation
-        prefs.groupRulers = false
-        rulerVisibility.showAll()
-        for ruler in rulers {
-            ruler.resetPosition()
-            showRuler(ruler, updateMode: false)
-        }
-
-        prefs.groupRulers = Prefs.defaultGroupRulers
-        applyRulerWindowMode()
     }
 
     @IBAction func toggleHorizontalRuler(_ sender: Any) {
@@ -897,63 +597,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func flipRulers(along orientation: Orientation) {
-        if !rulerManager.hasRulers && rulers.isEmpty {
-            createRulersIfNeeded()
-        }
+        createRulersIfNeeded()
 
         if let controller = rulerManager.activeController {
             let flippedCorner = controller.state.settings.zeroCorner.flipped(along: orientation)
             controller.prepareForZeroCornerChange(to: flippedCorner)
             controller.redrawForPreferenceChange()
             updateDisplay()
-            return
         }
-
-        createLegacyRulersIfNeeded()
-
-        let oldGeometry = ZeroCornerGeometry(zeroCorner: prefs.zeroCorner)
-        let flippedCorner = prefs.zeroCorner.flipped(along: orientation)
-        let flippedRuler = existingRulerController(orientation: orientation)
-        let otherOrientation: Orientation = orientation == .horizontal ? .vertical : .horizontal
-        let otherRuler = existingRulerController(orientation: otherOrientation)
-        let zeroPointOffset = zeroPointOffset(
-            from: flippedRuler?.rulerWindow,
-            to: otherRuler?.rulerWindow,
-            geometry: oldGeometry
-        )
-
-        if prefs.groupRulers,
-           let groupedRulerController = groupedRulerController,
-           groupedRulerController.isVisible {
-            groupedRulerController.prepareForZeroCornerChange(to: flippedCorner)
-            prefs.zeroCorner = flippedCorner
-            syncGroupedRulerFramesToRulerWindows(persistAutosave: true)
-            return
-        }
-
-        prefs.zeroCorner = flippedCorner
-
-        guard prefs.groupRulers,
-              let flippedWindow = flippedRuler?.rulerWindow,
-              let otherWindow = otherRuler?.rulerWindow,
-              isRulerWindowShown(otherWindow),
-              let zeroPointOffset = zeroPointOffset else { return }
-
-        let newGeometry = ZeroCornerGeometry(zeroCorner: flippedCorner)
-        let flippedZeroPoint = newGeometry.zeroPoint(in: flippedWindow.frame, for: orientation)
-        let targetOtherZeroPoint = NSPoint(
-            x: flippedZeroPoint.x + zeroPointOffset.width,
-            y: flippedZeroPoint.y + zeroPointOffset.height
-        )
-        let otherFrame = newGeometry.frame(
-            for: otherOrientation,
-            zeroPoint: targetOtherZeroPoint,
-            size: otherWindow.frame.size
-        )
-
-        detachRulerWindows()
-        otherWindow.setFrame(otherFrame, display: true)
-        applyRulerWindowMode()
     }
 
     private func setUnit(_ unit: Unit) {
@@ -966,41 +617,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         prefs.unit = unit
     }
 
-    func isRulerWindowShown(_ window: LegacyRulerWindow) -> Bool {
-        return window.isVisible || window.parent != nil || rulers.contains {
-            $0.rulerWindow.childWindows?.contains(window) == true
-        }
-    }
-
-    private func zeroPointOffset(
-        from sourceWindow: LegacyRulerWindow?,
-        to targetWindow: LegacyRulerWindow?,
-        geometry: ZeroCornerGeometry
-    ) -> NSSize? {
-        guard let sourceWindow = sourceWindow,
-              let targetWindow = targetWindow else { return nil }
-
-        let sourceZeroPoint = geometry.zeroPoint(
-            in: sourceWindow.frame,
-            for: sourceWindow.ruler.orientation
-        )
-        let targetZeroPoint = geometry.zeroPoint(
-            in: targetWindow.frame,
-            for: targetWindow.ruler.orientation
-        )
-
-        return NSSize(
-            width: targetZeroPoint.x - sourceZeroPoint.x,
-            height: targetZeroPoint.y - sourceZeroPoint.y
-        )
-    }
-
     func performRulerHotkey(
         keyCode: Int,
         modifierFlags: NSEvent.ModifierFlags,
         sender: Any
     ) -> Bool {
-        if let controller = sender as? GroupedRulerController {
+        if let controller = sender as? RulerController {
             rulerManager.markActive(controller)
         }
 
@@ -1081,15 +703,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return rulerController.rulerWindow.screen
         }
 
-        if let groupedRulerController = sender as? GroupedRulerController {
-            return groupedRulerController.groupedWindow.screen
-        }
-
         if let activeController = rulerManager.activeController {
-            return activeController.groupedWindow.screen
+            return activeController.rulerWindow.screen
         }
 
-        return rulers.first { $0.rulerWindow.isKeyWindow }?.rulerWindow.screen
+        return nil
     }
 
     private func unitLabel(_ unit: Unit) -> String {
@@ -1139,11 +757,11 @@ extension AppDelegate: NSMenuItemValidation {
                 return !isVisible || controller.state.isWingVisible(.vertical)
             }
 
-            let ruler = existingRulerController(orientation: .horizontal)
-            menuItem.title = isRulerVisible(ruler)
-                ? NSLocalizedString("Hide Horizontal Ruler", comment: "Menu item title to hide the horizontal ruler")
-                : NSLocalizedString("Show Horizontal Ruler", comment: "Menu item title to show the horizontal ruler")
-            return canToggleRulerVisibility
+            menuItem.title = NSLocalizedString(
+                "Show Horizontal Ruler",
+                comment: "Menu item title to show the horizontal ruler"
+            )
+            return true
         case #selector(toggleVerticalRuler(_:)):
             if let controller = rulerManager.activeController {
                 let isVisible = controller.state.isWingVisible(.vertical)
@@ -1153,11 +771,11 @@ extension AppDelegate: NSMenuItemValidation {
                 return !isVisible || controller.state.isWingVisible(.horizontal)
             }
 
-            let ruler = existingRulerController(orientation: .vertical)
-            menuItem.title = isRulerVisible(ruler)
-                ? NSLocalizedString("Hide Vertical Ruler", comment: "Menu item title to hide the vertical ruler")
-                : NSLocalizedString("Show Vertical Ruler", comment: "Menu item title to show the vertical ruler")
-            return canToggleRulerVisibility
+            menuItem.title = NSLocalizedString(
+                "Show Vertical Ruler",
+                comment: "Menu item title to show the vertical ruler"
+            )
+            return true
         default:
             return true
         }
@@ -1204,14 +822,9 @@ extension AppDelegate {
     }
 
     private func setMouseTickDrawingEnabled(_ isEnabled: Bool) {
-        for ruler in rulers {
-            ruler.rulerWindow.rule.showMouseTick = isEnabled
-        }
-
         for controller in rulerManager.controllers {
             controller.setMouseTickDrawingEnabled(isEnabled)
         }
-        legacyGroupedRulerController?.setMouseTickDrawingEnabled(isEnabled)
     }
 
     private func updateMouseTickTimer() {
@@ -1255,21 +868,8 @@ extension AppDelegate {
         mouseLoc.x = mouseLoc.x.rounded()
         mouseLoc.y = mouseLoc.y.rounded()
 
-        if rulerManager.hasRulers {
-            for controller in rulerManager.controllers where controller.isVisible {
-                controller.drawMouseTick(at: mouseLoc)
-            }
-            return
-        }
-
-        if let groupedRulerController = groupedRulerController,
-           groupedRulerController.isVisible {
-            groupedRulerController.drawMouseTick(at: mouseLoc)
-            return
-        }
-
-        for ruler in rulers {
-            ruler.rulerWindow.rule.drawMouseTick(at: mouseLoc)
+        for controller in rulerManager.controllers where controller.isVisible {
+            controller.drawMouseTick(at: mouseLoc)
         }
     }
 

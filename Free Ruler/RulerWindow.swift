@@ -1,7 +1,7 @@
 import Cocoa
 import Carbon.HIToolbox
 
-struct GroupedRulerLayout: Equatable {
+struct RulerWindowLayout: Equatable {
     let groupFrame: NSRect
     let horizontalFrame: NSRect
     let verticalFrame: NSRect
@@ -10,7 +10,7 @@ struct GroupedRulerLayout: Equatable {
         horizontalFrame: NSRect,
         verticalFrame: NSRect,
         zeroCorner: ZeroCorner
-    ) -> GroupedRulerLayout {
+    ) -> RulerWindowLayout {
         let zeroPoint = ZeroCornerGeometry(zeroCorner: zeroCorner)
             .zeroPoint(in: horizontalFrame, for: .horizontal)
 
@@ -25,7 +25,7 @@ struct GroupedRulerLayout: Equatable {
     static func layout(
         groupFrame: NSRect,
         zeroCorner: ZeroCorner
-    ) -> GroupedRulerLayout {
+    ) -> RulerWindowLayout {
         let zeroPoint = zeroPoint(in: groupFrame, zeroCorner: zeroCorner)
         let horizontalLength = length(
             in: groupFrame,
@@ -53,7 +53,7 @@ struct GroupedRulerLayout: Equatable {
         verticalLength: CGFloat,
         zeroPoint: NSPoint,
         zeroCorner: ZeroCorner
-    ) -> GroupedRulerLayout {
+    ) -> RulerWindowLayout {
         let geometry = ZeroCornerGeometry(zeroCorner: zeroCorner)
         let horizontalFrame = geometry.frame(
             for: .horizontal,
@@ -66,7 +66,7 @@ struct GroupedRulerLayout: Equatable {
             size: NSSize(width: Ruler.thickness, height: verticalLength)
         )
 
-        return GroupedRulerLayout(
+        return RulerWindowLayout(
             groupFrame: horizontalFrame.union(verticalFrame),
             horizontalFrame: horizontalFrame,
             verticalFrame: verticalFrame
@@ -226,7 +226,7 @@ struct GroupedRulerLayout: Equatable {
     }
 }
 
-private extension GroupedRulerLayout {
+private extension RulerWindowLayout {
     func emptyCornerFrame(zeroCorner: ZeroCorner) -> NSRect {
         let geometry = ZeroCornerGeometry(zeroCorner: zeroCorner)
         let x: CGFloat
@@ -266,18 +266,18 @@ final class RulerWindow: NSPanel {
     let horizontalRule: HorizontalRule
     let verticalRule: VerticalRule
 
-    private let groupedContentView: GroupedRulerContentView
+    private let rulerContentView: RulerContentView
     private(set) var settings: RulerSettings
 
     init(frame: NSRect, settings: RulerSettings = RulerSettings(defaults: prefs)) {
         self.settings = settings
-        horizontalRule = GroupedHorizontalRule(
+        horizontalRule = RulerWindowHorizontalRule(
             frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness)
         )
-        verticalRule = GroupedVerticalRule(
+        verticalRule = RulerWindowVerticalRule(
             frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300)
         )
-        groupedContentView = GroupedRulerContentView(
+        rulerContentView = RulerContentView(
             frame: NSRect(origin: .zero, size: frame.size),
             horizontalRule: horizontalRule,
             verticalRule: verticalRule
@@ -301,10 +301,10 @@ final class RulerWindow: NSPanel {
             "Ruler",
             comment: "Window title for a ruler window"
         )
-        identifier = NSUserInterfaceItemIdentifier("grouped-ruler-window")
-        setAccessibilityIdentifier("grouped-ruler-window")
-        minSize = GroupedRulerLayout.minSize(zeroCorner: settings.zeroCorner)
-        maxSize = GroupedRulerLayout.maxSize(zeroCorner: settings.zeroCorner)
+        identifier = NSUserInterfaceItemIdentifier("ruler-window")
+        setAccessibilityIdentifier("ruler-window")
+        minSize = RulerWindowLayout.minSize(zeroCorner: settings.zeroCorner)
+        maxSize = RulerWindowLayout.maxSize(zeroCorner: settings.zeroCorner)
 
         isOpaque = false
         backgroundColor = .clear
@@ -319,9 +319,9 @@ final class RulerWindow: NSPanel {
         verticalRule.setAccessibilityIdentifier("vertical-ruler-view")
         horizontalRule.nextResponder = self
         verticalRule.nextResponder = self
-        groupedContentView.nextResponder = self
+        rulerContentView.nextResponder = self
 
-        contentView = groupedContentView
+        contentView = rulerContentView
         apply(settings: settings)
         updateLayoutForCurrentZeroCorner()
     }
@@ -337,12 +337,12 @@ final class RulerWindow: NSPanel {
 
     override func setFrame(_ frameRect: NSRect, display flag: Bool) {
         super.setFrame(frameRect, display: flag)
-        updateGroupedContentFrame()
+        updateRulerContentFrame()
     }
 
     override func setContentSize(_ size: NSSize) {
         super.setContentSize(size)
-        updateGroupedContentFrame()
+        updateRulerContentFrame()
     }
 
     override func mouseDown(with event: NSEvent) {
@@ -350,7 +350,7 @@ final class RulerWindow: NSPanel {
         super.mouseDown(with: event)
 
         if !leftMouseButtonIsPressed {
-            (nextResponder as? GroupedRulerController)?.finishMouseDrag(with: event)
+            (nextResponder as? RulerController)?.finishMouseDrag(with: event)
         }
     }
 
@@ -373,11 +373,11 @@ final class RulerWindow: NSPanel {
 
     func updateLayoutForCurrentZeroCorner() {
         updateSizeConstraintsForVisibleRules()
-        updateGroupedContentFrame()
-        groupedContentView.zeroCorner = settings.zeroCorner
-        groupedContentView.needsLayout = true
-        groupedContentView.layoutSubtreeIfNeeded()
-        groupedContentView.needsDisplay = true
+        updateRulerContentFrame()
+        rulerContentView.zeroCorner = settings.zeroCorner
+        rulerContentView.needsLayout = true
+        rulerContentView.layoutSubtreeIfNeeded()
+        rulerContentView.needsDisplay = true
     }
 
     func apply(settings: RulerSettings) {
@@ -387,7 +387,7 @@ final class RulerWindow: NSPanel {
         hasShadow = settings.rulerShadow
         horizontalRule.settingsOverride = settings
         verticalRule.settingsOverride = settings
-        groupedContentView.color = RulerColors(customFill: settings.rulerColor)
+        rulerContentView.color = RulerColors(customFill: settings.rulerColor)
         updateLayoutForCurrentZeroCorner()
     }
 
@@ -398,36 +398,36 @@ final class RulerWindow: NSPanel {
     }
 
     func screenFrame(for orientation: Orientation) -> NSRect {
-        return convertToScreen(groupedContentView.localFrame(for: orientation))
+        return convertToScreen(rulerContentView.localFrame(for: orientation))
     }
 
-    func visibleFrame(in layout: GroupedRulerLayout) -> NSRect {
+    func visibleFrame(in layout: RulerWindowLayout) -> NSRect {
         return layout.visibleFrame(
-            showsHorizontalRule: groupedContentView.showsHorizontalRule,
-            showsVerticalRule: groupedContentView.showsVerticalRule
+            showsHorizontalRule: rulerContentView.showsHorizontalRule,
+            showsVerticalRule: rulerContentView.showsVerticalRule
         )
     }
 
     func setVisibleRules(horizontal: Bool, vertical: Bool) {
-        groupedContentView.showsHorizontalRule = horizontal
-        groupedContentView.showsVerticalRule = vertical
+        rulerContentView.showsHorizontalRule = horizontal
+        rulerContentView.showsVerticalRule = vertical
         updateSizeConstraintsForVisibleRules()
-        groupedContentView.needsLayout = true
-        groupedContentView.layoutSubtreeIfNeeded()
+        rulerContentView.needsLayout = true
+        rulerContentView.layoutSubtreeIfNeeded()
     }
 
     func isRuleVisible(_ orientation: Orientation) -> Bool {
         switch orientation {
         case .horizontal:
-            return groupedContentView.showsHorizontalRule
+            return rulerContentView.showsHorizontalRule
         case .vertical:
-            return groupedContentView.showsVerticalRule
+            return rulerContentView.showsVerticalRule
         }
     }
 
     func isEmptyCorner(atWindowPoint windowPoint: NSPoint) -> Bool {
-        let contentPoint = groupedContentView.convert(windowPoint, from: nil)
-        return groupedContentView.containsEmptyCorner(contentPoint)
+        let contentPoint = rulerContentView.convert(windowPoint, from: nil)
+        return rulerContentView.containsEmptyCorner(contentPoint)
     }
 
     func zeroPoint() -> NSPoint {
@@ -454,24 +454,24 @@ final class RulerWindow: NSPanel {
         return NSEvent.pressedMouseButtons & 1 == 1
     }
 
-    private func updateGroupedContentFrame() {
-        guard contentView === groupedContentView else { return }
+    private func updateRulerContentFrame() {
+        guard contentView === rulerContentView else { return }
 
-        groupedContentView.frame = NSRect(origin: .zero, size: frame.size)
-        groupedContentView.needsLayout = true
-        groupedContentView.layoutSubtreeIfNeeded()
+        rulerContentView.frame = NSRect(origin: .zero, size: frame.size)
+        rulerContentView.needsLayout = true
+        rulerContentView.layoutSubtreeIfNeeded()
     }
 
     private func updateSizeConstraintsForVisibleRules() {
-        minSize = GroupedRulerLayout.minSize(
+        minSize = RulerWindowLayout.minSize(
             zeroCorner: settings.zeroCorner,
-            showsHorizontalRule: groupedContentView.showsHorizontalRule,
-            showsVerticalRule: groupedContentView.showsVerticalRule
+            showsHorizontalRule: rulerContentView.showsHorizontalRule,
+            showsVerticalRule: rulerContentView.showsVerticalRule
         )
-        maxSize = GroupedRulerLayout.maxSize(
+        maxSize = RulerWindowLayout.maxSize(
             zeroCorner: settings.zeroCorner,
-            showsHorizontalRule: groupedContentView.showsHorizontalRule,
-            showsVerticalRule: groupedContentView.showsVerticalRule
+            showsHorizontalRule: rulerContentView.showsHorizontalRule,
+            showsVerticalRule: rulerContentView.showsVerticalRule
         )
     }
 }
@@ -479,17 +479,17 @@ final class RulerWindow: NSPanel {
 extension RulerWindow: RulerContextMenuActivating {
     func activateForRulerContextMenu() {
         makeKey()
-        (nextResponder as? GroupedRulerController)?.activateForRulerContextMenu()
+        (nextResponder as? RulerController)?.activateForRulerContextMenu()
     }
 }
 
-private final class GroupedHorizontalRule: HorizontalRule {
+private final class RulerWindowHorizontalRule: HorizontalRule {
     override func setFrameSize(_ newSize: NSSize) {
         super.setFrameSize(NSSize(width: newSize.width, height: Ruler.thickness))
     }
 }
 
-private final class GroupedVerticalRule: VerticalRule {
+private final class RulerWindowVerticalRule: VerticalRule {
     override var rulerWidth: CGFloat {
         return Ruler.thickness
     }
@@ -565,7 +565,7 @@ private final class RulerClipView: NSView {
     }
 }
 
-private final class GroupedRulerBorderView: RulerBorderView {
+private final class RulerWindowBorderView: RulerBorderView {
     var zeroCorner = prefs.zeroCorner {
         didSet {
             needsDisplay = true
@@ -598,7 +598,7 @@ private final class GroupedRulerBorderView: RulerBorderView {
     }
 
     private func lShapedBorderPath() -> NSBezierPath {
-        return groupedRulerLShapedPath(
+        return rulerWindowLShapedPath(
             in: bounds,
             zeroCorner: zeroCorner,
             inset: Self.borderCenterInset
@@ -613,7 +613,7 @@ private final class GroupedRulerBorderView: RulerBorderView {
     }
 }
 
-private final class GroupedRulerZeroLabelsView: NSView {
+private final class RulerWindowZeroLabelsView: NSView {
     private let horizontalRule: HorizontalRule
     private let verticalRule: VerticalRule
     private let zeroLabel = "0"
@@ -763,7 +763,7 @@ private final class GroupedRulerZeroLabelsView: NSView {
     }
 }
 
-final class GroupedRulerContentView: NSView {
+final class RulerContentView: NSView {
     let horizontalRule: HorizontalRule
     let verticalRule: VerticalRule
     private let horizontalHost = RulerClipView(frame: .zero)
@@ -772,8 +772,8 @@ final class GroupedRulerContentView: NSView {
         orientation: .horizontal,
         label: NSAttributedString(string: "")
     )
-    private let zeroLabelsView: GroupedRulerZeroLabelsView
-    private let borderView = GroupedRulerBorderView(frame: .zero)
+    private let zeroLabelsView: RulerWindowZeroLabelsView
+    private let borderView = RulerWindowBorderView(frame: .zero)
     private var cornerTrackingArea: NSTrackingArea?
 
     var showsHorizontalRule = true {
@@ -815,7 +815,7 @@ final class GroupedRulerContentView: NSView {
     ) {
         self.horizontalRule = horizontalRule
         self.verticalRule = verticalRule
-        self.zeroLabelsView = GroupedRulerZeroLabelsView(
+        self.zeroLabelsView = RulerWindowZeroLabelsView(
             horizontalRule: horizontalRule,
             verticalRule: verticalRule
         )
@@ -876,7 +876,7 @@ final class GroupedRulerContentView: NSView {
     override func layout() {
         super.layout()
 
-        let layout = GroupedRulerLayout.layout(groupFrame: bounds, zeroCorner: zeroCorner)
+        let layout = RulerWindowLayout.layout(groupFrame: bounds, zeroCorner: zeroCorner)
         let cornerFrame = layout.emptyCornerFrame(zeroCorner: zeroCorner)
         setFrame(ruleFrame(for: .horizontal, in: bounds, layout: layout), for: horizontalHost)
         setFrame(horizontalHost.bounds, for: horizontalRule)
@@ -947,12 +947,12 @@ final class GroupedRulerContentView: NSView {
     }
 
     func localFrame(for orientation: Orientation) -> NSRect {
-        let layout = GroupedRulerLayout.layout(groupFrame: bounds, zeroCorner: zeroCorner)
+        let layout = RulerWindowLayout.layout(groupFrame: bounds, zeroCorner: zeroCorner)
         return ruleFrame(for: orientation, in: bounds, layout: layout)
     }
 
     private func cornerFrame() -> NSRect {
-        return GroupedRulerLayout
+        return RulerWindowLayout
             .layout(groupFrame: bounds, zeroCorner: zeroCorner)
             .emptyCornerFrame(zeroCorner: zeroCorner)
     }
@@ -960,7 +960,7 @@ final class GroupedRulerContentView: NSView {
     private func ruleFrame(
         for orientation: Orientation,
         in bounds: NSRect,
-        layout: GroupedRulerLayout
+        layout: RulerWindowLayout
     ) -> NSRect {
         switch (showsHorizontalRule, showsVerticalRule) {
         case (true, true):
@@ -1039,11 +1039,11 @@ final class GroupedRulerContentView: NSView {
     }
 
     private func rulerFillPath() -> NSBezierPath {
-        let layout = GroupedRulerLayout.layout(groupFrame: bounds, zeroCorner: zeroCorner)
+        let layout = RulerWindowLayout.layout(groupFrame: bounds, zeroCorner: zeroCorner)
 
         switch (showsHorizontalRule, showsVerticalRule) {
         case (true, true):
-            return groupedRulerLShapedPath(in: bounds, zeroCorner: zeroCorner, inset: 0)
+            return rulerWindowLShapedPath(in: bounds, zeroCorner: zeroCorner, inset: 0)
         case (true, false):
             return NSBezierPath(rect: ruleFrame(for: .horizontal, in: bounds, layout: layout))
         case (false, true):
@@ -1089,17 +1089,17 @@ final class GroupedRulerContentView: NSView {
 }
 
 #if !SNAPSHOT_GENERATOR
-final class GroupedRulerController: NSWindowController, NSWindowDelegate, NotificationObserver {
+final class RulerController: NSWindowController, NSWindowDelegate, NotificationObserver {
     var observers: [NSKeyValueObservation] = []
     var notificationObservers: [NSObjectProtocol] = []
 
-    let groupedWindow: RulerWindow
+    let rulerWindow: RulerWindow
     var state: RulerInstanceState
-    var onBecameActive: ((GroupedRulerController) -> Void)?
-    var onDragStarted: ((GroupedRulerController) -> Void)?
-    var onDragged: ((GroupedRulerController) -> Void)?
-    var onDragFinished: ((GroupedRulerController) -> Void)?
-    var onStateChanged: ((GroupedRulerController) -> Void)?
+    var onBecameActive: ((RulerController) -> Void)?
+    var onDragStarted: ((RulerController) -> Void)?
+    var onDragged: ((RulerController) -> Void)?
+    var onDragFinished: ((RulerController) -> Void)?
+    var onStateChanged: ((RulerController) -> Void)?
 
     private var keyListener: Any?
     private var mouseInteraction: RulerMouseInteractionState!
@@ -1121,12 +1121,12 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
 
     var opacity = 0 {
         didSet {
-            groupedWindow.alphaValue = windowAlphaValue(opacity)
+            rulerWindow.alphaValue = windowAlphaValue(opacity)
         }
     }
 
     convenience init(frame: NSRect) {
-        let layout = GroupedRulerLayout.layout(groupFrame: frame, zeroCorner: prefs.zeroCorner)
+        let layout = RulerWindowLayout.layout(groupFrame: frame, zeroCorner: prefs.zeroCorner)
         let state = RulerInstanceState(
             settings: RulerSettings(defaults: prefs),
             layout: RulerLayoutState(
@@ -1147,21 +1147,21 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
         self.state = state
         self.followsDefaultPreferences = followsDefaultPreferences
         let layout = state.layout.layout(zeroCorner: state.settings.zeroCorner)
-        groupedWindow = RulerWindow(
+        rulerWindow = RulerWindow(
             frame: layout.visibleFrame(
                 showsHorizontalRule: state.visibility.showsHorizontal,
                 showsVerticalRule: state.visibility.showsVertical
             ),
             settings: state.settings
         )
-        super.init(window: groupedWindow)
+        super.init(window: rulerWindow)
 
         opacity = state.settings.foregroundOpacity
         createObservers()
         subscribeToPrefs()
 
-        groupedWindow.delegate = self
-        groupedWindow.nextResponder = self
+        rulerWindow.delegate = self
+        rulerWindow.nextResponder = self
         mouseInteraction = RulerMouseInteractionState(owner: self) { [weak self] event in
             return self?.mouseIsInsideRuler(with: event) ?? false
         }
@@ -1179,13 +1179,13 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
     }
 
     var isVisible: Bool {
-        return groupedWindow.isVisible
+        return rulerWindow.isVisible
     }
 
     func show() {
         applyStateToWindow(display: false)
         showWindow(self)
-        groupedWindow.orderFrontRegardless()
+        rulerWindow.orderFrontRegardless()
     }
 
     func show(
@@ -1208,7 +1208,7 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
     }
 
     func hide() {
-        groupedWindow.orderOut(self)
+        rulerWindow.orderOut(self)
     }
 
     @discardableResult
@@ -1229,42 +1229,26 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
         return true
     }
 
-    func syncFrames(
-        to horizontalWindow: LegacyRulerWindow,
-        and verticalWindow: LegacyRulerWindow,
-        persistAutosave: Bool = false
-    ) {
-        guard isVisible else { return }
-
-        let frames = syncedRulerFrames(
-            horizontalWindow: horizontalWindow,
-            verticalWindow: verticalWindow
-        )
-
-        syncFrame(frames.horizontal, to: horizontalWindow, persistAutosave: persistAutosave)
-        syncFrame(frames.vertical, to: verticalWindow, persistAutosave: persistAutosave)
-    }
-
     func align(at point: NSPoint) {
-        let horizontalLength = groupedWindow.screenFrame(for: .horizontal).width
-        let verticalLength = groupedWindow.screenFrame(for: .vertical).height
-        let layout = GroupedRulerLayout.layout(
+        let horizontalLength = rulerWindow.screenFrame(for: .horizontal).width
+        let verticalLength = rulerWindow.screenFrame(for: .vertical).height
+        let layout = RulerWindowLayout.layout(
             horizontalLength: horizontalLength,
             verticalLength: verticalLength,
             zeroPoint: point,
             zeroCorner: state.settings.zeroCorner
         )
 
-        groupedWindow.setFrame(groupedWindow.visibleFrame(in: layout), display: true)
-        groupedWindow.updateLayoutForCurrentZeroCorner()
+        rulerWindow.setFrame(rulerWindow.visibleFrame(in: layout), display: true)
+        rulerWindow.updateLayoutForCurrentZeroCorner()
         captureStateFromWindow()
     }
 
     func prepareForZeroCornerChange(to zeroCorner: ZeroCorner) {
-        let zeroPoint = groupedWindow.zeroPoint()
-        let horizontalLength = groupedWindow.screenFrame(for: .horizontal).width
-        let verticalLength = groupedWindow.screenFrame(for: .vertical).height
-        let layout = GroupedRulerLayout.layout(
+        let zeroPoint = rulerWindow.zeroPoint()
+        let horizontalLength = rulerWindow.screenFrame(for: .horizontal).width
+        let verticalLength = rulerWindow.screenFrame(for: .vertical).height
+        let layout = RulerWindowLayout.layout(
             horizontalLength: horizontalLength,
             verticalLength: verticalLength,
             zeroPoint: zeroPoint,
@@ -1272,11 +1256,11 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
         )
 
         state.settings.zeroCorner = zeroCorner
-        groupedWindow.apply(settings: state.settings)
-        groupedWindow.alphaValue = windowAlphaValue(opacity)
+        rulerWindow.apply(settings: state.settings)
+        rulerWindow.alphaValue = windowAlphaValue(opacity)
         updateIsFloatingPanel()
         updateHasShadow()
-        groupedWindow.setFrame(groupedWindow.visibleFrame(in: layout), display: true)
+        rulerWindow.setFrame(rulerWindow.visibleFrame(in: layout), display: true)
         captureStateFromWindow()
         notifyStateChanged()
     }
@@ -1290,15 +1274,15 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
     }
 
     func updateIsFloatingPanel() {
-        groupedWindow.isFloatingPanel = preferencesWindowOpen ? false : state.settings.floatRulers
+        rulerWindow.isFloatingPanel = preferencesWindowOpen ? false : state.settings.floatRulers
     }
 
     func updateHasShadow() {
-        groupedWindow.hasShadow = state.settings.rulerShadow
+        rulerWindow.hasShadow = state.settings.rulerShadow
     }
 
     func redrawForPreferenceChange() {
-        groupedWindow.redrawForPreferenceChange()
+        rulerWindow.redrawForPreferenceChange()
     }
 
     func updateSettings(_ update: (inout RulerSettings) -> Void) {
@@ -1314,7 +1298,7 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
         let maxVerticalLength = getMaxSize(ruler: Ruler(.vertical)).height
 
         state.layout = RulerLayoutState(
-            zeroPoint: groupedWindow.zeroPoint(),
+            zeroPoint: rulerWindow.zeroPoint(),
             horizontalLength: min(max(horizontalLength, minHorizontalLength), maxHorizontalLength),
             verticalLength: min(max(verticalLength, minVerticalLength), maxVerticalLength)
         )
@@ -1323,7 +1307,7 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
     }
 
     func move(to frame: NSRect) {
-        groupedWindow.setFrame(frame, display: false)
+        rulerWindow.setFrame(frame, display: false)
         captureStateFromWindow()
     }
 
@@ -1338,11 +1322,11 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
     }
 
     func drawMouseTick(at mouseLoc: NSPoint) {
-        if groupedWindow.isRuleVisible(.horizontal) {
-            groupedWindow.horizontalRule.drawMouseTick(at: mouseLoc)
+        if rulerWindow.isRuleVisible(.horizontal) {
+            rulerWindow.horizontalRule.drawMouseTick(at: mouseLoc)
         }
-        if groupedWindow.isRuleVisible(.vertical) {
-            groupedWindow.verticalRule.drawMouseTick(at: mouseLoc)
+        if rulerWindow.isRuleVisible(.vertical) {
+            rulerWindow.verticalRule.drawMouseTick(at: mouseLoc)
         }
     }
 
@@ -1352,53 +1336,53 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
     }
 
     private func updateMouseTickDrawingVisibility() {
-        groupedWindow.horizontalRule.showMouseTick = isMouseTickDrawingEnabled
-            && groupedWindow.isRuleVisible(.horizontal)
-        groupedWindow.verticalRule.showMouseTick = isMouseTickDrawingEnabled
-            && groupedWindow.isRuleVisible(.vertical)
+        rulerWindow.horizontalRule.showMouseTick = isMouseTickDrawingEnabled
+            && rulerWindow.isRuleVisible(.horizontal)
+        rulerWindow.verticalRule.showMouseTick = isMouseTickDrawingEnabled
+            && rulerWindow.isRuleVisible(.vertical)
     }
 
     private func applyStateToWindow(display: Bool) {
         let zeroCorner = state.settings.zeroCorner
         let layout = state.layout.layout(zeroCorner: zeroCorner)
-        groupedWindow.apply(settings: state.settings)
-        groupedWindow.alphaValue = windowAlphaValue(opacity)
+        rulerWindow.apply(settings: state.settings)
+        rulerWindow.alphaValue = windowAlphaValue(opacity)
         updateIsFloatingPanel()
         updateHasShadow()
-        groupedWindow.setVisibleRules(
+        rulerWindow.setVisibleRules(
             horizontal: state.visibility.showsHorizontal,
             vertical: state.visibility.showsVertical
         )
         updateMouseTickDrawingVisibility()
-        groupedWindow.setFrame(
+        rulerWindow.setFrame(
             layout.visibleFrame(
                 showsHorizontalRule: state.visibility.showsHorizontal,
                 showsVerticalRule: state.visibility.showsVertical
             ),
             display: display
         )
-        groupedWindow.updateLayoutForCurrentZeroCorner()
+        rulerWindow.updateLayoutForCurrentZeroCorner()
     }
 
     private func captureStateFromWindow() {
         var horizontalLength = state.layout.horizontalLength
         var verticalLength = state.layout.verticalLength
 
-        if groupedWindow.isRuleVisible(.horizontal) {
-            horizontalLength = groupedWindow.screenFrame(for: .horizontal).width
+        if rulerWindow.isRuleVisible(.horizontal) {
+            horizontalLength = rulerWindow.screenFrame(for: .horizontal).width
         }
-        if groupedWindow.isRuleVisible(.vertical) {
-            verticalLength = groupedWindow.screenFrame(for: .vertical).height
+        if rulerWindow.isRuleVisible(.vertical) {
+            verticalLength = rulerWindow.screenFrame(for: .vertical).height
         }
 
         state.layout = RulerLayoutState(
-            zeroPoint: groupedWindow.zeroPoint(),
+            zeroPoint: rulerWindow.zeroPoint(),
             horizontalLength: horizontalLength,
             verticalLength: verticalLength
         )
         state.visibility = RulerWingVisibility(
-            horizontal: groupedWindow.isRuleVisible(.horizontal),
-            vertical: groupedWindow.isRuleVisible(.vertical)
+            horizontal: rulerWindow.isRuleVisible(.horizontal),
+            vertical: rulerWindow.isRuleVisible(.vertical)
         )
         notifyStateChanged()
     }
@@ -1407,80 +1391,11 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
         onStateChanged?(self)
     }
 
-    private func syncedRulerFrames(
-        horizontalWindow: LegacyRulerWindow,
-        verticalWindow: LegacyRulerWindow
-    ) -> (horizontal: NSRect, vertical: NSRect) {
-        let showsHorizontalRule = groupedWindow.isRuleVisible(.horizontal)
-        let showsVerticalRule = groupedWindow.isRuleVisible(.vertical)
-
-        switch (showsHorizontalRule, showsVerticalRule) {
-        case (true, true):
-            return (
-                groupedWindow.screenFrame(for: .horizontal),
-                groupedWindow.screenFrame(for: .vertical)
-            )
-        case (true, false):
-            let horizontalFrame = groupedWindow.screenFrame(for: .horizontal)
-            let zeroPoint = ZeroCornerGeometry(zeroCorner: state.settings.zeroCorner)
-                .zeroPoint(in: horizontalFrame, for: .horizontal)
-            return (
-                horizontalFrame,
-                hiddenRuleFrame(
-                    orientation: .vertical,
-                    zeroPoint: zeroPoint,
-                    size: verticalWindow.frame.size
-                )
-            )
-        case (false, true):
-            let verticalFrame = groupedWindow.screenFrame(for: .vertical)
-            let zeroPoint = ZeroCornerGeometry(zeroCorner: state.settings.zeroCorner)
-                .zeroPoint(in: verticalFrame, for: .vertical)
-            return (
-                hiddenRuleFrame(
-                    orientation: .horizontal,
-                    zeroPoint: zeroPoint,
-                    size: horizontalWindow.frame.size
-                ),
-                verticalFrame
-            )
-        case (false, false):
-            return (horizontalWindow.frame, verticalWindow.frame)
-        }
-    }
-
-    private func hiddenRuleFrame(
-        orientation: Orientation,
-        zeroPoint: NSPoint,
-        size: NSSize
-    ) -> NSRect {
-        return ZeroCornerGeometry(zeroCorner: state.settings.zeroCorner).frame(
-            for: orientation,
-            zeroPoint: zeroPoint,
-            size: size
-        )
-    }
-
-    private func syncFrame(
-        _ frame: NSRect,
-        to window: LegacyRulerWindow,
-        persistAutosave: Bool
-    ) {
-        window.setFrame(frame, display: false)
-
-        guard persistAutosave else { return }
-
-        if let frameAutosaveName = window.ruler.name {
-            window.saveFrame(usingName: NSWindow.FrameAutosaveName(frameAutosaveName))
-        }
-    }
-
     func windowWillStartLiveResize(_ notification: Notification) {
         mouseInteraction.windowWillStartLiveResize()
     }
 
     func windowDidEndLiveResize(_ notification: Notification) {
-        syncRulerWindowFrames(persistAutosave: true)
         captureStateFromWindow()
         mouseInteraction.windowDidEndLiveResize()
     }
@@ -1490,12 +1405,7 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
     }
 
     func windowDidMove(_ notification: Notification) {
-        groupedWindow.invalidateShadow()
-        syncRulerWindowFrames(
-            persistAutosave: mouseInteraction.shouldPersistFrameAutosaveOnWindowMove(
-                isLeftMouseButtonPressed: isLeftMouseButtonPressed()
-            )
-        )
+        rulerWindow.invalidateShadow()
         captureStateFromWindow()
         onDragged?(self)
         mouseInteraction.windowDidMove(isLeftMouseButtonPressed: isLeftMouseButtonPressed())
@@ -1529,7 +1439,6 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
 
     func finishMouseDrag(with event: NSEvent) {
         if mouseInteraction.finishMouseDrag(with: event) {
-            syncRulerWindowFrames(persistAutosave: true)
             captureStateFromWindow()
             onDragFinished?(self)
         }
@@ -1543,30 +1452,22 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
         mouseInteraction.mouseMoved(with: event)
     }
 
-    private var appDelegate: AppDelegate? {
-        return NSApp.delegate as? AppDelegate
-    }
-
-    private func syncRulerWindowFrames(persistAutosave: Bool = false) {
-        appDelegate?.syncGroupedRulerFramesToRulerWindows(persistAutosave: persistAutosave)
-    }
-
     private func mouseIsInsideRuler(with event: NSEvent) -> Bool {
         return orientation(at: event) != nil
-            || groupedWindow.isEmptyCorner(atWindowPoint: event.locationInWindow)
+            || rulerWindow.isEmptyCorner(atWindowPoint: event.locationInWindow)
     }
 
     private func orientation(at event: NSEvent) -> Orientation? {
-        let horizontalLocation = groupedWindow.horizontalRule.convert(event.locationInWindow, from: nil)
-        let verticalLocation = groupedWindow.verticalRule.convert(event.locationInWindow, from: nil)
+        let horizontalLocation = rulerWindow.horizontalRule.convert(event.locationInWindow, from: nil)
+        let verticalLocation = rulerWindow.verticalRule.convert(event.locationInWindow, from: nil)
 
-        if groupedWindow.isRuleVisible(.horizontal),
-           groupedWindow.horizontalRule.bounds.contains(horizontalLocation) {
+        if rulerWindow.isRuleVisible(.horizontal),
+           rulerWindow.horizontalRule.bounds.contains(horizontalLocation) {
             return .horizontal
         }
 
-        if groupedWindow.isRuleVisible(.vertical),
-           groupedWindow.verticalRule.bounds.contains(verticalLocation) {
+        if rulerWindow.isRuleVisible(.vertical),
+           rulerWindow.verticalRule.bounds.contains(verticalLocation) {
             return .vertical
         }
 
@@ -1609,7 +1510,7 @@ final class GroupedRulerController: NSWindowController, NSWindowDelegate, Notifi
 
 // MARK: KeyListener
 
-extension GroupedRulerController {
+extension RulerController {
     func startKeyListener() {
         keyListener = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] in
             guard let self = self else { return $0 }
@@ -1628,7 +1529,7 @@ extension GroupedRulerController {
         let shift = event.modifierFlags.contains(.shift)
         let keyboardModifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
 
-        if groupedWindow.isKeyWindow,
+        if rulerWindow.isKeyWindow,
            let appDelegate = NSApp.delegate as? AppDelegate,
            appDelegate.performRulerHotkey(
                keyCode: Int(event.keyCode),
@@ -1640,16 +1541,16 @@ extension GroupedRulerController {
 
         switch Int(event.keyCode) {
         case kVK_LeftArrow:
-            groupedWindow.nudgeLeft(withShift: shift)
+            rulerWindow.nudgeLeft(withShift: shift)
             return nil
         case kVK_RightArrow:
-            groupedWindow.nudgeRight(withShift: shift)
+            rulerWindow.nudgeRight(withShift: shift)
             return nil
         case kVK_UpArrow:
-            groupedWindow.nudgeUp(withShift: shift)
+            rulerWindow.nudgeUp(withShift: shift)
             return nil
         case kVK_DownArrow:
-            groupedWindow.nudgeDown(withShift: shift)
+            rulerWindow.nudgeDown(withShift: shift)
             return nil
         default:
             return event
@@ -1658,7 +1559,7 @@ extension GroupedRulerController {
 }
 
 final class RulerManager {
-    typealias ControllerFactory = (RulerInstanceState) -> GroupedRulerController
+    typealias ControllerFactory = (RulerInstanceState) -> RulerController
 
     private struct GroupedDragState {
         let draggedRulerID: UUID
@@ -1666,16 +1567,16 @@ final class RulerManager {
     }
 
     private let controllerFactory: ControllerFactory
-    private(set) var controllers: [GroupedRulerController] = []
+    private(set) var controllers: [RulerController] = []
     private(set) var activeRulerID: UUID?
-    var onActiveControllerChanged: ((GroupedRulerController?) -> Void)?
+    var onActiveControllerChanged: ((RulerController?) -> Void)?
     var onStateChanged: ((RulerManager) -> Void)?
     private var groupedDragState: GroupedDragState?
     private var isApplyingGroupedDrag = false
 
     init(
         initialStates: [RulerInstanceState] = [],
-        controllerFactory: @escaping ControllerFactory = { GroupedRulerController(state: $0) }
+        controllerFactory: @escaping ControllerFactory = { RulerController(state: $0) }
     ) {
         self.controllerFactory = controllerFactory
         restore(initialStates)
@@ -1689,13 +1590,13 @@ final class RulerManager {
         return controllers.contains { $0.isVisible }
     }
 
-    var activeController: GroupedRulerController? {
+    var activeController: RulerController? {
         if let activeRulerID = activeRulerID,
            let controller = controllers.first(where: { $0.state.id == activeRulerID }) {
             return controller
         }
 
-        if let keyController = controllers.first(where: { $0.groupedWindow.isKeyWindow }) {
+        if let keyController = controllers.first(where: { $0.rulerWindow.isKeyWindow }) {
             return keyController
         }
 
@@ -1710,7 +1611,7 @@ final class RulerManager {
     func createRuler(
         defaults: RulerSettings = RulerSettings(defaults: prefs),
         screenFrame: NSRect = defaultRulerScreenFrame()
-    ) -> GroupedRulerController {
+    ) -> RulerController {
         let defaultState = RulerInstanceState.createFromDefaults(
             defaults: defaults,
             screenFrame: screenFrame
@@ -1721,7 +1622,7 @@ final class RulerManager {
     }
 
     @discardableResult
-    func addRuler(state: RulerInstanceState) -> GroupedRulerController {
+    func addRuler(state: RulerInstanceState) -> RulerController {
         let controller = controllerFactory(state)
         configure(controller)
         controllers.append(controller)
@@ -1756,12 +1657,12 @@ final class RulerManager {
         }
 
         if let activeController = activeController {
-            activeController.groupedWindow.makeKey()
+            activeController.rulerWindow.makeKey()
         }
     }
 
     @discardableResult
-    func cycleActiveRuler() -> GroupedRulerController? {
+    func cycleActiveRuler() -> RulerController? {
         let visibleControllers = controllers.filter(\.isVisible)
         guard !visibleControllers.isEmpty else { return nil }
 
@@ -1773,8 +1674,8 @@ final class RulerManager {
         let nextController = visibleControllers[nextIndex]
 
         markActive(nextController)
-        nextController.groupedWindow.orderFrontRegardless()
-        nextController.groupedWindow.makeKey()
+        nextController.rulerWindow.orderFrontRegardless()
+        nextController.rulerWindow.makeKey()
         return nextController
     }
 
@@ -1786,7 +1687,7 @@ final class RulerManager {
         return true
     }
 
-    func close(_ controller: GroupedRulerController) {
+    func close(_ controller: RulerController) {
         controller.hide()
         controllers.removeAll { $0 === controller }
 
@@ -1798,7 +1699,7 @@ final class RulerManager {
         notifyStateChanged()
     }
 
-    func markActive(_ controller: GroupedRulerController) {
+    func markActive(_ controller: RulerController) {
         guard controllers.contains(where: { $0 === controller }) else { return }
 
         activeRulerID = controller.state.id
@@ -1806,7 +1707,7 @@ final class RulerManager {
         notifyStateChanged()
     }
 
-    func beginGroupedDrag(from controller: GroupedRulerController) {
+    func beginGroupedDrag(from controller: RulerController) {
         guard prefs.groupRulers,
               controllers.contains(where: { $0 === controller }) else {
             groupedDragState = nil
@@ -1818,12 +1719,12 @@ final class RulerManager {
             framesByRulerID: Dictionary(
                 uniqueKeysWithValues: controllers
                     .filter(\.isVisible)
-                    .map { ($0.state.id, $0.groupedWindow.frame) }
+                    .map { ($0.state.id, $0.rulerWindow.frame) }
             )
         )
     }
 
-    func syncGroupedDrag(from controller: GroupedRulerController) {
+    func syncGroupedDrag(from controller: RulerController) {
         guard prefs.groupRulers,
               !isApplyingGroupedDrag,
               let groupedDragState = groupedDragState,
@@ -1833,8 +1734,8 @@ final class RulerManager {
         }
 
         let offset = NSSize(
-            width: controller.groupedWindow.frame.minX - originalDraggedFrame.minX,
-            height: controller.groupedWindow.frame.minY - originalDraggedFrame.minY
+            width: controller.rulerWindow.frame.minX - originalDraggedFrame.minX,
+            height: controller.rulerWindow.frame.minY - originalDraggedFrame.minY
         )
         guard offset.width != 0 || offset.height != 0 else { return }
 
@@ -1854,22 +1755,22 @@ final class RulerManager {
         notifyStateChanged()
     }
 
-    func finishGroupedDrag(from controller: GroupedRulerController) {
+    func finishGroupedDrag(from controller: RulerController) {
         syncGroupedDrag(from: controller)
         groupedDragState = nil
     }
 
-    func controller(containing window: NSWindow?) -> GroupedRulerController? {
+    func controller(containing window: NSWindow?) -> RulerController? {
         guard let window = window else { return nil }
 
-        return controllers.first { $0.groupedWindow === window }
+        return controllers.first { $0.rulerWindow === window }
     }
 
-    func controller(id: UUID) -> GroupedRulerController? {
+    func controller(id: UUID) -> RulerController? {
         return controllers.first { $0.state.id == id }
     }
 
-    private func configure(_ controller: GroupedRulerController) {
+    private func configure(_ controller: RulerController) {
         controller.onBecameActive = { [weak self, weak controller] _ in
             guard let controller = controller else { return }
             self?.markActive(controller)
@@ -1913,12 +1814,12 @@ final class RulerManager {
 }
 #endif
 
-private func groupedRulerLShapedPath(
+private func rulerWindowLShapedPath(
     in bounds: NSRect,
     zeroCorner: ZeroCorner,
     inset: CGFloat
 ) -> NSBezierPath {
-    let layout = GroupedRulerLayout.layout(groupFrame: bounds, zeroCorner: zeroCorner)
+    let layout = RulerWindowLayout.layout(groupFrame: bounds, zeroCorner: zeroCorner)
     let horizontalFrame = layout.localFrame(for: .horizontal)
     let verticalFrame = layout.localFrame(for: .vertical)
     let minX = bounds.minX + inset

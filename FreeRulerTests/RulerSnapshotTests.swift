@@ -24,10 +24,10 @@ final class RulerSnapshotTests: XCTestCase {
         )
     }
 
-    func testGroupedWindowLayoutRenderingMatchesSnapshot() throws {
+    func testRulerWindowLayoutRenderingMatchesSnapshot() throws {
         try assertSnapshot(
             named: "grouped-ruler-window-layout",
-            view: RulerSnapshotFactory.groupedWindowLayoutSnapshotView()
+            view: RulerSnapshotFactory.rulerWindowLayoutSnapshotView()
         )
     }
 
@@ -222,15 +222,15 @@ enum RulerSnapshotFactory {
         return canvas
     }
 
-    static func groupedWindowLayoutSnapshotView() -> NSView {
+    static func rulerWindowLayoutSnapshotView() -> NSView {
         let margin: CGFloat = 24
-        let groupedSize = NSSize(width: 620, height: 360)
+        let rulerWindowSize = NSSize(width: 620, height: 360)
         let canvas = SnapshotCanvasView(
             frame: NSRect(
                 x: 0,
                 y: 0,
-                width: groupedSize.width + (margin * 2),
-                height: groupedSize.height + (margin * 2)
+                width: rulerWindowSize.width + (margin * 2),
+                height: rulerWindowSize.height + (margin * 2)
             )
         )
         canvas.backgroundColor = NSColor(deviceWhite: 0.18, alpha: 1)
@@ -249,17 +249,17 @@ enum RulerSnapshotFactory {
         configure(horizontalRule, fill: SnapshotColors.lightRuler, showsMouseTick: false)
         configure(verticalRule, fill: SnapshotColors.lightRuler, showsMouseTick: false)
 
-        let groupedView = GroupedRulerContentView(
-            frame: NSRect(origin: NSPoint(x: margin, y: margin), size: groupedSize),
+        let rulerWindowView = RulerContentView(
+            frame: NSRect(origin: NSPoint(x: margin, y: margin), size: rulerWindowSize),
             horizontalRule: horizontalRule,
             verticalRule: verticalRule
         )
-        groupedView.zeroCorner = zeroCorner
-        groupedView.color = RulerColors(customFill: SnapshotColors.lightRuler)
-        groupedView.layoutSubtreeIfNeeded()
-        groupedView.needsDisplay = true
+        rulerWindowView.zeroCorner = zeroCorner
+        rulerWindowView.color = RulerColors(customFill: SnapshotColors.lightRuler)
+        rulerWindowView.layoutSubtreeIfNeeded()
+        rulerWindowView.needsDisplay = true
 
-        canvas.addSubview(groupedView)
+        canvas.addSubview(rulerWindowView)
         return canvas
     }
 
@@ -269,7 +269,7 @@ enum RulerSnapshotFactory {
         let snapshots: [(name: String, view: NSView)] = [
             ("ruler-zero-corners", zeroCornerSnapshotView()),
             ("ruler-mouse-tick-labels", mouseTickLabelSnapshotView()),
-            ("grouped-ruler-window-layout", groupedWindowLayoutSnapshotView()),
+            ("grouped-ruler-window-layout", rulerWindowLayoutSnapshotView()),
         ]
 
         for snapshot in snapshots {
