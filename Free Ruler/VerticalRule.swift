@@ -3,6 +3,7 @@ import Cocoa
 class VerticalRule: RuleView {
 
     let transformer = AffineTransform(translationByX: 0, byY: -0.5)
+    let mouseTickTransformer = AffineTransform(translationByX: 0, byY: 0.5)
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
@@ -136,7 +137,7 @@ class VerticalRule: RuleView {
         mouseTick.move(to: CGPoint(x: startX, y: lineY))
         mouseTick.line(to: CGPoint(x: rulerWidth, y: lineY))
 
-        mouseTick.transform(using: transformer)
+        mouseTick.transform(using: mouseTickTransformer)
 
         color.mouseTick.setStroke()
         mouseTick.stroke()
@@ -149,7 +150,7 @@ class VerticalRule: RuleView {
 
         switch growthDirection {
         case .positive:
-            zeroTickY = bounds.minY
+            zeroTickY = bounds.minY + 1
         case .negative:
             zeroTickY = bounds.maxY
         }
@@ -322,7 +323,7 @@ class VerticalRule: RuleView {
 
         switch growthDirection {
         case .positive:
-            return mouseTickY
+            return max(0, mouseTickY - 1)
         case .negative:
             return rulerHeight - mouseTickY
         }
@@ -334,7 +335,7 @@ class VerticalRule: RuleView {
     ) -> CGFloat {
         switch growthDirection {
         case .positive:
-            return mouseTickY + 1
+            return mouseTickY
         case .negative:
             return mouseTickY
         }

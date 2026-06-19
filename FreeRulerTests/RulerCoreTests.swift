@@ -1660,7 +1660,7 @@ final class RulerCoreTests: XCTestCase {
         )
         XCTAssertEqual(
             rule.mouseTickLineX(forTickX: 299, growthDirection: .negative),
-            298
+            299
         )
 
         let bottomTick = rule.tickLine(forX: 50, length: 10, rulerHeight: 40, tickSide: .bottom)
@@ -1687,7 +1687,14 @@ final class RulerCoreTests: XCTestCase {
             prefs.zeroCorner = .bottomRight
             let rule = HorizontalRule(frame: NSRect(x: 0, y: 0, width: 300, height: Ruler.thickness))
 
-            XCTAssertEqual(rule.mouseNumber(forTickX: 260, rulerWidth: 300), 40)
+            XCTAssertEqual(rule.mouseNumber(forTickX: 259, rulerWidth: 300), 40)
+            XCTAssertEqual(
+                rule.mouseNumber(
+                    forTickX: rule.tickX(forOffset: 50, rulerWidth: 300, growthDirection: .negative),
+                    rulerWidth: 300
+                ),
+                50
+            )
             XCTAssertEqual(
                 rule.unitLabelRect(labelSize: NSSize(width: 12, height: 10), rulerSize: NSSize(width: 300, height: 40)),
                 CGRect(x: 280, y: 0, width: 20, height: 19)
@@ -1712,7 +1719,7 @@ final class RulerCoreTests: XCTestCase {
         )
         XCTAssertEqual(
             rule.mouseTickLineY(forTickY: 1, growthDirection: .positive),
-            2
+            1
         )
 
         let rightTick = rule.tickLine(forY: 250, length: 10, rulerWidth: 40, tickSide: .right)
@@ -1739,7 +1746,14 @@ final class RulerCoreTests: XCTestCase {
             prefs.zeroCorner = .bottomRight
             let rule = VerticalRule(frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300))
 
-            XCTAssertEqual(rule.mouseNumber(forTickY: 40, rulerHeight: 300), 40)
+            XCTAssertEqual(rule.mouseNumber(forTickY: 41, rulerHeight: 300), 40)
+            XCTAssertEqual(
+                rule.mouseNumber(
+                    forTickY: rule.tickY(forOffset: 50, rulerHeight: 300, growthDirection: .positive),
+                    rulerHeight: 300
+                ),
+                50
+            )
             XCTAssertEqual(
                 rule.unitLabelRect(labelSize: NSSize(width: 12, height: 10), rulerSize: NSSize(width: 40, height: 300)),
                 CGRect(x: 20, y: 0, width: 20, height: 19)
@@ -1954,8 +1968,8 @@ final class RulerCoreTests: XCTestCase {
             let verticalRule = VerticalRule(
                 frame: NSRect(x: 0, y: 0, width: Ruler.thickness, height: 300)
             )
-            let horizontalNumber = horizontalRule.mouseNumber(forTickX: 260, rulerWidth: 300)
-            let verticalNumber = verticalRule.mouseNumber(forTickY: 40, rulerHeight: 300)
+            let horizontalNumber = horizontalRule.mouseNumber(forTickX: 259, rulerWidth: 300)
+            let verticalNumber = verticalRule.mouseNumber(forTickY: 41, rulerHeight: 300)
             let horizontalDpmm = horizontalRule.screen?.dpmm.width ?? NSScreen.defaultDpmm
             let verticalDpmm = verticalRule.screen?.dpmm.width ?? NSScreen.defaultDpmm
             let horizontalDpi = horizontalRule.screen?.dpi.width ?? NSScreen.defaultDpi
