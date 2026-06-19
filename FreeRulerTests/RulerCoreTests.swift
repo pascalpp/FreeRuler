@@ -169,6 +169,26 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertEqual(manager.states.map(\.settings.unit), [.inches])
     }
 
+    func testRulerManagerStaggersNewRulersWhenDefaultPositionIsOccupied() {
+        let manager = RulerManager()
+        defer {
+            for controller in manager.controllers {
+                controller.hide()
+            }
+        }
+
+        let screenFrame = NSRect(x: 0, y: 0, width: 1000, height: 800)
+        let first = manager.createRuler(screenFrame: screenFrame)
+        let second = manager.createRuler(screenFrame: screenFrame)
+        let third = manager.createRuler(screenFrame: screenFrame)
+        let staggerOffset = Ruler.thickness / 2
+
+        XCTAssertEqual(second.state.layout.zeroPoint.x, first.state.layout.zeroPoint.x + staggerOffset)
+        XCTAssertEqual(second.state.layout.zeroPoint.y, first.state.layout.zeroPoint.y - staggerOffset)
+        XCTAssertEqual(third.state.layout.zeroPoint.x, first.state.layout.zeroPoint.x + (staggerOffset * 2))
+        XCTAssertEqual(third.state.layout.zeroPoint.y, first.state.layout.zeroPoint.y - (staggerOffset * 2))
+    }
+
     func testRulerContextMenuActivatesClickedRulerAndShowsSettingsCommand() {
         withInstalledAppDelegate { appDelegate in
             let manager = appDelegate.rulerManager
