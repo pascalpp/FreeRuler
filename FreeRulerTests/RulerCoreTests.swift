@@ -381,7 +381,7 @@ final class RulerCoreTests: XCTestCase {
         }
     }
 
-    func testRulerSettingsControllerPresentsAsSheetOnRulerWindow() {
+    func testRulerSettingsControllerPresentsAsAttachedSheetOnRulerWindow() {
         let controller = GroupedRulerController(
             state: RulerInstanceState(
                 settings: RulerSettings(),
@@ -401,7 +401,12 @@ final class RulerCoreTests: XCTestCase {
         controller.show()
         settingsController.show(attachedTo: controller, sender: self)
 
-        XCTAssertTrue(settingsController.window?.sheetParent === controller.groupedWindow)
+        guard let settingsWindow = settingsController.window else {
+            XCTFail("Expected settings window")
+            return
+        }
+        XCTAssertTrue(controller.groupedWindow.childWindows?.contains(settingsWindow) ?? false)
+        XCTAssertNil(settingsWindow.sheetParent)
     }
 
     func testRulerSettingsControllerRestoresForegroundOpacityWhenClosingSheet() {
@@ -434,6 +439,36 @@ final class RulerCoreTests: XCTestCase {
         settingsController.close()
 
         XCTAssertEqual(controller.groupedWindow.alphaValue, 0.8, accuracy: 0.0001)
+    }
+
+    func testRulerSettingsControllerCloseButtonClosesAttachedSheet() {
+        let controller = GroupedRulerController(
+            state: RulerInstanceState(
+                settings: RulerSettings(),
+                layout: RulerLayoutState(
+                    zeroPoint: NSPoint(x: 240, y: 320),
+                    horizontalLength: 260,
+                    verticalLength: 180
+                )
+            )
+        )
+        let settingsController = RulerSettingsController(rulerController: controller)
+        defer {
+            settingsController.close()
+            controller.hide()
+        }
+
+        controller.show()
+        settingsController.show(attachedTo: controller, sender: self)
+        guard let settingsWindow = settingsController.window else {
+            XCTFail("Expected settings window")
+            return
+        }
+
+        settingsController.closeButton.performClick(self)
+
+        XCTAssertFalse(controller.groupedWindow.childWindows?.contains(settingsWindow) ?? false)
+        XCTAssertFalse(settingsWindow.isVisible)
     }
 
     func testRulerManagerCopiesUpdatedDefaultsOnlyForNewRulers() {

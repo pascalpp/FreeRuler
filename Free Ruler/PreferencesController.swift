@@ -306,6 +306,7 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
     let backgroundOpacityLabel: NSTextField
     let floatRulersCheckbox: NSButton
     let rulerShadowCheckbox: NSButton
+    let closeButton: NSButton
 
     var currentRulerController: GroupedRulerController? {
         return rulerController
@@ -336,6 +337,14 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
             target: nil,
             action: nil
         )
+        closeButton = NSButton(
+            title: NSLocalizedString(
+                "Close",
+                comment: "Button title for closing the active ruler settings panel"
+            ),
+            target: nil,
+            action: nil
+        )
 
         let window = RulerSettingsController.makeWindow(
             rulerColorWell: rulerColorWell,
@@ -345,7 +354,8 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
             foregroundOpacityLabel: foregroundOpacityLabel,
             backgroundOpacityLabel: backgroundOpacityLabel,
             floatRulersCheckbox: floatRulersCheckbox,
-            rulerShadowCheckbox: rulerShadowCheckbox
+            rulerShadowCheckbox: rulerShadowCheckbox,
+            closeButton: closeButton
         )
 
         super.init(window: window)
@@ -368,7 +378,7 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
     }
 
     override func showWindow(_ sender: Any?) {
-        endSheetIfNeeded()
+        detachWindowIfNeeded()
         configureOpaqueColorPicking()
         updateView()
         window?.makeKeyAndOrderFront(sender)
@@ -382,12 +392,15 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
 
         configureOpaqueColorPicking()
 
-        if settingsWindow.sheetParent === controller.groupedWindow {
+        if settingsWindow.parent === controller.groupedWindow {
+            position(settingsWindow, attachedTo: controller)
+            settingsWindow.orderFront(sender)
+            settingsWindow.makeKey()
             settingsWindow.makeFirstResponder(rulerColorWell)
             return
         }
 
-        endSheetIfNeeded()
+        detachWindowIfNeeded()
 
         guard controller.groupedWindow.isVisible else {
             showWindow(sender)
@@ -398,30 +411,24 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
             settingsWindow.orderOut(sender)
         }
 
-        controller.groupedWindow.beginSheet(settingsWindow) { [weak self] _ in
-            self?.closeSheetColorControls()
-        }
+        position(settingsWindow, attachedTo: controller)
+        controller.groupedWindow.addChildWindow(settingsWindow, ordered: .above)
+        settingsWindow.orderFront(sender)
+        settingsWindow.makeKey()
         settingsWindow.makeFirstResponder(rulerColorWell)
     }
 
     override func close() {
-        guard let settingsWindow = window,
-              settingsWindow.sheetParent != nil else {
-            super.close()
-            return
-        }
-
-        endSheetIfNeeded()
+        detachWindowIfNeeded()
+        super.close()
     }
 
     func windowShouldClose(_ sender: NSWindow) -> Bool {
-        guard sender.sheetParent != nil else { return true }
-
-        endSheetIfNeeded()
-        return false
+        true
     }
 
     func windowWillClose(_ notification: Notification) {
+        detachWindowIfNeeded()
         closeSheetColorControls()
     }
 
@@ -468,6 +475,10 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         applyRulerColor(Prefs.defaultRulerFillColor)
     }
 
+    @objc func closeRulerSettings(_ sender: Any) {
+        close()
+    }
+
     func updateView() {
         let currentColor = rulerController?.state.settings.rulerColor ?? Prefs.defaultRulerFillColor
         let currentSettings = rulerController?.state.settings
@@ -499,7 +510,8 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         foregroundOpacityLabel: NSTextField,
         backgroundOpacityLabel: NSTextField,
         floatRulersCheckbox: NSButton,
-        rulerShadowCheckbox: NSButton
+        rulerShadowCheckbox: NSButton,
+        closeButton: NSButton
     ) -> NSPanel {
         let contentView = NSView()
         let colorLabel = makeLabel(
@@ -523,6 +535,8 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         let colorRow = NSStackView(views: [colorLabel, resetRulerColorButton, rulerColorWell])
         let foregroundHeaderRow = NSStackView(views: [foregroundLabel, foregroundOpacityLabel])
         let backgroundHeaderRow = NSStackView(views: [backgroundLabel, backgroundOpacityLabel])
+        let closeRow = NSView()
+        closeRow.addSubview(closeButton)
         let contentStack = NSStackView(views: [
             colorRow,
             foregroundHeaderRow,
@@ -531,6 +545,7 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
             backgroundOpacitySlider,
             floatRulersCheckbox,
             rulerShadowCheckbox,
+            closeRow,
         ])
 
         for row in [colorRow, foregroundHeaderRow, backgroundHeaderRow] {
@@ -558,12 +573,15 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         backgroundOpacitySlider.translatesAutoresizingMaskIntoConstraints = false
         floatRulersCheckbox.translatesAutoresizingMaskIntoConstraints = false
         rulerShadowCheckbox.translatesAutoresizingMaskIntoConstraints = false
+        closeButton.translatesAutoresizingMaskIntoConstraints = false
+        closeRow.translatesAutoresizingMaskIntoConstraints = false
 
         contentView.addSubview(contentStack)
         NSLayoutConstraint.activate([
             colorRow.widthAnchor.constraint(equalTo: contentStack.widthAnchor),
             foregroundHeaderRow.widthAnchor.constraint(equalTo: contentStack.widthAnchor),
             backgroundHeaderRow.widthAnchor.constraint(equalTo: contentStack.widthAnchor),
+            closeRow.widthAnchor.constraint(equalTo: contentStack.widthAnchor),
             rulerColorWell.widthAnchor.constraint(equalToConstant: 60),
             rulerColorWell.heightAnchor.constraint(equalToConstant: 24),
             resetRulerColorButton.widthAnchor.constraint(equalToConstant: 28),
@@ -572,6 +590,10 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
             backgroundOpacitySlider.widthAnchor.constraint(equalTo: contentStack.widthAnchor),
             floatRulersCheckbox.widthAnchor.constraint(lessThanOrEqualTo: contentStack.widthAnchor),
             rulerShadowCheckbox.widthAnchor.constraint(lessThanOrEqualTo: contentStack.widthAnchor),
+            closeButton.trailingAnchor.constraint(equalTo: closeRow.trailingAnchor),
+            closeButton.topAnchor.constraint(equalTo: closeRow.topAnchor),
+            closeButton.bottomAnchor.constraint(equalTo: closeRow.bottomAnchor),
+            closeButton.leadingAnchor.constraint(greaterThanOrEqualTo: closeRow.leadingAnchor),
             contentStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             contentStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             contentStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 18),
@@ -579,7 +601,7 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         ])
 
         let window = NSPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 315, height: 232),
+            contentRect: NSRect(x: 0, y: 0, width: 315, height: 270),
             styleMask: [.titled, .closable],
             backing: .buffered,
             defer: false
@@ -658,6 +680,11 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         rulerShadowCheckbox.action = #selector(setRulerShadow(_:))
         rulerShadowCheckbox.identifier = NSUserInterfaceItemIdentifier("ruler-settings-ruler-shadow-checkbox")
         rulerShadowCheckbox.setAccessibilityIdentifier("ruler-settings-ruler-shadow-checkbox")
+
+        closeButton.target = self
+        closeButton.action = #selector(closeRulerSettings(_:))
+        closeButton.identifier = NSUserInterfaceItemIdentifier("ruler-settings-close-button")
+        closeButton.setAccessibilityIdentifier("ruler-settings-close-button")
     }
 
     private func applyRulerColor(_ color: NSColor) {
@@ -690,11 +717,58 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         applyRulerColor(colorPanel.color)
     }
 
-    private func endSheetIfNeeded() {
-        guard let settingsWindow = window,
-              let parentWindow = settingsWindow.sheetParent else { return }
+    private func position(_ settingsWindow: NSWindow, attachedTo controller: GroupedRulerController) {
+        let parentFrame = controller.groupedWindow.frame
+        let settingsSize = settingsWindow.frame.size
+        let margin: CGFloat = 12
+        let frame: NSRect
 
-        parentWindow.endSheet(settingsWindow)
+        if controller.state.visibility.showsHorizontal {
+            let horizontalFrame = controller.groupedWindow.screenFrame(for: .horizontal)
+            let x = clamp(
+                horizontalFrame.midX - settingsSize.width / 2,
+                lower: parentFrame.minX + margin,
+                upper: parentFrame.maxX - settingsSize.width - margin
+            )
+            let belowY = horizontalFrame.minY - settingsSize.height - margin
+            let aboveY = horizontalFrame.maxY + margin
+            let y = belowY >= parentFrame.minY + margin
+                ? belowY
+                : min(aboveY, parentFrame.maxY - settingsSize.height - margin)
+            frame = NSRect(origin: NSPoint(x: x, y: y), size: settingsSize)
+        } else {
+            let verticalFrame = controller.groupedWindow.screenFrame(for: .vertical)
+            let y = clamp(
+                verticalFrame.midY - settingsSize.height / 2,
+                lower: parentFrame.minY + margin,
+                upper: parentFrame.maxY - settingsSize.height - margin
+            )
+            let rightX = verticalFrame.maxX + margin
+            let leftX = verticalFrame.minX - settingsSize.width - margin
+            let x = rightX + settingsSize.width <= parentFrame.maxX - margin
+                ? rightX
+                : max(leftX, parentFrame.minX + margin)
+            frame = NSRect(origin: NSPoint(x: x, y: y), size: settingsSize)
+        }
+
+        settingsWindow.setFrame(frame, display: true)
+    }
+
+    private func clamp(_ value: CGFloat, lower: CGFloat, upper: CGFloat) -> CGFloat {
+        guard lower <= upper else { return lower }
+
+        return min(max(value, lower), upper)
+    }
+
+    private func detachWindowIfNeeded() {
+        guard let settingsWindow = window else { return }
+
+        if let sheetParent = settingsWindow.sheetParent {
+            sheetParent.endSheet(settingsWindow)
+        }
+        if let parentWindow = settingsWindow.parent {
+            parentWindow.removeChildWindow(settingsWindow)
+        }
     }
 
     private func closeSheetColorControls() {
