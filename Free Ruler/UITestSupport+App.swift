@@ -18,7 +18,7 @@ extension UITestSupport {
             "NSWindow Frame preferencesWindow",
         ].forEach(defaults.removeObject(forKey:))
 
-        prefs.groupRulers = true
+        prefs.groupRulers = Prefs.defaultGroupRulers
         prefs.floatRulers = true
         prefs.rulerShadow = false
         prefs.foregroundOpacity = 90

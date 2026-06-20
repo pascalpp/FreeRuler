@@ -54,7 +54,7 @@ final class FreeRulerUITests: XCTestCase {
         XCTAssertTrue(rulerWindow.waitForExistence(timeout: 3))
         XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
         XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
-        XCTAssertTrue(waitForPreference("groupRulers", equals: true))
+        XCTAssertTrue(waitForPreference("groupRulers", equals: false))
 
         horizontalRuler.click()
         app.typeKey("v", modifierFlags: [])
@@ -67,7 +67,7 @@ final class FreeRulerUITests: XCTestCase {
             matches: horizontalRuler.frame,
             message: "Ruler window should shrink to the visible horizontal ruler frame"
         )
-        XCTAssertTrue(waitForPreference("groupRulers", equals: true))
+        XCTAssertTrue(waitForPreference("groupRulers", equals: false))
 
         app.typeKey("v", modifierFlags: [])
         XCTAssertTrue(verticalRuler.waitForExistence(timeout: 2))
@@ -83,20 +83,20 @@ final class FreeRulerUITests: XCTestCase {
             matches: verticalRuler.frame,
             message: "Ruler window should shrink to the visible vertical ruler frame"
         )
-        XCTAssertTrue(waitForPreference("groupRulers", equals: true))
+        XCTAssertTrue(waitForPreference("groupRulers", equals: false))
     }
 
     func testGroupRulersKeyboardCommandTogglesGroupedDraggingWithoutChangingRulerWindow() {
         XCTAssertTrue(rulerWindow.waitForExistence(timeout: 3))
         XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
         XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
-        XCTAssertTrue(waitForPreference("groupRulers", equals: true))
+        XCTAssertTrue(waitForPreference("groupRulers", equals: false))
 
         let originalFrame = rulerWindow.frame
 
         horizontalRuler.click()
         app.typeKey("g", modifierFlags: [])
-        XCTAssertTrue(waitForPreference("groupRulers", equals: false))
+        XCTAssertTrue(waitForPreference("groupRulers", equals: true))
         XCTAssertTrue(rulerWindow.waitForExistence(timeout: 2))
         XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 2))
         XCTAssertTrue(verticalRuler.waitForExistence(timeout: 2))
@@ -107,14 +107,14 @@ final class FreeRulerUITests: XCTestCase {
         )
 
         app.typeKey("g", modifierFlags: [])
-        XCTAssertTrue(waitForPreference("groupRulers", equals: true))
+        XCTAssertTrue(waitForPreference("groupRulers", equals: false))
         XCTAssertTrue(rulerWindow.waitForExistence(timeout: 2))
         XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 2))
         XCTAssertTrue(verticalRuler.waitForExistence(timeout: 2))
 
         verticalRuler.click()
         app.typeKey("g", modifierFlags: [])
-        XCTAssertTrue(waitForPreference("groupRulers", equals: false))
+        XCTAssertTrue(waitForPreference("groupRulers", equals: true))
         XCTAssertTrue(rulerWindow.waitForExistence(timeout: 2))
         XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 2))
         XCTAssertTrue(verticalRuler.waitForExistence(timeout: 2))
@@ -396,7 +396,7 @@ final class FreeRulerUITests: XCTestCase {
 
         XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 2))
         XCTAssertTrue(verticalRuler.waitForNonExistence(timeout: 2))
-        XCTAssertTrue(waitForPreference("groupRulers", equals: true))
+        XCTAssertTrue(waitForPreference("groupRulers", equals: false))
     }
 
     private func isolateVerticalWing() {
@@ -405,7 +405,7 @@ final class FreeRulerUITests: XCTestCase {
 
         XCTAssertTrue(verticalRuler.waitForExistence(timeout: 2))
         XCTAssertTrue(horizontalRuler.waitForNonExistence(timeout: 2))
-        XCTAssertTrue(waitForPreference("groupRulers", equals: true))
+        XCTAssertTrue(waitForPreference("groupRulers", equals: false))
     }
 
     private func resetRulerCursorScenario() {
@@ -414,7 +414,7 @@ final class FreeRulerUITests: XCTestCase {
         XCTAssertTrue(rulerWindow.waitForVisibleFrame(timeout: 1))
         XCTAssertTrue(horizontalRuler.waitForVisibleFrame(timeout: 1))
         XCTAssertTrue(verticalRuler.waitForVisibleFrame(timeout: 1))
-        XCTAssertTrue(waitForPreference("groupRulers", equals: true))
+        XCTAssertTrue(waitForPreference("groupRulers", equals: false))
     }
 
     private func assertCursorSequence(on ruler: XCUIElement, label: String) {
