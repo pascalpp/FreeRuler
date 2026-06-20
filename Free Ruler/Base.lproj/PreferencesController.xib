@@ -31,18 +31,26 @@
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <box ambiguous="YES" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="PREF-defaults-box">
-                        <rect key="frame" x="9" y="58" width="342" height="319"/>
-                        <view key="contentView" ambiguous="YES" id="PREF-defaults-box-content">
-                            <rect key="frame" x="4" y="5" width="334" height="311"/>
+                    <box borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="PREF-defaults-box">
+                        <rect key="frame" x="9" y="56" width="342" height="321"/>
+                        <view key="contentView" id="PREF-defaults-box-content">
+                            <rect key="frame" x="4" y="5" width="334" height="313"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <customView ambiguous="YES" id="PREF-controls" customClass="RulerSettingsControlsView" customModule="Free_Ruler" customModuleProvider="target">
-                                    <rect key="frame" x="-4" y="4" width="340" height="309"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <customView translatesAutoresizingMaskIntoConstraints="NO" id="PREF-controls" customClass="RulerSettingsControlsView" customModule="Free_Ruler" customModuleProvider="target">
+                                    <rect key="frame" x="0.0" y="0.0" width="334" height="313"/>
                                 </customView>
                             </subviews>
+                            <constraints>
+                                <constraint firstItem="PREF-controls" firstAttribute="top" secondItem="PREF-defaults-box-content" secondAttribute="top" id="2PU-zO-13P"/>
+                                <constraint firstItem="PREF-controls" firstAttribute="leading" secondItem="PREF-defaults-box-content" secondAttribute="leading" id="E1g-HQ-LBp"/>
+                                <constraint firstAttribute="bottom" secondItem="PREF-controls" secondAttribute="bottom" id="SZc-2t-9lg"/>
+                                <constraint firstAttribute="trailing" secondItem="PREF-controls" secondAttribute="trailing" id="xvK-u5-loF"/>
+                            </constraints>
                         </view>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="315" id="yon-lf-kxx"/>
+                        </constraints>
                     </box>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="PREF-factory-button">
                         <rect key="frame" x="11" y="11" width="183" height="32"/>
