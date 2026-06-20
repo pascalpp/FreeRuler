@@ -163,7 +163,7 @@
                 </slider>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RSV-float-checkbox">
                     <rect key="frame" x="13" y="50" width="247" height="18"/>
-                    <buttonCell key="cell" type="check" title="Float rulers above other applications" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="RSV-float-cell">
+                    <buttonCell key="cell" type="check" title="Float ruler above other applications" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="RSV-float-cell">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>

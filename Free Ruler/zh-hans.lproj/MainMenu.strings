@@ -38,7 +38,7 @@
 /* Class = "NSMenuItem"; title = "Free Ruler Help"; ObjectID = "FKE-Sm-Kum"; */
 "FKE-Sm-Kum.title" = "Free Ruler 帮助";
 
-/* Class = "NSMenuItem"; title = "Float Rulers"; ObjectID = "GDK-AC-uC8"; */
+/* Class = "NSMenuItem"; title = "Float Ruler"; ObjectID = "GDK-AC-uC8"; */
 "GDK-AC-uC8.title" = "悬浮尺子";
 
 /* Class = "NSMenuItem"; title = "Flip Horizontal"; ObjectID = "GZl-Zd-Ad4"; */

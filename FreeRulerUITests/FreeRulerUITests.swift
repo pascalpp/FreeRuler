@@ -248,10 +248,10 @@ final class FreeRulerUITests: XCTestCase {
 
         horizontalRuler.click()
         app.typeKey("f", modifierFlags: [])
-        XCTAssertTrue(waitForHotkeyBezel("Rulers unfloated"))
+        XCTAssertTrue(waitForHotkeyBezel("Ruler unfloated"))
 
         app.typeKey("f", modifierFlags: [])
-        XCTAssertTrue(waitForHotkeyBezel("Rulers floated"))
+        XCTAssertTrue(waitForHotkeyBezel("Ruler floated"))
 
         app.typeKey("s", modifierFlags: [])
         XCTAssertTrue(waitForHotkeyBezel("Shadow enabled"))

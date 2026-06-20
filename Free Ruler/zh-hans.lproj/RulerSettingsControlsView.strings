@@ -11,7 +11,7 @@
 /* Class = "NSTextFieldCell"; title = "Foreground Opacity"; ObjectID = "RSV-fg-cell"; */
 "RSV-fg-cell.title" = "前景不透明度";
 
-/* Class = "NSButtonCell"; title = "Float rulers above other applications"; ObjectID = "RSV-float-cell"; */
+/* Class = "NSButtonCell"; title = "Float ruler above other applications"; ObjectID = "RSV-float-cell"; */
 "RSV-float-cell.title" = "让标尺窗口悬浮在其他应用程序之上";
 
 /* Class = "NSButtonCell"; title = "Show ruler shadow"; ObjectID = "RSV-shadow-cell"; */

@@ -8,8 +8,8 @@ import Sparkle
 #endif
 
 private enum HotkeyBezelLocalizationKey: String {
-    case rulersFloated = "HotkeyBezel.RulersFloated"
-    case rulersUnfloated = "HotkeyBezel.RulersUnfloated"
+    case rulerFloated = "HotkeyBezel.RulerFloated"
+    case rulerUnfloated = "HotkeyBezel.RulerUnfloated"
     case rulersGrouped = "HotkeyBezel.RulersGrouped"
     case rulersUngrouped = "HotkeyBezel.RulersUngrouped"
     case shadowEnabled = "HotkeyBezel.ShadowEnabled"
@@ -27,10 +27,10 @@ private enum HotkeyBezelLocalizationKey: String {
 
     private var comment: String {
         switch self {
-        case .rulersFloated:
-            return "Hotkey status bezel text indicating rulers now float above other windows"
-        case .rulersUnfloated:
-            return "Hotkey status bezel text indicating rulers no longer float above other windows"
+        case .rulerFloated:
+            return "Hotkey status bezel text indicating the ruler now floats above other windows"
+        case .rulerUnfloated:
+            return "Hotkey status bezel text indicating the ruler no longer floats above other windows"
         case .rulersGrouped:
             return "Hotkey status bezel text indicating rulers are grouped"
         case .rulersUngrouped:
@@ -471,7 +471,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             updateFloatRulersMenuItem()
             uiTestSupport?.writePreferencesState(activeSettings: controller.state.settings)
             showHotkeyBezel(
-                shouldFloat ? .rulersFloated : .rulersUnfloated,
+                shouldFloat ? .rulerFloated : .rulerUnfloated,
                 on: bezelScreen(for: sender)
             )
             return
@@ -479,7 +479,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         prefs.floatRulers = !prefs.floatRulers
         showHotkeyBezel(
-            prefs.floatRulers ? .rulersFloated : .rulersUnfloated,
+            prefs.floatRulers ? .rulerFloated : .rulerUnfloated,
             on: bezelScreen(for: sender)
         )
     }

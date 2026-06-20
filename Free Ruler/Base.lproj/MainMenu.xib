@@ -212,13 +212,7 @@
                                     </items>
                                 </menu>
                             </menuItem>
-                            <menuItem title="Group Rulers" keyEquivalent="g" id="7Ga-Fb-LLc">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="toggleGroupRulers:" target="Voe-Tx-rLC" id="0Dt-8h-7ed"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Float Rulers" keyEquivalent="f" id="GDK-AC-uC8">
+                            <menuItem title="Float Ruler" keyEquivalent="f" id="GDK-AC-uC8">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="toggleFloatRulers:" target="Voe-Tx-rLC" id="MFv-BV-ZRR"/>
@@ -231,6 +225,12 @@
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="hB3-LF-h0Y"/>
+                            <menuItem title="Group Rulers" keyEquivalent="g" id="7Ga-Fb-LLc">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="toggleGroupRulers:" target="Voe-Tx-rLC" id="0Dt-8h-7ed"/>
+                                </connections>
+                            </menuItem>
                             <menuItem title="Align Ruler at Mouse Location" keyEquivalent="o" id="iKV-uW-hwy">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>

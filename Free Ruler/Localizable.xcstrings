@@ -247,32 +247,32 @@
         }
       }
     },
-    "Float rulers above other applications" : {
+    "Float ruler above other applications" : {
       "comment" : "Checkbox title for whether the active ruler floats above other apps",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lineale schweben über anderen Programmen"
+            "value" : "Lineal über anderen Programmen schweben lassen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Float rulers above other applications"
+            "value" : "Float ruler above other applications"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reglas flotantes sobre otras aplicaciones"
+            "value" : "Regla flotante sobre otras aplicaciones"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kelluta viivaimia muiden sovellusten päällä"
+            "value" : "Kelluta viivainta muiden sovellusten päällä"
           }
         },
         "ja" : {
@@ -499,32 +499,32 @@
         }
       }
     },
-    "HotkeyBezel.RulersFloated" : {
-      "comment" : "Hotkey status bezel text indicating rulers now float above other windows",
+    "HotkeyBezel.RulerFloated" : {
+      "comment" : "Hotkey status bezel text indicating the ruler now floats above other windows",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lineale schweben"
+            "value" : "Lineal schwebt"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rulers floated"
+            "value" : "Ruler floated"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reglas flotantes"
+            "value" : "Regla flotante"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Viivaimet päällimmäisinä"
+            "value" : "Viivain päällimmäisenä"
           }
         },
         "ja" : {
@@ -583,32 +583,32 @@
         }
       }
     },
-    "HotkeyBezel.RulersUnfloated" : {
-      "comment" : "Hotkey status bezel text indicating rulers no longer float above other windows",
+    "HotkeyBezel.RulerUnfloated" : {
+      "comment" : "Hotkey status bezel text indicating the ruler no longer floats above other windows",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lineale schweben nicht"
+            "value" : "Lineal schwebt nicht"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rulers unfloated"
+            "value" : "Ruler unfloated"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reglas no flotantes"
+            "value" : "Regla no flotante"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Viivaimet eivät ole päällimmäisinä"
+            "value" : "Viivain ei ole päällimmäisenä"
           }
         },
         "ja" : {

@@ -38,8 +38,8 @@
 /* Class = "NSMenuItem"; title = "Free Ruler Help"; ObjectID = "FKE-Sm-Kum"; */
 "FKE-Sm-Kum.title" = "Free Rulerin ohje";
 
-/* Class = "NSMenuItem"; title = "Float Rulers"; ObjectID = "GDK-AC-uC8"; */
-"GDK-AC-uC8.title" = "Kelluta viivaimet";
+/* Class = "NSMenuItem"; title = "Float Ruler"; ObjectID = "GDK-AC-uC8"; */
+"GDK-AC-uC8.title" = "Kelluta viivain";
 
 /* Class = "NSMenuItem"; title = "Flip Horizontal"; ObjectID = "GZl-Zd-Ad4"; */
 "GZl-Zd-Ad4.title" = "Käännä vaakasuunnassa";
