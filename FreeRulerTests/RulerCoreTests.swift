@@ -2033,6 +2033,8 @@ final class RulerCoreTests: XCTestCase {
                 rule.mouseTickLineX(forTickX: 299, growthDirection: .negative),
                 299
             )
+            XCTAssertEqual(rule.mouseTickX(forLocalMouseX: 50.49), 50)
+            XCTAssertEqual(rule.mouseTickX(forLocalMouseX: 50.5), 51)
 
             let bottomTick = rule.tickLine(forX: 50, length: 10, rulerHeight: 40, tickSide: .bottom)
             XCTAssertEqual(bottomTick.start, CGPoint(x: 50, y: 1))
@@ -2093,6 +2095,8 @@ final class RulerCoreTests: XCTestCase {
             rule.mouseTickLineY(forTickY: 1, growthDirection: .positive),
             1
         )
+        XCTAssertEqual(rule.mouseTickY(forLocalMouseY: 50.49), 50)
+        XCTAssertEqual(rule.mouseTickY(forLocalMouseY: 50.5), 51)
 
         let rightTick = rule.tickLine(forY: 250, length: 10, rulerWidth: 40, tickSide: .right)
         XCTAssertEqual(rightTick.start, CGPoint(x: 39, y: 250))

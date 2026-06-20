@@ -125,7 +125,11 @@ class VerticalRule: RuleView {
 
         let windowPoint = window.convertPoint(fromScreen: mouseLoc)
         let viewPoint = convert(windowPoint, from: nil)
-        mouseTickY = viewPoint.y
+        mouseTickY = mouseTickY(forLocalMouseY: viewPoint.y)
+    }
+
+    func mouseTickY(forLocalMouseY localMouseY: CGFloat) -> CGFloat {
+        return localMouseY.rounded()
     }
 
     func drawMouseTick(_ mouseTickY: CGFloat) {

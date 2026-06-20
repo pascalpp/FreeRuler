@@ -120,7 +120,11 @@ class HorizontalRule: RuleView {
 
         let windowPoint = window.convertPoint(fromScreen: mouseLoc)
         let viewPoint = convert(windowPoint, from: nil)
-        mouseTickX = viewPoint.x
+        mouseTickX = mouseTickX(forLocalMouseX: viewPoint.x)
+    }
+
+    func mouseTickX(forLocalMouseX localMouseX: CGFloat) -> CGFloat {
+        return localMouseX.rounded()
     }
 
     func drawMouseTick(_ mouseTickX: CGFloat) {
