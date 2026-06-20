@@ -18,9 +18,8 @@ The main app target lives in `Free Ruler/` and the Xcode project is
   hotkey behavior, timer policy wiring, and UI test state reset.
 - `Ruler.swift`: ruler model plus default placement and min/max size
   helpers.
-- `RulerController.swift`, `RulerWindow.swift`, `RuleView.swift`,
-  `HorizontalRule.swift`, `VerticalRule.swift`: ruler window/view behavior and
-  drawing.
+- `RulerWindow.swift`, `RuleView.swift`, `HorizontalRule.swift`,
+  `VerticalRule.swift`: ruler window/controller/view behavior and drawing.
 - `Prefs.swift`: persisted app preferences.
 - `Base.lproj/*.xib`: AppKit interface files for menus/preferences.
 - `*.lproj/*.strings` and `Localizable.xcstrings`:

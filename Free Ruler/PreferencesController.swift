@@ -663,6 +663,7 @@ class PreferencesController: NSWindowController, NSWindowDelegate, NotificationP
 
         window?.delegate = self
         window?.identifier = NSUserInterfaceItemIdentifier("preferences-window")
+        window?.setAccessibilityIdentifier("preferences-window")
         window?.isMovableByWindowBackground = true
         configureOpaqueColorPicking()
         settingsControlsView.delegate = self
@@ -890,7 +891,7 @@ final class RulerSettingsWindow: NSPanel {
 
 final class RulerSettingsController: NSWindowController, NSWindowDelegate {
 
-    private weak var rulerController: GroupedRulerController?
+    private weak var rulerController: RulerController?
     private var colorPanelObserver: NSObjectProtocol?
     private var didConfigureWindow = false
 
@@ -942,7 +943,7 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         return settingsControlsView.rulerShadowCheckbox
     }
 
-    var currentRulerController: GroupedRulerController? {
+    var currentRulerController: RulerController? {
         return rulerController
     }
 
@@ -950,7 +951,7 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         return "RulerSettingsController"
     }
 
-    init(rulerController: GroupedRulerController) {
+    init(rulerController: RulerController) {
         self.rulerController = rulerController
         super.init(window: nil)
         loadWindow()
@@ -1010,13 +1011,13 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         window?.center()
     }
 
-    func show(attachedTo controller: GroupedRulerController, sender: Any?) {
+    func show(attachedTo controller: RulerController, sender: Any?) {
         updateRulerController(controller)
         guard let settingsWindow = window else { return }
 
         configureOpaqueColorPicking()
 
-        if settingsWindow.parent === controller.groupedWindow {
+        if settingsWindow.parent === controller.rulerWindow {
             position(settingsWindow, attachedTo: controller)
             settingsWindow.orderFront(sender)
             settingsWindow.makeKey()
@@ -1026,7 +1027,7 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
 
         detachWindowIfNeeded()
 
-        guard controller.groupedWindow.isVisible else {
+        guard controller.rulerWindow.isVisible else {
             showWindow(sender)
             return
         }
@@ -1036,7 +1037,7 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         }
 
         position(settingsWindow, attachedTo: controller)
-        controller.groupedWindow.addChildWindow(settingsWindow, ordered: .above)
+        controller.rulerWindow.addChildWindow(settingsWindow, ordered: .above)
         settingsWindow.orderFront(sender)
         settingsWindow.makeKey()
         settingsWindow.makeFirstResponder(unitSegmentedControl)
@@ -1056,7 +1057,7 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         closeSheetColorControls()
     }
 
-    func updateRulerController(_ controller: GroupedRulerController) {
+    func updateRulerController(_ controller: RulerController) {
         rulerController = controller
         updateView()
     }
@@ -1148,7 +1149,7 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
             unit: currentSettings?.unit ?? Prefs.defaultUnit,
             horizontalLength: rulerController?.state.layout.horizontalLength,
             verticalLength: rulerController?.state.layout.verticalLength,
-            dimensionScreen: rulerController?.groupedWindow.screen ?? window?.screen ?? NSScreen.main,
+            dimensionScreen: rulerController?.rulerWindow.screen ?? window?.screen ?? NSScreen.main,
             rulerColor: currentSettings?.rulerColor ?? Prefs.defaultRulerFillColor,
             foregroundOpacity: currentSettings?.foregroundOpacity ?? Prefs.defaultForegroundOpacity,
             backgroundOpacity: currentSettings?.backgroundOpacity ?? Prefs.defaultBackgroundOpacity,
@@ -1269,7 +1270,7 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         guard let controller = rulerController,
               let settingsWindow = window,
               settingsWindow.isVisible,
-              settingsWindow.parent === controller.groupedWindow else { return }
+              settingsWindow.parent === controller.rulerWindow else { return }
 
         position(settingsWindow, attachedTo: controller)
 
@@ -1302,11 +1303,11 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         applyRulerColor(colorPanel.color)
     }
 
-    private func position(_ settingsWindow: NSWindow, attachedTo controller: GroupedRulerController) {
+    private func position(_ settingsWindow: NSWindow, attachedTo controller: RulerController) {
         let settingsSize = settingsWindow.frame.size
         let frame = settingsFrame(
             size: settingsSize,
-            zeroPoint: controller.groupedWindow.zeroPoint(),
+            zeroPoint: controller.rulerWindow.zeroPoint(),
             zeroCorner: controller.state.settings.zeroCorner
         )
 

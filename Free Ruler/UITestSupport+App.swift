@@ -28,8 +28,12 @@ extension UITestSupport {
         prefs.zeroCorner = Prefs.defaultZeroCorner
     }
 
-    func writePreferencesState() {
+    func writePreferencesState(activeSettings: RulerSettings? = nil) {
+        let activeSettings = activeSettings ?? RulerSettings(defaults: prefs)
         let state = [
+            "activeFloatRulers": boolStateValue(activeSettings.floatRulers),
+            "activeRulerShadow": boolStateValue(activeSettings.rulerShadow),
+            "activeUnit": unitStateValue(activeSettings.unit),
             "floatRulers": boolStateValue(prefs.floatRulers),
             "groupRulers": boolStateValue(prefs.groupRulers),
             "rulerShadow": boolStateValue(prefs.rulerShadow),

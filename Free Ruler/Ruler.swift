@@ -1,5 +1,9 @@
 import Cocoa
 
+func windowAlphaValue(_ value: Int) -> CGFloat {
+    return CGFloat(value) / 100.0
+}
+
 enum Orientation: String {
     case horizontal
     case vertical
@@ -338,8 +342,8 @@ struct RulerLayoutState: Equatable, Codable {
         return (horizontalLength, verticalLength)
     }
 
-    func layout(zeroCorner: ZeroCorner) -> GroupedRulerLayout {
-        return GroupedRulerLayout.layout(
+    func layout(zeroCorner: ZeroCorner) -> RulerWindowLayout {
+        return RulerWindowLayout.layout(
             horizontalLength: horizontalLength,
             verticalLength: verticalLength,
             zeroPoint: zeroPoint,
@@ -669,14 +673,5 @@ func getMaxSize(ruler: Ruler) -> NSSize {
         return NSSize(width: 4000, height: 40)
     case .vertical:
         return NSSize(width: 40, height: 4000)
-    }
-}
-
-func getRulerView(ruler: Ruler) -> RuleView {
-    switch ruler.orientation {
-    case .horizontal:
-        return HorizontalRule(frame: ruler.frame)
-    case .vertical:
-        return VerticalRule(frame: ruler.frame)
     }
 }
