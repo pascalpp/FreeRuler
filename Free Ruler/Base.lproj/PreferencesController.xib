@@ -18,7 +18,7 @@
         <window title="Free Ruler Settings" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" frameAutosaveName="preferencesWindow" animationBehavior="default" id="F0z-JX-Cv5">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <rect key="contentRect" x="602" y="400" width="360" height="415"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1512" height="944"/>
             <view key="contentView" id="se5-gp-TjO">
                 <rect key="frame" x="0.0" y="0.0" width="360" height="415"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -31,15 +31,15 @@
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <box borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="PREF-defaults-box">
+                    <box ambiguous="YES" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="PREF-defaults-box">
                         <rect key="frame" x="9" y="58" width="342" height="319"/>
-                        <view key="contentView" id="PREF-defaults-box-content">
+                        <view key="contentView" ambiguous="YES" id="PREF-defaults-box-content">
                             <rect key="frame" x="4" y="5" width="334" height="311"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <customView id="PREF-controls" customClass="RulerSettingsControlsView" customModule="Free_Ruler" customModuleProvider="target">
+                                <customView ambiguous="YES" id="PREF-controls" customClass="RulerSettingsControlsView" customModule="Free_Ruler" customModuleProvider="target">
                                     <rect key="frame" x="-4" y="4" width="340" height="309"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 </customView>
                             </subviews>
                         </view>
@@ -59,7 +59,6 @@
                     <constraint firstItem="PREF-defaults-box" firstAttribute="top" secondItem="PREF-defaults-header" secondAttribute="bottom" constant="12" id="PREF-box-below-header"/>
                     <constraint firstItem="PREF-defaults-box" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="12" id="PREF-box-leading"/>
                     <constraint firstAttribute="trailing" secondItem="PREF-defaults-box" secondAttribute="trailing" constant="12" id="PREF-box-trailing"/>
-                    <constraint firstItem="PREF-factory-button" firstAttribute="top" secondItem="PREF-defaults-box" secondAttribute="bottom" constant="24" id="PREF-button-below-box"/>
                     <constraint firstAttribute="bottom" secondItem="PREF-factory-button" secondAttribute="bottom" constant="18" id="PREF-button-bottom"/>
                     <constraint firstItem="PREF-factory-button" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="18" id="PREF-button-leading"/>
                     <constraint firstItem="PREF-defaults-header" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="24" id="PREF-header-leading"/>

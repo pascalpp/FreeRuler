@@ -251,6 +251,10 @@ final class RulerCoreTests: XCTestCase {
                 movedFirstFrame.origin.y += dragOffset.height
 
                 appDelegate.rulerManager.beginGroupedDrag(from: first)
+                XCTAssertTrue(first.rulerWindow.childWindows?.contains(second.rulerWindow) ?? false)
+                XCTAssertTrue(second.rulerWindow.parent === first.rulerWindow)
+                XCTAssertFalse(first.rulerWindow.childWindows?.contains(hidden.rulerWindow) ?? false)
+
                 first.move(to: movedFirstFrame)
                 appDelegate.rulerManager.syncGroupedDrag(from: first)
                 appDelegate.rulerManager.finishGroupedDrag(from: first)
@@ -266,6 +270,8 @@ final class RulerCoreTests: XCTestCase {
                         for: .horizontal
                     )
                 )
+                XCTAssertFalse(first.rulerWindow.childWindows?.contains(second.rulerWindow) ?? false)
+                XCTAssertNil(second.rulerWindow.parent)
             }
         }
     }
@@ -756,7 +762,7 @@ final class RulerCoreTests: XCTestCase {
             prefs.foregroundOpacity = 42
             prefs.backgroundOpacity = 21
             prefs.floatRulers = false
-            prefs.groupRulers = false
+            prefs.groupRulers = true
             prefs.rulerShadow = true
             prefs.zeroCorner = .bottomRight
             prefs.defaultHorizontalLength = 333
@@ -1449,6 +1455,18 @@ final class RulerCoreTests: XCTestCase {
                 UserDefaults.standard.integer(forKey: "zeroCorner"),
                 ZeroCorner.topRight.rawValue
             )
+        }
+    }
+
+    func testGroupRulersDefaultsOffAndPersistsToUserDefaults() {
+        withRestoredRulerPreferences {
+            XCTAssertFalse(Prefs.defaultGroupRulers)
+
+            prefs.groupRulers = true
+            XCTAssertTrue(UserDefaults.standard.bool(forKey: "groupRulers"))
+
+            prefs.groupRulers = false
+            XCTAssertFalse(UserDefaults.standard.bool(forKey: "groupRulers"))
         }
     }
 

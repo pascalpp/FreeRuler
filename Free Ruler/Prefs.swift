@@ -176,7 +176,7 @@ extension Prefs {
     }
   
     static var defaultGroupRulers: Bool {
-        return true
+        return false
     }
 
     func applyDefaults(from settings: RulerSettings, layout: RulerLayoutState? = nil) {
