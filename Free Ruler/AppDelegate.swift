@@ -355,7 +355,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func migratedLegacyRulerState() -> RulerInstanceState? {
-        let defaults = UserDefaults.standard
+        let defaults = Prefs.userDefaults
         let horizontalAutosaveName = "horizontal-ruler"
         let verticalAutosaveName = "vertical-ruler"
         let hasLegacyAutosave = defaults.object(forKey: "NSWindow Frame \(horizontalAutosaveName)") != nil

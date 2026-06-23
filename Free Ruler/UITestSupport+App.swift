@@ -2,7 +2,7 @@ import Foundation
 
 extension UITestSupport {
     func resetApplicationState() {
-        let defaults = UserDefaults.standard
+        let defaults = Prefs.userDefaults
         [
             "groupRulers",
             "floatRulers",

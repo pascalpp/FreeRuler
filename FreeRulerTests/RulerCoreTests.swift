@@ -11,6 +11,10 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertEqual(windowAlphaValue(100), 1.0)
     }
 
+    func testUnitTestsUseIsolatedUserDefaults() {
+        XCTAssertFalse(Prefs.userDefaults === UserDefaults.standard)
+    }
+
     func testRulerStoresOrientationFrameAndAutosaveName() {
         let frame = NSRect(x: 10, y: 20, width: 300, height: 40)
         let ruler = Ruler(.horizontal, frame: frame, name: "test-ruler")
@@ -1326,7 +1330,7 @@ final class RulerCoreTests: XCTestCase {
 
     func testSavedRulerSetStateFallsBackForCorruptOrUnknownSchemaData() throws {
         try withRestoredRulerSetState {
-            UserDefaults.standard.set(Data("not-json".utf8), forKey: Prefs.rulerSetStateKey)
+            Prefs.userDefaults.set(Data("not-json".utf8), forKey: Prefs.rulerSetStateKey)
 
             XCTAssertNil(prefs.loadRulerSetState())
 
@@ -1338,7 +1342,7 @@ final class RulerCoreTests: XCTestCase {
                 activeRulerID: nil
             )
             let data = try JSONEncoder().encode(unknownSchemaState)
-            UserDefaults.standard.set(data, forKey: Prefs.rulerSetStateKey)
+            Prefs.userDefaults.set(data, forKey: Prefs.rulerSetStateKey)
 
             XCTAssertNil(prefs.loadRulerSetState())
         }
@@ -1422,7 +1426,7 @@ final class RulerCoreTests: XCTestCase {
 
                 UITestSupport.prepareForLaunch().resetApplicationState()
 
-                XCTAssertNil(UserDefaults.standard.data(forKey: Prefs.rulerSetStateKey))
+                XCTAssertNil(Prefs.userDefaults.data(forKey: Prefs.rulerSetStateKey))
             }
         }
     }
@@ -1455,14 +1459,14 @@ final class RulerCoreTests: XCTestCase {
             prefs.zeroCorner = .bottomRight
 
             XCTAssertEqual(
-                UserDefaults.standard.integer(forKey: "zeroCorner"),
+                Prefs.userDefaults.integer(forKey: "zeroCorner"),
                 ZeroCorner.bottomRight.rawValue
             )
 
             prefs.zeroCorner = .topRight
 
             XCTAssertEqual(
-                UserDefaults.standard.integer(forKey: "zeroCorner"),
+                Prefs.userDefaults.integer(forKey: "zeroCorner"),
                 ZeroCorner.topRight.rawValue
             )
         }
@@ -1473,10 +1477,10 @@ final class RulerCoreTests: XCTestCase {
             XCTAssertFalse(Prefs.defaultGroupRulers)
 
             prefs.groupRulers = true
-            XCTAssertTrue(UserDefaults.standard.bool(forKey: "groupRulers"))
+            XCTAssertTrue(Prefs.userDefaults.bool(forKey: "groupRulers"))
 
             prefs.groupRulers = false
-            XCTAssertFalse(UserDefaults.standard.bool(forKey: "groupRulers"))
+            XCTAssertFalse(Prefs.userDefaults.bool(forKey: "groupRulers"))
         }
     }
 
@@ -3663,59 +3667,24 @@ final class RulerCoreTests: XCTestCase {
     }
 
     private func withRestoredRulerColorPreference(_ test: () throws -> Void) rethrows {
-        let defaults = UserDefaults.standard
         let previousColor = prefs.rulerColor
-        let domainName = Bundle.main.bundleIdentifier
-        let previousDomainValue = domainName
-            .flatMap { defaults.persistentDomain(forName: $0)?["rulerColor"] }
+        let previousDomainValue = persistentPreferenceValue(forKey: "rulerColor")
 
         defer {
             prefs.rulerColor = previousColor
-
-            if let domainName = domainName {
-                var domain = defaults.persistentDomain(forName: domainName) ?? [:]
-                if let previousDomainValue = previousDomainValue {
-                    domain["rulerColor"] = previousDomainValue
-                } else {
-                    domain.removeValue(forKey: "rulerColor")
-                }
-                defaults.setPersistentDomain(domain, forName: domainName)
-            } else {
-                if previousDomainValue == nil {
-                    defaults.removeObject(forKey: "rulerColor")
-                }
-            }
+            restorePersistentPreferenceValue(previousDomainValue, forKey: "rulerColor")
         }
 
         try test()
     }
 
     private func withRestoredZeroCornerPreference(_ test: () throws -> Void) rethrows {
-        let defaults = UserDefaults.standard
         let previousZeroCorner = prefs.zeroCorner
-        let domainName = Bundle.main.bundleIdentifier
-        let previousDomainValue = domainName
-            .flatMap { defaults.persistentDomain(forName: $0)?["zeroCorner"] }
-        let previousStandardValue = defaults.object(forKey: "zeroCorner")
+        let previousDomainValue = persistentPreferenceValue(forKey: "zeroCorner")
 
         defer {
             prefs.zeroCorner = previousZeroCorner
-
-            if let domainName = domainName {
-                var domain = defaults.persistentDomain(forName: domainName) ?? [:]
-                if let previousDomainValue = previousDomainValue {
-                    domain["zeroCorner"] = previousDomainValue
-                } else {
-                    domain.removeValue(forKey: "zeroCorner")
-                }
-                defaults.setPersistentDomain(domain, forName: domainName)
-            } else {
-                if let previousStandardValue = previousStandardValue {
-                    defaults.set(previousStandardValue, forKey: "zeroCorner")
-                } else {
-                    defaults.removeObject(forKey: "zeroCorner")
-                }
-            }
+            restorePersistentPreferenceValue(previousDomainValue, forKey: "zeroCorner")
         }
 
         try test()
@@ -3891,18 +3860,42 @@ final class RulerCoreTests: XCTestCase {
     }
 
     private func withRestoredRulerSetState(_ test: () throws -> Void) rethrows {
-        let defaults = UserDefaults.standard
-        let previousState = defaults.object(forKey: Prefs.rulerSetStateKey)
+        let previousState = persistentPreferenceValue(forKey: Prefs.rulerSetStateKey)
 
         defer {
-            if let previousState = previousState {
-                defaults.set(previousState, forKey: Prefs.rulerSetStateKey)
-            } else {
-                defaults.removeObject(forKey: Prefs.rulerSetStateKey)
-            }
+            restorePersistentPreferenceValue(previousState, forKey: Prefs.rulerSetStateKey)
         }
 
         try test()
+    }
+
+    private func persistentPreferenceValue(forKey key: String) -> Any? {
+        let defaults = Prefs.userDefaults
+        guard let domainName = Prefs.userDefaultsPersistentDomainName else {
+            return defaults.object(forKey: key)
+        }
+
+        return defaults.persistentDomain(forName: domainName)?[key]
+    }
+
+    private func restorePersistentPreferenceValue(_ value: Any?, forKey key: String) {
+        let defaults = Prefs.userDefaults
+        guard let domainName = Prefs.userDefaultsPersistentDomainName else {
+            if let value = value {
+                defaults.set(value, forKey: key)
+            } else {
+                defaults.removeObject(forKey: key)
+            }
+            return
+        }
+
+        var domain = defaults.persistentDomain(forName: domainName) ?? [:]
+        if let value = value {
+            domain[key] = value
+        } else {
+            domain.removeValue(forKey: key)
+        }
+        defaults.setPersistentDomain(domain, forName: domainName)
     }
 }
 

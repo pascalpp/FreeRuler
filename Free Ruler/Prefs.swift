@@ -21,8 +21,19 @@ let prefs = Prefs.shared
 
 class Prefs: NSObject {
 
+    private struct UserDefaultsConfiguration {
+        let defaults: UserDefaults
+        let persistentDomainName: String?
+    }
+
     // MARK: - shared singleton instance
-    static let shared = Prefs()
+    static let shared = Prefs(defaults: userDefaultsConfiguration.defaults)
+    static var userDefaults: UserDefaults {
+        return shared.defaults
+    }
+    static var userDefaultsPersistentDomainName: String? {
+        return userDefaultsConfiguration.persistentDomainName
+    }
 
     // MARK: - public properties
     @objc dynamic var floatRulers       : Bool
@@ -43,7 +54,31 @@ class Prefs: NSObject {
 
     // MARK: - private implementation
 
-    private let defaults = UserDefaults.standard
+    private let defaults: UserDefaults
+    private static let userDefaultsConfiguration: UserDefaultsConfiguration = {
+        guard isRunningHostedUnitTests else {
+            return UserDefaultsConfiguration(
+                defaults: .standard,
+                persistentDomainName: Bundle.main.bundleIdentifier
+            )
+        }
+
+        let suiteName = "com.pascal.freeruler.unit-tests"
+        guard let defaults = UserDefaults(suiteName: suiteName) else {
+            return UserDefaultsConfiguration(
+                defaults: .standard,
+                persistentDomainName: Bundle.main.bundleIdentifier
+            )
+        }
+
+        defaults.removePersistentDomain(forName: suiteName)
+        return UserDefaultsConfiguration(defaults: defaults, persistentDomainName: suiteName)
+    }()
+    private static var isRunningHostedUnitTests: Bool {
+        let environment = ProcessInfo.processInfo.environment
+        return environment["XCTestConfigurationFilePath"] != nil
+            && environment["FREE_RULER_UI_TESTS"] == nil
+    }
     private static let defaultRulerColor = #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1)
     private static let defaultRulerColorData: Data? = {
         guard let data = archivedColorData(defaultRulerColor) else {
@@ -74,7 +109,8 @@ class Prefs: NSObject {
         return values
     }
 
-    private override init() {
+    private init(defaults: UserDefaults) {
+        self.defaults = defaults
         defaults.register(defaults: Prefs.defaultValues)
 
         floatRulers       = defaults.bool(forKey: "floatRulers")
@@ -297,11 +333,11 @@ extension Prefs {
 
         guard let data = try? JSONEncoder().encode(state) else { return }
 
-        UserDefaults.standard.set(data, forKey: Self.rulerSetStateKey)
+        defaults.set(data, forKey: Self.rulerSetStateKey)
     }
 
     func loadRulerSetState() -> StoredRulerSetState? {
-        guard let data = UserDefaults.standard.data(forKey: Self.rulerSetStateKey),
+        guard let data = defaults.data(forKey: Self.rulerSetStateKey),
               let state = try? JSONDecoder().decode(StoredRulerSetState.self, from: data),
               state.schemaVersion == StoredRulerSetState.currentSchemaVersion else {
             return nil
@@ -311,6 +347,6 @@ extension Prefs {
     }
 
     func clearRulerSetState() {
-        UserDefaults.standard.removeObject(forKey: Self.rulerSetStateKey)
+        defaults.removeObject(forKey: Self.rulerSetStateKey)
     }
 }
