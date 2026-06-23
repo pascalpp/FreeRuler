@@ -146,6 +146,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         configureUpdater()
 #endif
 
+        rulerManager.setApplicationActive(NSApp.isActive)
         restoreSavedRulers()
         showRulers()
     }
@@ -417,6 +418,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
+        rulerManager.setApplicationActive(true)
+
         for controller in rulerManager.controllers {
             controller.foreground()
         }
@@ -428,6 +431,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidResignActive(_ notification: Notification) {
+        rulerManager.setApplicationActive(false)
+
         for controller in rulerManager.controllers {
             controller.background()
         }

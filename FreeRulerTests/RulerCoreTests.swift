@@ -194,6 +194,16 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertTrue(first.rulerWindow.drawsActiveBorder)
         XCTAssertFalse(second.rulerWindow.drawsActiveBorder)
 
+        manager.setApplicationActive(false)
+
+        XCTAssertFalse(first.rulerWindow.drawsActiveBorder)
+        XCTAssertFalse(second.rulerWindow.drawsActiveBorder)
+
+        manager.setApplicationActive(true)
+
+        XCTAssertTrue(first.rulerWindow.drawsActiveBorder)
+        XCTAssertFalse(second.rulerWindow.drawsActiveBorder)
+
         XCTAssertTrue(manager.closeActiveRuler())
 
         XCTAssertTrue(second.rulerWindow.drawsActiveBorder)

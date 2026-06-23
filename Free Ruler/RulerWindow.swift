@@ -1617,6 +1617,7 @@ final class RulerManager {
     private(set) var activeRulerID: UUID?
     var onActiveControllerChanged: ((RulerController?) -> Void)?
     var onStateChanged: ((RulerManager) -> Void)?
+    private var isApplicationActive = true
     private var groupedDragState: GroupedDragState?
     private var isApplyingGroupedDrag = false
 
@@ -1724,6 +1725,13 @@ final class RulerManager {
         nextController.rulerWindow.orderFrontRegardless()
         nextController.rulerWindow.makeKey()
         return nextController
+    }
+
+    func setApplicationActive(_ isApplicationActive: Bool) {
+        guard self.isApplicationActive != isApplicationActive else { return }
+
+        self.isApplicationActive = isApplicationActive
+        updateActiveRulerBorders()
     }
 
     @discardableResult
@@ -1956,7 +1964,8 @@ final class RulerManager {
 
     private func updateActiveRulerBorders() {
         for controller in controllers {
-            controller.rulerWindow.drawsActiveBorder = controller.state.id == activeRulerID
+            controller.rulerWindow.drawsActiveBorder = isApplicationActive
+                && controller.state.id == activeRulerID
         }
     }
 }
