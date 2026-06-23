@@ -867,9 +867,7 @@ extension AppDelegate {
     }
 
     private func updateMouseLocation() {
-        var mouseLoc = NSEvent.mouseLocation
-        mouseLoc.x = mouseLoc.x.rounded()
-        mouseLoc.y = mouseLoc.y.rounded()
+        let mouseLoc = NSEvent.mouseLocation
 
         for controller in rulerManager.controllers where controller.isVisible {
             controller.drawMouseTick(at: mouseLoc)
