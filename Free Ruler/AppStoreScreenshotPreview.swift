@@ -899,7 +899,7 @@ private enum AppStoreFlipScreenshotLayout {
 
 private enum AppStorePreferencesScreenshotLayout {
     static let title = "Pick your preferences"
-    static let subtitle = "Change opacity, add shadows, and more."
+    static let subtitle = "Change dimensions, appearance, and more."
     static let previewName = "Preferences"
     static let outputFilename = "06-customize-rulers.png"
     static let backgroundColor = #colorLiteral(red: 0.5181607008, green: 0.4312165375, blue: 0.6487324834, alpha: 1)
@@ -911,13 +911,13 @@ private enum AppStorePreferencesScreenshotLayout {
     static let verticalRulerY: CGFloat = 212
     static let verticalRulerLength: CGFloat = 2050
     static let horizontalRulerX: CGFloat = 100
-    static let horizontalRulerY: CGFloat = 1180
+    static let horizontalRulerY: CGFloat = 1340
     static let horizontalRulerLength: CGFloat = 3000
     static let preferencesWindowX: CGFloat = 680
     static let preferencesWindowY: CGFloat = 540
-    static let preferencesWindowScale: CGFloat = 4
+    static let preferencesWindowScale: CGFloat = 3.5
     static let preferencesContentWidth: CGFloat = 350
-    static let preferencesContentHeight: CGFloat = 333
+    static let preferencesContentHeight: CGFloat = 400
     static let preferencesWindowShadowOpacity: CGFloat = 0.28
     static let preferencesWindowShadowYOffset: CGFloat = -5
 
