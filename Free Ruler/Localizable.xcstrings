@@ -5,6 +5,12 @@
       "comment" : "Application menu item title for manually checking for software updates",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zkontrolovat aktualizace…"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -47,6 +53,12 @@
       "comment" : "Label for the active ruler color setting",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Barva"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -59,6 +71,12 @@
       "comment" : "Window title for a ruler window",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pravítko"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -71,6 +89,12 @@
       "comment" : "Window title for the active ruler settings panel",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nastavení pravítka"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -83,6 +107,12 @@
       "comment" : "Context menu item title to open the active ruler settings panel",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nastavení pravítka…"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -125,6 +155,12 @@
       "comment" : "Label for the active ruler color setting",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Barva pravítka"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -167,6 +203,12 @@
       "comment" : "Label for the active ruler foreground opacity setting",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Průhlednost popředí"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -209,6 +251,12 @@
       "comment" : "Label for the active ruler background opacity setting",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Průhlednost pozadí"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -251,6 +299,12 @@
       "comment" : "Checkbox title for whether the active ruler floats above other apps",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zobrazovat pravítko nad ostatními aplikacemi"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -293,6 +347,12 @@
       "comment" : "Checkbox title for whether the active ruler draws a window shadow",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zobrazovat stín pravítka"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -335,6 +395,12 @@
       "comment" : "Menu item title to hide the horizontal ruler",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skrýt vodorovné pravítko"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -377,6 +443,12 @@
       "comment" : "Menu item title to hide the vertical ruler",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skrýt svislé pravítko"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -419,6 +491,12 @@
       "comment" : "Window title for the horizontal ruler",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vodorovné pravítko"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -461,6 +539,12 @@
       "comment" : "Hotkey status bezel text indicating the horizontal ruler was flipped",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Převrátit vodorovně"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -503,6 +587,12 @@
       "comment" : "Hotkey status bezel text indicating the ruler now floats above other windows",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pravítko plave nad okny"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -545,6 +635,12 @@
       "comment" : "Hotkey status bezel text indicating rulers are grouped",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pravítka seskupena"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -587,6 +683,12 @@
       "comment" : "Hotkey status bezel text indicating the ruler no longer floats above other windows",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pravítko neplave nad okny"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -629,6 +731,12 @@
       "comment" : "Hotkey status bezel text indicating rulers are ungrouped",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pravítka uvolněna"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -671,6 +779,12 @@
       "comment" : "Hotkey status bezel text indicating ruler shadow is disabled",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stín vypnut"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -713,6 +827,12 @@
       "comment" : "Hotkey status bezel text indicating ruler shadow is enabled",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stín zapnut"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -755,6 +875,12 @@
       "comment" : "Hotkey status bezel format for the selected measurement unit",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jednotky: %@"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -793,10 +919,160 @@
         }
       }
     },
+    "HotkeyBezel.Unit.Pixels" : {
+      "comment" : "Pixels unit name for the hotkey status bezel",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pixely"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pixel"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pixels"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "píxeles"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pikselit"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ピクセル"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "像素"
+          }
+        }
+      }
+    },
+    "HotkeyBezel.Unit.Millimeters" : {
+      "comment" : "Millimeters unit name for the hotkey status bezel",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "milimetry"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Millimeter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "millimeters"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "milímetros"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "millimetrit"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ミリメートル"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "毫米"
+          }
+        }
+      }
+    },
+    "HotkeyBezel.Unit.Inches" : {
+      "comment" : "Inches unit name for the hotkey status bezel",
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "palce"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoll"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "inches"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pulgadas"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "tuumat"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インチ"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "英寸"
+          }
+        }
+      }
+    },
     "HotkeyBezel.FlipVertical" : {
       "comment" : "Hotkey status bezel text indicating the vertical ruler was flipped",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Převrátit svisle"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -849,6 +1125,12 @@
       "comment" : "Tooltip and accessibility label for the button that restores the default ruler color",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obnovit barvu pravítka"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -891,6 +1173,12 @@
       "comment" : "Menu item title to show the horizontal ruler",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zobrazit vodorovné pravítko"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -933,6 +1221,12 @@
       "comment" : "Menu item title to show the vertical ruler",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zobrazit svislé pravítko"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -975,6 +1269,12 @@
       "comment" : "Inches unit abbreviation",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "in"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1017,6 +1317,12 @@
       "comment" : "Millimeters unit abbreviation",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mm"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1059,6 +1365,12 @@
       "comment" : "Pixels unit abbreviation",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "px"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1101,6 +1413,12 @@
       "comment" : "Window title for the vertical ruler",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Svislé pravítko"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
