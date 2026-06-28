@@ -1145,19 +1145,16 @@ final class RulerController: NSWindowController, NSWindowDelegate, NotificationO
     private var keyListener: Any?
     private var mouseInteraction: RulerMouseInteractionState!
     private var isMouseTickDrawingEnabled = true
+    private let rulerInteractionSuspensionOwners = NSHashTable<AnyObject>.weakObjects()
     private let followsDefaultPreferences: Bool
 
     var isLeftMouseButtonPressed = {
         return NSEvent.pressedMouseButtons & 1 == 1
     }
 
-    var preferencesWindowOpen = false {
-        didSet {
-            updateIsFloatingPanel()
-            if !preferencesWindowOpen {
-                opacity = state.settings.foregroundOpacity
-            }
-        }
+    var isRulerInteractionSuspended: Bool {
+        guard rulerInteractionSuspensionOwners.count > 0 else { return false }
+        return rulerInteractionSuspensionOwners.anyObject != nil
     }
 
     var opacity = 0 {
@@ -1314,8 +1311,26 @@ final class RulerController: NSWindowController, NSWindowDelegate, NotificationO
         opacity = state.settings.backgroundOpacity
     }
 
+    func suspendRulerInteraction(owner: AnyObject) {
+        guard !rulerInteractionSuspensionOwners.contains(owner) else { return }
+
+        rulerInteractionSuspensionOwners.add(owner)
+        updateIsFloatingPanel()
+    }
+
+    func resumeRulerInteraction(owner: AnyObject) {
+        guard rulerInteractionSuspensionOwners.contains(owner) else { return }
+
+        rulerInteractionSuspensionOwners.remove(owner)
+        updateIsFloatingPanel()
+
+        if !isRulerInteractionSuspended {
+            opacity = state.settings.foregroundOpacity
+        }
+    }
+
     func updateIsFloatingPanel() {
-        rulerWindow.isFloatingPanel = preferencesWindowOpen ? false : state.settings.floatRulers
+        rulerWindow.isFloatingPanel = isRulerInteractionSuspended ? false : state.settings.floatRulers
     }
 
     func updateHasShadow() {
@@ -1521,11 +1536,13 @@ final class RulerController: NSWindowController, NSWindowDelegate, NotificationO
 
     private func createObservers() {
         notificationObservers = [
-            addObserver(.preferencesWindowOpened) { [weak self] _ in
-                self?.preferencesWindowOpen = true
+            addObserver(.preferencesWindowOpened) { [weak self] notification in
+                guard let owner = notification.object else { return }
+                self?.suspendRulerInteraction(owner: owner as AnyObject)
             },
-            addObserver(.preferencesWindowClosed) { [weak self] _ in
-                self?.preferencesWindowOpen = false
+            addObserver(.preferencesWindowClosed) { [weak self] notification in
+                guard let owner = notification.object else { return }
+                self?.resumeRulerInteraction(owner: owner as AnyObject)
             },
         ]
     }
@@ -1574,8 +1591,10 @@ extension RulerController {
         let shift = event.modifierFlags.contains(.shift)
         let keyboardModifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
 
-        if rulerWindow.isKeyWindow,
-           let appDelegate = NSApp.delegate as? AppDelegate,
+        guard !isRulerInteractionSuspended,
+              rulerWindow.isKeyWindow else { return event }
+
+        if let appDelegate = NSApp.delegate as? AppDelegate,
            appDelegate.performRulerHotkey(
                keyCode: Int(event.keyCode),
                modifierFlags: keyboardModifiers,

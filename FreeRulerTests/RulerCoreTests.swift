@@ -1070,6 +1070,86 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertNil(settingsWindow.sheetParent)
     }
 
+    func testRulerSettingsControllerSuspendsOnlyAttachedRulerWhileVisible() {
+        let first = RulerController(
+            state: RulerInstanceState(
+                settings: RulerSettings(floatRulers: true),
+                layout: RulerLayoutState(
+                    zeroPoint: NSPoint(x: 240, y: 320),
+                    horizontalLength: 260,
+                    verticalLength: 180
+                )
+            )
+        )
+        let second = RulerController(
+            state: RulerInstanceState(
+                settings: RulerSettings(floatRulers: true),
+                layout: RulerLayoutState(
+                    zeroPoint: NSPoint(x: 540, y: 320),
+                    horizontalLength: 260,
+                    verticalLength: 180
+                )
+            )
+        )
+        let settingsController = RulerSettingsController(rulerController: first)
+        defer {
+            settingsController.close()
+            first.hide()
+            second.hide()
+        }
+
+        first.show()
+        second.show()
+
+        settingsController.show(attachedTo: first, sender: self)
+
+        XCTAssertTrue(first.isRulerInteractionSuspended)
+        XCTAssertFalse(second.isRulerInteractionSuspended)
+        XCTAssertFalse(first.rulerWindow.isFloatingPanel)
+        XCTAssertTrue(second.rulerWindow.isFloatingPanel)
+
+        settingsController.show(attachedTo: second, sender: self)
+
+        XCTAssertFalse(first.isRulerInteractionSuspended)
+        XCTAssertTrue(second.isRulerInteractionSuspended)
+        XCTAssertTrue(first.rulerWindow.isFloatingPanel)
+        XCTAssertFalse(second.rulerWindow.isFloatingPanel)
+
+        settingsController.close()
+
+        XCTAssertFalse(first.isRulerInteractionSuspended)
+        XCTAssertFalse(second.isRulerInteractionSuspended)
+        XCTAssertTrue(first.rulerWindow.isFloatingPanel)
+        XCTAssertTrue(second.rulerWindow.isFloatingPanel)
+    }
+
+    func testRulerControllerPassesArrowKeysThroughWhileInteractionSuspended() {
+        let controller = RulerController(
+            state: RulerInstanceState(
+                settings: RulerSettings(),
+                layout: RulerLayoutState(
+                    zeroPoint: NSPoint(x: 240, y: 320),
+                    horizontalLength: 260,
+                    verticalLength: 180
+                )
+            )
+        )
+        let owner = NSObject()
+        defer {
+            controller.resumeRulerInteraction(owner: owner)
+            controller.hide()
+        }
+
+        let event = keyDownEvent(characters: "", keyCode: UInt16(kVK_RightArrow))
+        let initialFrame = controller.rulerWindow.frame
+
+        controller.suspendRulerInteraction(owner: owner)
+
+        XCTAssertTrue(controller.isRulerInteractionSuspended)
+        XCTAssertTrue(controller.onKeyDown(with: event) === event)
+        XCTAssertEqual(controller.rulerWindow.frame, initialFrame)
+    }
+
     func testRulerSettingsControllerAnchorsPanelCornerToRulerZeroPoint() {
         let visibleFrame = NSScreen.main?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1200, height: 900)
         let zeroPoint = NSPoint(x: visibleFrame.midX, y: visibleFrame.midY)
