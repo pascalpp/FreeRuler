@@ -17,9 +17,9 @@ private enum HotkeyBezelLocalizationKey: String {
     case flipHorizontal = "HotkeyBezel.FlipHorizontal"
     case flipVertical = "HotkeyBezel.FlipVertical"
     case unitsFormat = "HotkeyBezel.UnitsFormat"
-    case pixelsUnit = "Unit.Pixels.Abbreviation"
-    case millimetersUnit = "Unit.Millimeters.Abbreviation"
-    case inchesUnit = "Unit.Inches.Abbreviation"
+    case pixelsUnit = "HotkeyBezel.Unit.Pixels"
+    case millimetersUnit = "HotkeyBezel.Unit.Millimeters"
+    case inchesUnit = "HotkeyBezel.Unit.Inches"
 
     var localizedString: String {
         NSLocalizedString(rawValue, comment: comment)
@@ -46,11 +46,11 @@ private enum HotkeyBezelLocalizationKey: String {
         case .unitsFormat:
             return "Hotkey status bezel format for the selected measurement unit"
         case .pixelsUnit:
-            return "Pixels unit abbreviation"
+            return "Pixels unit name for the hotkey status bezel"
         case .millimetersUnit:
-            return "Millimeters unit abbreviation"
+            return "Millimeters unit name for the hotkey status bezel"
         case .inchesUnit:
-            return "Inches unit abbreviation"
+            return "Inches unit name for the hotkey status bezel"
         }
     }
 }

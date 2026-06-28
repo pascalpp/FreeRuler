@@ -1,0 +1,9 @@
+
+/* Class = "NSWindow"; title = "Free Ruler Settings"; ObjectID = "F0z-JX-Cv5"; */
+"F0z-JX-Cv5.title" = "Nastavení Free Ruler";
+
+/* Class = "NSTextFieldCell"; title = "Default settings for new rulers"; ObjectID = "PREF-defaults-header-cell"; */
+"PREF-defaults-header-cell.title" = "Výchozí nastavení pro nová pravítka";
+
+/* Class = "NSButtonCell"; title = "Reset to factory defaults"; ObjectID = "PREF-factory-cell"; */
+"PREF-factory-cell.title" = "Obnovit tovární nastavení";
