@@ -3588,6 +3588,25 @@ final class RulerCoreTests: XCTestCase {
         XCTAssertTrue(appDelegate.validateMenuItem(groupItem))
     }
 
+    func testManagedMenuValidationDisablesWingCommandsWithoutActiveRuler() {
+        let appDelegate = AppDelegate()
+        let horizontalItem = NSMenuItem(
+            title: "",
+            action: #selector(AppDelegate.toggleHorizontalRuler(_:)),
+            keyEquivalent: ""
+        )
+        let verticalItem = NSMenuItem(
+            title: "",
+            action: #selector(AppDelegate.toggleVerticalRuler(_:)),
+            keyEquivalent: ""
+        )
+
+        XCTAssertFalse(appDelegate.validateMenuItem(horizontalItem))
+        XCTAssertEqual(horizontalItem.title, "Show Horizontal Ruler")
+        XCTAssertFalse(appDelegate.validateMenuItem(verticalItem))
+        XCTAssertEqual(verticalItem.title, "Show Vertical Ruler")
+    }
+
     func testShiftHotkeysFlipActiveRulerOrigin() {
         let appDelegate = AppDelegate()
         let controller = appDelegate.rulerManager.createRuler(
