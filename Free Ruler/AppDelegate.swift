@@ -769,7 +769,7 @@ extension AppDelegate: NSMenuItemValidation {
                 "Show Horizontal Ruler",
                 comment: "Menu item title to show the horizontal ruler"
             )
-            return true
+            return false
         case #selector(toggleVerticalRuler(_:)):
             if let controller = rulerManager.activeController {
                 let isVisible = controller.state.isWingVisible(.vertical)
@@ -783,7 +783,7 @@ extension AppDelegate: NSMenuItemValidation {
                 "Show Vertical Ruler",
                 comment: "Menu item title to show the vertical ruler"
             )
-            return true
+            return false
         default:
             return true
         }
