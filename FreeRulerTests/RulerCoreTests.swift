@@ -290,6 +290,43 @@ final class RulerCoreTests: XCTestCase {
         }
     }
 
+    func testRulerManagerMovesGroupedActiveRulerToTopOfStack() {
+        withRestoredRulerPreferences {
+            prefs.groupRulers = true
+            let manager = RulerManager()
+            let first = manager.createRuler(
+                defaults: RulerSettings(unit: .pixels),
+                screenFrame: NSRect(x: 0, y: 0, width: 1000, height: 800)
+            )
+            let second = manager.createRuler(
+                defaults: RulerSettings(unit: .inches),
+                screenFrame: NSRect(x: 0, y: 0, width: 1000, height: 800)
+            )
+            defer {
+                first.hide()
+                second.hide()
+            }
+            first.show()
+            second.show()
+
+            XCTAssertTrue(manager.controllers.last === second)
+
+            manager.markActive(first)
+
+            XCTAssertTrue(manager.activeController === first)
+            XCTAssertTrue(manager.controllers.last === first)
+
+            manager.beginGroupedDrag(from: first)
+            XCTAssertTrue(first.rulerWindow.childWindows?.contains(second.rulerWindow) ?? false)
+
+            manager.finishGroupedDrag(from: first)
+
+            XCTAssertFalse(first.rulerWindow.childWindows?.contains(second.rulerWindow) ?? false)
+            XCTAssertNil(second.rulerWindow.parent)
+            XCTAssertTrue(manager.controllers.last === first)
+        }
+    }
+
     func testRulerManagerCyclesVisibleRulers() {
         let manager = RulerManager()
         let first = manager.createRuler()

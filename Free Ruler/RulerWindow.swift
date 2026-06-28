@@ -1765,6 +1765,9 @@ final class RulerManager {
         guard controllers.contains(where: { $0 === controller }) else { return }
 
         activeRulerID = controller.state.id
+        if prefs.groupRulers {
+            moveControllerToTopOfStack(controller)
+        }
         updateActiveRulerBorders()
         onActiveControllerChanged?(controller)
         notifyStateChanged()
@@ -1848,6 +1851,17 @@ final class RulerManager {
         syncGroupedDrag(from: controller)
         detachGroupedDragFollowers(from: controller, groupedDragState: groupedDragState)
         captureGroupedDragFollowerStates(excluding: controller, groupedDragState: groupedDragState)
+        moveControllerToTopOfStack(controller)
+        DispatchQueue.main.async { [weak self, weak controller] in
+            guard let self = self,
+                  let controller = controller,
+                  prefs.groupRulers,
+                  self.activeRulerID == controller.state.id else {
+                return
+            }
+
+            self.moveControllerToTopOfStack(controller)
+        }
         self.groupedDragState = nil
         notifyStateChanged()
     }
@@ -1888,6 +1902,22 @@ final class RulerManager {
         }
     }
 
+    private func moveControllerToTopOfStack(_ controller: RulerController) {
+        if let index = controllers.firstIndex(where: { $0 === controller }),
+           index != controllers.index(before: controllers.endIndex) {
+            controllers.remove(at: index)
+            controllers.append(controller)
+        }
+
+        if controller.isVisible {
+            controller.rulerWindow.orderFrontRegardless()
+            for otherController in controllers where otherController !== controller && otherController.isVisible {
+                controller.rulerWindow.order(.above, relativeTo: otherController.rulerWindow.windowNumber)
+                otherController.rulerWindow.order(.below, relativeTo: controller.rulerWindow.windowNumber)
+            }
+        }
+    }
+
     private func attachGroupedDragFollowers(
         to draggedController: RulerController,
         visibleControllers: [RulerController]
@@ -1923,6 +1953,9 @@ final class RulerManager {
                   followerController.rulerWindow.parent === draggedWindow else { continue }
 
             draggedWindow.removeChildWindow(followerController.rulerWindow)
+            if draggedController.isVisible, followerController.isVisible {
+                followerController.rulerWindow.order(.below, relativeTo: draggedWindow.windowNumber)
+            }
         }
     }
 
