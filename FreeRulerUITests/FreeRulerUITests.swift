@@ -27,9 +27,7 @@ final class FreeRulerUITests: XCTestCase {
     }
 
     func testRulerVisibilityKeyboardCommands() {
-        XCTAssertTrue(rulerWindow.waitForExistence(timeout: 3))
-        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
-        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
+        assertInitialRulerVisible()
 
         horizontalRuler.click()
         app.typeKey("h", modifierFlags: [])
@@ -38,7 +36,7 @@ final class FreeRulerUITests: XCTestCase {
         XCTAssertTrue(rulerWindow.exists)
 
         app.typeKey("h", modifierFlags: [])
-        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 2))
+        XCTAssertTrue(horizontalRuler.waitForVisibleFrame(timeout: 2))
 
         verticalRuler.click()
         app.typeKey("v", modifierFlags: [])
@@ -47,19 +45,17 @@ final class FreeRulerUITests: XCTestCase {
         XCTAssertTrue(rulerWindow.exists)
 
         app.typeKey("v", modifierFlags: [])
-        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 2))
+        XCTAssertTrue(verticalRuler.waitForVisibleFrame(timeout: 2))
     }
 
     func testRulerWindowToggleHidesRequestedWingWithoutChangingGroupedDragging() {
-        XCTAssertTrue(rulerWindow.waitForExistence(timeout: 3))
-        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
-        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
+        assertInitialRulerVisible()
         XCTAssertTrue(waitForPreference("groupRulers", equals: false))
 
         horizontalRuler.click()
         app.typeKey("v", modifierFlags: [])
 
-        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 2))
+        XCTAssertTrue(horizontalRuler.waitForVisibleFrame(timeout: 2))
         XCTAssertTrue(verticalRuler.waitForNonExistence(timeout: 2))
         XCTAssertTrue(rulerWindow.exists)
         assertFrame(
@@ -70,12 +66,12 @@ final class FreeRulerUITests: XCTestCase {
         XCTAssertTrue(waitForPreference("groupRulers", equals: false))
 
         app.typeKey("v", modifierFlags: [])
-        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 2))
+        XCTAssertTrue(verticalRuler.waitForVisibleFrame(timeout: 2))
 
         verticalRuler.click()
         app.typeKey("h", modifierFlags: [])
 
-        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 2))
+        XCTAssertTrue(verticalRuler.waitForVisibleFrame(timeout: 2))
         XCTAssertTrue(horizontalRuler.waitForNonExistence(timeout: 2))
         XCTAssertTrue(rulerWindow.exists)
         assertFrame(
@@ -87,9 +83,7 @@ final class FreeRulerUITests: XCTestCase {
     }
 
     func testGroupRulersKeyboardCommandTogglesGroupedDraggingWithoutChangingRulerWindow() {
-        XCTAssertTrue(rulerWindow.waitForExistence(timeout: 3))
-        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
-        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
+        assertInitialRulerVisible()
         XCTAssertTrue(waitForPreference("groupRulers", equals: false))
 
         let originalFrame = rulerWindow.frame
@@ -97,9 +91,9 @@ final class FreeRulerUITests: XCTestCase {
         horizontalRuler.click()
         app.typeKey("g", modifierFlags: [])
         XCTAssertTrue(waitForPreference("groupRulers", equals: true))
-        XCTAssertTrue(rulerWindow.waitForExistence(timeout: 2))
-        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 2))
-        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 2))
+        XCTAssertTrue(rulerWindow.waitForVisibleFrame(timeout: 2))
+        XCTAssertTrue(horizontalRuler.waitForVisibleFrame(timeout: 2))
+        XCTAssertTrue(verticalRuler.waitForVisibleFrame(timeout: 2))
         assertFrame(
             rulerWindow.frame,
             matches: originalFrame,
@@ -108,22 +102,22 @@ final class FreeRulerUITests: XCTestCase {
 
         app.typeKey("g", modifierFlags: [])
         XCTAssertTrue(waitForPreference("groupRulers", equals: false))
-        XCTAssertTrue(rulerWindow.waitForExistence(timeout: 2))
-        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 2))
-        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 2))
+        XCTAssertTrue(rulerWindow.waitForVisibleFrame(timeout: 2))
+        XCTAssertTrue(horizontalRuler.waitForVisibleFrame(timeout: 2))
+        XCTAssertTrue(verticalRuler.waitForVisibleFrame(timeout: 2))
 
         verticalRuler.click()
         app.typeKey("g", modifierFlags: [])
         XCTAssertTrue(waitForPreference("groupRulers", equals: true))
-        XCTAssertTrue(rulerWindow.waitForExistence(timeout: 2))
-        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 2))
-        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 2))
+        XCTAssertTrue(rulerWindow.waitForVisibleFrame(timeout: 2))
+        XCTAssertTrue(horizontalRuler.waitForVisibleFrame(timeout: 2))
+        XCTAssertTrue(verticalRuler.waitForVisibleFrame(timeout: 2))
     }
 
     func testPreferencesCloseWithCommandW() {
         openPreferencesShortcut()
 
-        XCTAssertTrue(preferencesWindow.waitForExistence(timeout: 3))
+        XCTAssertTrue(preferencesWindow.waitForVisibleFrame(timeout: 3))
 
         app.typeKey("w", modifierFlags: .command)
         XCTAssertTrue(preferencesWindow.waitForNonExistence(timeout: 2))
@@ -142,13 +136,13 @@ final class FreeRulerUITests: XCTestCase {
         )
     }
 
-    func testClosingPreferencesClosesRulerColorPanel() {
+    func testClosingRulerSettingsClosesRulerColorPanel() {
         openRulerColorPanel()
 
-        preferencesWindow.click()
+        rulerSettingsWindow.click()
         app.typeKey("w", modifierFlags: .command)
 
-        XCTAssertTrue(preferencesWindow.waitForNonExistence(timeout: 2))
+        XCTAssertTrue(rulerSettingsWindow.waitForNonExistence(timeout: 2))
         XCTAssertTrue(colorPanel.waitForNonExistence(timeout: 2))
     }
 
@@ -159,15 +153,13 @@ final class FreeRulerUITests: XCTestCase {
         app.launch()
         app.activate()
 
-        XCTAssertTrue(rulerWindow.waitForExistence(timeout: 3))
-        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
+        XCTAssertTrue(rulerWindow.waitForVisibleFrame(timeout: 3))
+        XCTAssertTrue(horizontalRuler.waitForVisibleFrame(timeout: 3))
         XCTAssertTrue(colorPanel.waitForNonExistence(timeout: 2))
     }
 
     func testRulerCloseWithCommandW() {
-        XCTAssertTrue(rulerWindow.waitForExistence(timeout: 3))
-        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
-        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
+        assertInitialRulerVisible()
 
         rulerWindow.click()
         app.typeKey("w", modifierFlags: .command)
@@ -178,9 +170,7 @@ final class FreeRulerUITests: XCTestCase {
     }
 
     func testLastVisibleWingStaysVisibleAndResetRestoresBothWings() {
-        XCTAssertTrue(rulerWindow.waitForExistence(timeout: 3))
-        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
-        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
+        assertInitialRulerVisible()
 
         horizontalRuler.click()
         app.typeKey("h", modifierFlags: [])
@@ -188,28 +178,26 @@ final class FreeRulerUITests: XCTestCase {
 
         verticalRuler.click()
         app.typeKey("v", modifierFlags: [])
-        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 2))
-        XCTAssertTrue(rulerWindow.waitForExistence(timeout: 2))
+        XCTAssertTrue(verticalRuler.waitForVisibleFrame(timeout: 2))
+        XCTAssertTrue(rulerWindow.waitForVisibleFrame(timeout: 2))
 
         app.typeKey("h", modifierFlags: [])
-        XCTAssertTrue(rulerWindow.waitForExistence(timeout: 2))
-        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 2))
-        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 2))
+        XCTAssertTrue(rulerWindow.waitForVisibleFrame(timeout: 2))
+        XCTAssertTrue(horizontalRuler.waitForVisibleFrame(timeout: 2))
+        XCTAssertTrue(verticalRuler.waitForVisibleFrame(timeout: 2))
 
         horizontalRuler.click()
         app.typeKey("h", modifierFlags: [])
         XCTAssertTrue(horizontalRuler.waitForNonExistence(timeout: 2))
 
         app.typeKey("r", modifierFlags: .command)
-        XCTAssertTrue(rulerWindow.waitForExistence(timeout: 2))
-        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 2))
-        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 2))
+        XCTAssertTrue(rulerWindow.waitForVisibleFrame(timeout: 2))
+        XCTAssertTrue(horizontalRuler.waitForVisibleFrame(timeout: 2))
+        XCTAssertTrue(verticalRuler.waitForVisibleFrame(timeout: 2))
     }
 
     func testFloatShadowAndUnitKeyboardCommands() {
-        XCTAssertTrue(rulerWindow.waitForExistence(timeout: 3))
-        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
-        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
+        assertInitialRulerVisible()
         XCTAssertTrue(waitForPreference("activeFloatRulers", equals: true))
         XCTAssertTrue(waitForPreference("activeRulerShadow", equals: false))
 
@@ -242,9 +230,7 @@ final class FreeRulerUITests: XCTestCase {
     }
 
     func testOptionHotkeysShowStatusBezel() {
-        XCTAssertTrue(rulerWindow.waitForExistence(timeout: 3))
-        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
-        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
+        assertInitialRulerVisible()
 
         horizontalRuler.click()
         app.typeKey("f", modifierFlags: [])
@@ -260,10 +246,10 @@ final class FreeRulerUITests: XCTestCase {
         XCTAssertTrue(waitForHotkeyBezel("Shadow disabled"))
 
         app.typeKey("g", modifierFlags: [])
-        XCTAssertTrue(waitForHotkeyBezel("Rulers ungrouped"))
+        XCTAssertTrue(waitForHotkeyBezel("Rulers grouped"))
 
         app.typeKey("g", modifierFlags: [])
-        XCTAssertTrue(waitForHotkeyBezel("Rulers grouped"))
+        XCTAssertTrue(waitForHotkeyBezel("Rulers ungrouped"))
 
         app.typeKey("u", modifierFlags: [])
         XCTAssertTrue(waitForHotkeyBezel("Units: mm"))
@@ -276,9 +262,7 @@ final class FreeRulerUITests: XCTestCase {
     }
 
     func testAlignRulersAtMouseLocationKeyboardCommand() {
-        XCTAssertTrue(rulerWindow.waitForExistence(timeout: 3))
-        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
-        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
+        assertInitialRulerVisible()
 
         let originalHorizontalFrame = horizontalRuler.frame
         let originalVerticalFrame = verticalRuler.frame
@@ -291,9 +275,7 @@ final class FreeRulerUITests: XCTestCase {
     }
 
     func testRulerCursorsForVisibleWings() {
-        XCTAssertTrue(rulerWindow.waitForExistence(timeout: 3))
-        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 3))
-        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 3))
+        assertInitialRulerVisible()
 
         XCTContext.runActivity(named: "horizontal-only ruler cursor") { _ in
             resetRulerCursorScenario()
@@ -350,8 +332,12 @@ final class FreeRulerUITests: XCTestCase {
         app.windows["preferences-window"]
     }
 
-    private var rulerColorWell: XCUIElement {
-        app.colorWells["ruler-color-well"]
+    private var rulerSettingsWindow: XCUIElement {
+        app.windows["ruler-settings-window"]
+    }
+
+    private var rulerSettingsColorWell: XCUIElement {
+        app.colorWells["ruler-settings-color-well"]
     }
 
     private var colorPanel: XCUIElement {
@@ -366,10 +352,19 @@ final class FreeRulerUITests: XCTestCase {
         app.otherElements["hotkey-bezel"]
     }
 
+    private func assertInitialRulerVisible(
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        XCTAssertTrue(rulerWindow.waitForVisibleFrame(timeout: 3), file: file, line: line)
+        XCTAssertTrue(horizontalRuler.waitForVisibleFrame(timeout: 3), file: file, line: line)
+        XCTAssertTrue(verticalRuler.waitForVisibleFrame(timeout: 3), file: file, line: line)
+    }
+
     private func openPreferences() {
         if !preferencesWindow.exists {
             openPreferencesShortcut()
-            XCTAssertTrue(preferencesWindow.waitForExistence(timeout: 3))
+            XCTAssertTrue(preferencesWindow.waitForVisibleFrame(timeout: 3))
         }
     }
 
@@ -377,8 +372,17 @@ final class FreeRulerUITests: XCTestCase {
         app.typeKey(",", modifierFlags: [.command, .option])
     }
 
+    private func openRulerSettings() {
+        if !rulerSettingsWindow.exists {
+            horizontalRuler.click()
+            app.typeKey(",", modifierFlags: .command)
+            XCTAssertTrue(rulerSettingsWindow.waitForVisibleFrame(timeout: 3))
+            XCTAssertFalse(preferencesWindow.exists)
+        }
+    }
+
     private func openRulerColorPanel() {
-        openPreferences()
+        openRulerSettings()
 
         if colorPanel.exists {
             colorPanel.click()
@@ -386,15 +390,15 @@ final class FreeRulerUITests: XCTestCase {
             XCTAssertTrue(colorPanel.waitForNonExistence(timeout: 2))
         }
 
-        rulerColorWell.click()
-        XCTAssertTrue(colorPanel.waitForExistence(timeout: 3))
+        rulerSettingsColorWell.click()
+        XCTAssertTrue(colorPanel.waitForVisibleFrame(timeout: 3))
     }
 
     private func isolateHorizontalWing() {
         horizontalRuler.click()
         app.typeKey("v", modifierFlags: [])
 
-        XCTAssertTrue(horizontalRuler.waitForExistence(timeout: 2))
+        XCTAssertTrue(horizontalRuler.waitForVisibleFrame(timeout: 2))
         XCTAssertTrue(verticalRuler.waitForNonExistence(timeout: 2))
         XCTAssertTrue(waitForPreference("groupRulers", equals: false))
     }
@@ -403,7 +407,7 @@ final class FreeRulerUITests: XCTestCase {
         verticalRuler.click()
         app.typeKey("h", modifierFlags: [])
 
-        XCTAssertTrue(verticalRuler.waitForExistence(timeout: 2))
+        XCTAssertTrue(verticalRuler.waitForVisibleFrame(timeout: 2))
         XCTAssertTrue(horizontalRuler.waitForNonExistence(timeout: 2))
         XCTAssertTrue(waitForPreference("groupRulers", equals: false))
     }
@@ -589,9 +593,17 @@ final class FreeRulerUITests: XCTestCase {
 
 private extension XCUIElement {
     func waitForNonExistence(timeout: TimeInterval) -> Bool {
-        let predicate = NSPredicate(format: "exists == false")
-        let expectation = XCTNSPredicateExpectation(predicate: predicate, object: self)
-        return XCTWaiter.wait(for: [expectation], timeout: timeout) == .completed
+        let deadline = Date().addingTimeInterval(timeout)
+
+        while Date() < deadline {
+            if !exists {
+                return true
+            }
+
+            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
+        }
+
+        return !exists
     }
 
     func waitForVisibleFrame(timeout: TimeInterval) -> Bool {
