@@ -17,8 +17,8 @@
 /* Class = "NSMenuItem"; title = "Redo"; ObjectID = "6dh-zS-Vam"; */
 "6dh-zS-Vam.title" = "やり直し";
 
-/* Class = "NSMenuItem"; title = "Reset Rulers"; ObjectID = "6ph-5N-O9R"; */
-"6ph-5N-O9R.title" = "定規をリセット";
+/* Class = "NSMenuItem"; title = "Reset Ruler Position"; ObjectID = "6ph-5N-O9R"; */
+"6ph-5N-O9R.title" = "定規の位置をリセット";
 
 /* Class = "NSMenuItem"; title = "Group Rulers"; ObjectID = "7Ga-Fb-LLc"; */
 "7Ga-Fb-LLc.title" = "定規をグループ化";
@@ -29,8 +29,8 @@
 /* Class = "NSMenuItem"; title = "Millimeters"; ObjectID = "B6Y-Hi-AkN"; */
 "B6Y-Hi-AkN.title" = "ミリメートル";
 
-/* Class = "NSMenuItem"; title = "Preferences…"; ObjectID = "BOF-NM-1cW"; */
-"BOF-NM-1cW.title" = "環境設定...";
+/* Class = "NSMenuItem"; title = "Settings…"; ObjectID = "BOF-NM-1cW"; */
+"BOF-NM-1cW.title" = "設定...";
 
 /* Class = "NSMenuItem"; title = "Close"; ObjectID = "DVo-aG-piG"; */
 "DVo-aG-piG.title" = "閉じる";
@@ -41,7 +41,7 @@
 /* Class = "NSMenuItem"; title = "Free Ruler Help"; ObjectID = "FKE-Sm-Kum"; */
 "FKE-Sm-Kum.title" = "Free Rulerヘルプ";
 
-/* Class = "NSMenuItem"; title = "Float Rulers"; ObjectID = "GDK-AC-uC8"; */
+/* Class = "NSMenuItem"; title = "Float Ruler"; ObjectID = "GDK-AC-uC8"; */
 "GDK-AC-uC8.title" = "定規を常に手前に表示";
 
 /* Class = "NSMenuItem"; title = "Flip Horizontal"; ObjectID = "GZl-Zd-Ad4"; */
@@ -122,7 +122,7 @@
 /* Class = "NSMenuItem"; title = "Unit"; ObjectID = "iDP-2z-irv"; */
 "iDP-2z-irv.title" = "単位";
 
-/* Class = "NSMenuItem"; title = "Align Rulers at Mouse Location"; ObjectID = "iKV-uW-hwy"; */
+/* Class = "NSMenuItem"; title = "Align Ruler at Mouse Location"; ObjectID = "iKV-uW-hwy"; */
 "iKV-uW-hwy.title" = "マウスの位置に定規を移動";
 
 /* Class = "NSMenuItem"; title = "Inches"; ObjectID = "lt1-Hj-2TR"; */
@@ -148,3 +148,9 @@
 
 /* Class = "NSMenu"; title = "Unit"; ObjectID = "z2p-dA-zcS"; */
 "z2p-dA-zcS.title" = "単位";
+
+/* Class = "NSMenuItem"; title = "New Ruler"; ObjectID = "rWt-KM-qSf"; */
+"rWt-KM-qSf.title" = "新規定規";
+
+/* Class = "NSMenuItem"; title = "Ruler Settings…"; ObjectID = "rSt-Tg-232"; */
+"rSt-Tg-232.title" = "定規設定…";

@@ -3,6 +3,7 @@ import Cocoa
 class VerticalRule: RuleView {
 
     let transformer = AffineTransform(translationByX: 0, byY: -0.5)
+    let mouseTickTransformer = AffineTransform(translationByX: 0, byY: 0.5)
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
@@ -124,7 +125,11 @@ class VerticalRule: RuleView {
 
         let windowPoint = window.convertPoint(fromScreen: mouseLoc)
         let viewPoint = convert(windowPoint, from: nil)
-        mouseTickY = viewPoint.y
+        mouseTickY = mouseTickY(forLocalMouseY: viewPoint.y)
+    }
+
+    func mouseTickY(forLocalMouseY localMouseY: CGFloat) -> CGFloat {
+        return localMouseY.rounded()
     }
 
     func drawMouseTick(_ mouseTickY: CGFloat) {
@@ -136,7 +141,7 @@ class VerticalRule: RuleView {
         mouseTick.move(to: CGPoint(x: startX, y: lineY))
         mouseTick.line(to: CGPoint(x: rulerWidth, y: lineY))
 
-        mouseTick.transform(using: transformer)
+        mouseTick.transform(using: mouseTickTransformer)
 
         color.mouseTick.setStroke()
         mouseTick.stroke()
@@ -149,7 +154,7 @@ class VerticalRule: RuleView {
 
         switch growthDirection {
         case .positive:
-            zeroTickY = bounds.minY
+            zeroTickY = bounds.minY + 1
         case .negative:
             zeroTickY = bounds.maxY
         }
@@ -324,7 +329,7 @@ class VerticalRule: RuleView {
         case .positive:
             return mouseTickY
         case .negative:
-            return rulerHeight - mouseTickY
+            return max(0, rulerHeight - mouseTickY - 1)
         }
     }
 
@@ -334,7 +339,7 @@ class VerticalRule: RuleView {
     ) -> CGFloat {
         switch growthDirection {
         case .positive:
-            return mouseTickY + 1
+            return mouseTickY
         case .negative:
             return mouseTickY
         }

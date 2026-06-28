@@ -50,6 +50,10 @@ final class UnitLabelView: NSView {
         label.draw(with: labelRect, context: nil)
     }
 
+    override func menu(for event: NSEvent) -> NSMenu? {
+        return rulerContextMenu(for: self)
+    }
+
     func frame(in bounds: NSRect) -> NSRect {
         return frame(in: bounds, zeroCorner: zeroCorner)
     }

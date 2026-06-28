@@ -14,8 +14,8 @@
 /* Class = "NSMenuItem"; title = "Redo"; ObjectID = "6dh-zS-Vam"; */
 "6dh-zS-Vam.title" = "重做";
 
-/* Class = "NSMenuItem"; title = "Reset Rulers"; ObjectID = "6ph-5N-O9R"; */
-"6ph-5N-O9R.title" = "重置尺子";
+/* Class = "NSMenuItem"; title = "Reset Ruler Position"; ObjectID = "6ph-5N-O9R"; */
+"6ph-5N-O9R.title" = "重置尺子位置";
 
 /* Class = "NSMenuItem"; title = "Group Rulers"; ObjectID = "7Ga-Fb-LLc"; */
 "7Ga-Fb-LLc.title" = "组合尺子";
@@ -26,8 +26,8 @@
 /* Class = "NSMenu"; title = "Main Menu"; ObjectID = "AYu-sK-qS6"; */
 "AYu-sK-qS6.title" = "Main Menu";
 
-/* Class = "NSMenuItem"; title = "Preferences…"; ObjectID = "BOF-NM-1cW"; */
-"BOF-NM-1cW.title" = "偏好设置…";
+/* Class = "NSMenuItem"; title = "Settings…"; ObjectID = "BOF-NM-1cW"; */
+"BOF-NM-1cW.title" = "设置…";
 
 /* Class = "NSMenuItem"; title = "Close"; ObjectID = "DVo-aG-piG"; */
 "DVo-aG-piG.title" = "关闭";
@@ -38,7 +38,7 @@
 /* Class = "NSMenuItem"; title = "Free Ruler Help"; ObjectID = "FKE-Sm-Kum"; */
 "FKE-Sm-Kum.title" = "Free Ruler 帮助";
 
-/* Class = "NSMenuItem"; title = "Float Rulers"; ObjectID = "GDK-AC-uC8"; */
+/* Class = "NSMenuItem"; title = "Float Ruler"; ObjectID = "GDK-AC-uC8"; */
 "GDK-AC-uC8.title" = "悬浮尺子";
 
 /* Class = "NSMenuItem"; title = "Flip Horizontal"; ObjectID = "GZl-Zd-Ad4"; */
@@ -116,7 +116,7 @@
 /* Class = "NSMenu"; title = "Services"; ObjectID = "hz9-B4-Xy5"; */
 "hz9-B4-Xy5.title" = "服务";
 
-/* Class = "NSMenuItem"; title = "Align Rulers at Mouse Location"; ObjectID = "iKV-uW-hwy"; */
+/* Class = "NSMenuItem"; title = "Align Ruler at Mouse Location"; ObjectID = "iKV-uW-hwy"; */
 "iKV-uW-hwy.title" = "将尺子与鼠标位置对齐";
 
 /* Class = "NSMenuItem"; title = "Delete"; ObjectID = "pa3-QI-u2k"; */
@@ -151,3 +151,9 @@
 
 /* Class = "NSMenuItem"; title = "Cycle Units"; ObjectID = "2nm-aL-kZd"; */
 "2nm-aL-kZd.title" = "循环单位";
+
+/* Class = "NSMenuItem"; title = "New Ruler"; ObjectID = "rWt-KM-qSf"; */
+"rWt-KM-qSf.title" = "新建尺子";
+
+/* Class = "NSMenuItem"; title = "Ruler Settings…"; ObjectID = "rSt-Tg-232"; */
+"rSt-Tg-232.title" = "尺子设置…";

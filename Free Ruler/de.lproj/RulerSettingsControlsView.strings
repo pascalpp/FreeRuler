@@ -1,0 +1,21 @@
+
+/* Class = "NSTextFieldCell"; title = "Background Opacity"; ObjectID = "RSV-bg-cell"; */
+"RSV-bg-cell.title" = "Deckkraft im Hintergrund";
+
+/* Class = "NSTextFieldCell"; title = "Ruler Color"; ObjectID = "RSV-color-cell"; */
+"RSV-color-cell.title" = "Linealfarbe";
+
+/* Class = "NSTextFieldCell"; title = "Dimensions"; ObjectID = "RSV-dimensions-cell"; */
+"RSV-dimensions-cell.title" = "Abmessungen";
+
+/* Class = "NSTextFieldCell"; title = "Foreground Opacity"; ObjectID = "RSV-fg-cell"; */
+"RSV-fg-cell.title" = "Deckkraft im Vordergrund";
+
+/* Class = "NSButtonCell"; title = "Float ruler above other applications"; ObjectID = "RSV-float-cell"; */
+"RSV-float-cell.title" = "Lineal über anderen Programmen schweben lassen";
+
+/* Class = "NSButtonCell"; title = "Show ruler shadow"; ObjectID = "RSV-shadow-cell"; */
+"RSV-shadow-cell.title" = "Linealschatten anzeigen";
+
+/* Class = "NSTextFieldCell"; title = "Unit"; ObjectID = "RSV-unit-cell"; */
+"RSV-unit-cell.title" = "Einheit";

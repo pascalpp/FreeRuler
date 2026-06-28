@@ -1,0 +1,21 @@
+
+/* Class = "NSTextFieldCell"; title = "Background Opacity"; ObjectID = "RSV-bg-cell"; */
+"RSV-bg-cell.title" = "背景の不透明度";
+
+/* Class = "NSTextFieldCell"; title = "Ruler Color"; ObjectID = "RSV-color-cell"; */
+"RSV-color-cell.title" = "定規の色";
+
+/* Class = "NSTextFieldCell"; title = "Dimensions"; ObjectID = "RSV-dimensions-cell"; */
+"RSV-dimensions-cell.title" = "寸法";
+
+/* Class = "NSTextFieldCell"; title = "Foreground Opacity"; ObjectID = "RSV-fg-cell"; */
+"RSV-fg-cell.title" = "前景の不透明度";
+
+/* Class = "NSButtonCell"; title = "Float ruler above other applications"; ObjectID = "RSV-float-cell"; */
+"RSV-float-cell.title" = "定規を常に手前に表示";
+
+/* Class = "NSButtonCell"; title = "Show ruler shadow"; ObjectID = "RSV-shadow-cell"; */
+"RSV-shadow-cell.title" = "定規の影を表示";
+
+/* Class = "NSTextFieldCell"; title = "Unit"; ObjectID = "RSV-unit-cell"; */
+"RSV-unit-cell.title" = "単位";

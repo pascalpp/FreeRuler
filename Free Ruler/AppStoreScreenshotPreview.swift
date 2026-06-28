@@ -899,7 +899,7 @@ private enum AppStoreFlipScreenshotLayout {
 
 private enum AppStorePreferencesScreenshotLayout {
     static let title = "Pick your preferences"
-    static let subtitle = "Change opacity, add shadows, and more."
+    static let subtitle = "Change dimensions, appearance, and more."
     static let previewName = "Preferences"
     static let outputFilename = "06-customize-rulers.png"
     static let backgroundColor = #colorLiteral(red: 0.5181607008, green: 0.4312165375, blue: 0.6487324834, alpha: 1)
@@ -911,13 +911,13 @@ private enum AppStorePreferencesScreenshotLayout {
     static let verticalRulerY: CGFloat = 212
     static let verticalRulerLength: CGFloat = 2050
     static let horizontalRulerX: CGFloat = 100
-    static let horizontalRulerY: CGFloat = 1180
+    static let horizontalRulerY: CGFloat = 1340
     static let horizontalRulerLength: CGFloat = 3000
     static let preferencesWindowX: CGFloat = 680
     static let preferencesWindowY: CGFloat = 540
-    static let preferencesWindowScale: CGFloat = 4
+    static let preferencesWindowScale: CGFloat = 3.5
     static let preferencesContentWidth: CGFloat = 350
-    static let preferencesContentHeight: CGFloat = 333
+    static let preferencesContentHeight: CGFloat = 400
     static let preferencesWindowShadowOpacity: CGFloat = 0.28
     static let preferencesWindowShadowYOffset: CGFloat = -5
 
@@ -1417,7 +1417,7 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         }
     }
 
-    private static func makeMeasureGroupedRulerPlacement() -> AppStoreViewPlacement {
+    private static func makeMeasureRulerWindowPlacement() -> AppStoreViewPlacement {
         let horizontalBoundsSize = NSSize(
             width: AppStoreMeasureScreenshotLayout.horizontalRulerLength / AppStoreMeasureScreenshotLayout.rulerScale,
             height: Ruler.thickness
@@ -1436,7 +1436,7 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
             frame: NSRect(origin: .zero, size: verticalBoundsSize)
         )
         let color = RulerColors(customFill: Prefs.defaultRulerFillColor)
-        let groupedView = GroupedRulerContentView(
+        let rulerWindowView = RulerContentView(
             frame: NSRect(origin: .zero, size: boundsSize),
             horizontalRule: horizontalRule,
             verticalRule: verticalRule
@@ -1446,19 +1446,19 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         verticalRule.color = color
         horizontalRule.showMouseTick = false
         verticalRule.showMouseTick = false
-        groupedView.color = color
-        groupedView.zeroCorner = .topLeft
-        groupedView.needsLayout = true
-        groupedView.layoutSubtreeIfNeeded()
+        rulerWindowView.color = color
+        rulerWindowView.zeroCorner = .topLeft
+        rulerWindowView.needsLayout = true
+        rulerWindowView.layoutSubtreeIfNeeded()
 
         return AppStoreViewPlacement(
-            view: groupedView,
+            view: rulerWindowView,
             frame: AppStoreMeasureScreenshotLayout.groupedRulerRect,
             boundsSize: boundsSize
         )
     }
 
-    private static func makeGroupsGroupedRulerPlacement() -> AppStoreViewPlacement {
+    private static func makeGroupsRulerWindowPlacement() -> AppStoreViewPlacement {
         let horizontalBoundsSize = AppStoreGroupsScreenshotLayout.horizontalBoundsSize
         let verticalBoundsSize = AppStoreGroupsScreenshotLayout.verticalBoundsSize
         let boundsSize = AppStoreGroupsScreenshotLayout.groupedBoundsSize
@@ -1471,7 +1471,7 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
             frame: NSRect(origin: .zero, size: verticalBoundsSize)
         )
         let color = RulerColors(customFill: AppStoreGroupsScreenshotLayout.rulerColor)
-        let groupedView = GroupedRulerContentView(
+        let rulerWindowView = RulerContentView(
             frame: NSRect(origin: .zero, size: boundsSize),
             horizontalRule: horizontalRule,
             verticalRule: verticalRule
@@ -1481,20 +1481,20 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
         verticalRule.color = color
         horizontalRule.showMouseTick = false
         verticalRule.showMouseTick = false
-        groupedView.color = color
-        groupedView.alphaValue = AppStoreGroupsScreenshotLayout.rulerOpacity
-        groupedView.zeroCorner = .topLeft
-        groupedView.needsLayout = true
-        groupedView.layoutSubtreeIfNeeded()
+        rulerWindowView.color = color
+        rulerWindowView.alphaValue = AppStoreGroupsScreenshotLayout.rulerOpacity
+        rulerWindowView.zeroCorner = .topLeft
+        rulerWindowView.needsLayout = true
+        rulerWindowView.layoutSubtreeIfNeeded()
 
         return AppStoreViewPlacement(
-            view: groupedView,
+            view: rulerWindowView,
             frame: AppStoreGroupsScreenshotLayout.groupedRulerRect,
             boundsSize: boundsSize
         )
     }
 
-    private static func makeFlipGroupedRulerPlacements() -> [AppStoreViewPlacement] {
+    private static func makeFlipRulerWindowPlacements() -> [AppStoreViewPlacement] {
         AppStoreFlipScreenshotLayout.rulerSets.map { rulerSet in
             let horizontalBoundsSize = AppStoreFlipScreenshotLayout.horizontalBoundsSize(for: rulerSet)
             let verticalBoundsSize = AppStoreFlipScreenshotLayout.verticalBoundsSize(for: rulerSet)
@@ -1510,7 +1510,7 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
                 zeroCorner: rulerSet.zeroCorner
             )
             let color = RulerColors(customFill: rulerSet.fillColor)
-            let groupedView = GroupedRulerContentView(
+            let rulerWindowView = RulerContentView(
                 frame: NSRect(origin: .zero, size: boundsSize),
                 horizontalRule: horizontalRule,
                 verticalRule: verticalRule
@@ -1520,13 +1520,13 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
             verticalRule.color = color
             horizontalRule.showMouseTick = false
             verticalRule.showMouseTick = false
-            groupedView.color = color
-            groupedView.zeroCorner = rulerSet.zeroCorner
-            groupedView.needsLayout = true
-            groupedView.layoutSubtreeIfNeeded()
+            rulerWindowView.color = color
+            rulerWindowView.zeroCorner = rulerSet.zeroCorner
+            rulerWindowView.needsLayout = true
+            rulerWindowView.layoutSubtreeIfNeeded()
 
             return AppStoreViewPlacement(
-                view: groupedView,
+                view: rulerWindowView,
                 frame: rulerSet.groupedFrame(rulerScale: AppStoreFlipScreenshotLayout.rulerScale),
                 boundsSize: boundsSize
             )
@@ -1547,11 +1547,11 @@ private final class AppStoreScreenshotScenarioNSView: NSView {
     ) -> [AppStoreViewPlacement] {
         switch screen.scenario {
         case .measure:
-            return [makeMeasureGroupedRulerPlacement()]
+            return [makeMeasureRulerWindowPlacement()]
         case .groups:
-            return [makeGroupsGroupedRulerPlacement()]
+            return [makeGroupsRulerWindowPlacement()]
         case .flipRulers:
-            return makeFlipGroupedRulerPlacements()
+            return makeFlipRulerWindowPlacements()
         case .units, .colors:
             return []
         case .preferences:

@@ -3,6 +3,7 @@ import Cocoa
 class HorizontalRule: RuleView {
 
     let transformer = AffineTransform(translationByX: 0.5, byY: 0)
+    let mouseTickTransformer = AffineTransform(translationByX: -0.5, byY: 0)
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
@@ -119,7 +120,11 @@ class HorizontalRule: RuleView {
 
         let windowPoint = window.convertPoint(fromScreen: mouseLoc)
         let viewPoint = convert(windowPoint, from: nil)
-        mouseTickX = viewPoint.x
+        mouseTickX = mouseTickX(forLocalMouseX: viewPoint.x)
+    }
+
+    func mouseTickX(forLocalMouseX localMouseX: CGFloat) -> CGFloat {
+        return localMouseX.rounded()
     }
 
     func drawMouseTick(_ mouseTickX: CGFloat) {
@@ -131,7 +136,7 @@ class HorizontalRule: RuleView {
         mouseTick.move(to: CGPoint(x: lineX, y: 0))
         mouseTick.line(to: CGPoint(x: lineX, y: height))
 
-        mouseTick.transform(using: transformer)
+        mouseTick.transform(using: mouseTickTransformer)
 
         color.mouseTick.setStroke()
         mouseTick.stroke()
@@ -146,7 +151,7 @@ class HorizontalRule: RuleView {
         case .positive:
             zeroTickX = bounds.minX
         case .negative:
-            zeroTickX = bounds.maxX
+            zeroTickX = bounds.maxX - 1
         }
 
         let lineX = mouseTickLineX(forTickX: zeroTickX, growthDirection: growthDirection)
@@ -280,9 +285,9 @@ class HorizontalRule: RuleView {
 
         switch growthDirection {
         case .positive:
-            return mouseTickX
+            return max(0, mouseTickX - 1)
         case .negative:
-            return rulerWidth - mouseTickX
+            return max(0, rulerWidth - mouseTickX)
         }
     }
 
@@ -294,7 +299,7 @@ class HorizontalRule: RuleView {
         case .positive:
             return mouseTickX
         case .negative:
-            return mouseTickX - 1
+            return mouseTickX
         }
     }
 

@@ -8,182 +8,76 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="PreferencesController" customModule="Free_Ruler" customModuleProvider="target">
             <connections>
-                <outlet property="backgroundOpacityLabel" destination="L9c-EP-R2u" id="nAz-JV-OSp"/>
-                <outlet property="backgroundOpacitySlider" destination="vDG-0i-7UH" id="bh7-oU-DQI"/>
-                <outlet property="floatRulersCheckbox" destination="MHD-HA-XYA" id="FQ1-9T-pqJ"/>
-                <outlet property="foregroundOpacityLabel" destination="Fs7-sZ-5IE" id="qfm-M7-boB"/>
-                <outlet property="foregroundOpacitySlider" destination="ZzT-WS-Ex9" id="rug-vL-keS"/>
-                <outlet property="groupRulersCheckbox" destination="GrR-RZ-ofD" id="2Nc-Pt-4iJ"/>
-                <outlet property="resetRulerColorButton" destination="rXy-v5-rst" id="trd-Fi-zY2"/>
-                <outlet property="rulerColorWell" destination="3cj-Zq-t2I" id="HZA-4N-mAw"/>
-                <outlet property="rulerShadowCheckbox" destination="wce-fE-92o" id="Nm0-Wx-NCz"/>
+                <outlet property="resetFactoryDefaultsButton" destination="PREF-factory-button" id="PREF-factory-outlet"/>
+                <outlet property="settingsControlsView" destination="PREF-controls" id="PREF-controls-outlet"/>
                 <outlet property="window" destination="F0z-JX-Cv5" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window title="Free Ruler Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" frameAutosaveName="preferencesWindow" animationBehavior="default" id="F0z-JX-Cv5">
+        <window title="Free Ruler Settings" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" frameAutosaveName="preferencesWindow" animationBehavior="default" id="F0z-JX-Cv5">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
-            <rect key="contentRect" x="602" y="400" width="315" height="332"/>
+            <rect key="contentRect" x="602" y="400" width="360" height="415"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1512" height="944"/>
             <view key="contentView" id="se5-gp-TjO">
-                <rect key="frame" x="0.0" y="0.0" width="315" height="332"/>
+                <rect key="frame" x="0.0" y="0.0" width="360" height="415"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fKJ-pW-Idj">
-                        <rect key="frame" x="18" y="255" width="125" height="16"/>
-                        <textFieldCell key="cell" lineBreakMode="clipping" title="Foreground Opacity" id="BgV-9N-IVn">
-                            <font key="font" metaFont="system"/>
+                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="PREF-defaults-header">
+                        <rect key="frame" x="22" y="387" width="290" height="16"/>
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="Default settings for new rulers" id="PREF-defaults-header-cell">
+                            <font key="font" textStyle="headline" name=".SFNS-Bold"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Fs7-sZ-5IE">
-                        <rect key="frame" x="260" y="255" width="37" height="16"/>
-                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Label" id="Vqd-CI-vmd">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZzT-WS-Ex9">
-                        <rect key="frame" x="18" y="221" width="279" height="28"/>
-                        <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="5" maxValue="100" doubleValue="50" tickMarkPosition="below" numberOfTickMarks="20" allowsTickMarkValuesOnly="YES" sliderType="linear" id="cBe-kv-k4O"/>
-                        <connections>
-                            <action selector="setForegroundOpacity:" target="-2" id="1eU-1v-QVs"/>
-                        </connections>
-                    </slider>
-                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8tT-pC-4Sb">
-                        <rect key="frame" x="18" y="191" width="127" height="16"/>
-                        <textFieldCell key="cell" lineBreakMode="clipping" title="Background Opacity" id="cRb-8z-VZj">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="L9c-EP-R2u">
-                        <rect key="frame" x="260" y="191" width="37" height="16"/>
-                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Label" id="VXi-Ch-Jf5">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vDG-0i-7UH">
-                        <rect key="frame" x="18" y="157" width="279" height="28"/>
-                        <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="5" maxValue="100" doubleValue="50" tickMarkPosition="below" numberOfTickMarks="20" allowsTickMarkValuesOnly="YES" sliderType="linear" id="isR-aS-fmz"/>
-                        <connections>
-                            <action selector="setBackgroundOpacity:" target="-2" id="KAY-mT-HC0"/>
-                        </connections>
-                    </slider>
-                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MHD-HA-XYA">
-                        <rect key="frame" x="18" y="126" width="247" height="18"/>
-                        <buttonCell key="cell" type="check" title="Float rulers above other applications" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="yPM-Cw-Qsi">
-                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="setFloatRulers:" target="-2" id="Mp1-PV-8KT"/>
-                        </connections>
-                    </button>
-                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GrR-RZ-ofD">
-                        <rect key="frame" x="18" y="95" width="102" height="18"/>
-                        <buttonCell key="cell" type="check" title="Group rulers" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="N2Y-8B-L9c">
-                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="setGroupRulers:" target="-2" id="iCX-5R-RRg"/>
-                        </connections>
-                    </button>
-                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Dlw-cH-IYI">
-                        <rect key="frame" x="13" y="18" width="162" height="32"/>
-                        <buttonCell key="cell" type="push" title="Reset Rulers" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="10f-9L-qca">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="resetRulerPositions:" target="-1" id="Wyr-iL-1li"/>
-                        </connections>
-                    </button>
-                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wce-fE-92o">
-                        <rect key="frame" x="18" y="64" width="141" height="18"/>
-                        <buttonCell key="cell" type="check" title="Show ruler shadow" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="l53-85-hoA">
-                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="setRulerShadow:" target="-2" id="Tbm-gn-rr5"/>
-                        </connections>
-                    </button>
-                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eOK-GV-sMs">
-                        <rect key="frame" x="18" y="297" width="72" height="16"/>
-                        <textFieldCell key="cell" lineBreakMode="clipping" title="Ruler Color" id="ydA-TR-Gwu">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <colorWell translatesAutoresizingMaskIntoConstraints="NO" id="3cj-Zq-t2I" customClass="RulerColorWell" customModule="Free_Ruler" customModuleProvider="target">
-                        <rect key="frame" x="234" y="291" width="66" height="28"/>
+                    <box borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="PREF-defaults-box">
+                        <rect key="frame" x="9" y="56" width="342" height="321"/>
+                        <view key="contentView" id="PREF-defaults-box-content">
+                            <rect key="frame" x="4" y="5" width="334" height="313"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <customView translatesAutoresizingMaskIntoConstraints="NO" id="PREF-controls" customClass="RulerSettingsControlsView" customModule="Free_Ruler" customModuleProvider="target">
+                                    <rect key="frame" x="0.0" y="0.0" width="334" height="313"/>
+                                </customView>
+                            </subviews>
+                            <constraints>
+                                <constraint firstItem="PREF-controls" firstAttribute="top" secondItem="PREF-defaults-box-content" secondAttribute="top" id="2PU-zO-13P"/>
+                                <constraint firstItem="PREF-controls" firstAttribute="leading" secondItem="PREF-defaults-box-content" secondAttribute="leading" id="E1g-HQ-LBp"/>
+                                <constraint firstAttribute="bottom" secondItem="PREF-controls" secondAttribute="bottom" id="SZc-2t-9lg"/>
+                                <constraint firstAttribute="trailing" secondItem="PREF-controls" secondAttribute="trailing" id="xvK-u5-loF"/>
+                            </constraints>
+                        </view>
                         <constraints>
-                            <constraint firstAttribute="width" constant="60" id="G7i-q1-eDr"/>
-                            <constraint firstAttribute="height" constant="24" id="sIs-pi-nKw"/>
+                            <constraint firstAttribute="height" constant="315" id="yon-lf-kxx"/>
                         </constraints>
-                        <color key="color" name="systemYellowColor" catalog="System" colorSpace="catalog"/>
-                        <connections>
-                            <action selector="setRulerColor:" target="-2" id="WXz-pT-Afi"/>
-                        </connections>
-                    </colorWell>
-                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="rXy-v5-rst">
-                        <rect key="frame" x="196" y="291" width="28" height="28"/>
-                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" id="PRt-eJ-rst">
+                    </box>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="PREF-factory-button">
+                        <rect key="frame" x="11" y="11" width="183" height="32"/>
+                        <buttonCell key="cell" type="push" title="Reset to factory defaults" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="PREF-factory-cell">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
-                        <color key="bezelColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <connections>
-                            <action selector="resetRulerColor:" target="-2" id="y6f-Cj-rst"/>
+                            <action selector="resetToFactoryDefaults:" target="-2" id="PREF-factory-action"/>
                         </connections>
                     </button>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="fKJ-pW-Idj" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="1Kz-4t-Izh"/>
-                    <constraint firstItem="MHD-HA-XYA" firstAttribute="top" secondItem="vDG-0i-7UH" secondAttribute="bottom" constant="20" id="8aK-CY-f0B"/>
-                    <constraint firstItem="eOK-GV-sMs" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="8qL-pA-2PX"/>
-                    <constraint firstItem="ZzT-WS-Ex9" firstAttribute="top" secondItem="fKJ-pW-Idj" secondAttribute="bottom" constant="8" id="95Z-Nm-R3G"/>
-                    <constraint firstItem="rXy-v5-rst" firstAttribute="width" constant="28" id="9av-oy-rst"/>
-                    <constraint firstAttribute="bottom" secondItem="Dlw-cH-IYI" secondAttribute="bottom" constant="25" id="Amf-On-TbF"/>
-                    <constraint firstItem="wce-fE-92o" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="BmS-kj-FR4"/>
-                    <constraint firstItem="3cj-Zq-t2I" firstAttribute="centerY" secondItem="eOK-GV-sMs" secondAttribute="centerY" id="BpZ-SU-tsT"/>
-                    <constraint firstItem="rXy-v5-rst" firstAttribute="centerY" secondItem="3cj-Zq-t2I" secondAttribute="centerY" id="D6T-VN-qcA"/>
-                    <constraint firstItem="GrR-RZ-ofD" firstAttribute="top" secondItem="MHD-HA-XYA" secondAttribute="bottom" constant="15" id="DMF-Jv-qNT"/>
-                    <constraint firstItem="GrR-RZ-ofD" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="HOJ-20-15i"/>
-                    <constraint firstItem="rXy-v5-rst" firstAttribute="height" constant="28" id="JQs-fw-rst"/>
-                    <constraint firstItem="vDG-0i-7UH" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="JiU-zb-OYE"/>
-                    <constraint firstItem="8tT-pC-4Sb" firstAttribute="top" secondItem="ZzT-WS-Ex9" secondAttribute="bottom" constant="20" id="Os8-lr-m1I"/>
-                    <constraint firstItem="vDG-0i-7UH" firstAttribute="top" secondItem="8tT-pC-4Sb" secondAttribute="bottom" constant="8" id="QpH-M6-Hbl"/>
-                    <constraint firstAttribute="trailing" secondItem="ZzT-WS-Ex9" secondAttribute="trailing" constant="20" id="Z1g-J3-3RE"/>
-                    <constraint firstItem="Dlw-cH-IYI" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="a3p-rK-Pro"/>
-                    <constraint firstAttribute="trailing" secondItem="vDG-0i-7UH" secondAttribute="trailing" constant="20" id="bhX-QR-vP3"/>
-                    <constraint firstItem="ZzT-WS-Ex9" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="cS0-cB-7df"/>
-                    <constraint firstItem="L9c-EP-R2u" firstAttribute="firstBaseline" secondItem="8tT-pC-4Sb" secondAttribute="firstBaseline" id="drC-8c-dJ8"/>
-                    <constraint firstItem="Dlw-cH-IYI" firstAttribute="top" secondItem="wce-fE-92o" secondAttribute="bottom" constant="20" id="ecF-6L-G7y"/>
-                    <constraint firstItem="fKJ-pW-Idj" firstAttribute="top" secondItem="3cj-Zq-t2I" secondAttribute="bottom" constant="22" id="h19-vU-dTi"/>
-                    <constraint firstItem="Fs7-sZ-5IE" firstAttribute="firstBaseline" secondItem="fKJ-pW-Idj" secondAttribute="firstBaseline" id="iVj-L9-5lc"/>
-                    <constraint firstItem="3cj-Zq-t2I" firstAttribute="leading" secondItem="rXy-v5-rst" secondAttribute="trailing" constant="10" id="lWe-Eq-diC"/>
-                    <constraint firstAttribute="trailing" secondItem="L9c-EP-R2u" secondAttribute="trailing" constant="20" id="myW-gj-dmX"/>
-                    <constraint firstItem="MHD-HA-XYA" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="nEe-NO-kRx"/>
-                    <constraint firstAttribute="trailing" secondItem="Fs7-sZ-5IE" secondAttribute="trailing" constant="20" id="o3I-uM-LMk"/>
-                    <constraint firstItem="wce-fE-92o" firstAttribute="top" secondItem="GrR-RZ-ofD" secondAttribute="bottom" constant="15" id="p8g-qX-OTd"/>
-                    <constraint firstItem="8tT-pC-4Sb" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="vFk-iR-SJY"/>
-                    <constraint firstAttribute="trailing" secondItem="3cj-Zq-t2I" secondAttribute="trailing" constant="18" id="wdI-wU-qYh"/>
+                    <constraint firstItem="PREF-defaults-box" firstAttribute="top" secondItem="PREF-defaults-header" secondAttribute="bottom" constant="12" id="PREF-box-below-header"/>
+                    <constraint firstItem="PREF-defaults-box" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="12" id="PREF-box-leading"/>
+                    <constraint firstAttribute="trailing" secondItem="PREF-defaults-box" secondAttribute="trailing" constant="12" id="PREF-box-trailing"/>
+                    <constraint firstAttribute="bottom" secondItem="PREF-factory-button" secondAttribute="bottom" constant="18" id="PREF-button-bottom"/>
+                    <constraint firstItem="PREF-factory-button" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="18" id="PREF-button-leading"/>
+                    <constraint firstItem="PREF-defaults-header" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="24" id="PREF-header-leading"/>
+                    <constraint firstItem="PREF-defaults-header" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" constant="12" id="PREF-header-top"/>
+                    <constraint firstAttribute="trailing" secondItem="PREF-defaults-header" secondAttribute="trailing" constant="50" id="PREF-header-trailing"/>
                 </constraints>
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
             </connections>
-            <point key="canvasLocation" x="121.5" y="231"/>
+            <point key="canvasLocation" x="150" y="240"/>
         </window>
     </objects>
 </document>

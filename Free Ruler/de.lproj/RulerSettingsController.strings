@@ -1,0 +1,9 @@
+
+/* Class = "NSButtonCell"; title = "Reset to default"; ObjectID = "RSET-reset-defaults-cell"; */
+"RSET-reset-defaults-cell.title" = "Auf Standard zurücksetzen";
+
+/* Class = "NSButtonCell"; title = "Save as default"; ObjectID = "RSET-save-defaults-cell"; */
+"RSET-save-defaults-cell.title" = "Als Standard sichern";
+
+/* Class = "NSWindow"; title = "Ruler Settings"; ObjectID = "RSET-window"; */
+"RSET-window.title" = "Lineal-Einstellungen";

@@ -92,6 +92,10 @@ final class ResizeHandleView: NSView {
         restoreRulerCursor(with: event)
     }
 
+    override func menu(for event: NSEvent) -> NSMenu? {
+        return rulerContextMenu(for: self)
+    }
+
     override var mouseDownCanMoveWindow: Bool {
         return false
     }
@@ -129,7 +133,7 @@ final class ResizeHandleView: NSView {
         )
         let nextFrame = resizedRulerFrame(
             orientation: orientation,
-            zeroCorner: prefs.zeroCorner,
+            zeroCorner: zeroCorner,
             initialFrame: dragInitialWindowFrame,
             delta: delta,
             minSize: window.minSize,

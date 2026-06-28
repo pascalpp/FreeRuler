@@ -1,0 +1,21 @@
+
+/* Class = "NSTextFieldCell"; title = "Background Opacity"; ObjectID = "RSV-bg-cell"; */
+"RSV-bg-cell.title" = "Peittävyys taustalla";
+
+/* Class = "NSTextFieldCell"; title = "Ruler Color"; ObjectID = "RSV-color-cell"; */
+"RSV-color-cell.title" = "Viivaimen väri";
+
+/* Class = "NSTextFieldCell"; title = "Dimensions"; ObjectID = "RSV-dimensions-cell"; */
+"RSV-dimensions-cell.title" = "Mitat";
+
+/* Class = "NSTextFieldCell"; title = "Foreground Opacity"; ObjectID = "RSV-fg-cell"; */
+"RSV-fg-cell.title" = "Peittävyys edustalla";
+
+/* Class = "NSButtonCell"; title = "Float ruler above other applications"; ObjectID = "RSV-float-cell"; */
+"RSV-float-cell.title" = "Kelluta viivainta muiden sovellusten päällä";
+
+/* Class = "NSButtonCell"; title = "Show ruler shadow"; ObjectID = "RSV-shadow-cell"; */
+"RSV-shadow-cell.title" = "Näytä viivainten varjot";
+
+/* Class = "NSTextFieldCell"; title = "Unit"; ObjectID = "RSV-unit-cell"; */
+"RSV-unit-cell.title" = "Yksikkö";

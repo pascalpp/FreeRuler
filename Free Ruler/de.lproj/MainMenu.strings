@@ -14,8 +14,8 @@
 /* Class = "NSMenuItem"; title = "Redo"; ObjectID = "6dh-zS-Vam"; */
 "6dh-zS-Vam.title" = "Wiederholen";
 
-/* Class = "NSMenuItem"; title = "Reset Rulers"; ObjectID = "6ph-5N-O9R"; */
-"6ph-5N-O9R.title" = "Lineale zurücksetzen";
+/* Class = "NSMenuItem"; title = "Reset Ruler Position"; ObjectID = "6ph-5N-O9R"; */
+"6ph-5N-O9R.title" = "Linealposition zurücksetzen";
 
 /* Class = "NSMenuItem"; title = "Group Rulers"; ObjectID = "7Ga-Fb-LLc"; */
 "7Ga-Fb-LLc.title" = "Lineale gruppieren";
@@ -26,7 +26,7 @@
 /* Class = "NSMenu"; title = "Main Menu"; ObjectID = "AYu-sK-qS6"; */
 "AYu-sK-qS6.title" = "Main Menu";
 
-/* Class = "NSMenuItem"; title = "Preferences…"; ObjectID = "BOF-NM-1cW"; */
+/* Class = "NSMenuItem"; title = "Settings…"; ObjectID = "BOF-NM-1cW"; */
 "BOF-NM-1cW.title" = "Einstellungen …";
 
 /* Class = "NSMenuItem"; title = "Close"; ObjectID = "DVo-aG-piG"; */
@@ -38,8 +38,8 @@
 /* Class = "NSMenuItem"; title = "Free Ruler Help"; ObjectID = "FKE-Sm-Kum"; */
 "FKE-Sm-Kum.title" = "„Free Ruler“-Hilfe";
 
-/* Class = "NSMenuItem"; title = "Float Rulers"; ObjectID = "GDK-AC-uC8"; */
-"GDK-AC-uC8.title" = "Oben schweben";
+/* Class = "NSMenuItem"; title = "Float Ruler"; ObjectID = "GDK-AC-uC8"; */
+"GDK-AC-uC8.title" = "Lineal schweben lassen";
 
 /* Class = "NSMenuItem"; title = "Flip Horizontal"; ObjectID = "GZl-Zd-Ad4"; */
 "GZl-Zd-Ad4.title" = "Horizontal spiegeln";
@@ -116,8 +116,8 @@
 /* Class = "NSMenu"; title = "Services"; ObjectID = "hz9-B4-Xy5"; */
 "hz9-B4-Xy5.title" = "Dienste";
 
-/* Class = "NSMenuItem"; title = "Align Rulers at Mouse Location"; ObjectID = "iKV-uW-hwy"; */
-"iKV-uW-hwy.title" = "Lineale an Zeigerposition ausrichten";
+/* Class = "NSMenuItem"; title = "Align Ruler at Mouse Location"; ObjectID = "iKV-uW-hwy"; */
+"iKV-uW-hwy.title" = "Lineal an Zeigerposition ausrichten";
 
 /* Class = "NSMenuItem"; title = "Delete"; ObjectID = "pa3-QI-u2k"; */
 "pa3-QI-u2k.title" = "Löschen";
@@ -151,3 +151,9 @@
 
 /* Class = "NSMenuItem"; title = "Cycle Units"; ObjectID = "2nm-aL-kZd"; */
 "2nm-aL-kZd.title" = "Nächste Einheit auswählen";
+
+/* Class = "NSMenuItem"; title = "New Ruler"; ObjectID = "rWt-KM-qSf"; */
+"rWt-KM-qSf.title" = "Neues Lineal";
+
+/* Class = "NSMenuItem"; title = "Ruler Settings…"; ObjectID = "rSt-Tg-232"; */
+"rSt-Tg-232.title" = "Lineal-Einstellungen…";

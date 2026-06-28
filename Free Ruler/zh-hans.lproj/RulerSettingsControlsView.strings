@@ -1,0 +1,21 @@
+
+/* Class = "NSTextFieldCell"; title = "Background Opacity"; ObjectID = "RSV-bg-cell"; */
+"RSV-bg-cell.title" = "背景不透明度";
+
+/* Class = "NSTextFieldCell"; title = "Ruler Color"; ObjectID = "RSV-color-cell"; */
+"RSV-color-cell.title" = "尺子颜色";
+
+/* Class = "NSTextFieldCell"; title = "Dimensions"; ObjectID = "RSV-dimensions-cell"; */
+"RSV-dimensions-cell.title" = "尺寸";
+
+/* Class = "NSTextFieldCell"; title = "Foreground Opacity"; ObjectID = "RSV-fg-cell"; */
+"RSV-fg-cell.title" = "前景不透明度";
+
+/* Class = "NSButtonCell"; title = "Float ruler above other applications"; ObjectID = "RSV-float-cell"; */
+"RSV-float-cell.title" = "让标尺窗口悬浮在其他应用程序之上";
+
+/* Class = "NSButtonCell"; title = "Show ruler shadow"; ObjectID = "RSV-shadow-cell"; */
+"RSV-shadow-cell.title" = "显示尺子阴影";
+
+/* Class = "NSTextFieldCell"; title = "Unit"; ObjectID = "RSV-unit-cell"; */
+"RSV-unit-cell.title" = "单位";

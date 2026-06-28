@@ -17,8 +17,8 @@
 /* Class = "NSMenuItem"; title = "Redo"; ObjectID = "6dh-zS-Vam"; */
 "6dh-zS-Vam.title" = "Rehacer";
 
-/* Class = "NSMenuItem"; title = "Reset Rulers"; ObjectID = "6ph-5N-O9R"; */
-"6ph-5N-O9R.title" = "Restablecer reglas";
+/* Class = "NSMenuItem"; title = "Reset Ruler Position"; ObjectID = "6ph-5N-O9R"; */
+"6ph-5N-O9R.title" = "Restablecer posición de la regla";
 
 /* Class = "NSMenuItem"; title = "Group Rulers"; ObjectID = "7Ga-Fb-LLc"; */
 "7Ga-Fb-LLc.title" = "Agrupar reglas";
@@ -29,8 +29,8 @@
 /* Class = "NSMenuItem"; title = "Millimeters"; ObjectID = "B6Y-Hi-AkN"; */
 "B6Y-Hi-AkN.title" = "Milímetros";
 
-/* Class = "NSMenuItem"; title = "Preferences…"; ObjectID = "BOF-NM-1cW"; */
-"BOF-NM-1cW.title" = "Preferencias…";
+/* Class = "NSMenuItem"; title = "Settings…"; ObjectID = "BOF-NM-1cW"; */
+"BOF-NM-1cW.title" = "Ajustes…";
 
 /* Class = "NSMenuItem"; title = "Close"; ObjectID = "DVo-aG-piG"; */
 "DVo-aG-piG.title" = "Cerrar";
@@ -41,8 +41,8 @@
 /* Class = "NSMenuItem"; title = "Free Ruler Help"; ObjectID = "FKE-Sm-Kum"; */
 "FKE-Sm-Kum.title" = "Ayuda de Free Ruler";
 
-/* Class = "NSMenuItem"; title = "Float Rulers"; ObjectID = "GDK-AC-uC8"; */
-"GDK-AC-uC8.title" = "Reglas flotantes";
+/* Class = "NSMenuItem"; title = "Float Ruler"; ObjectID = "GDK-AC-uC8"; */
+"GDK-AC-uC8.title" = "Regla flotante";
 
 /* Class = "NSMenuItem"; title = "Flip Horizontal"; ObjectID = "GZl-Zd-Ad4"; */
 "GZl-Zd-Ad4.title" = "Voltear horizontalmente";
@@ -122,8 +122,8 @@
 /* Class = "NSMenuItem"; title = "Unit"; ObjectID = "iDP-2z-irv"; */
 "iDP-2z-irv.title" = "Unidad";
 
-/* Class = "NSMenuItem"; title = "Align Rulers at Mouse Location"; ObjectID = "iKV-uW-hwy"; */
-"iKV-uW-hwy.title" = "Alinear reglas con el ratón";
+/* Class = "NSMenuItem"; title = "Align Ruler at Mouse Location"; ObjectID = "iKV-uW-hwy"; */
+"iKV-uW-hwy.title" = "Alinear regla con el ratón";
 
 /* Class = "NSMenuItem"; title = "Inches"; ObjectID = "lt1-Hj-2TR"; */
 "lt1-Hj-2TR.title" = "Pulgadas";
@@ -148,3 +148,9 @@
 
 /* Class = "NSMenuItem"; title = "Copy"; ObjectID = "x3v-GG-iWU"; */
 "x3v-GG-iWU.title" = "Copiar";
+
+/* Class = "NSMenuItem"; title = "New Ruler"; ObjectID = "rWt-KM-qSf"; */
+"rWt-KM-qSf.title" = "Nueva regla";
+
+/* Class = "NSMenuItem"; title = "Ruler Settings…"; ObjectID = "rSt-Tg-232"; */
+"rSt-Tg-232.title" = "Ajustes de regla…";
