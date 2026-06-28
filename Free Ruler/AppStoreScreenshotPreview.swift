@@ -130,20 +130,25 @@ enum AppStoreColorsScreenshotLayout {
 
 enum AppStoreInfinityScreenshotLayout {
     static let title = "Rulers upon rulers"
-    static let subtitle = "Measure to infinity, and beyond."
+    static let subtitle = "Make as many as you want."
     static let previewName = "Infinity"
     static let outputFilename = "03-infinity.png"
     static let backgroundColor = #colorLiteral(red: 0.866, green: 0.93, blue: 0.951, alpha: 1)
     static let bottomBackgroundColor = #colorLiteral(red: 0.624, green: 0.746, blue: 0.882, alpha: 1)
 
+    static let copyViewX: CGFloat = 735
+    static let copyViewY: CGFloat = AppStoreScreenshotLayout.copyViewY
+    static let copyTitleX: CGFloat = 380
+    static let copySubtitleX: CGFloat = copyTitleX
+
     static let inset: CGFloat = 80
     static let startScale: CGFloat = 6
-    static let endScale: CGFloat = 2
-    static let steps = 20
+    static let endScale: CGFloat = 0.01
+    static let steps = 40
     static let startLength: CGFloat = 2486
     static let startHeight: CGFloat = 1400
-    static let decrementLength: CGFloat = 100
-    static let decrementHeight: CGFloat = 100
+    static let secondVerticalOffset: CGFloat = 60
+    static let secondHorizontalLengthReduction: CGFloat = 60
     static let overlap: CGFloat = 0.5
 
     static let rulerColor = Prefs.defaultRulerFillColor

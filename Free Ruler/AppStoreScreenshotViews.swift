@@ -139,6 +139,14 @@ private struct AppStoreFlipRulerSet {
     }
 }
 
+private struct AppStoreInfinityRulerSpec {
+    let zeroCorner: ZeroCorner
+    let horizontalBoundsSize: NSSize
+    let verticalBoundsSize: NSSize
+    let boundsSize: NSSize
+    let frame: NSRect
+}
+
 enum AppStoreScreenshotRenderer {
     static func exportAll(to outputDirectory: URL) throws {
         try FileManager.default.createDirectory(
@@ -1203,72 +1211,210 @@ private extension AppStoreInfinityScreenshotLayout {
         Ruler.thickness
     }
 
-    static func zeroCorner(index: Int) -> ZeroCorner {
-        index.isMultiple(of: 2) ? .bottomLeft : .bottomRight
+    static var minimumScale: CGFloat {
+        0.01
     }
 
-    static func rulerScale(index: Int) -> CGFloat {
-        guard steps > 1 else { return startScale }
-
-        let fraction = CGFloat(index) / CGFloat(steps - 1)
-        return startScale + (endScale - startScale) * fraction
-    }
-
-    static func horizontalLength(index: Int) -> CGFloat {
-        max(minimumRulerLength, startLength - CGFloat(index) * decrementLength)
-    }
-
-    static func verticalLength(index: Int) -> CGFloat {
-        max(minimumRulerLength, startHeight - CGFloat(index) * decrementHeight)
-    }
-
-    static func opacity(index: Int) -> CGFloat {
-        guard steps > 1 else { return 1 }
-
-        let fraction = CGFloat(index) / CGFloat(steps - 1)
-        return 1 + (endOpacity - 1) * fraction
-    }
-
-    static func rulerFrame(index: Int, size: NSSize) -> NSRect {
-        let x: CGFloat
-        switch zeroCorner(index: index) {
-        case .bottomLeft:
-            x = sideInset(index: index)
-        case .bottomRight:
-            x = AppStoreScreenshotLayout.canvasWidth - sideInset(index: index) - size.width
-        case .topLeft, .topRight:
-            x = sideInset(index: index)
-        }
-
-        return NSRect(
-            x: x,
-            y: AppStoreScreenshotLayout.canvasHeight - bottomInset(index: index) - size.height,
-            width: size.width,
-            height: size.height
+    static var copyViewLayout: AppStoreScreenshotCopyViewLayout {
+        AppStoreScreenshotCopyViewLayout(
+            viewX: copyViewX,
+            viewY: copyViewY,
+            iconX: AppStoreScreenshotLayout.copyIconX,
+            iconY: AppStoreScreenshotLayout.copyIconY,
+            iconSize: AppStoreScreenshotLayout.copyIconSize,
+            titleX: copyTitleX,
+            titleY: AppStoreScreenshotLayout.copyTitleY,
+            titleWidth: AppStoreScreenshotLayout.titleWidth,
+            titleHeight: AppStoreScreenshotLayout.titleHeight,
+            subtitleX: copySubtitleX,
+            subtitleY: AppStoreScreenshotLayout.copySubtitleY,
+            subtitleWidth: AppStoreScreenshotLayout.subtitleWidth,
+            subtitleHeight: AppStoreScreenshotLayout.subtitleHeight
         )
     }
 
-    private static func sideInset(index: Int) -> CGFloat {
-        let pairIndex = index / 2
-        guard pairIndex > 0 else { return inset }
-
-        let revealDistance = (1...pairIndex).reduce(CGFloat.zero) { distance, pair in
-            distance + rulerRevealDistance(index: pair * 2)
-        }
-        return inset + revealDistance
+    static var baseRulerScale: CGFloat {
+        max(startScale, minimumScale)
     }
 
-    private static func bottomInset(index: Int) -> CGFloat {
-        guard index > 0 else { return inset }
-
-        let revealDistance = (1...index).reduce(CGFloat.zero) { distance, rulerIndex in
-            distance + rulerRevealDistance(index: rulerIndex) / 2
-        }
-        return inset + revealDistance
+    static var endPairScale: CGFloat {
+        min(1, max(endScale, minimumScale) / baseRulerScale)
     }
 
-    private static func rulerRevealDistance(index: Int) -> CGFloat {
-        Ruler.thickness * rulerScale(index: index) * (1 - clampedOverlap)
+    static var stepCount: Int {
+        max(steps, 1)
+    }
+
+    static var baseHorizontalLength: CGFloat {
+        max(minimumRulerLength, startLength / baseRulerScale)
+    }
+
+    static var verticalLength: CGFloat {
+        max(minimumRulerLength, startHeight / baseRulerScale)
+    }
+
+    static var secondVerticalLength: CGFloat {
+        max(minimumRulerLength, (startHeight - clampedSecondVerticalOffset) / baseRulerScale)
+    }
+
+    static var pairGroupWidth: CGFloat {
+        max(0, AppStoreScreenshotLayout.canvasWidth - inset * 2)
+    }
+
+    static var clampedSecondVerticalOffset: CGFloat {
+        min(max(secondVerticalOffset, 0), max(0, startHeight - minimumRulerLength * baseRulerScale))
+    }
+
+    static var clampedSecondHorizontalLengthReduction: CGFloat {
+        min(max(secondHorizontalLengthReduction, 0), max(0, startLength - minimumRulerLength * baseRulerScale))
+    }
+
+    static var baseRulerSpecs: [AppStoreInfinityRulerSpec] {
+        [
+            baseRulerSpec(
+                zeroCorner: .bottomRight,
+                scale: baseRulerScale,
+                bottomInset: inset + clampedSecondVerticalOffset,
+                verticalLength: secondVerticalLength,
+                horizontalLengthReduction: clampedSecondHorizontalLengthReduction
+            ),
+            baseRulerSpec(
+                zeroCorner: .bottomLeft,
+                scale: baseRulerScale,
+                bottomInset: inset,
+                verticalLength: verticalLength,
+                horizontalLengthReduction: 0
+            ),
+        ]
+    }
+
+    static var basePairFrame: NSRect {
+        guard let firstSpec = baseRulerSpecs.first else {
+            return .zero
+        }
+
+        return baseRulerSpecs
+            .dropFirst()
+            .reduce(firstSpec.frame) { frame, spec in
+                frame.union(spec.frame)
+            }
+    }
+
+    static func pairScale(index: Int) -> CGFloat {
+        guard stepCount > 1 else { return 1 }
+
+        return pow(pairScaleRatio, CGFloat(index))
+    }
+
+    private static var pairScaleRatio: CGFloat {
+        max(targetPairScaleRatio, minimumOverlapPairScaleRatio)
+    }
+
+    private static var targetPairScaleRatio: CGFloat {
+        pow(endPairScale, 1 / CGFloat(stepCount - 1))
+    }
+
+    private static var minimumOverlapPairScaleRatio: CGFloat {
+        guard pairGroupWidth > 0 else { return 1 }
+
+        let revealDistance = Ruler.thickness * baseRulerScale * (1 - clampedOverlap)
+        let ratio = 1 - revealDistance / (pairGroupWidth / 2)
+        return min(max(ratio, 0), 1)
+    }
+
+    static func opacity(index: Int) -> CGFloat {
+        guard stepCount > 1 else { return 1 }
+
+        let fraction = CGFloat(index) / CGFloat(stepCount - 1)
+        return 1 + (endOpacity - 1) * fraction
+    }
+
+    static func rulerFrame(for baseFrame: NSRect, pairIndex: Int) -> NSRect {
+        scaled(baseFrame, around: basePairCenter, by: pairScale(index: pairIndex))
+    }
+
+    private static var basePairCenter: NSPoint {
+        NSPoint(x: basePairFrame.midX, y: basePairFrame.midY)
+    }
+
+    private static func baseRulerSpec(
+        zeroCorner: ZeroCorner,
+        scale: CGFloat,
+        bottomInset: CGFloat,
+        verticalLength: CGFloat,
+        horizontalLengthReduction: CGFloat
+    ) -> AppStoreInfinityRulerSpec {
+        let horizontalLength = max(
+            minimumRulerLength,
+            horizontalLength(scale: scale, zeroCorner: zeroCorner) - horizontalLengthReduction / scale
+        )
+        let horizontalBoundsSize = NSSize(
+            width: horizontalLength,
+            height: Ruler.thickness
+        )
+        let verticalBoundsSize = NSSize(
+            width: Ruler.thickness,
+            height: verticalLength
+        )
+        let boundsSize = RulerWindowLayout.layout(
+            horizontalLength: horizontalBoundsSize.width,
+            verticalLength: verticalBoundsSize.height,
+            zeroPoint: .zero,
+            zeroCorner: zeroCorner
+        ).groupFrame.size
+        let frameSize = NSSize(
+            width: boundsSize.width * scale,
+            height: boundsSize.height * scale
+        )
+        let x: CGFloat
+        switch zeroCorner {
+        case .bottomLeft, .topLeft:
+            x = inset
+        case .bottomRight, .topRight:
+            x = AppStoreScreenshotLayout.canvasWidth - inset - frameSize.width
+        }
+
+        return AppStoreInfinityRulerSpec(
+            zeroCorner: zeroCorner,
+            horizontalBoundsSize: horizontalBoundsSize,
+            verticalBoundsSize: verticalBoundsSize,
+            boundsSize: boundsSize,
+            frame: NSRect(
+                x: x,
+                y: AppStoreScreenshotLayout.canvasHeight - bottomInset - frameSize.height,
+                width: frameSize.width,
+                height: frameSize.height
+            )
+        )
+    }
+
+    private static func horizontalLength(scale: CGFloat, zeroCorner: ZeroCorner) -> CGFloat {
+        let requiredHorizontalLength = pairGroupWidth / scale - groupWidthExtra(zeroCorner: zeroCorner)
+        return max(minimumRulerLength, baseHorizontalLength, requiredHorizontalLength)
+    }
+
+    private static func groupWidthExtra(zeroCorner: ZeroCorner) -> CGFloat {
+        switch zeroCorner {
+        case .bottomLeft, .topLeft:
+            return Ruler.thickness - ZeroCornerGeometry.borderCompensation
+        case .bottomRight, .topRight:
+            return Ruler.thickness
+        }
+    }
+
+    private static func scaled(_ rect: NSRect, around point: NSPoint, by scale: CGFloat) -> NSRect {
+        let center = NSPoint(x: rect.midX, y: rect.midY)
+        let scaledSize = NSSize(width: rect.width * scale, height: rect.height * scale)
+        let scaledCenter = NSPoint(
+            x: point.x + (center.x - point.x) * scale,
+            y: point.y + (center.y - point.y) * scale
+        )
+        return NSRect(
+            x: scaledCenter.x - scaledSize.width / 2,
+            y: scaledCenter.y - scaledSize.height / 2,
+            width: scaledSize.width,
+            height: scaledSize.height
+        )
     }
 }
 
@@ -1289,7 +1435,8 @@ private final class AppStoreInfinityScreenshotView: AppStoreScreenshotCanvasView
     init() {
         super.init(
             screen: Self.screen,
-            viewPlacements: Self.makeRulerWindowPlacements()
+            viewPlacements: Self.makeRulerWindowPlacements(),
+            copyViewLayout: Layout.copyViewLayout
         )
     }
 
@@ -1298,45 +1445,30 @@ private final class AppStoreInfinityScreenshotView: AppStoreScreenshotCanvasView
     }
 
     private static func makeRulerWindowPlacements() -> [AppStoreViewPlacement] {
-        (0..<Layout.steps).reversed().map { index in
-            makeRulerWindowPlacement(index: index)
+        (0..<Layout.stepCount).reversed().flatMap { pairIndex in
+            Layout.baseRulerSpecs.map { spec in
+                makeRulerWindowPlacement(spec: spec, pairIndex: pairIndex)
+            }
         }
     }
 
-    private static func makeRulerWindowPlacement(index: Int) -> AppStoreViewPlacement {
-        let scale = Layout.rulerScale(index: index)
-        let zeroCorner = Layout.zeroCorner(index: index)
-        let horizontalBoundsSize = NSSize(
-            width: Layout.horizontalLength(index: index) / scale,
-            height: Ruler.thickness
-        )
-        let verticalBoundsSize = NSSize(
-            width: Ruler.thickness,
-            height: Layout.verticalLength(index: index) / scale
-        )
-        let boundsSize = RulerWindowLayout.layout(
-            horizontalLength: horizontalBoundsSize.width,
-            verticalLength: verticalBoundsSize.height,
-            zeroPoint: .zero,
-            zeroCorner: zeroCorner
-        ).groupFrame.size
-        let frameSize = NSSize(
-            width: boundsSize.width * scale,
-            height: boundsSize.height * scale
-        )
+    private static func makeRulerWindowPlacement(
+        spec: AppStoreInfinityRulerSpec,
+        pairIndex: Int
+    ) -> AppStoreViewPlacement {
         let horizontalRule = AppStoreHorizontalRule(
             unit: .pixels,
-            frame: NSRect(origin: .zero, size: horizontalBoundsSize),
-            zeroCorner: zeroCorner
+            frame: NSRect(origin: .zero, size: spec.horizontalBoundsSize),
+            zeroCorner: spec.zeroCorner
         )
         let verticalRule = AppStoreVerticalRule(
             unit: .pixels,
-            frame: NSRect(origin: .zero, size: verticalBoundsSize),
-            zeroCorner: zeroCorner
+            frame: NSRect(origin: .zero, size: spec.verticalBoundsSize),
+            zeroCorner: spec.zeroCorner
         )
         let color = RulerColors(customFill: Layout.rulerColor)
         let rulerWindowView = RulerContentView(
-            frame: NSRect(origin: .zero, size: boundsSize),
+            frame: NSRect(origin: .zero, size: spec.boundsSize),
             horizontalRule: horizontalRule,
             verticalRule: verticalRule
         )
@@ -1347,14 +1479,14 @@ private final class AppStoreInfinityScreenshotView: AppStoreScreenshotCanvasView
         verticalRule.showMouseTick = false
         rulerWindowView.color = color
         rulerWindowView.alphaValue = 1
-        rulerWindowView.zeroCorner = zeroCorner
+        rulerWindowView.zeroCorner = spec.zeroCorner
         rulerWindowView.needsLayout = true
         rulerWindowView.layoutSubtreeIfNeeded()
 
         return AppStoreViewPlacement(
             view: rulerWindowView,
-            frame: Layout.rulerFrame(index: index, size: frameSize),
-            boundsSize: boundsSize
+            frame: Layout.rulerFrame(for: spec.frame, pairIndex: pairIndex),
+            boundsSize: spec.boundsSize
         )
     }
 }
