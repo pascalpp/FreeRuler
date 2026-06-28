@@ -1323,10 +1323,10 @@ private extension AppStoreInfinityScreenshotLayout {
     }
 
     static func opacity(index: Int) -> CGFloat {
-        guard stepCount > 1 else { return 1 }
+        guard stepCount > 1 else { return startOpacity }
 
         let fraction = CGFloat(index) / CGFloat(stepCount - 1)
-        return 1 + (endOpacity - 1) * fraction
+        return startOpacity + (endOpacity - startOpacity) * fraction
     }
 
     static func rulerFrame(for baseFrame: NSRect, pairIndex: Int) -> NSRect {
@@ -1428,7 +1428,7 @@ private final class AppStoreInfinityScreenshotView: AppStoreScreenshotCanvasView
         outputFilename: Layout.outputFilename,
         backgroundColor: Layout.backgroundColor,
         bottomBackgroundColor: Layout.bottomBackgroundColor,
-        usesDarkCopy: true,
+        usesDarkCopy: Layout.useDarkCopy,
         makeView: { AppStoreInfinityScreenshotView() }
     )
 
@@ -1478,7 +1478,7 @@ private final class AppStoreInfinityScreenshotView: AppStoreScreenshotCanvasView
         horizontalRule.showMouseTick = false
         verticalRule.showMouseTick = false
         rulerWindowView.color = color
-        rulerWindowView.alphaValue = 1
+        rulerWindowView.alphaValue = Layout.opacity(index: pairIndex)
         rulerWindowView.zeroCorner = spec.zeroCorner
         rulerWindowView.needsLayout = true
         rulerWindowView.layoutSubtreeIfNeeded()

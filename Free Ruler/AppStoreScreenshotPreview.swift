@@ -100,8 +100,8 @@ enum AppStoreColorsScreenshotLayout {
     static let subtitle = "Follow your heart. Be hue you want to be."
     static let previewName = "Colors"
     static let outputFilename = "02-custom-colors.png"
-    static let backgroundColor = #colorLiteral(red: 0.6497740259, green: 0.7557746611, blue: 0.9677759309, alpha: 1)
-    static let bottomBackgroundColor = #colorLiteral(red: 0.875857736, green: 0.8972384907, blue: 0.94, alpha: 1)
+    static let bottomBackgroundColor = #colorLiteral(red: 0.6497740259, green: 0.7557746611, blue: 0.9677759309, alpha: 1)
+    static let backgroundColor = #colorLiteral(red: 0.875857736, green: 0.8972384907, blue: 0.94, alpha: 1)
 
     static let rulerOpacity: CGFloat = 1
     static let rulerCount = 7
@@ -133,12 +133,13 @@ enum AppStoreInfinityScreenshotLayout {
     static let subtitle = "Make as many as you want."
     static let previewName = "Infinity"
     static let outputFilename = "03-infinity.png"
-    static let backgroundColor = #colorLiteral(red: 0.866, green: 0.93, blue: 0.951, alpha: 1)
-    static let bottomBackgroundColor = #colorLiteral(red: 0.624, green: 0.746, blue: 0.882, alpha: 1)
+    static let bottomBackgroundColor = #colorLiteral(red: 0.49, green: 0.7, blue: 0.63, alpha: 1)
+    static let backgroundColor = #colorLiteral(red: 0.3, green: 0.6, blue: 0.4999999999, alpha: 1)
 
-    static let copyViewX: CGFloat = 735
+    static let useDarkCopy = false
+    static let copyViewX: CGFloat = 780
     static let copyViewY: CGFloat = AppStoreScreenshotLayout.copyViewY
-    static let copyTitleX: CGFloat = 380
+    static let copyTitleX: CGFloat = 390
     static let copySubtitleX: CGFloat = copyTitleX
 
     static let inset: CGFloat = 80
@@ -152,7 +153,8 @@ enum AppStoreInfinityScreenshotLayout {
     static let overlap: CGFloat = 0.5
 
     static let rulerColor = Prefs.defaultRulerFillColor
-    static let endOpacity: CGFloat = 0.62
+    static let startOpacity: CGFloat = 1
+    static let endOpacity: CGFloat = 0.1
 }
 
 enum AppStoreGroupsScreenshotLayout {
