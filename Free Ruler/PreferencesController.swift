@@ -892,6 +892,7 @@ final class RulerSettingsWindow: NSPanel {
 final class RulerSettingsController: NSWindowController, NSWindowDelegate {
 
     private weak var rulerController: RulerController?
+    private weak var interactionSuspendedRulerController: RulerController?
     private var colorPanelObserver: NSObjectProtocol?
     private var didConfigureWindow = false
 
@@ -997,6 +998,7 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
     }
 
     deinit {
+        clearRulerInteractionSuspension()
         if let colorPanelObserver = colorPanelObserver {
             NotificationCenter.default.removeObserver(colorPanelObserver)
         }
@@ -1009,6 +1011,7 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         window?.makeKeyAndOrderFront(sender)
         window?.makeFirstResponder(unitSegmentedControl)
         window?.center()
+        updateRulerInteractionSuspension()
     }
 
     func show(attachedTo controller: RulerController, sender: Any?) {
@@ -1022,6 +1025,7 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
             settingsWindow.orderFront(sender)
             settingsWindow.makeKey()
             settingsWindow.makeFirstResponder(unitSegmentedControl)
+            updateRulerInteractionSuspension()
             return
         }
 
@@ -1041,9 +1045,11 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         settingsWindow.orderFront(sender)
         settingsWindow.makeKey()
         settingsWindow.makeFirstResponder(unitSegmentedControl)
+        updateRulerInteractionSuspension()
     }
 
     override func close() {
+        clearRulerInteractionSuspension()
         detachWindowIfNeeded()
         super.close()
     }
@@ -1053,12 +1059,14 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
     }
 
     func windowWillClose(_ notification: Notification) {
+        clearRulerInteractionSuspension()
         detachWindowIfNeeded()
         closeSheetColorControls()
     }
 
     func updateRulerController(_ controller: RulerController) {
         rulerController = controller
+        updateRulerInteractionSuspension()
         updateView()
     }
 
@@ -1278,6 +1286,25 @@ final class RulerSettingsController: NSWindowController, NSWindowDelegate {
         if colorPanel.parent === settingsWindow {
             position(colorPanel, attachedTo: settingsWindow)
         }
+    }
+
+    private func updateRulerInteractionSuspension() {
+        guard window?.isVisible == true,
+              let controller = rulerController else {
+            clearRulerInteractionSuspension()
+            return
+        }
+
+        guard interactionSuspendedRulerController !== controller else { return }
+
+        clearRulerInteractionSuspension()
+        controller.suspendRulerInteraction(owner: self)
+        interactionSuspendedRulerController = controller
+    }
+
+    private func clearRulerInteractionSuspension() {
+        interactionSuspendedRulerController?.resumeRulerInteraction(owner: self)
+        interactionSuspendedRulerController = nil
     }
 
     private func applySettings(_ update: (inout RulerSettings) -> Void) {
